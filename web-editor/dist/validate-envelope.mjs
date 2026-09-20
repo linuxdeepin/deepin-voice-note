@@ -15372,6 +15372,31 @@ const FontSizeMark = Mark2.create({
     return ["span", mergeAttributes(HTMLAttributes), 0];
   }
 });
+function normalizeFontWeight(value) {
+  const normalized = String(value ?? "").trim().toLowerCase();
+  if (!normalized) return null;
+  if (normalized === "normal" || normalized === "400") return "normal";
+  if (normalized === "bold" || normalized === "700") return "700";
+  return normalized;
+}
+const FontWeightMark = Mark2.create({
+  name: "fontWeight",
+  addAttributes() {
+    return {
+      fontWeight: {
+        default: null,
+        parseHTML: (element) => normalizeFontWeight(element.style.fontWeight),
+        renderHTML: (attributes) => attributes.fontWeight ? { style: `font-weight: ${attributes.fontWeight}` } : {}
+      }
+    };
+  },
+  parseHTML() {
+    return [{ tag: "span[style*=font-weight]" }];
+  },
+  renderHTML({ HTMLAttributes }) {
+    return ["span", mergeAttributes(HTMLAttributes), 0];
+  }
+});
 var inputRegex = /(?:^|\s)(!\[(.+|:?)]\((\S+)(?:(?:\s+)["'](\S+)["'])?\))$/;
 var Image = Node3.create({
   name: "image",
@@ -16533,13 +16558,6 @@ let currentSearchState = {
   currentVoiceId: null,
   version: 0
 };
-function subscribeSearchState(callback) {
-  if (typeof callback !== "function") return () => {
-  };
-  subscribers.add(callback);
-  callback(currentSearchState);
-  return () => subscribers.delete(callback);
-}
 function notifySearchState(state) {
   currentSearchState = {
     query: String(state?.query ?? ""),
@@ -16552,47 +16570,12 @@ function notifySearchState(state) {
     callback(currentSearchState);
   }
 }
-function renderHighlightedText(element, text, query, className = "dvn-search-match") {
-  if (!element) return;
-  const source = String(text ?? "");
-  const needle = String(query ?? "");
-  element.replaceChildren();
-  if (!source || !needle) {
-    element.textContent = source;
-    return;
-  }
-  const lowerSource = source.toLocaleLowerCase();
-  const lowerNeedle = needle.toLocaleLowerCase();
-  let pos = 0;
-  let match = lowerSource.indexOf(lowerNeedle, pos);
-  while (match >= 0) {
-    if (match > pos) {
-      element.appendChild(document.createTextNode(source.slice(pos, match)));
-    }
-    const span = document.createElement("span");
-    span.className = className;
-    span.textContent = source.slice(match, match + needle.length);
-    element.appendChild(span);
-    pos = match + needle.length;
-    match = lowerSource.indexOf(lowerNeedle, pos);
-  }
-  if (pos < source.length) {
-    element.appendChild(document.createTextNode(source.slice(pos)));
-  }
-}
-function textMatchesQuery(text, query) {
-  const source = String(text ?? "");
-  const needle = String(query ?? "");
-  return !!needle && source.toLocaleLowerCase().includes(needle.toLocaleLowerCase());
-}
 if (typeof document !== "undefined" && !document.getElementById("dvn-search-style")) {
   const style = document.createElement("style");
   style.id = "dvn-search-style";
   style.textContent = `
-    .dvn-search-match { background: var(--dvn-search-match-bg, rgba(255, 214, 0, 0.55)); border-radius: 2px; }
-    .dvn-search-current { background: var(--dvn-search-current-bg, rgba(255, 150, 0, 0.75)); }
-    .dvn-search-voice-match .voiceInfoBox { outline: 2px solid var(--dvn-search-match-outline, rgba(255, 214, 0, 0.75)); outline-offset: 1px; }
-    .dvn-search-current-voice .voiceInfoBox { outline-color: var(--dvn-search-current-outline, rgba(255, 150, 0, 0.95)); }
+    .dvn-search-match { background: var(--dvn-search-match-bg, #0081ff); color: var(--dvn-search-match-fg, #ffffff); border-radius: 2px; }
+    .dvn-search-current { background: var(--dvn-search-current-bg, #0081ff); }
   `;
   document.head.appendChild(style);
 }
@@ -16643,18 +16626,6 @@ function buildSearchState(doc2, query, currentIndex = 0) {
       return false;
     }
     if (node.type?.name === "voiceBlock") {
-      const voiceId = node.attrs?.voiceId;
-      const titleMatched = normalize(node.attrs?.title).includes(normalize(normalizedQuery));
-      const transcriptMatched = normalize(node.attrs?.text).includes(normalize(normalizedQuery));
-      if (voiceId && (titleMatched || transcriptMatched)) {
-        const index = matches2.length;
-        matchedVoiceIds.add(voiceId);
-        if (transcriptMatched) matchedVoiceTranscriptIds.add(voiceId);
-        matches2.push({ type: "voiceBlock", from: pos, to: pos + node.nodeSize, voiceId });
-        decorations.push(Decoration.node(pos, pos + node.nodeSize, {
-          class: index === currentIndex ? "dvn-search-voice-match dvn-search-current-voice" : "dvn-search-voice-match"
-        }));
-      }
       return false;
     }
     return true;
@@ -17048,8 +17019,6 @@ const VoiceBlock = Node3.create({
       let unplayable = false;
       let currentNode = node;
       let destroyed = false;
-      let activeSearchQuery = "";
-      let transcriptMatchedBySearch = false;
       const wrapper = document.createElement("div");
       wrapper.className = "voiceBox";
       wrapper.setAttribute("data-type", "voice-block");
@@ -17152,12 +17121,7 @@ const VoiceBlock = Node3.create({
       translate.appendChild(translateText);
       box.appendChild(translate);
       function renderTranscriptText() {
-        const text = currentNode.attrs.text || "";
-        if (transcriptMatchedBySearch) {
-          renderHighlightedText(translateText, text, activeSearchQuery);
-        } else {
-          translateText.textContent = text;
-        }
+        translateText.textContent = currentNode.attrs.text || "";
       }
       function refreshState() {
         playback.classList.toggle("play", playing);
@@ -17165,16 +17129,12 @@ const VoiceBlock = Node3.create({
         playback.classList.toggle("voiceToText", translating);
         playback.classList.toggle("unplayable", unplayable);
         const hasText = !!(currentNode.attrs.text && currentNode.attrs.text.length > 0);
-        currentNode.attrs.voiceId;
-        const voiceMatchedBySearch = !!activeSearchQuery && textMatchesQuery(currentNode.attrs.title, activeSearchQuery);
-        transcriptMatchedBySearch = !!activeSearchQuery && textMatchesQuery(currentNode.attrs.text, activeSearchQuery);
-        box.classList.toggle("dvn-search-voice-attrs-match", voiceMatchedBySearch || transcriptMatchedBySearch);
         box.classList.toggle("containText", hasText);
         toTextTrigger.style.display = "none";
         createTimeEl.style.display = playing || paused || translating ? "none" : "";
         const unfold = currentNode.attrs.translateUnfold !== false;
         translateHeader.classList.toggle("unfold", unfold);
-        translateText.style.display = hasText && (unfold || transcriptMatchedBySearch) ? "" : "none";
+        translateText.style.display = hasText && unfold ? "" : "none";
         renderTranscriptText();
         const pct = duration > 0 ? Math.min(progress / duration * 100, 100) : 0;
         progressBar.style.setProperty("--progressValue", pct + "%");
@@ -17428,10 +17388,6 @@ const VoiceBlock = Node3.create({
           refreshState();
         }
       });
-      const unsubscribeSearch = subscribeSearchState((state) => {
-        activeSearchQuery = state?.query || "";
-        refreshState();
-      });
       refreshState();
       return {
         dom: wrapper,
@@ -17468,7 +17424,6 @@ const VoiceBlock = Node3.create({
           if (destroyed) return;
           destroyed = true;
           unsubscribe();
-          unsubscribeSearch();
           wrapper.removeEventListener("beforeinput", onVoiceBoxBeforeInput);
           wrapper.removeEventListener("input", onVoiceBoxInput);
           wrapper.removeEventListener("keydown", onVoiceBoxKeyDown);
@@ -17616,7 +17571,8 @@ function createTiptapSchemaV1() {
     ColorMark,
     index_default$1.configure({ multicolor: true }),
     FontFamilyMark,
-    FontSizeMark
+    FontSizeMark,
+    FontWeightMark
   ]);
 }
 const TIPTAP_FORMAT = "tiptap";
@@ -17644,7 +17600,8 @@ const SCHEMA_V1_MARKS = Object.freeze([
   "color",
   "highlight",
   "fontFamily",
-  "fontSize"
+  "fontSize",
+  "fontWeight"
 ]);
 const MAX_NODE_DEPTH = 100;
 const URL_SCHEME_RE = /^([a-z][a-z0-9+.-]*):/i;

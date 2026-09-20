@@ -514,6 +514,52 @@ test('heading dropdown reflects collapsed cursor heading context', () => {
   editor.destroy()
 })
 
+test('heading default bold drives bold button and selected heading text can cancel it', () => {
+  const { editor, host } = createEditorWithToolbar()
+  insertText(editor, 'title')
+  selectText(editor)
+
+  const select = host.querySelector('select[data-control="heading"]')
+  const boldButton = host.querySelector('button[data-format="bold"]')
+  assert.ok(select && boldButton)
+
+  boldButton.click()
+  boldButton.click()
+  assert.equal(boldButton.getAttribute('aria-pressed'), 'false', 'precondition: manual bold state is off before heading selection')
+
+  select.value = '2'
+  select.dispatchEvent(new Event('change'))
+
+  assert.ok(editor.isActive('heading', { level: 2 }))
+  assert.equal(boldButton.getAttribute('aria-pressed'), 'true', 'heading default bold should activate the bold button')
+
+  editor.chain().focus().setTextSelection(findTextRange(editor, 'title')).run()
+  boldButton.click()
+
+  assert.equal(boldButton.getAttribute('aria-pressed'), 'false', 'normal-weight heading text should deactivate bold')
+  assert.ok(textHasMark(editor, 'title', 'fontWeight'), 'heading text should carry a normal font-weight override')
+  assert.equal(textMarkAttrs(editor, 'title', 'fontWeight').fontWeight, 'normal')
+  assert.ok(!textHasMark(editor, 'title', 'bold'), 'turning off heading bold should not leave a redundant bold mark')
+
+  select.value = '3'
+  select.dispatchEvent(new Event('change'))
+
+  assert.ok(editor.isActive('heading', { level: 3 }), 'switching heading level should keep the text as heading')
+  assert.equal(boldButton.getAttribute('aria-pressed'), 'true', 'switching heading level should restore heading default bold')
+  assert.ok(!textHasMark(editor, 'title', 'fontWeight'), 'heading level switch should clear normal-weight override')
+
+  boldButton.click()
+  assert.equal(boldButton.getAttribute('aria-pressed'), 'false', 'heading default bold can still be cancelled after level switch')
+  assert.ok(textHasMark(editor, 'title', 'fontWeight'))
+
+  boldButton.click()
+
+  assert.equal(boldButton.getAttribute('aria-pressed'), 'true', 'removing the override should restore heading default bold')
+  assert.ok(!textHasMark(editor, 'title', 'fontWeight'), 'normal font-weight override should be cleared')
+  assert.ok(editor.isActive('heading', { level: 3 }), 'text should remain a heading after toggling bold')
+  editor.destroy()
+})
+
 test('empty heading keeps the body placeholder on the active heading line', () => {
   const { editor, host, appElement } = createEditorWithToolbar()
   const select = host.querySelector('select[data-control="heading"]')
@@ -1094,6 +1140,20 @@ function textHasMark(editor, text, markName) {
     if (!exists) throw new Error(`text not found: ${text}`)
   }
   return found
+}
+
+function textMarkAttrs(editor, text, markName) {
+  let attrs = null
+  editor.state.doc.descendants((node) => {
+    if (node.isText && node.text?.includes(text)) {
+      const mark = node.marks.find((item) => item.type.name === markName)
+      attrs = mark?.attrs ?? null
+      return false
+    }
+    return true
+  })
+  if (attrs == null) throw new Error(`mark not found: ${markName} on ${text}`)
+  return attrs
 }
 
 function findTextEndPosition(editor, text) {

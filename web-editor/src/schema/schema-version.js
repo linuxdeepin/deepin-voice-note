@@ -29,4 +29,5 @@ export const SCHEMA_V1_MARKS = Object.freeze([
   'highlight',
   'fontFamily',
   'fontSize',
+  'fontWeight',
 ])

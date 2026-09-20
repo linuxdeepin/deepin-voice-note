@@ -22,6 +22,7 @@ import Highlight from '@tiptap/extension-highlight'
 import { ColorMark } from '../extensions/color-mark.js'
 import { FontFamilyMark } from '../extensions/font-family-mark.js'
 import { FontSizeMark } from '../extensions/font-size-mark.js'
+import { FontWeightMark } from '../extensions/font-weight-mark.js'
 import { ImageBlock } from '../extensions/image-block.js'
 import { VoiceBlock } from '../extensions/voice-block.js'
 
@@ -48,5 +49,6 @@ export function createTiptapSchemaV1() {
     Highlight.configure({ multicolor: true }),
     FontFamilyMark,
     FontSizeMark,
+    FontWeightMark,
   ])
 }

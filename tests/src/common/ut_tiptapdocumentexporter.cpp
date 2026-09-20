@@ -138,6 +138,8 @@ QString sampleEnvelope()
 {
     QJsonObject colorAttrs;
     colorAttrs.insert(QStringLiteral("color"), QStringLiteral("#123456"));
+    QJsonObject weightAttrs;
+    weightAttrs.insert(QStringLiteral("fontWeight"), QStringLiteral("normal"));
 
     QJsonObject doc;
     doc.insert(QStringLiteral("type"), QStringLiteral("doc"));
@@ -145,7 +147,8 @@ QString sampleEnvelope()
                    heading(2, QStringLiteral("导出标题")),
                    paragraph(QJsonArray { textNode(QStringLiteral("正文")),
                                           textNode(QStringLiteral("加粗"), QJsonArray { mark(QStringLiteral("bold")) }),
-                                          textNode(QStringLiteral("彩色"), QJsonArray { mark(QStringLiteral("color"), colorAttrs) }) }),
+                                          textNode(QStringLiteral("彩色"), QJsonArray { mark(QStringLiteral("color"), colorAttrs) }),
+                                          textNode(QStringLiteral("字重"), QJsonArray { mark(QStringLiteral("fontWeight"), weightAttrs) }) }),
                    nestedBulletList(),
                    taskList(),
                    paragraph(QJsonArray { imageNode(QStringLiteral("images/export-test.png"), QStringLiteral("截图Alt"), QStringLiteral("截图标题")) }),
@@ -193,7 +196,7 @@ TEST(UT_TiptapDocumentExporter, plainTextExportsStructuredNodes)
     const QString text = TiptapDocumentExporter::toPlainText(sampleEnvelope());
 
     EXPECT_TRUE(text.contains(QStringLiteral("导出标题")));
-    EXPECT_TRUE(text.contains(QStringLiteral("正文加粗彩色")));
+    EXPECT_TRUE(text.contains(QStringLiteral("正文加粗彩色字重")));
     EXPECT_TRUE(text.contains(QStringLiteral("- 父项\n  - 子项")));
     EXPECT_TRUE(text.contains(QStringLiteral("[x] 任务完成")));
     EXPECT_TRUE(text.contains(QStringLiteral("[图片: 截图标题]")));
@@ -214,6 +217,7 @@ TEST(UT_TiptapDocumentExporter, htmlExportsImagesTranscriptAndMarks)
     EXPECT_TRUE(html.contains(QStringLiteral("<h2>导出标题</h2>")));
     EXPECT_TRUE(html.contains(QStringLiteral("<strong>加粗</strong>")));
     EXPECT_TRUE(html.contains(QStringLiteral("style=\"color:#123456\"")));
+    EXPECT_TRUE(html.contains(QStringLiteral("style=\"font-weight:normal\"")));
     EXPECT_TRUE(html.contains(QStringLiteral("<ul><li><p>父项</p><ul><li><p>子项</p></li></ul></li></ul>")));
     EXPECT_TRUE(html.contains(QStringLiteral("data-type=\"taskItem\" data-checked=\"true\"")));
     EXPECT_TRUE(html.contains(QStringLiteral("<img")));
@@ -271,7 +275,7 @@ TEST(UT_TiptapDocumentExporter, exportWorkerWritesTiptapPlainText)
     QFile file(dir.filePath(QStringLiteral("tiptap-note.txt")));
     ASSERT_TRUE(file.open(QIODevice::ReadOnly | QIODevice::Text));
     const QString text = QString::fromUtf8(file.readAll());
-    EXPECT_TRUE(text.contains(QStringLiteral("正文加粗彩色")));
+    EXPECT_TRUE(text.contains(QStringLiteral("正文加粗彩色字重")));
     EXPECT_TRUE(text.contains(QStringLiteral("[图片: 截图标题]")));
     EXPECT_TRUE(text.contains(QStringLiteral("语音转写结果")));
     EXPECT_FALSE(text.contains(QStringLiteral("[语音:")));
