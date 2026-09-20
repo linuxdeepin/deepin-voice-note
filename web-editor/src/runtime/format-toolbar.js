@@ -185,7 +185,7 @@ function injectTaskListStyles() {
     'ul[data-type="taskList"] > li > div > ul[data-type="taskList"] > li > div > ul[data-type="taskList"] > li > div > ul[data-type="taskList"] { padding-left: 0; }',
     'ul[data-type="taskList"] > li[data-dvn-indent-level="1"] > div > ul[data-type="taskList"] { margin-left: -40px; }',
     'ul[data-type="taskList"] > li[data-dvn-indent-level="2"] > div > ul[data-type="taskList"] { margin-left: -60px; }',
-    'ul[data-type="taskList"] > li { display: flex; align-items: flex-start; gap: 0; }',
+    'ul[data-type="taskList"] > li { display: flex; align-items: center; gap: 0; }',
     'ul[data-type="taskList"] > li > label { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 20px; width: 20px; height: 1.72em; margin: 0; background: transparent; }',
     'ul[data-type="taskList"] > li > label > input[type="checkbox"] { margin: 0; accent-color: var(--highlightColor, #007AFF); }',
     'ul[data-type="taskList"] > li > div { flex: 1 1 auto; min-width: 0; }',

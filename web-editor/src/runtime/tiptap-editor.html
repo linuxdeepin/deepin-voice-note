@@ -48,8 +48,40 @@
     /* Match legacy Summernote list spacing from saved note CSS.
        Browser defaults indent lists too far and can make migrated long lines
        wrap earlier than the original note. */
-    .ProseMirror ul, .ProseMirror ol { margin: 0; padding-left: 20px; }
-    .ProseMirror ul:not([data-type="taskList"]) { list-style-type: disc; }
+    .ProseMirror ul, .ProseMirror ol { margin: 0; padding-left: 0; }
+    .ProseMirror ul:not([data-type="taskList"]) > li,
+    .ProseMirror ol > li {
+      list-style: none;
+      display: grid;
+      grid-template-columns: 20px minmax(0, 1fr);
+      align-items: center;
+      column-gap: 0;
+    }
+    .ProseMirror ul:not([data-type="taskList"]) > li::before,
+    .ProseMirror ol > li::before {
+      grid-column: 1;
+      grid-row: 1;
+      align-self: center;
+      justify-self: center;
+      font-size: 14px;
+      line-height: 1;
+      color: currentColor;
+    }
+    .ProseMirror ul:not([data-type="taskList"]) > li::before { content: "•"; }
+    .ProseMirror ol { counter-reset: dvn-ordered-list; }
+    .ProseMirror ol > li { counter-increment: dvn-ordered-list; }
+    .ProseMirror ol > li::before {
+      content: counter(dvn-ordered-list) ".";
+      justify-self: end;
+      padding-right: 4px;
+      box-sizing: border-box;
+    }
+    .ProseMirror ul:not([data-type="taskList"]) > li > p,
+    .ProseMirror ol > li > p { grid-column: 2; grid-row: 1; }
+    .ProseMirror ul:not([data-type="taskList"]) > li > ul,
+    .ProseMirror ul:not([data-type="taskList"]) > li > ol,
+    .ProseMirror ol > li > ul,
+    .ProseMirror ol > li > ol { grid-column: 2; }
     .ProseMirror li li li ul, .ProseMirror li li li ol { padding-left: 0; }
     .ProseMirror li[data-dvn-indent-level="1"] { margin-left: 20px; }
     .ProseMirror li[data-dvn-indent-level="2"] { margin-left: 40px; }

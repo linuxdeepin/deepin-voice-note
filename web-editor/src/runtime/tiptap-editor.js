@@ -20,6 +20,7 @@ import { setTiptapSearchQuery, clearTiptapSearch } from './search-extension.js'
 import { currentTranscriptCopyText, copyTranscriptTextViaBridge, installTranscriptCopyHandler } from './transcript-copy.js'
 import { installEmptyPlaceholderState } from './empty-placeholder-state.js'
 import { createResourceInsertionSelection } from './resource-insertion-selection.js'
+import { installNormalListMarkerSync } from './normal-list-markers.js'
 
 // ---------------------------------------------------------------------------
 // 编辑器初始化模块（本接口不替换此模块）
@@ -134,6 +135,7 @@ const appElement = document.getElementById('app')
 const editor = createTiptapEditor(appElement)
 const resourceInsertionSelection = createResourceInsertionSelection(editor)
 installEmptyPlaceholderState(editor, appElement)
+installNormalListMarkerSync(editor)
 let tiptapBridge = null
 if (typeof window !== 'undefined') {
   window.__dvnTiptapEditor = editor

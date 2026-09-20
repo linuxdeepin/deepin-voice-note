@@ -1199,13 +1199,15 @@ test('task list style keeps checkbox and text on the same row', () => {
   assert.match(style.textContent, /ul\[data-type="taskList"\] > li > div > ul\[data-type="taskList"\] > li > div > ul\[data-type="taskList"\] > li > div > ul\[data-type="taskList"\] \{ padding-left: 0;/)
   assert.match(style.textContent, /ul\[data-type="taskList"\] > li\[data-dvn-indent-level="1"\] > div > ul\[data-type="taskList"\] \{ margin-left: -40px;/)
   assert.match(style.textContent, /ul\[data-type="taskList"\] > li\[data-dvn-indent-level="2"\] > div > ul\[data-type="taskList"\] \{ margin-left: -60px;/)
-  assert.match(style.textContent, /ul\[data-type="taskList"\] > li \{ display: flex; align-items: flex-start; gap: 0;/)
+  assert.match(style.textContent, /ul\[data-type="taskList"\] > li \{ display: flex; align-items: center; gap: 0;/)
   assert.equal(/ul\[data-type="taskList"\] li \{ display: flex/.test(style.textContent), false, 'task list row style must not hide markers of nested bullet/ordered lists')
   assert.match(style.textContent, /ul\[data-type="taskList"\] > li > label \{ display: inline-flex; align-items: center; justify-content: center;[^}]*flex: 0 0 20px; width: 20px;[^}]*height: 1\.72em; margin: 0; background: transparent;/)
   assert.match(style.textContent, /ul\[data-type="taskList"\] > li > label > input\[type="checkbox"\] \{ margin: 0; accent-color: var\(--highlightColor, #007AFF\);/)
   assert.equal(/ul\[data-type="taskList"\] > li\[data-checked="true"\] > label/.test(style.textContent), false, 'checked task label must not paint a dark background around checkbox')
   assert.equal(style.textContent.includes('background: var(--backgroundColor'), false, 'task checkbox wrapper must not reuse editor background in dark mode')
-  assert.match(tiptapEditorHtml, /\.ProseMirror ul:not\(\[data-type="taskList"\]\) \{ list-style-type: disc; \}/)
+  assert.match(tiptapEditorHtml, /\.ProseMirror ul:not\(\[data-type="taskList"\]\) > li,[\s\S]*\.ProseMirror ol > li \{[\s\S]*display: grid;[\s\S]*align-items: center;/)
+  assert.match(tiptapEditorHtml, /\.ProseMirror ul:not\(\[data-type="taskList"\]\) > li::before \{ content: "•"; \}/)
+  assert.match(tiptapEditorHtml, /\.ProseMirror ol > li::before \{[\s\S]*content: counter\(dvn-ordered-list\) "\.";/)
   assert.match(tiptapEditorHtml, /\.ProseMirror li\[data-dvn-indent-level="1"\] \{ margin-left: 20px; \}/)
   assert.match(tiptapEditorHtml, /\.ProseMirror li\[data-dvn-indent-level="2"\] \{ margin-left: 40px; \}/)
   assert.match(tiptapEditorHtml, /li\[data-dvn-indent-level="1"\] > ul,[\s\S]*margin-left: -20px;/)
@@ -2328,3 +2330,66 @@ test('save and reload preserves list type, nesting, start and checked', () => {
   editor.destroy()
   editor2.destroy()
 })
+test('font size wraps underline and strike marks so text decoration follows large text in paragraphs and lists', () => {
+  const { editor } = createEditorWithToolbar()
+  const largeStrikeText = (text) => ({
+    type: 'text',
+    text,
+    marks: [
+      { type: 'fontSize', attrs: { fontSize: '36px' } },
+      { type: 'strike' },
+    ],
+  })
+  const largeUnderlineText = (text) => ({
+    type: 'text',
+    text,
+    marks: [
+      { type: 'fontSize', attrs: { fontSize: '36px' } },
+      { type: 'underline' },
+    ],
+  })
+  const listItem = (text) => ({
+    type: 'listItem',
+    content: [{ type: 'paragraph', content: [largeStrikeText(text)] }],
+  })
+
+  editor.commands.setContent({
+    type: 'doc',
+    content: [
+      {
+        type: 'paragraph',
+        content: [
+          largeStrikeText('paragraphStrike'),
+          { type: 'text', text: ' ' },
+          largeUnderlineText('paragraphUnderline'),
+        ],
+      },
+      {
+        type: 'bulletList',
+        content: [listItem('bulletStrike')],
+      },
+      {
+        type: 'orderedList',
+        attrs: { start: 1, type: null },
+        content: [listItem('orderedStrike')],
+      },
+      {
+        type: 'taskList',
+        content: [{
+          type: 'taskItem',
+          attrs: { checked: false },
+          content: [{ type: 'paragraph', content: [largeStrikeText('taskStrike')] }],
+        }],
+      },
+    ],
+  })
+
+  const html = editor.getHTML()
+  assert.match(html, /<span style="font-size: 36px;"><s>paragraphStrike<\/s><\/span>/)
+  assert.match(html, /<span style="font-size: 36px;"><u>paragraphUnderline<\/u><\/span>/)
+  assert.match(html, /<ul><li><p><span style="font-size: 36px;"><s>bulletStrike<\/s><\/span><\/p><\/li><\/ul>/)
+  assert.match(html, /<ol><li><p><span style="font-size: 36px;"><s>orderedStrike<\/s><\/span><\/p><\/li><\/ol>/)
+  assert.match(html, /<ul data-type="taskList"><li data-checked="false" data-type="taskItem"><label><input type="checkbox"><span><\/span><\/label><div><p><span style="font-size: 36px;"><s>taskStrike<\/s><\/span><\/p><\/div><\/li><\/ul>/)
+  editor.destroy()
+})
+
