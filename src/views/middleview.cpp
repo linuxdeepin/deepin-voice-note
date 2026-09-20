@@ -451,6 +451,7 @@ void MiddleView::mousePressEvent(QMouseEvent *event)
             }
             //仅左/中键
             else {
+                m_touchPressPoint = event->pos();
                 setTouchState(TouchPressing);
                 setModifierState(ModifierState::noModifier);
                 setMouseState(MouseState::pressing);

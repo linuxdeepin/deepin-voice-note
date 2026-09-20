@@ -77,6 +77,7 @@ void WebRichTextEditor::initWebView()
     if (nullptr != focusProxy()) {
         focusProxy()->installEventFilter(this);
     }
+    qApp->installEventFilter(this);
 }
 
 void WebRichTextEditor::initFontsInformation()
@@ -836,12 +837,28 @@ void WebRichTextEditor::clearJSContent()
 
 bool WebRichTextEditor::eventFilter(QObject *o, QEvent *e)
 {
-    if (o == focusProxy()) {
-        if (e->type() == QEvent::MouseButtonRelease) {
-            QMouseEvent *event = dynamic_cast<QMouseEvent *>(e);
-            if (event) {
-                m_mouseClickPos = event->globalPos();
+    if (e->type() == QEvent::MouseButtonPress && o == focusProxy()) {
+        QMouseEvent *pressEvent = dynamic_cast<QMouseEvent *>(e);
+        if (pressEvent && pressEvent->button() == Qt::LeftButton) {
+            m_isMouseSelecting = true;
+        }
+    }
+
+    if (e->type() == QEvent::MouseButtonRelease) {
+        QMouseEvent *releaseEvent = dynamic_cast<QMouseEvent *>(e);
+        if (releaseEvent && releaseEvent->button() == Qt::LeftButton) {
+            if (o == focusProxy()) {
+                m_mouseClickPos = releaseEvent->globalPos();
+            } else if (m_isMouseSelecting && m_loadFinshSign) {
+                page()->runJavaScript(
+                    "if (window.getSelection().toString()) {"
+                    "  setTimeout(function() {"
+                    "    $('#summernote').summernote('airPopover.update');"
+                    "  }, 10);"
+                    "}"
+                );
             }
+            m_isMouseSelecting = false;
         }
     }
     return QWebEngineView::eventFilter(o, e);
