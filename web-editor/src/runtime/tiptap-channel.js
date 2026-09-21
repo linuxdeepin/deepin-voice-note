@@ -495,6 +495,7 @@ function applyTheme(theme, highlightColor, disableHighlightColor, backgroundColo
   root.style.setProperty('--dvn-toolbar-hover-fg', isDark ? 'rgba(255, 255, 255, 0.95)' : 'rgba(0, 0, 0, 0.85)')
   root.style.setProperty('--dvn-clear-btn-bg', isDark ? '#2d2d2d' : '#fafafa')
   root.style.setProperty('--dvn-color-chip-border', isDark ? 'rgba(255, 255, 255, 0.18)' : 'rgba(0, 0, 0, 0.20)')
+  root.style.setProperty('--dvn-color-transparent-bg', isDark ? '#242424' : '#ffffff')
   root.style.setProperty('--dvn-color-transparent-line', isDark ? 'rgba(255, 255, 255, 0.32)' : 'rgba(0, 0, 0, 0.25)')
   root.style.setProperty('--dvn-active-outline', highlightColor || '#0086cc')
   // Summernote 深色主题在 #242424 画布上使用白色 5% 的语音块背景。
