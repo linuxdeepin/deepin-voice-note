@@ -326,6 +326,39 @@ test('more button highlights only while the more panel is opened', () => {
   editor.destroy()
 })
 
+test('opening a main-toolbar color palette closes the more menu', () => {
+  const { host, editor, window } = createEditorWithToolbar()
+  const toolbar = host.querySelector('[data-testid="format-toolbar"]')
+  let hasOverflow = false
+
+  Object.defineProperty(host, 'clientWidth', {
+    configurable: true,
+    get: () => 616,
+  })
+  Object.defineProperty(toolbar, 'scrollWidth', {
+    configurable: true,
+    get: () => {
+      hasOverflow = Boolean(toolbar.querySelector('.tiptap-overflow-panel'))
+      return hasOverflow ? 600 : 700
+    },
+  })
+  window.dispatchEvent(new window.Event('resize'))
+
+  const moreButton = toolbar.querySelector('button[data-format="more"]')
+  const foreButton = toolbar.querySelector('button[data-color-menu="foreColor"]')
+  const forePanel = toolbar.querySelector('[data-panel="foreColor"]')
+  assert.ok(moreButton && foreButton && forePanel)
+  assert.equal(foreButton.closest('.tiptap-overflow-panel'), null, 'color button should remain in the main toolbar')
+
+  moreButton.click()
+  assert.equal(moreButton.getAttribute('aria-expanded'), 'true')
+
+  foreButton.click()
+  assert.equal(moreButton.getAttribute('aria-expanded'), 'false', 'opening a main-toolbar color palette should close more')
+  assert.equal(forePanel.style.display, 'grid')
+  editor.destroy()
+})
+
 test('color palettes remain usable when their controls are folded into the more menu', () => {
   const { host, editor, window } = createEditorWithToolbar()
   const toolbar = host.querySelector('[data-testid="format-toolbar"]')
@@ -357,10 +390,12 @@ test('color palettes remain usable when their controls are folded into the more 
   foreButton.click()
   assert.equal(forePanel.style.display, 'grid')
   assert.equal(backPanel.style.display, 'none')
+  assert.equal(moreButton.getAttribute('aria-expanded'), 'true', 'more should stay open when its child color palette opens')
 
   backButton.click()
   assert.equal(backPanel.style.display, 'grid')
   assert.equal(forePanel.style.display, 'none')
+  assert.equal(moreButton.getAttribute('aria-expanded'), 'true', 'more should stay open when switching child palettes')
 
   // The overflow popover must not clip a palette positioned below its trigger.
   assert.match(toolbarCss, /\.tiptap-overflow-panel \{[\s\S]*overflow: visible;/)
