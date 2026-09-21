@@ -484,8 +484,11 @@ function applyTheme(theme, highlightColor, disableHighlightColor, backgroundColo
   root.style.setProperty('--dvn-toolbar-border', isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.08)')
   root.style.setProperty('--dvn-toolbar-fg', isDark ? 'rgba(192, 198, 212, 1)' : 'rgba(63, 63, 63, 1)')
   root.style.setProperty('--dvn-editor-fg', isDark ? 'rgba(192, 198, 212, 1)' : 'rgba(0, 0, 0, 1)')
+  // 浅色主题使用设计稿的黑色 30% 透明度；深色主题使用 Summernote 的浅色
+  // 文字色，避免黑色透明文字与 #242424 背景融为一体。正文占位符继续
+  // 使用较弱的灰色，与标题的层级保持区分。
   root.style.setProperty('--dvn-title-fg', isDark ? 'rgba(192, 198, 212, 1)' : 'rgba(0, 0, 0, 0.30)')
-  root.style.setProperty('--dvn-placeholder-fg', isDark ? 'rgba(109, 124, 136, 1)' : 'rgba(0, 0, 0, 0.25)')
+  root.style.setProperty('--dvn-placeholder-fg', isDark ? 'rgba(109, 124, 136, 1)' : 'rgba(0, 0, 0, 0.30)')
   root.style.setProperty('--dvn-toolbar-separator', isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)')
   root.style.setProperty('--dvn-scrollbar-thumb', isDark ? 'rgba(255, 255, 255, 0.20)' : 'rgba(0, 0, 0, 0.30)')
   root.style.setProperty('--dvn-scrollbar-thumb-hover', isDark ? 'rgba(255, 255, 255, 0.25)' : 'rgba(0, 0, 0, 0.50)')
