@@ -12,11 +12,10 @@ import VNote 1.0
 
 // 迁移升级覆盖层，避免与旧 QWidget UpgradeView 类型名冲突。
 // 使用 DTK Declarative 原生 WaterProgressBar 复刻原始 QWidget UpgradeView。
-// 页面只覆盖 titlebar 下方的 central widget 区域。
+// 迁移期间作为全窗口遮罩显示，覆盖包括 QML titlebar 在内的全部内容。
 Item {
     id: root
 
-    property int titleBarHeight: 0
 
     readonly property int progressValue: {
         if (MigrationViewController.stage === "Migrating"
@@ -31,33 +30,21 @@ Item {
     z: 9999
 
     Rectangle {
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.top: parent.top
-        anchors.topMargin: root.titleBarHeight
-        anchors.bottom: parent.bottom
+        anchors.fill: parent
         color: Window.window
                ? Window.window.palette.window
                : (DTK.themeType === ApplicationHelper.LightType ? "#FFFFFF" : "#242424")
     }
 
-    // central widget 区域阻止迁移期间的编辑器交互，但不覆盖 titlebar。
+    // 全窗口阻止迁移期间的所有交互，包括 QML titlebar 区域。
     MouseArea {
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.top: parent.top
-        anchors.topMargin: root.titleBarHeight
-        anchors.bottom: parent.bottom
+        anchors.fill: parent
         acceptedButtons: Qt.AllButtons
         z: 1
     }
 
     ColumnLayout {
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.top: parent.top
-        anchors.topMargin: root.titleBarHeight
-        anchors.bottom: parent.bottom
+        anchors.fill: parent
         spacing: 0
         z: 2
 
@@ -85,7 +72,9 @@ Item {
                    ? Window.window.palette.text
                    : (DTK.themeType === ApplicationHelper.LightType ? "#000000" : "#FFFFFF")
             font.pixelSize: 14
-            text: qsTr("Importing notes from the old version, please wait...")
+            // 复用旧 QWidget UpgradeView 已有翻译上下文，避免 QML 文件名
+            // 变更导致运行时找不到既有 ts/qm 翻译。
+            text: qsTranslate("UpgradeView", "Importing notes from the old version, please wait...")
         }
 
         Item {

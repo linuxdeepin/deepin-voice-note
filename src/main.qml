@@ -116,7 +116,7 @@ ApplicationWindow {
         id: settingDlgLoader
     }
 
-    // 迁移期间只覆盖主窗口内容区，保留原有 titlebar 区域。
+    // 迁移期间覆盖整个主窗口，避免 titlebar 区域残留或可交互。
     MigrationUpgradeView {
         Accessible.name: "MainWindow_UpgradeView"
         Accessible.role: Accessible.Pane
@@ -124,7 +124,6 @@ ApplicationWindow {
         id: migrationView
 
         anchors.fill: parent
-        titleBarHeight: workspaceLoader.active ? 50 : 40
     }
 
     Connections {
