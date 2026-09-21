@@ -476,7 +476,7 @@
 }
 
 .tiptap-color-panel button[data-color="transparent"] {
-    background: #ffffff !important;
+    background: var(--dvn-color-transparent-bg, #ffffff) !important;
     overflow: hidden;
 }
 

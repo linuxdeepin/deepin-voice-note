@@ -706,7 +706,10 @@ Item {
             active: TiptapChannel.tiptapEnabled
             // 搜索无结果时由 noSearchRect 占据编辑区，Tiptap 不应继续参与布局，
             // 否则会被 ColumnLayout 排到无结果区域下方，导致工具栏出现在底部。
-            visible: active && !noSearchResult
+            // 多选占位页显示时 webVisible=false；此时 Tiptap Loader 不能继续
+            // 参与 ColumnLayout 分配高度，否则多选插图和操作浮窗会被挤到
+            // 编辑内容区下半部分，看起来不在内容区居中。
+            visible: active && !noSearchResult && rootItem.webVisible
             Layout.fillHeight: true
             Layout.fillWidth: true
 
@@ -856,8 +859,8 @@ Item {
         Loader {
             id: multipleChoicesLoader
 
-            Layout.fillHeight: parent.height
-            Layout.fillWidth: parent.width
+            Layout.fillHeight: true
+            Layout.fillWidth: true
             visible: false
 
             sourceComponent: MultipleChoices {

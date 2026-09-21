@@ -4,7 +4,6 @@
 import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import org.deepin.dtk 1.0
-import "../" as VNoteComponents
 
 Item {
     id: rootWindow
@@ -55,7 +54,8 @@ Item {
             }
 
             FloatingPanel {
-                property int fontSize: 6
+                id: operationPanel
+                property font actionFont: DTK.fontManager.t8
 
                 Layout.topMargin: 20
                 implicitHeight: 52
@@ -63,15 +63,25 @@ Item {
                 radius: 6
 
                 contentItem: RowLayout {
+                    anchors.fill: parent
+                    anchors.margins: 6
                     spacing: 0
 
-                    VNoteComponents.VNoteToolButton {
+                    ToolButton {
                         Accessible.name: "MoveButton"
                         Accessible.ignored: false
                         Accessible.role: Accessible.Button
+                        Layout.preferredWidth: 40
+                        Layout.preferredHeight: 40
+                        display: AbstractButton.TextUnderIcon
                         icon.name: "move_note"
-                        implicitHeight: 40
-                        implicitWidth: 40
+                        icon.width: 16
+                        icon.height: 16
+                        font: operationPanel.actionFont
+                        leftPadding: 0
+                        rightPadding: 0
+                        topPadding: 0
+                        bottomPadding: 0
                         enabled: moveEnabled
                         text: qsTr("Move")
 
@@ -80,15 +90,21 @@ Item {
                         }
                     }
 
-                    VNoteComponents.VNoteToolButton {
+                    ToolButton {
                         Accessible.name: "SaveNoteButton"
                         Accessible.ignored: false
                         Accessible.role: Accessible.Button
+                        Layout.preferredWidth: 48
+                        Layout.preferredHeight: 40
+                        display: AbstractButton.TextUnderIcon
                         icon.name: "save_note"
-                        implicitHeight: 40
-                        implicitWidth: 48
+                        icon.width: 16
+                        icon.height: 16
+                        font: operationPanel.actionFont
                         leftPadding: 0
                         rightPadding: 0
+                        topPadding: 0
+                        bottomPadding: 0
                         text: qsTr("Save Note")
 
                         onClicked: {
@@ -96,15 +112,21 @@ Item {
                         }
                     }
 
-                    VNoteComponents.VNoteToolButton {
+                    ToolButton {
                         Accessible.name: "SaveVoiceButton"
                         Accessible.ignored: false
                         Accessible.role: Accessible.Button
+                        Layout.preferredWidth: 48
+                        Layout.preferredHeight: 40
+                        display: AbstractButton.TextUnderIcon
                         icon.name: "save_audio"
-                        implicitHeight: 40
-                        implicitWidth: 48
+                        icon.width: 16
+                        icon.height: 16
+                        font: operationPanel.actionFont
                         leftPadding: 0
                         rightPadding: 0
+                        topPadding: 0
+                        bottomPadding: 0
                         text: qsTr("Save Voice")
                         enabled: saveVoiceEnabled
 
@@ -113,13 +135,21 @@ Item {
                         }
                     }
 
-                    VNoteComponents.VNoteToolButton {
+                    ToolButton {
                         Accessible.name: "DeleteButton"
                         Accessible.ignored: false
                         Accessible.role: Accessible.Button
+                        Layout.preferredWidth: 40
+                        Layout.preferredHeight: 40
+                        display: AbstractButton.TextUnderIcon
                         icon.name: "delete"
-                        implicitHeight: 40
-                        implicitWidth: 40
+                        icon.width: 16
+                        icon.height: 16
+                        font: operationPanel.actionFont
+                        leftPadding: 0
+                        rightPadding: 0
+                        topPadding: 0
+                        bottomPadding: 0
                         enabled: deleteEnabled
                         text: qsTr("Delete")
 
