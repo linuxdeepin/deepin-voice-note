@@ -497,6 +497,9 @@ Item {
             id: titleBarHost
 
             Layout.fillWidth: true
+            // 没有笔记时其余区域均为不可见项，ColumnLayout 会把固定高度项
+            // 按默认 alignment 放到可用空间中间；标题栏必须始终贴在顶部。
+            Layout.alignment: Qt.AlignTop
             Layout.minimumHeight: 50
             Layout.maximumHeight: 50
 
