@@ -240,16 +240,57 @@ function buildColorPicker(editor, kind, colors, apply, clear, readActive, onOpen
   })
 
   function openPanel() {
-    onOpen?.()
+    onOpen?.(wrapper)
     panel.style.display = 'grid'
     wrapper.classList.add('is-open')
     menuButton.setAttribute('aria-expanded', 'true')
+    positionPanelInOverflow()
+  }
+
+  function resetPanelPosition() {
+    panel.style.position = ''
+    panel.style.left = ''
+    panel.style.top = ''
+    panel.style.right = ''
+  }
+
+  function positionPanelInOverflow() {
+    const overflow = wrapper.closest('.tiptap-overflow-panel')
+    if (!overflow?.classList.contains('is-open')) {
+      resetPanelPosition()
+      return
+    }
+
+    // 颜色面板是 overflow 面板里的子弹层。若继续使用 absolute +
+    // top: 100%，它会被父面板的内容区域覆盖，视觉上与“更多”面板重叠。
+    // 改成 fixed 后按触发按钮的位置计算，既保留父面板，也不遮挡其工具按钮。
+    const margin = 6
+    const viewportWidth = window.innerWidth || document.documentElement.clientWidth || 0
+    const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0
+    const triggerRect = wrapper.getBoundingClientRect()
+    const panelWidth = panel.offsetWidth || 153
+    const panelHeight = panel.offsetHeight || 0
+    let left = triggerRect.left
+    let top = triggerRect.bottom + 4
+
+    if (viewportWidth) {
+      left = Math.max(margin, Math.min(left, viewportWidth - panelWidth - margin))
+    }
+    if (viewportHeight && top + panelHeight > viewportHeight - margin && triggerRect.top - panelHeight - 4 >= margin) {
+      top = triggerRect.top - panelHeight - 4
+    }
+
+    panel.style.position = 'fixed'
+    panel.style.left = `${Math.round(left)}px`
+    panel.style.top = `${Math.round(top)}px`
+    panel.style.right = 'auto'
   }
 
   function closePanel() {
     panel.style.display = 'none'
     wrapper.classList.remove('is-open')
     menuButton.setAttribute('aria-expanded', 'false')
+    resetPanelPosition()
   }
 
   function togglePanel() {
@@ -626,7 +667,8 @@ export function createFormatToolbar(editor, host) {
     (editor, color) => applyMarkColor(editor, 'color', 'color', color),
     (editor) => clearMarkColor(editor, 'color'),
     () => editor.getAttributes('color').color,
-    () => {
+    (pickerWrapper) => {
+      if (!overflowPanel.contains(pickerWrapper)) closeOverflowPanel()
       backPicker.closePanel()
       headingControl.close()
       fontControl.close()
@@ -642,7 +684,8 @@ export function createFormatToolbar(editor, host) {
     (editor, color) => applyHighlight(editor, color),
     (editor) => clearHighlight(editor),
     () => editor.getAttributes('highlight').color,
-    () => {
+    (pickerWrapper) => {
+      if (!overflowPanel.contains(pickerWrapper)) closeOverflowPanel()
       forePicker.closePanel()
       headingControl.close()
       fontControl.close()
@@ -829,6 +872,8 @@ export function createFormatToolbar(editor, host) {
 
   function renderOverflowLayout() {
     closeOverflowPanel()
+    forePicker.closePanel()
+    backPicker.closePanel()
     toolbar.classList.toggle('is-overflowing', overflowSet.size > 0)
 
     removeAllChildren(toolbar)
