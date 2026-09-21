@@ -91,6 +91,59 @@ Item {
         return isFinite(n) ? n : 0;
     }
 
+    Timer {
+        id: tiptapSurfaceRefreshTimer
+        // 等窗口全屏/最大化的几何变化结束后再处理，避免在过渡动画中
+        // 用旧尺寸的 WebEngine backing surface 拉伸整页内容。
+        interval: 160
+        repeat: false
+        onTriggered: rootItem.refreshTiptapSurface()
+    }
+
+    Timer {
+        id: tiptapSurfaceRestoreTimer
+        // 至少跨过一个渲染帧，确保 visible=false 已被提交给 Scene Graph。
+        interval: 32
+        repeat: false
+        onTriggered: rootItem.restoreTiptapSurface()
+    }
+
+    property bool tiptapSurfaceHadFocus: false
+
+    function scheduleTiptapSurfaceRefresh() {
+        if (!TiptapChannel.tiptapEnabled || !tiptapLoader.item || !rootItem.webVisible) {
+            return;
+        }
+        tiptapSurfaceRefreshTimer.restart();
+    }
+
+    function refreshTiptapSurface() {
+        var tiptapView = tiptapLoader.item ? tiptapLoader.item.editor : null;
+        if (!tiptapView || !tiptapView.visible) {
+            return;
+        }
+
+        // QQuickWebEngineView 在窗口全屏/最大化后可能沿用切换前尺寸的
+        // 合成纹理，令文字、SVG 图标和菜单同时被低分辨率拉伸。临时卸载
+        // surface 后跨帧恢复，使其按最终窗口尺寸重新申请纹理；不刷新页面，
+        // 因而不会丢失当前笔记、光标或下拉菜单状态。
+        tiptapSurfaceHadFocus = tiptapView.activeFocus;
+        tiptapView.visible = false;
+        tiptapSurfaceRestoreTimer.restart();
+    }
+
+    function restoreTiptapSurface() {
+        var tiptapView = tiptapLoader.item ? tiptapLoader.item.editor : null;
+        if (!tiptapView || !rootItem.webVisible) {
+            return;
+        }
+        tiptapView.visible = true;
+        if (tiptapSurfaceHadFocus) {
+            tiptapView.forceActiveFocus();
+        }
+        tiptapSurfaceHadFocus = false;
+    }
+
     function consumeTiptapNativeZoomFactor(tiptapView) {
         if (!tiptapView || !TiptapChannel.tiptapEnabled) {
             return;
@@ -483,6 +536,14 @@ Item {
 
     visible: true
 
+    Connections {
+        target: Window.window
+
+        function onVisibilityChanged() {
+            rootItem.scheduleTiptapSurfaceRefresh();
+        }
+    }
+
     onNoSearchResultChanged: {
         summernoteVisible = !noSearchResult;
     }
@@ -755,7 +816,7 @@ Item {
                         }
                     }
 
-                                    onZoomFactorChanged: {
+                    onZoomFactorChanged: {
                         if (tiptapWebView.dvnResettingNativeZoom) {
                         } else {
                             rootItem.consumeTiptapNativeZoomFactor(tiptapWebView);
