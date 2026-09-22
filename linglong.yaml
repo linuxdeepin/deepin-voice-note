@@ -19,16 +19,11 @@ base: org.deepin.base/25.2.2
 runtime: org.deepin.runtime.webengine/6.7.0
 
 build: |
-  apt -y install --download-only libdtk6gui-dev libdtk6widget-dev qt6-svg-dev qt6-tools-dev qt6-tools-dev-tools qt6-base-dev qt6-base-dev-tools qt6-base-private-dev qt6-l10n-tools qt6-webengine-dev qt6-5compat-dev
-  apt -y install --download-only libsqlite3-dev libglib2.0-dev libvlc-dev libvlccore-dev libgstreamer-plugins-base1.0-dev libgstreamer1.0-dev libffmpegthumbnailer-dev libdmr-dev
-  apt -y install --download-only gstreamer1.0-plugins-good gstreamer1.0-pulseaudio
-
-  bash ./install_dep /var/cache/apt/archives "$PREFIX"
-
   # 修正lrelease路径
   sed -i 's|/usr/lib/qt[56]/bin/lrelease|lrelease|' $PWD/assets/translate_generation.sh
 
   VERSION=$(head -1 debian/changelog | awk -F'[()]' '{print $2}')
+  rm -rf build
   cmake -B build \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_PREFIX=${PREFIX} \
@@ -37,24 +32,15 @@ build: |
   cmake --build build -j`nproc`
   cmake --build build --target install >install.log 2>&1
 
-  # 项目生成应用名和动态隐式加载的依赖库，ldd无法找到的其他库
-  LDD_FILES=(
-    deepin-voice-note
-    libvlc.so
-    libffmpegthumbnailer.so
-    libdeepin-event-log.so
-    gstreamer-1.0/libgstcoreelements.so
-    gstreamer-1.0/libgstlame.so
-    gstreamer-1.0/libgstpulseaudio.so
-    gstreamer-1.0/libgstaudioconvert.so
-    gstreamer-1.0/libgstaudioresample.so
-  )
-
-  # 生成.install 文件
-  bash ./deploy_dep "${LDD_FILES[@]}"
-
-  # allow apt download in build and do apt update
 buildext:
   apt:
     build_depends:
-      - libc6
+      - cmake
+      - pkg-config
+      - libvlc-dev
+      - libgstreamer1.0-dev
+    depends:
+      - libvlc5
+      - vlc-plugin-base
+      - gstreamer1.0-plugins-good
+      - gstreamer1.0-pulseaudio
