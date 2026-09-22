@@ -74,12 +74,15 @@ function clampEditorContentZoom(value) {
 function applyEditorContentZoom(value) {
   editorContentZoom = clampEditorContentZoom(value)
   const normalized = Math.round(editorContentZoom * 1000) / 1000
-  const widthPercent = `${100 / normalized}%`
   document.documentElement.style.setProperty('--dvn-editor-content-zoom', String(normalized))
   for (const element of [document.getElementById('note-title-host'), appElement]) {
     if (!element) continue
+    // CSS zoom already reduces the element's logical layout width. Compensating
+    // with 100 / zoom shrinks it a second time, leaving only one character per
+    // line at high magnification. Keep its natural width to match Summernote's
+    // native WebEngine zoom: content is anchored at the left and wraps normally.
     element.style.zoom = String(normalized)
-    element.style.width = normalized === 1 ? '' : widthPercent
+    element.style.width = ''
   }
   document.documentElement.dataset.dvnEditorContentZoom = String(normalized)
   window.dispatchEvent(new CustomEvent('dvn-tiptap-content-zoom-changed', { detail: { zoom: normalized } }))
