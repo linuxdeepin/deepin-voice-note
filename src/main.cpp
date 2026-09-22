@@ -12,6 +12,7 @@
 #include "config.h"
 
 #include <QQmlApplicationEngine>
+#include <QWindow>
 #include <QScopedPointer>
 #include <QQmlContext>
 #include <QStandardPaths>
@@ -26,6 +27,7 @@
 
 #include <DApplication>
 #include <DGuiApplicationHelper>
+#include <DPlatformHandle>
 #include <DLog>
 
 #include <stdio.h>
@@ -36,6 +38,7 @@
 
 DWIDGET_USE_NAMESPACE
 DCORE_USE_NAMESPACE
+DGUI_USE_NAMESPACE
 
 static void activateExistingInstanceViaDBus()
 {
@@ -122,6 +125,16 @@ int main(int argc, char *argv[])
         },
         Qt::QueuedConnection);
     engine.load(url);
+
+    if (!engine.rootObjects().isEmpty()) {
+        if (auto *rootWindow = qobject_cast<QWindow *>(engine.rootObjects().constFirst())) {
+            // KWin skips its opacity startup animation when startEffectType is 0.
+            DPlatformHandle platformHandle(rootWindow);
+            platformHandle.setWindowStartUpEffect(DPlatformHandle::EffectTypes());
+            rootWindow->show();
+            rootWindow->requestActivate();
+        }
+    }
     qInfo() << "QML engine loaded successfully";
 
     DLogManager::registerConsoleAppender();
