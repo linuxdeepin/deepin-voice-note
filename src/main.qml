@@ -28,7 +28,7 @@ ApplicationWindow {
     height: 681
     minimumHeight: 300
     minimumWidth: 690
-    visible: true
+    visible: false
     width: 1096
 
     function activateWorkspace(createFirstNotebook) {
