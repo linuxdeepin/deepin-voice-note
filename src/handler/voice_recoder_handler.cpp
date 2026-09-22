@@ -331,8 +331,8 @@ void VoiceRecoderHandler::onReduceNoiseChanged(bool reduceNoiseChanged)
     }
 
     QTimer::singleShot(200, this, [this]() {
-        QString deviceName = m_audioWatcher->getDeviceName(static_cast<AudioWatcher::AudioMode>(m_currentMode));
-        updateRecordBtnState(!deviceName.isEmpty());
+        const AudioWatcher::AudioMode mode = static_cast<AudioWatcher::AudioMode>(m_currentMode);
+        updateRecordBtnState(m_audioWatcher->getDeviceEnable(mode));
     });
 }
 
