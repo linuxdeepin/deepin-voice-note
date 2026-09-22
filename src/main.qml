@@ -20,7 +20,10 @@ ApplicationWindow {
     property bool isRecording: workspaceLoader.item ? workspaceLoader.item.isRecording : false
 
     DWindow.enabled: true
-    color: DTK.themeType === ApplicationHelper.LightType ? "#FFFFFF" : "#101010"
+    // StyledBehindWindowBlur 只有在窗口启用 DTK 背景模糊并且窗口本身
+    // 允许透明合成时才会真正采集窗口背后的内容；否则只会显示兜底纯色。
+    DWindow.enableBlurWindow: true
+    color: "transparent"
     flags: Qt.Window | Qt.WindowMinMaxButtonsHint | Qt.WindowCloseButtonHint | Qt.WindowTitleHint
     height: 681
     minimumHeight: 300
