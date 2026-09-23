@@ -479,6 +479,16 @@ function applyTheme(theme, highlightColor, disableHighlightColor, backgroundColo
   root.style.setProperty('--dvn-editor-bg', isDark ? '#242424' : '#FBFCFD')
   root.style.setProperty('--dvn-panel-bg', isDark ? '#252525' : '#ffffff')
   root.style.setProperty('--dvn-toolbar-bg', isDark ? 'rgba(42, 42, 42, 1)' : 'rgba(245, 245, 245, 1)')
+  // DTK-style popup surface: keep the panel translucent so the editor canvas
+  // softly shows through, while retaining a solid fallback when blur is absent.
+  root.style.setProperty('--dvn-menu-bg', isDark ? 'rgba(37, 37, 37, 0.92)' : 'rgba(247, 247, 247, 0.92)')
+  root.style.setProperty('--dvn-menu-solid-bg', isDark ? '#252525' : '#f7f7f7')
+  root.style.setProperty('--dvn-menu-border', isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.06)')
+  root.style.setProperty('--dvn-menu-inner-border', isDark ? 'rgba(255, 255, 255, 0.10)' : 'rgba(255, 255, 255, 0.70)')
+  root.style.setProperty('--dvn-menu-shadow', isDark ? '0 8px 24px rgba(0, 0, 0, 0.32)' : '0 8px 20px rgba(0, 0, 0, 0.12)')
+  root.style.setProperty('--dvn-menu-backdrop-blur', '20px')
+  root.style.setProperty('--dvn-menu-selected-bg', highlightColor || (isDark ? '#347de2' : '#2878e8'))
+  root.style.setProperty('--dvn-menu-selected-fg', '#ffffff')
   root.style.setProperty('--dvn-toolbar-border-soft', isDark ? 'rgba(0, 0, 0, 0.30)' : 'rgba(0, 0, 0, 0.04)')
   root.style.setProperty('--dvn-panel-border', isDark ? '#444444' : '#cccccc')
   root.style.setProperty('--dvn-toolbar-border', isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.08)')

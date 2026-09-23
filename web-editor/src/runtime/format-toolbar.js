@@ -244,7 +244,7 @@ function buildColorPicker(editor, kind, colors, apply, clear, readActive, onOpen
     panel.style.display = 'grid'
     wrapper.classList.add('is-open')
     menuButton.setAttribute('aria-expanded', 'true')
-    positionPanelInOverflow()
+    positionPanel()
   }
 
   function resetPanelPosition() {
@@ -254,35 +254,33 @@ function buildColorPicker(editor, kind, colors, apply, clear, readActive, onOpen
     panel.style.right = ''
   }
 
-  function positionPanelInOverflow() {
+  function positionPanel() {
     const overflow = wrapper.closest('.tiptap-overflow-panel')
-    if (!overflow?.classList.contains('is-open')) {
-      resetPanelPosition()
-      return
-    }
-
-    // 颜色面板是 overflow 面板里的子弹层。若继续使用 absolute +
-    // top: 100%，它会被父面板的内容区域覆盖，视觉上与“更多”面板重叠。
-    // 改成 fixed 后按触发按钮的位置计算，既保留父面板，也不遮挡其工具按钮。
+    // 普通工具栏由 picker 自身定位；折叠工具栏则由 overflow 面板定位。
+    // overflow 面板的 backdrop-filter 会为 fixed 子元素创建 containing
+    // block，因此两个场景都统一使用相对定位根节点的 absolute 坐标。
+    const positioningRoot = overflow?.classList.contains('is-open') ? overflow : wrapper
     const margin = 6
     const viewportWidth = window.innerWidth || document.documentElement.clientWidth || 0
     const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0
     const triggerRect = wrapper.getBoundingClientRect()
+    const rootRect = positioningRoot.getBoundingClientRect()
     const panelWidth = panel.offsetWidth || 153
     const panelHeight = panel.offsetHeight || 0
-    let left = triggerRect.left
-    let top = triggerRect.bottom + 4
+    // 保持原有的 -12px 左对齐视觉；靠近视口右侧时，将整个面板回收至可见范围。
+    let viewportLeft = triggerRect.left - 12
+    let viewportTop = triggerRect.bottom + 4
 
     if (viewportWidth) {
-      left = Math.max(margin, Math.min(left, viewportWidth - panelWidth - margin))
+      viewportLeft = Math.max(margin, Math.min(viewportLeft, viewportWidth - panelWidth - margin))
     }
-    if (viewportHeight && top + panelHeight > viewportHeight - margin && triggerRect.top - panelHeight - 4 >= margin) {
-      top = triggerRect.top - panelHeight - 4
+    if (viewportHeight && viewportTop + panelHeight > viewportHeight - margin && triggerRect.top - panelHeight - 4 >= margin) {
+      viewportTop = triggerRect.top - panelHeight - 4
     }
 
-    panel.style.position = 'fixed'
-    panel.style.left = `${Math.round(left)}px`
-    panel.style.top = `${Math.round(top)}px`
+    panel.style.position = 'absolute'
+    panel.style.left = `${Math.round(viewportLeft - rootRect.left)}px`
+    panel.style.top = `${Math.round(viewportTop - rootRect.top)}px`
     panel.style.right = 'auto'
   }
 
@@ -553,7 +551,9 @@ export function createFormatToolbar(editor, host) {
     onOpen: (current) => closeStyleSelects(current),
     options: [
       { value: '', label: '14' },
-      ...FONT_SIZES.map((size) => ({ value: size, label: size })),
+      // 14px is the default paragraph size and is represented by the clear/default row above.
+      // Do not add it again as an explicit item, otherwise the menu shows two identical "14" entries.
+      ...FONT_SIZES.filter((size) => size !== '14').map((size) => ({ value: size, label: size })),
     ],
     onChange(value) {
       if (!value) {

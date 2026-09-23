@@ -121,10 +121,13 @@
     padding: var(--dvn-menu-padding, 8px 6px);
     box-sizing: border-box;
     z-index: 30;
-    background: var(--dvn-menu-bg, var(--dvn-panel-bg, rgba(238, 238, 238, 1)));
-    border: 1px solid var(--dvn-panel-border, #cccccc);
+    background: var(--dvn-menu-bg, rgba(247, 247, 247, 0.92));
+    border: 1px solid var(--dvn-menu-border, rgba(0, 0, 0, 0.06));
     border-radius: var(--dvn-menu-radius, 12px);
-    box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.20);
+    box-shadow: var(--dvn-menu-shadow, 0 8px 20px rgba(0, 0, 0, 0.12)),
+                inset 0 0 0 0.5px var(--dvn-menu-inner-border, rgba(255, 255, 255, 0.70));
+    -webkit-backdrop-filter: blur(var(--dvn-menu-backdrop-blur, 20px));
+    backdrop-filter: blur(var(--dvn-menu-backdrop-blur, 20px));
 }
 
 .tiptap-select-menu::-webkit-scrollbar {
@@ -182,8 +185,8 @@
 
 .tiptap-select-option:hover,
 .tiptap-select-option:focus-visible {
-    background-color: var(--highlightColor, #0081ff) !important;
-    color: #ffffff !important;
+    background-color: var(--dvn-menu-selected-bg, var(--highlightColor, #2878e8)) !important;
+    color: var(--dvn-menu-selected-fg, #ffffff) !important;
     outline: none;
 }
 
@@ -200,8 +203,9 @@
 }
 
 .tiptap-select-fontFamily .tiptap-select-menu {
-    width: 275px;
-    min-width: 275px;
+    width: 220px;
+    min-width: 220px;
+    max-height: 220px;
 }
 
 .tiptap-select-fontFamily .tiptap-select-option {
@@ -445,10 +449,22 @@
     box-sizing: border-box;
     padding: 10px 10px;
     z-index: 20;
-    background: var(--dvn-menu-bg, var(--dvn-panel-bg, rgba(238, 238, 238, 1)));
-    border: 1px solid var(--dvn-panel-border, rgba(255, 255, 255, 0.1));
+    background: var(--dvn-menu-bg, rgba(247, 247, 247, 0.92));
+    border: 1px solid var(--dvn-menu-border, rgba(0, 0, 0, 0.06));
     border-radius: var(--vn-menu-radius, var(--dvn-menu-radius, 12px));
-    box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.20);
+    box-shadow: var(--dvn-menu-shadow, 0 8px 20px rgba(0, 0, 0, 0.12)),
+                inset 0 0 0 0.5px var(--dvn-menu-inner-border, rgba(255, 255, 255, 0.70));
+    -webkit-backdrop-filter: blur(var(--dvn-menu-backdrop-blur, 20px));
+    backdrop-filter: blur(var(--dvn-menu-backdrop-blur, 20px));
+}
+
+/* 颜色面板嵌在“更多”半透明面板中时，两个 backdrop-filter 会叠加，
+   让色板看起来像被穿透了一样。嵌套场景改用实色表面，普通工具栏的
+   独立色板仍保留设计稿要求的半透明模糊。 */
+.tiptap-overflow-panel .tiptap-color-panel {
+    background: var(--dvn-menu-solid-bg, #f7f7f7);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
 }
 
 .tiptap-color-panel button[data-color] {
@@ -615,10 +631,13 @@
     min-height: 40px;
     box-sizing: border-box;
     padding: 4px 6px;
-    border: 1px solid var(--dvn-toolbar-border-soft, rgba(0, 0, 0, 0.04));
+    border: 1px solid var(--dvn-menu-border, rgba(0, 0, 0, 0.06));
     border-radius: var(--dvn-menu-radius, 12px);
-    background: var(--dvn-toolbar-bg, rgba(245, 245, 245, 1));
-    box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.10);
+    background: var(--dvn-menu-bg, rgba(247, 247, 247, 0.92));
+    box-shadow: var(--dvn-menu-shadow, 0 8px 20px rgba(0, 0, 0, 0.12)),
+                inset 0 0 0 0.5px var(--dvn-menu-inner-border, rgba(255, 255, 255, 0.70));
+    -webkit-backdrop-filter: blur(var(--dvn-menu-backdrop-blur, 20px));
+    backdrop-filter: blur(var(--dvn-menu-backdrop-blur, 20px));
     max-width: calc(100vw - 12px);
     /*
      * The color palettes are absolutely positioned below their trigger.  The
