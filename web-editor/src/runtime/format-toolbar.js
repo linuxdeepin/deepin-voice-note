@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import toolbarCss from './format-toolbar.css?inline'
+import { AllSelection, TextSelection } from '@tiptap/pm/state'
 import boldIconUrl from '../../../src/web/css/createfont/svg/bold.svg?url'
 import italicIconUrl from '../../../src/web/css/createfont/svg/Italic.svg?url'
 import underlineIconUrl from '../../../src/web/css/createfont/svg/underline.svg?url'
@@ -195,8 +196,93 @@ function injectTaskListStyles() {
   document.head.appendChild(style)
 }
 
+// ---------------------------------------------------------------------------
+// 块级样式（标题/正文）与显式字号的关系
+// ---------------------------------------------------------------------------
+
+// 选区覆盖到的文本块。nodesBetween 会遍历到语音块、图片等非文本块，
+// 这里统一过滤，后续清理只作用于真正的文本块。
+function selectedTextblocks(state) {
+  const blocks = []
+  const { from, to } = state.selection
+  state.doc.nodesBetween(from, to, (node, pos) => {
+    if (!node.isTextblock) return true
+    blocks.push({ node, pos })
+    return false
+  })
+  if (blocks.length > 0) return blocks
+
+  // 折叠光标停在文档末尾等边界位置时 nodesBetween 取不到所在文本块，用父节点兜底。
+  const $from = state.selection.$from
+  for (let depth = $from.depth; depth > 0; depth -= 1) {
+    const node = $from.node(depth)
+    if (!node.isTextblock) continue
+    blocks.push({ node, pos: $from.before(depth) })
+    break
+  }
+  return blocks
+}
+
+// 整块文字使用同一个显式字号时返回该字号；存在没有显式字号的文字，
+// 或同一块内出现多种字号时返回 null（视为用户刻意设置的局部字号）。
+function uniformBlockFontSize(node, fontSizeType) {
+  let hasText = false
+  let value = null
+  let mixed = false
+  node.descendants((child) => {
+    if (!child.isText) return
+    const mark = fontSizeType.isInSet(child.marks)
+    const current = mark ? String(mark.attrs?.fontSize || '') : ''
+    if (!hasText) {
+      hasText = true
+      value = current
+      return
+    }
+    if (!mixed && current !== value) mixed = true
+  })
+  return hasText && !mixed && value ? value : null
+}
+
+// 标题是带固定字号比例的块级样式。若整段文字仍带着同一个显式字号，
+// 行内 font-size 会盖住标题自身的字号，视觉上等同于“点了标题没生效”，
+// 因此这类整块显式字号要随标题样式一起清掉；局部字号继续保留。
+function clearUniformBlockFontSize(tr, state, level) {
+  const headingType = state.schema.nodes.heading
+  const fontSizeType = state.schema.marks.fontSize
+  if (!headingType || !fontSizeType) return
+  for (const { node, pos } of selectedTextblocks(state)) {
+    if (node.type !== headingType || Number(node.attrs?.level) !== level) continue
+    if (!uniformBlockFontSize(node, fontSizeType)) continue
+    tr.removeMark(pos + 1, pos + node.nodeSize - 1, fontSizeType)
+  }
+}
+
+function selectedTextRange(selection) {
+  if (selection.empty || (!(selection instanceof TextSelection) && !(selection instanceof AllSelection))) return null
+  return { from: selection.from, to: selection.to }
+}
+
+function textSelectionFromRange(doc, range) {
+  const max = doc.content.size
+  const from = Math.max(0, Math.min(range.from, max))
+  const to = Math.max(0, Math.min(range.to, max))
+  return TextSelection.between(doc.resolve(from), doc.resolve(to))
+}
+
 function applyMarkColor(editor, markName, attrName, value) {
-  editor.chain().focus().setMark(markName, { [attrName]: value }).run()
+  const { selection } = editor.state
+  const textSelection = selectedTextRange(selection)
+  const chain = editor.chain().focus().setMark(markName, { [attrName]: value })
+
+  // 包含语音块/图片的跨块文本选区经过 setMark 后可能被折叠到资源节点上。
+  // 恢复有效文本范围，避免用户接着点标题/列表时命令因 NodeSelection 失效。
+  if (textSelection) {
+    chain.command(({ tr }) => {
+      tr.setSelection(textSelectionFromRange(tr.doc, textSelection))
+      return true
+    })
+  }
+  chain.run()
 }
 
 function clearMarkColor(editor, markName) {
@@ -518,11 +604,32 @@ export function createFormatToolbar(editor, host) {
         // 手动粗体开关遗留状态，否则切换标题等级的事务同步会重新写入
         // fontWeight: normal，导致标题看起来不再自动加粗。
         persistentInlineFormats.delete('bold')
-        editor
-          .chain()
-          .focus()
+        const level = Number(value)
+        const { selection } = editor.state
+        const textSelection = selectedTextRange(selection)
+        const chain = editor.chain().focus()
+        if (textSelection) {
+          // Ctrl+A 产生 AllSelection。Heading.toggleNode 在这种选区下会把
+          // 文档边界也算入活动范围，多段落时可能因此不转换；先规范成文本选区。
+          chain.command(({ tr }) => {
+            tr.setSelection(textSelectionFromRange(tr.doc, textSelection))
+            return true
+          })
+        }
+        chain
           .unsetMark('fontWeight', { extendEmptyMarkRange: true })
-          .toggleHeading({ level: Number(value) })
+          .toggleHeading({ level })
+          // 跨资源节点时 toggleHeading 可能将选区落到语音块/图片；转换后再恢复
+          // 有效文本范围，确保字号清理和工具栏状态作用于文本块。
+          .command(({ tr }) => {
+            if (textSelection) tr.setSelection(textSelectionFromRange(tr.doc, textSelection))
+            return true
+          })
+          // 同一事务里清理整段显式字号，保证一次撤销即可回到标题切换前的状态。
+          .command(({ tr, state }) => {
+            clearUniformBlockFontSize(tr, state, level)
+            return true
+          })
           .run()
         syncActiveStates()
       }
