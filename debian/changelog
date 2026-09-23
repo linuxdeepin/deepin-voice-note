@@ -1,3 +1,10 @@
+deepin-voice-note (6.5.68) unstable; urgency=medium
+
+  * refactor(packaging): migrate dependencies to buildext
+  * fix: sync recorder and startup window fixes
+
+ -- dengzhongyuan <dengzhongyuan@uniontech.com>  Wed, 23 Sep 2026 17:07:14 +0800
+
 deepin-voice-note (6.5.67) unstable; urgency=medium
 
   * fix(audio): correct microphone availability detection
