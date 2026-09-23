@@ -556,6 +556,119 @@ test('heading dropdown applies and clears heading levels', () => {
   editor.destroy()
 })
 
+test('applying a heading clears a uniform paragraph font size so the heading scale is visible', () => {
+  const { editor, host } = createEditorWithToolbar()
+  insertText(editor, 'title')
+  selectText(editor)
+
+  const fontSizeSelect = host.querySelector('select[data-control="fontSize"]')
+  const headingSelect = host.querySelector('select[data-control="heading"]')
+  assert.ok(fontSizeSelect && headingSelect)
+
+  fontSizeSelect.value = '18'
+  fontSizeSelect.dispatchEvent(new Event('change'))
+  assert.ok(editor.isActive('fontSize', { fontSize: '18px' }))
+
+  headingSelect.value = '1'
+  headingSelect.dispatchEvent(new Event('change'))
+
+  assert.ok(editor.isActive('heading', { level: 1 }))
+  assert.ok(!textHasMark(editor, 'title', 'fontSize'), 'heading should not keep the paragraph-wide inline font size')
+  assert.equal(editor.view.dom.innerHTML, '<h1>title</h1>')
+  editor.destroy()
+})
+
+test('font size keeps select-all across resource blocks so a heading can still apply', () => {
+  const { editor, host } = createEditorWithToolbar()
+  editor.commands.setContent({
+    type: 'doc',
+    content: [
+      { type: 'paragraph', content: [{ type: 'text', text: 'one' }] },
+      { type: 'voiceBlock', attrs: { voiceId: 'v1', voicePath: 'a.mp3' } },
+    ],
+  })
+  markEditorFocused(editor)
+  editor.chain().focus().selectAll().run()
+  assert.equal(editor.state.selection.constructor.name, 'AllSelection')
+
+  const fontSizeSelect = host.querySelector('select[data-control="fontSize"]')
+  const headingSelect = host.querySelector('select[data-control="heading"]')
+  assert.ok(fontSizeSelect && headingSelect)
+
+  fontSizeSelect.value = '18'
+  fontSizeSelect.dispatchEvent(new Event('change'))
+
+  assert.equal(editor.state.selection.constructor.name, 'TextSelection')
+
+  headingSelect.value = '1'
+  headingSelect.dispatchEvent(new Event('change'))
+
+  assert.ok(editor.isActive('heading', { level: 1 }))
+  assert.equal(editor.getJSON().content?.[1]?.type, 'voiceBlock')
+  assert.ok(!textHasMark(editor, 'one', 'fontSize'))
+  editor.destroy()
+})
+
+test('select all keeps heading conversion after changing font size', () => {
+  const { editor, host } = createEditorWithToolbar()
+  editor.commands.setContent({
+    type: 'doc',
+    content: [
+      { type: 'paragraph', content: [{ type: 'text', text: 'first paragraph' }] },
+      { type: 'paragraph', content: [{ type: 'text', text: 'second paragraph' }] },
+    ],
+  })
+  markEditorFocused(editor)
+  editor.chain().focus().selectAll().run()
+  assert.equal(editor.state.selection.constructor.name, 'AllSelection')
+
+  const fontSizeSelect = host.querySelector('select[data-control="fontSize"]')
+  const headingSelect = host.querySelector('select[data-control="heading"]')
+  assert.ok(fontSizeSelect && headingSelect)
+
+  fontSizeSelect.value = '18'
+  fontSizeSelect.dispatchEvent(new Event('change'))
+  assert.equal(editor.state.selection.constructor.name, 'TextSelection')
+
+  headingSelect.value = '1'
+  headingSelect.dispatchEvent(new Event('change'))
+
+  assert.deepEqual(editor.getJSON().content.map((node) => node.type), ['heading', 'heading'])
+  assert.ok(editor.getJSON().content.every((node) => node.attrs.level === 1))
+  assert.ok(editor.getJSON().content.every((node) => node.content.every((child) => !child.marks?.some((mark) => mark.type === 'fontSize'))))
+  assert.ok(editor.isActive('heading', { level: 1 }))
+  editor.destroy()
+})
+
+test('select all keeps font family while heading conversion is applied', () => {
+  const { editor, host, toolbar } = createEditorWithToolbar()
+  editor.commands.setContent({
+    type: 'doc',
+    content: [
+      { type: 'paragraph', content: [{ type: 'text', text: 'first paragraph' }] },
+      { type: 'paragraph', content: [{ type: 'text', text: 'second paragraph' }] },
+    ],
+  })
+  toolbar.setFontList(['Arial', 'Noto Sans CJK SC'], 'Arial')
+  markEditorFocused(editor)
+  editor.chain().focus().selectAll().run()
+
+  const fontSelect = host.querySelector('select[data-control="fontFamily"]')
+  const headingSelect = host.querySelector('select[data-control="heading"]')
+  assert.ok(fontSelect && headingSelect)
+
+  fontSelect.value = 'Noto Sans CJK SC'
+  fontSelect.dispatchEvent(new Event('change'))
+  headingSelect.value = '2'
+  headingSelect.dispatchEvent(new Event('change'))
+
+  const nodes = editor.getJSON().content
+  assert.deepEqual(nodes.map((node) => node.type), ['heading', 'heading'])
+  assert.ok(nodes.every((node) => node.attrs.level === 2))
+  assert.ok(nodes.every((node) => node.content.every((child) => child.marks?.some((mark) => mark.type === 'fontFamily' && mark.attrs.fontFamily === 'Noto Sans CJK SC'))))
+  editor.destroy()
+})
+
 test('heading dropdown reflects collapsed cursor heading context', () => {
   const { editor, host } = createEditorWithToolbar()
   markEditorFocused(editor)
