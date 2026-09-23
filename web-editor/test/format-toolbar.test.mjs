@@ -359,6 +359,37 @@ test('opening a main-toolbar color palette closes the more menu', () => {
   editor.destroy()
 })
 
+test('main-toolbar color palette is clamped into the editor viewport', () => {
+  const { host, editor, window } = createEditorWithToolbar()
+  const menuButton = host.querySelector('button[data-color-menu="backColor"]')
+  const panel = host.querySelector('[data-panel="backColor"]')
+  const picker = menuButton?.closest('.tiptap-color-picker')
+  assert.ok(menuButton && panel && picker)
+
+  const originalInnerWidth = Object.getOwnPropertyDescriptor(window, 'innerWidth')
+  Object.defineProperty(window, 'innerWidth', { configurable: true, get: () => 230 })
+  const rect = (left, top, width, height) => ({
+    left,
+    top,
+    width,
+    height,
+    right: left + width,
+    bottom: top + height,
+    x: left,
+    y: top,
+    toJSON() { return this },
+  })
+  picker.getBoundingClientRect = () => rect(106, 9, 30, 30)
+
+  menuButton.click()
+  assert.equal(panel.style.position, 'absolute')
+  assert.equal(panel.style.left, '-35px', 'right-edge palettes must be moved back into the viewport')
+  assert.equal(panel.style.top, '34px')
+
+  if (originalInnerWidth) Object.defineProperty(window, 'innerWidth', originalInnerWidth)
+  editor.destroy()
+})
+
 test('color palettes remain usable when their controls are folded into the more menu', () => {
   const { host, editor, window } = createEditorWithToolbar()
   const toolbar = host.querySelector('[data-testid="format-toolbar"]')
@@ -668,7 +699,8 @@ test('heading dropdown follows the Sketch menu labels and type scale hooks', () 
   assert.doesNotMatch(toolbarCss, /tiptap-select-button::after/, 'select arrow should use the shared SVG asset instead of a CSS triangle')
   assert.doesNotMatch(toolbarCss, /dvn-heading-menu-bg/, 'heading dropdown must share the themed menu background with other dropdowns')
   assert.doesNotMatch(toolbarCss, /dvn-heading-menu-border/, 'heading dropdown must share the themed menu border with other dropdowns')
-  assert.match(toolbarCss, /\.tiptap-select-menu \{[\s\S]*background: var\(--dvn-menu-bg, var\(--dvn-panel-bg/)
+  assert.match(toolbarCss, /\.tiptap-select-menu \{[\s\S]*background: var\(--dvn-menu-bg, rgba\(247, 247, 247, 0\.92\)/)
+  assert.match(toolbarCss, /\.tiptap-select-menu \{[\s\S]*backdrop-filter: blur\(var\(--dvn-menu-backdrop-blur/)
   assert.match(toolbarCss, /\.tiptap-select-menu \{[\s\S]*scrollbar-width: none;/, 'select menus should remain scrollable without a visible scrollbar gutter')
   assert.match(toolbarCss, /\.tiptap-select-menu::-webkit-scrollbar \{[\s\S]*width: 0;/, 'select menus should hide webkit scrollbar width')
   assert.match(toolbarCss, /\.tiptap-select-check \{[\s\S]*color: inherit;/, 'selected option check should follow the normal/hover text color')
@@ -770,8 +802,11 @@ test('color panels share dropdown theme and switch palettes in dark mode', () =>
   const backPanel = host.querySelector('[data-panel="backColor"]')
   assert.ok(forePanel && backPanel)
 
-  assert.match(toolbarCss, /\.tiptap-color-panel \{[\s\S]*background: var\(--dvn-menu-bg, var\(--dvn-panel-bg/)
-  assert.match(toolbarCss, /\.tiptap-color-panel \{[\s\S]*border: 1px solid var\(--dvn-panel-border/)
+  assert.match(toolbarCss, /\.tiptap-color-panel \{[\s\S]*background: var\(--dvn-menu-bg, rgba\(247, 247, 247, 0\.92\)/)
+  assert.match(toolbarCss, /\.tiptap-color-panel \{[\s\S]*border: 1px solid var\(--dvn-menu-border/)
+  assert.match(toolbarCss, /\.tiptap-color-panel \{[\s\S]*backdrop-filter: blur\(var\(--dvn-menu-backdrop-blur/)
+  assert.match(toolbarCss, /\.tiptap-overflow-panel \.tiptap-color-panel \{[\s\S]*background: var\(--dvn-menu-solid-bg/)
+  assert.match(toolbarCss, /\.tiptap-overflow-panel \.tiptap-color-panel \{[\s\S]*backdrop-filter: none;/)
   assert.match(toolbarCss, /\.tiptap-color-panel button\[data-color\] \{[\s\S]*var\(--dvn-color-chip-border/)
   assert.doesNotMatch(toolbarCss, /dvn-color-panel-bg/, 'color panels must not keep a light-only panel background token')
 
@@ -907,6 +942,12 @@ test('fontSize dropdown reflects collapsed cursor size context without scaling m
   assert.ok(editor.isActive('fontSize', { fontSize: '24px' }))
   assert.equal(select.value, '24')
   assert.equal(label.textContent, '24')
+  assert.equal(
+    Array.from(host.querySelectorAll('.tiptap-select-fontSize .tiptap-select-option-label'))
+      .filter((node) => node.textContent === '14').length,
+    1,
+    'the default 14px row should not be duplicated in the font size menu',
+  )
   for (const option of host.querySelectorAll('.tiptap-select-fontSize .tiptap-select-option')) {
     assert.equal(option.style.fontSize, '', 'font size menu items should keep a uniform menu type scale')
   }
