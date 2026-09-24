@@ -1,4 +1,4 @@
-// Copyright (C) 2019 ~ 2019 UnionTech Software Technology Co.,Ltd.
+// Copyright (C) 2019 - 2026 UnionTech Software Technology Co.,Ltd.
 // SPDX-FileCopyrightText: 2023 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
@@ -533,12 +533,41 @@ TEST_F(UT_WebRichTextEditor, UT_WebRichTextEditor_onShowEditToolbar_001)
     QPoint menuPoint(0, 0);
     m_web->onShowEditToolbar(menuPoint);
     menuPoint.setX(menuPoint.x() - 9);
-    int width = m_web->width() - menuPoint.x() - 320;
+    int width = m_web->width() - menuPoint.x() - 395;
     if (width < 0) {
         menuPoint.setX(menuPoint.x() + width);
     }
     menuPoint.setY(menuPoint.y() + 15 + m_web->m_txtRightMenu->height());
+    //下边界保护：与实现保持一致
+    if (m_web->height() > 0) {
+        int maxMenuY = m_web->height() - 44 - 320;
+        if (maxMenuY < 0) {
+            maxMenuY = m_web->height() - 44;
+        }
+        if (maxMenuY < 0) {
+            maxMenuY = 0;
+        }
+        if (menuPoint.y() > maxMenuY) {
+            menuPoint.setY(maxMenuY);
+        }
+    }
     EXPECT_EQ(QRect(menuPoint, QPoint(menuPoint.x() + 290 + 85, menuPoint.y() + 35)), m_web->m_editToolbarRect);
+}
+
+TEST_F(UT_WebRichTextEditor, UT_WebRichTextEditor_onShowEditToolbar_002)
+{
+    //非最大化矮窗口：在页面底部右键时工具栏应上移，为向下展开的字体下拉栏预留空间
+    m_web->resize(600, 500);
+    m_web->onShowEditToolbar(QPoint(100, 480));
+    EXPECT_GE(m_web->m_editToolbarRect.top(), 0);
+    //工具栏(44)及其字体下拉栏(320)不超出编辑区可视下边界
+    EXPECT_LE(m_web->m_editToolbarRect.top() + 44 + 320, m_web->height());
+
+    //编辑区过矮时退化为仅保证工具栏自身不溢出可视下边界
+    m_web->resize(600, 300);
+    m_web->onShowEditToolbar(QPoint(100, 290));
+    EXPECT_GE(m_web->m_editToolbarRect.top(), 0);
+    EXPECT_LE(m_web->m_editToolbarRect.top() + 44, m_web->height());
 }
 
 TEST_F(UT_WebRichTextEditor, UT_WebRichTextEditor_onHideEditToolbar_001)
