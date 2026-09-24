@@ -15637,6 +15637,17 @@ const voiceBlockCss = `/* SPDX-FileCopyrightText: 2026 UnionTech Software Techno
     outline: none;
 }
 
+.voiceBox.dvn-voice-drag-ghost {
+    /* The native drag preview is a snapshot of this temporary node. Keep the
+       clipping boundary on the snapshot root so transparent square corners do
+       not appear while dragging the voice block. */
+    margin: 0 !important;
+    border-radius: 12px;
+    overflow: hidden;
+    clip-path: inset(0 round 12px);
+    -webkit-clip-path: inset(0 round 12px);
+}
+
 
 .voiceBox.ProseMirror-selectednode .voiceInfoBox,
 .voiceBox.active .voiceInfoBox {
@@ -17019,6 +17030,42 @@ const VoiceBlock = Node3.create({
       let unplayable = false;
       let currentNode = node;
       let destroyed = false;
+      let dragGhost = null;
+      function removeDragGhost() {
+        if (!dragGhost) return;
+        dragGhost.remove();
+        dragGhost = null;
+        document.removeEventListener("dragend", removeDragGhost, true);
+      }
+      function onVoiceBoxDragStart(event) {
+        const dataTransfer = event.dataTransfer;
+        if (!dataTransfer?.setDragImage) return;
+        removeDragGhost();
+        const rect = wrapper.getBoundingClientRect();
+        const width = Math.max(1, Math.round(rect.width));
+        const height = Math.max(1, Math.round(rect.height));
+        const ghost = wrapper.cloneNode(true);
+        ghost.classList.add("dvn-voice-drag-ghost");
+        Object.assign(ghost.style, {
+          position: "fixed",
+          left: "-10000px",
+          top: "-10000px",
+          width: `${width}px`,
+          height: `${height}px`,
+          margin: "0",
+          borderRadius: "12px",
+          overflow: "hidden",
+          clipPath: "inset(0 round 12px)",
+          webkitClipPath: "inset(0 round 12px)",
+          pointerEvents: "none"
+        });
+        document.body.appendChild(ghost);
+        dragGhost = ghost;
+        const offsetX = Number.isFinite(event.clientX) ? Math.max(0, Math.min(width, event.clientX - rect.left)) : Math.round(width / 2);
+        const offsetY = Number.isFinite(event.clientY) ? Math.max(0, Math.min(height, event.clientY - rect.top)) : Math.round(height / 2);
+        dataTransfer.setDragImage(ghost, Math.round(offsetX), Math.round(offsetY));
+        document.addEventListener("dragend", removeDragGhost, true);
+      }
       const wrapper = document.createElement("div");
       wrapper.className = "voiceBox";
       wrapper.setAttribute("data-type", "voice-block");
@@ -17300,6 +17347,8 @@ const VoiceBlock = Node3.create({
       function onTranslateTextSelectionEnd() {
         updateTranscriptSelectionCache();
       }
+      wrapper.addEventListener("dragstart", onVoiceBoxDragStart);
+      wrapper.addEventListener("dragend", removeDragGhost);
       wrapper.addEventListener("beforeinput", onVoiceBoxBeforeInput);
       wrapper.addEventListener("input", onVoiceBoxInput);
       wrapper.addEventListener("keydown", onVoiceBoxKeyDown);
@@ -17424,6 +17473,9 @@ const VoiceBlock = Node3.create({
           if (destroyed) return;
           destroyed = true;
           unsubscribe();
+          wrapper.removeEventListener("dragstart", onVoiceBoxDragStart);
+          wrapper.removeEventListener("dragend", removeDragGhost);
+          removeDragGhost();
           wrapper.removeEventListener("beforeinput", onVoiceBoxBeforeInput);
           wrapper.removeEventListener("input", onVoiceBoxInput);
           wrapper.removeEventListener("keydown", onVoiceBoxKeyDown);
