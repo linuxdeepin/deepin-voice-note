@@ -550,6 +550,12 @@ test('heading dropdown applies and clears heading levels', () => {
   select.dispatchEvent(new Event('change'))
   assert.ok(editor.isActive('heading', { level: 2 }))
 
+  const sizeSelect = host.querySelector('select[data-control="fontSize"]')
+  const sizeLabel = host.querySelector('.tiptap-select-fontSize .tiptap-select-label')
+  assert.equal(sizeSelect?.value, '20', 'heading 2 should sync its effective size to the size dropdown')
+  assert.equal(sizeLabel?.textContent, '20')
+  assert.equal(editor.getAttributes('fontSize').fontSize, undefined, 'heading size should not be stored as an inline mark')
+
   select.value = 'p'
   select.dispatchEvent(new Event('change'))
   assert.ok(!editor.isActive('heading'))
@@ -758,6 +764,12 @@ test('empty heading keeps the body placeholder on the active heading line', () =
   assert.equal(appElement.dataset.emptyBlock, 'heading')
   assert.equal(appElement.dataset.emptyHeadingLevel, '1')
   assert.match(tiptapEditorHtml, /#app\.is-empty\[data-empty-heading-level="1"\] \.ProseMirror::before/)
+  assert.match(tiptapEditorHtml, /\.ProseMirror h1 \{ font-size: 24px; line-height: 32px; \}/)
+  assert.match(tiptapEditorHtml, /\.ProseMirror h2 \{ font-size: 20px; line-height: 28px; \}/)
+  assert.match(tiptapEditorHtml, /\.ProseMirror h3 \{ font-size: 18px; line-height: 26px; \}/)
+  assert.match(tiptapEditorHtml, /\.ProseMirror h4 \{ font-size: 16px; line-height: 24px; \}/)
+  assert.match(tiptapEditorHtml, /\.ProseMirror h5 \{ font-size: 14px; line-height: 22px; \}/)
+  assert.match(tiptapEditorHtml, /Source Han Sans SC/)
   assert.match(tiptapEditorHtml, /\.ProseMirror h1, \.ProseMirror h2/)
   assert.match(tiptapEditorHtml, /\.ProseMirror::selection, \.ProseMirror ::selection \{ background: var\(--dvn-text-selection-bg/)
   assert.match(tiptapEditorHtml, /color: var\(--dvn-selection-fg, #ffffff\)/)
@@ -820,7 +832,10 @@ test('heading dropdown follows the Sketch menu labels and type scale hooks', () 
   assert.doesNotMatch(toolbarCss, /\.tiptap-select-option\[aria-selected="true"\][^{]*\{[^}]*background-color: var\(--highlightColor/, 'selected dropdown rows should not keep hover highlight')
   assert.doesNotMatch(toolbarCss, /\.tiptap-select-option:hover,\n\.tiptap-select-option:focus-visible,\n\.tiptap-select-option\[aria-selected="true"\]/, 'hover highlight must not be tied to selected state')
   assert.match(toolbarCss, /\.tiptap-select-heading \.tiptap-select-option\[data-value="1"\] \{[\s\S]*--dvn-heading-option-font-size: 24px;/)
-  assert.match(toolbarCss, /\.tiptap-select-heading \.tiptap-select-option\[data-value="2"\] \{[\s\S]*--dvn-heading-option-font-size: 21px;/)
+  assert.match(toolbarCss, /\.tiptap-select-heading \.tiptap-select-option\[data-value="2"\] \{[\s\S]*--dvn-heading-option-font-size: 20px;/)
+  assert.match(toolbarCss, /\.tiptap-select-heading \.tiptap-select-option\[data-value="3"\] \{[\s\S]*--dvn-heading-option-font-size: 18px;/)
+  assert.match(toolbarCss, /\.tiptap-select-heading \.tiptap-select-option\[data-value="4"\] \{[\s\S]*--dvn-heading-option-font-size: 16px;/)
+  assert.match(toolbarCss, /\.tiptap-select-heading \.tiptap-select-option\[data-value="5"\] \{[\s\S]*--dvn-heading-option-font-size: 14px;/)
   assert.equal(host.querySelector('.tiptap-select-option[data-value="6"]'), null, 'heading dropdown should not expose title 6')
   editor.destroy()
 })
@@ -1036,9 +1051,9 @@ test('fontSize dropdown applies and clears font size', () => {
   select.dispatchEvent(new Event('change'))
   assert.ok(editor.isActive('fontSize', { fontSize: '18px' }))
 
-  select.value = ''
+  select.value = '14'
   select.dispatchEvent(new Event('change'))
-  assert.ok(!editor.isActive('fontSize'))
+  assert.ok(editor.isActive('fontSize', { fontSize: '14px' }))
   editor.destroy()
 })
 
@@ -1048,6 +1063,7 @@ test('fontSize dropdown reflects collapsed cursor size context without scaling m
   const select = host.querySelector('select[data-control="fontSize"]')
   const label = host.querySelector('.tiptap-select-fontSize .tiptap-select-label')
   assert.ok(select && label)
+  assert.equal(select.value, '14', 'the paragraph default should select the numeric 14px option')
 
   select.value = '24'
   select.dispatchEvent(new Event('change'))
@@ -1055,12 +1071,14 @@ test('fontSize dropdown reflects collapsed cursor size context without scaling m
   assert.ok(editor.isActive('fontSize', { fontSize: '24px' }))
   assert.equal(select.value, '24')
   assert.equal(label.textContent, '24')
-  assert.equal(
+  assert.deepEqual(
     Array.from(host.querySelectorAll('.tiptap-select-fontSize .tiptap-select-option-label'))
-      .filter((node) => node.textContent === '14').length,
-    1,
-    'the default 14px row should not be duplicated in the font size menu',
+      .map((node) => node.textContent),
+    ['8', '9', '10', '11', '12', '14', '16', '18', '20', '24', '36'],
+    'the font size menu should contain the numeric sizes in order',
   )
+  assert.ok(host.querySelector('.tiptap-select-fontSize .tiptap-select-option[data-value="16"]'))
+  assert.ok(host.querySelector('.tiptap-select-fontSize .tiptap-select-option[data-value="20"]'))
   for (const option of host.querySelectorAll('.tiptap-select-fontSize .tiptap-select-option')) {
     assert.equal(option.style.fontSize, '', 'font size menu items should keep a uniform menu type scale')
   }

@@ -38,7 +38,19 @@ export function colorPaletteForTheme(kind, theme) {
   return THEME_COLOR_PALETTES[paletteTheme][kind] || []
 }
 
-export const FONT_SIZES = ['8', '9', '10', '11', '12', '14', '18', '24', '36']
+// Keep the heading sizes from the design available in the manual size menu.
+// 14px is also the default paragraph size and is rendered by the clear/default
+// row in the toolbar.
+export const FONT_SIZES = ['8', '9', '10', '11', '12', '14', '16', '18', '20', '24', '36']
+
+// The selected heading uses this size when it has no explicit font-size mark.
+export const HEADING_FONT_SIZES = Object.freeze({
+  1: '24',
+  2: '20',
+  3: '18',
+  4: '16',
+  5: '14',
+})
 
 // 字号数值转 Npx 应用值，与 formatted-text.json 口径一致
 export function toPxSize(value) {
