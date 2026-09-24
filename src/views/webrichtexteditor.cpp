@@ -29,6 +29,12 @@
 
 static const char webPage[] = WEB_PATH "/index.html";
 
+// 悬浮工具栏(气泡工具栏)高度，与前端 assets/web/index.js 中 airPopoverHeight 保持一致
+static const int kAirPopoverHeight = 44;
+// 字体下拉栏最大高度：字体名 .dropdown-fontname 限制为 300px；字号共 9 项(9*34+内边距)约 316px
+// 参见 assets/web/css/bootstrapCssReset.css
+static const int kFontDropdownMaxHeight = 320;
+
 WebRichTextEditor::WebRichTextEditor(QWidget *parent)
     : QWebEngineView(parent)
 {
@@ -727,6 +733,22 @@ void WebRichTextEditor::onShowEditToolbar(const QPoint &pos)
     } else {
         //窗无口正常显示右键菜单时，菜单左上角坐标=鼠标位置，工具栏显示在右键菜单上方
         menuPoint.setY(menuPoint.y() - 45);
+    }
+    //下边界保护：与 X 方向的右边界回退对称，为工具栏及向下展开的字体下拉栏预留空间，
+    //避免非最大化窗口在页面底部右键时工具栏偏下、字体下拉栏超出编辑区可视下边界而显示不全。
+    //仅在编辑区有有效可视高度时生效，避免尺寸未知(0)时误判。
+    if (this->height() > 0) {
+        int maxMenuY = this->height() - kAirPopoverHeight - kFontDropdownMaxHeight;
+        if (maxMenuY < 0) {
+            //编辑区过矮，无法同时容纳工具栏与下拉栏，退化为只保证工具栏自身不溢出可视下边界
+            maxMenuY = this->height() - kAirPopoverHeight;
+        }
+        if (maxMenuY < 0) {
+            maxMenuY = 0;
+        }
+        if (menuPoint.y() > maxMenuY) {
+            menuPoint.setY(maxMenuY);
+        }
     }
     //记录编辑工具栏的坐标位置
     m_editToolbarRect = QRect(menuPoint, QPoint(menuPoint.x() + 290 + 85, menuPoint.y() + 35));
