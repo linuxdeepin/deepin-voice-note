@@ -12,7 +12,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tiptap Editor</title>
   <style>
-    html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; --dvn-editor-content-zoom: 1; }
+    html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; --dvn-editor-content-zoom: 1; --dvn-editor-default-font: "Source Han Sans SC", "Noto Sans CJK SC", sans-serif; }
     body { margin: 0; padding: 0; width: 100%; height: 100%; cursor: text; overflow: hidden; background-color: var(--dvn-editor-bg, #ffffff); color: var(--dvn-editor-fg, rgba(0, 0, 0, 1)); --dvn-toolbar-host-height: 48px; --dvn-title-host-height: 68px; }
     /* The fixed toolbar shares the title/body canvas, while its thin separators
        retain the visual boundary of the formatting-control area. */
@@ -23,29 +23,29 @@
     #toolbar-host > .tiptap-toolbar { position: relative; z-index: 1; }
     #content-scroll { position: absolute; left: 0; right: 0; top: var(--dvn-toolbar-host-height); bottom: 0; overflow-x: hidden; overflow-y: auto; background: var(--dvn-editor-bg, #ffffff); cursor: text; }
     #note-title-host { min-height: var(--dvn-title-host-height, 68px); box-sizing: border-box; display: flex; align-items: flex-start; padding: 13px 20px 4px 30px; background: var(--dvn-editor-bg, #ffffff); transform-origin: left top; }
-    #note-title-input { display: block; width: 100%; min-width: 0; min-height: 34px; height: auto; box-sizing: border-box; border: 0; outline: none; padding: 0; resize: none; overflow: hidden; background: transparent; color: var(--dvn-title-fg, rgba(0, 0, 0, 0.30)); caret-color: var(--highlightColor, #0086cc); font: 600 24px/1.4 var(--dvn-editor-default-font, Helvetica), sans-serif; white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word; }
+    #note-title-input { display: block; width: 100%; min-width: 0; min-height: 34px; height: auto; box-sizing: border-box; border: 0; outline: none; padding: 0; resize: none; overflow: hidden; background: transparent; color: var(--dvn-title-fg, rgba(0, 0, 0, 0.30)); caret-color: var(--highlightColor, #0086cc); font: 600 24px/1.4 var(--dvn-editor-default-font), sans-serif; white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word; }
     #note-title-input.is-custom { color: var(--dvn-editor-fg, rgba(0, 0, 0, 1)); }
     #note-title-input::selection { background: var(--dvn-text-selection-bg, var(--highlightColor, #0081ff)); color: var(--dvn-selection-fg, #ffffff); }
     #app { width: 100%; min-height: calc(100% - var(--dvn-title-host-height, 68px)); box-sizing: border-box; overflow: visible; transform-origin: left top; }
     .tiptap { width: 100%; min-height: 100%; box-sizing: border-box; overflow: visible; }
     /* Match legacy summernote .note-editable geometry for migration display fidelity. */
-    .ProseMirror { box-sizing: border-box; outline: none; width: 100%; min-height: 100%; overflow: visible; padding: 0 20px 50px 30px; cursor: text; font-family: var(--dvn-editor-default-font, Helvetica), sans-serif; font-size: 14px; line-height: 1.72; color: var(--dvn-editor-fg, rgba(0, 0, 0, 1)); word-wrap: break-word; }
+    .ProseMirror { box-sizing: border-box; outline: none; width: 100%; min-height: 100%; overflow: visible; padding: 0 20px 50px 30px; cursor: text; font-family: var(--dvn-editor-default-font), sans-serif; font-size: 14px; line-height: 1.72; color: var(--dvn-editor-fg, rgba(0, 0, 0, 1)); word-wrap: break-word; }
     .ProseMirror::selection, .ProseMirror ::selection { background: var(--dvn-text-selection-bg, var(--highlightColor, #0081ff)); color: var(--dvn-selection-fg, #ffffff); }
     #app.is-empty .ProseMirror::before { content: '请输入正文'; display: block; height: 0; color: var(--dvn-placeholder-fg, rgba(0, 0, 0, 0.30)); pointer-events: none; }
     #app.is-empty[data-empty-block="heading"] .ProseMirror::before { font-weight: 700; line-height: 1.2; }
-    #app.is-empty[data-empty-heading-level="1"] .ProseMirror::before { font-size: 28px; }
-    #app.is-empty[data-empty-heading-level="2"] .ProseMirror::before { font-size: 21px; }
-    #app.is-empty[data-empty-heading-level="3"] .ProseMirror::before { font-size: 16px; }
-    #app.is-empty[data-empty-heading-level="4"] .ProseMirror::before { font-size: 14px; }
-    #app.is-empty[data-empty-heading-level="5"] .ProseMirror::before { font-size: 12px; }
+    #app.is-empty[data-empty-heading-level="1"] .ProseMirror::before { font-size: 24px; line-height: 32px; }
+    #app.is-empty[data-empty-heading-level="2"] .ProseMirror::before { font-size: 20px; line-height: 28px; }
+    #app.is-empty[data-empty-heading-level="3"] .ProseMirror::before { font-size: 18px; line-height: 26px; }
+    #app.is-empty[data-empty-heading-level="4"] .ProseMirror::before { font-size: 16px; line-height: 24px; }
+    #app.is-empty[data-empty-heading-level="5"] .ProseMirror::before { font-size: 14px; line-height: 22px; }
     #app.is-empty[data-empty-heading-level="6"] .ProseMirror::before { font-size: 10px; }
     .ProseMirror p { margin: 0; min-height: 1.72em; }
-    .ProseMirror h1, .ProseMirror h2, .ProseMirror h3, .ProseMirror h4, .ProseMirror h5, .ProseMirror h6 { margin: 0; font-weight: 700; line-height: 1.2; }
-    .ProseMirror h1 { font-size: 28px; }
-    .ProseMirror h2 { font-size: 21px; }
-    .ProseMirror h3 { font-size: 16px; }
-    .ProseMirror h4 { font-size: 14px; }
-    .ProseMirror h5 { font-size: 12px; }
+    .ProseMirror h1, .ProseMirror h2, .ProseMirror h3, .ProseMirror h4, .ProseMirror h5, .ProseMirror h6 { margin: 0; font-weight: 700; }
+    .ProseMirror h1 { font-size: 24px; line-height: 32px; }
+    .ProseMirror h2 { font-size: 20px; line-height: 28px; }
+    .ProseMirror h3 { font-size: 18px; line-height: 26px; }
+    .ProseMirror h4 { font-size: 16px; line-height: 24px; }
+    .ProseMirror h5 { font-size: 14px; line-height: 22px; }
     .ProseMirror h6 { font-size: 10px; }
     /* Match legacy Summernote list spacing from saved note CSS.
        Browser defaults indent lists too far and can make migrated long lines

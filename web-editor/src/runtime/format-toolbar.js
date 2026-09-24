@@ -17,7 +17,7 @@ import micIconUrl from './icons/mic.svg?url'
 import imageIconUrl from './icons/image.svg?url'
 import taskListIconUrl from './icons/task.svg?url'
 import checkIconUrl from './icons/check.svg?url'
-import { FORE_COLORS, BACK_COLORS, FONT_SIZES, colorPaletteForTheme, toPxSize } from './format-palette.js'
+import { FORE_COLORS, BACK_COLORS, FONT_SIZES, HEADING_FONT_SIZES, colorPaletteForTheme, toPxSize } from './format-palette.js'
 import { activeListType, canIndentActiveListItem, canOutdentActiveListItem, liftActiveListItem, sinkActiveListItem, switchActiveListType, switchSelectedListType } from './list-behavior.js'
 
 const TOGGLE_BUTTONS = [
@@ -656,18 +656,11 @@ export function createFormatToolbar(editor, host) {
     control: 'fontSize',
     title: '字号',
     onOpen: (current) => closeStyleSelects(current),
-    options: [
-      { value: '', label: '14' },
-      // 14px is the default paragraph size and is represented by the clear/default row above.
-      // Do not add it again as an explicit item, otherwise the menu shows two identical "14" entries.
-      ...FONT_SIZES.filter((size) => size !== '14').map((size) => ({ value: size, label: size })),
-    ],
+    // Keep the size menu as a plain numeric list. The paragraph default is
+    // 14px, so it is a normal option rather than a special first row.
+    options: FONT_SIZES.map((size) => ({ value: size, label: size })),
     onChange(value) {
-      if (!value) {
-        clearMarkColor(editor, 'fontSize')
-      } else {
-        applyMarkColor(editor, 'fontSize', 'fontSize', toPxSize(value))
-      }
+      if (value) applyMarkColor(editor, 'fontSize', 'fontSize', toPxSize(value))
     },
   })
   styleGroup.appendChild(sizeControl.wrapper)
@@ -1116,8 +1109,15 @@ export function createFormatToolbar(editor, host) {
     const fontFamily = hasEditorContext ? editor.getAttributes('fontFamily').fontFamily : ''
     fontControl.setValue(fontFamily || '')
 
-    const fontSize = hasEditorContext ? editor.getAttributes('fontSize').fontSize : ''
-    sizeControl.setValue(fontSize ? String(parseInt(fontSize, 10)) : '')
+    const explicitFontSize = hasEditorContext ? editor.getAttributes('fontSize').fontSize : ''
+    // Heading size is a block-level default, not a fontSize mark. Reflect the
+    // effective size in the dropdown so selecting a heading updates both
+    // controls without writing a redundant inline font-size mark.
+    const headingFontSize = activeLevel !== 'p' ? HEADING_FONT_SIZES[activeLevel] : ''
+    const effectiveFontSize = explicitFontSize
+      ? String(parseInt(explicitFontSize, 10))
+      : (hasEditorContext ? (headingFontSize || '14') : '14')
+    sizeControl.setValue(effectiveFontSize)
 
     // 颜色按钮与颜色面板同样表达当前输入上下文；折叠光标下选择颜色后，
     // stored mark 会影响下一次输入，当前色必须立即更新。

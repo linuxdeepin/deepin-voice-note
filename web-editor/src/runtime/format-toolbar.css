@@ -247,16 +247,20 @@
 
 .tiptap-select-heading .tiptap-select-option[data-value="2"] {
     --dvn-heading-option-height: 40px;
-    --dvn-heading-option-font-size: 21px;
+    --dvn-heading-option-font-size: 20px;
 }
 
 .tiptap-select-heading .tiptap-select-option[data-value="3"] {
     --dvn-heading-option-height: 34px;
+    --dvn-heading-option-font-size: 18px;
+}
+
+.tiptap-select-heading .tiptap-select-option[data-value="4"] {
     --dvn-heading-option-font-size: 16px;
 }
 
 .tiptap-select-heading .tiptap-select-option[data-value="5"] {
-    --dvn-heading-option-font-size: 12px;
+    --dvn-heading-option-font-size: 14px;
 }
 
 
