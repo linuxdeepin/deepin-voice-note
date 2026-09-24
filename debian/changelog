@@ -1,3 +1,161 @@
+deepin-voice-note (6.6.1) unstable; urgency=medium
+
+  * fix(tiptap): round voice block drag preview
+  * fix(tiptap): sync heading sizes with font toolbar
+  * refactor(packaging): migrate dependencies to buildext
+  * fix: sync recorder and startup window fixes
+  * fix(tiptap): preserve heading behavior after select-all formatting
+  * fix(tiptap): refine popup menus and color panel placement
+  * fix(tiptap): align toolbar canvas and correct content zoom
+  * fix(ui): restore sidebar frosted glass background
+  * fix(editor): refresh web surface after fullscreen changes
+  * fix(editor): fix dark placeholder colors and empty layout
+  * fix(editor): adapt dark theme for transparent color option
+  * fix(migration): cover full window during upgrade
+  * fix(toolbar): prevent color popup overlap with more menu
+  * fix(editor): sync heading default bold state
+  * fix(search): exclude voice blocks and align themed highlights
+  * fix(tiptap): align list markers and formatted text rendering
+  * fix(tiptap): align active selection colors
+  * fix(tiptap): allow note title to wrap in editor pane
+  * fix(tiptap): split color apply and menu buttons
+  * fix(tiptap): refine toolbar interaction states
+  * fix(tiptap): refine toolbar icon and palette states
+  * fix(editor): refine list conversion and task checkbox style
+  * fix(editor): stabilize list switching and task cascade
+  * fix(tiptap): keep toolbar chrome out of content zoom
+  * fix(tiptap): clear editor after deleting last note
+  * fix(tiptap): align toolbar font dropdown with design
+  * test: achieve 100% function coverage for deepin-voice-note
+  * fix(linglong): add libxml2 build dependency
+  * fix(debian): add libxml2 build dependency
+  * fix(cmake): install Tiptap dist files to expected path
+  * fix(atspi): expose voice note controls for automation
+  * fix(tiptap): keep image selection and caret aligned
+  * fix(tiptap): enable Tiptap by default and sync startup theme
+  * fix(tiptap): keep toolbar stable while editor scrolls
+  * fix(tiptap): align image insertion cursor behavior
+  * style(toolbar): draw separators from host overlay
+  * fix(toolbar): clamp overflow menu in narrow width
+  * fix(layout): align minimum three-pane widths
+  * style(toolbar): align recording icon with design
+  * fix(voice): restore recorder controls after stop
+  * fix(license): update copyright years to 2024-2026 Log: 修改年份信息
+  * fix(toolbar): restore reverse overflow and align resource icons
+  * fix(voice): gate transcription with UOS AI capability
+  * feat(dialog): add UOS AI update prompt
+  * feat(common): add UOS AI capability manager
+  * feat(editor): align Tiptap toolbar with Sketch and Summernote
+  * refactor(search): use theme color for highlight HTML
+  * feat(export): support Tiptap document export
+  * test(migration): wait async rollback in controller test
+  * test(at): clear QML cache before voice note launch
+  * fix(qml): avoid upgrade view type conflict
+  * chore(web): rebuild tiptap editor bundles
+  * fix(tiptap): route transcript copy actions
+  * fix(tiptap): add plain text clipboard bridge
+  * fix(tiptap): make transcript text selectable
+  * test(tiptap): cover editor search highlighting
+  * feat(tiptap): highlight search hits in editor
+  * feat(search): wire indexed search into note workflow
+  * feat(tiptap): bridge native search state
+  * refactor(search): reuse document extractor in note search
+  * test(search): cover native search architecture
+  * feat(search): add indexed note search service
+  * feat(search): extract searchable note documents
+  * feat(search): add document model and text normalization
+  * refactor(search): make note data accessors const-safe
+  * fix(migration): show upgrade view before starting migration
+  * feat(tiptap): align search layout and note creation entry
+  * feat(tiptap): add editable note title in workspace
+  * feat(tiptap): align dropdown selected check icon
+  * feat(tiptap): align dark theme editor and voice block appearance
+  * test(at): use fixture database for voice note setup
+  * feat(tiptap): sync resource toolbar states and image insertion
+  * test(at): normalize voice-note AT suite directory structure
+  * fix(at-spi): add missing Accessible.name/role for QML elements
+  * fix(startup): enable WebEngine debugging only for debug builds
+  * fix(startup): handle workspace loading fallback and shortcut position
+  * feat(tiptap): align toolbar icon resources and active state
+  * feat(tiptap): use project assets for toolbar icons
+  * feat(tiptap): align toolbar icon resources and active state
+  * feat(tiptap): align toolbar and image editing behavior
+  * fix(tiptap): align image selection and context menu
+  * perf(startup): defer workspace initialization for empty notebooks
+  * fix(tiptap): restore undo redo history handling
+  * feat(tiptap): limit list nesting depth
+  * feat(tiptap): preserve selection when using format toolbar
+  * feat(tiptap): normalize migrated list spacing
+  * fix(tiptap): handle voice block context menu copy and paste
+  * fix(tiptap): insert recorded voice blocks with legacy spacing
+  * fix(tiptap): improve voice block migration and interactions
+  * fix(tiptap): load editor from file path for local images
+  * test(migration): stabilize null orchestrator coverage test
+  * test(at): update voice note AT fixtures and selectors
+  * fix(migration): gate Tiptap migration behind debug flag
+  * fix(migration): reload note data after migration entry
+  * fix(tiptap): resolve titlebar occlusion and envelope loading
+  * feat(migration): replace MigrationProgressView with unified UpgradeView
+  * chore: Sync by https://github.com/linuxdeepin/.github/commit/a300f8523d4876677112edab6a0772f7ad112976
+  * chore(at-spi): add AT-SPI Accessible.name/role to all interactive QML controls
+  * fix(ut): resolve unit test hanging and flaky failures
+  * feat(test): add ut-summary.json generation for test results and coverage
+  * fix(ut): restore blockFromElement branches and helper functions
+  * test(ut): raise function coverage to 100%, add 115 test cases
+  * test(at): stabilize voice note AT suite assertions
+  * fix(ut): decouple migration validator tests from npm install
+  * test(ut): add 15 unit test suites, raise function coverage to 90.7%
+  * test(ut): 补充第2批单元测试，新增3个测试套件
+  * fix(ut): 修复5个失败的单元测试用例
+  * feat(tiptap): extend theme CSS variables, add voice-block copy-clear, and rebuild dist
+  * fix(tiptap): harden context menu probe against injection
+  * feat(tiptap): add scroll reporting channel and wire host interactions
+  * feat(tiptap): add list and task list toolbar with multi-level indent
+  * feat(tiptap): write back transcription result on note switch
+  * feat(tiptap): wire voice playback/to-text channel events and theme
+  * feat(tiptap): add voice block node view with self-contained styling
+  * feat(tiptap): add image insert, paste, view-original and path normalization
+  * feat(tiptap): add font list host delivery channel
+  * feat(tiptap): add fixed top format toolbar with ten basic formats
+  * feat(tiptap): replace temp channel with formal QWebChannel interface
+  * test(at): stabilize voice note AT suite setup
+  * test(at): update voice note AT suites
+  * feat(tiptap): integrate minimal Tiptap editor load/save
+  * fix(migration): use cumulative counts in resume report
+  * feat(migration): implement upgrade progress view
+  * feat(migration): orchestrate background full migration task
+  * feat(migration): implement migration report generation and persistence
+  * refactor(migration): split MigrationWriter::writeOne and cover remaining branches
+  * feat(migration): implement single-note transactional write-back
+  * fix(migration): detect query iteration failure in scanner
+  * feat(migration): implement read-only scan and precheck
+  * feat(migration): implement database backup module
+  * feat(migration): implement migration state machine
+  * fix(migration): address CR review P1/P2/P5 for TTP-013
+  * test(migration): add desensitized real-data fixtures for HTML conversion
+  * feat(migration): degrade unknown and dangerous HTML
+  * feat(migration): convert legacy HTML voice blocks
+  * feat(migration): convert legacy HTML images
+  * test: 修复单元测试构建以适配 Qt6 和 QML 架构改造
+  * feat(migration): convert HTML alignment and lists
+  * feat(migration): convert HTML text marks
+  * feat(migration): convert basic HTML blocks
+  * feat(migration): convert noteDatas voice blocks
+  * feat(migration): convert noteDatas text blocks
+  * feat(migration): add HTML parser adapter
+  * feat(migration): add envelope validator
+  * feat(migration): add json builder
+  * fix(schema): harden envelope validation
+  * feat(migration): add legacy format detector
+  * feat(tiptap): introduce schema v1 contract
+  * ci: allow cppcheck checkout for fork pull requests
+  * fix: add X-Deepin-Singleton flag to desktop file
+  * test: add AT-SPI test cases for deepin-voice-note
+  * fix: remove yaml literal block scalar in linglong.yaml
+  * fix(vnote): keep ctrl multi-selection count in sync
+
+ -- dengzhongyuan <dengzhongyuan@uniontech.com>  Thu, 24 Sep 2026 14:56:38 +0800
+
 deepin-voice-note (6.5.62) unstable; urgency=medium
 
   * fix(vnote): use folder ids for notebook operations
