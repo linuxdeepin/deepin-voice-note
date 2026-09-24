@@ -579,6 +579,10 @@ test('themeProvided: light theme variables', () => {
   assert.equal(document.documentElement.style.getPropertyValue('--dvn-color-transparent-line'), 'rgba(0, 0, 0, 0.25)')
 })
 
+test('voice block drag preview keeps rounded clipping on the snapshot root', () => {
+  assert.match(voiceBlockCss, /\.voiceBox\.dvn-voice-drag-ghost \{[\s\S]*border-radius: 12px;[\s\S]*overflow: hidden;[\s\S]*clip-path: inset\(0 round 12px\);/)
+})
+
 test('voice block active state uses active background and white foreground', () => {
   assert.match(
     voiceBlockCss,
@@ -992,6 +996,47 @@ test('to-text completed: writes text to voiceBlock attrs', () => {
 // ---------------------------------------------------------------------------
 // 复制清态：transformCopied 清 text、生成新 voiceId、重置 translateUnfold
 // ---------------------------------------------------------------------------
+
+test('drag: voice block uses a rounded custom drag preview', () => {
+  const { editor, window } = createEditor()
+  const { bridge } = createMockBridge()
+  setVoiceBridge(bridge)
+
+  editor.commands.insertContent({
+    type: 'voiceBlock',
+    attrs: {
+      voiceId: 'voice-drag-preview-test',
+      voicePath: 'voicenote/drag-preview.mp3',
+      voiceSize: 5000,
+      title: '拖拽预览',
+    },
+  })
+
+  const voiceBox = editor.view.dom.querySelector('.voiceBox')
+  assert.ok(voiceBox, 'voiceBox should render')
+  voiceBox.getBoundingClientRect = () => ({ left: 10, top: 20, width: 320, height: 42 })
+
+  let dragImage = null
+  const event = new window.Event('dragstart', { bubbles: true, cancelable: true })
+  Object.defineProperty(event, 'clientX', { value: 70 })
+  Object.defineProperty(event, 'clientY', { value: 40 })
+  Object.defineProperty(event, 'dataTransfer', {
+    value: { setDragImage(image, x, y) { dragImage = { image, x, y } } },
+  })
+  voiceBox.dispatchEvent(event)
+
+  assert.ok(dragImage?.image, 'drag image should be supplied explicitly')
+  assert.ok(dragImage.image.classList.contains('dvn-voice-drag-ghost'))
+  assert.ok(dragImage.image.classList.contains('voiceBox'))
+  assert.equal(dragImage.image.style.borderRadius, '12px')
+  assert.equal(dragImage.image.style.clipPath, 'inset(0 round 12px)')
+  assert.equal(dragImage.x, 60)
+  assert.equal(dragImage.y, 20)
+
+  voiceBox.dispatchEvent(new window.Event('dragend', { bubbles: true, cancelable: true }))
+  assert.equal(document.querySelector('.dvn-voice-drag-ghost'), null)
+  editor.destroy()
+})
 
 test('drag: internal voiceBlock drag preserves text and voiceId in copied slice', () => {
   const { editor, window } = createEditor()

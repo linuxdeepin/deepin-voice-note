@@ -10,6 +10,17 @@
     outline: none;
 }
 
+.voiceBox.dvn-voice-drag-ghost {
+    /* The native drag preview is a snapshot of this temporary node. Keep the
+       clipping boundary on the snapshot root so transparent square corners do
+       not appear while dragging the voice block. */
+    margin: 0 !important;
+    border-radius: 12px;
+    overflow: hidden;
+    clip-path: inset(0 round 12px);
+    -webkit-clip-path: inset(0 round 12px);
+}
+
 
 .voiceBox.ProseMirror-selectednode .voiceInfoBox,
 .voiceBox.active .voiceInfoBox {

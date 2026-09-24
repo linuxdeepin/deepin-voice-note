@@ -345,6 +345,50 @@ export const VoiceBlock = Node.create({
       let unplayable = false
       let currentNode = node
       let destroyed = false
+      let dragGhost = null
+
+      function removeDragGhost() {
+        if (!dragGhost) return
+        dragGhost.remove()
+        dragGhost = null
+        document.removeEventListener('dragend', removeDragGhost, true)
+      }
+
+      function onVoiceBoxDragStart(event) {
+        const dataTransfer = event.dataTransfer
+        if (!dataTransfer?.setDragImage) return
+
+        removeDragGhost()
+        const rect = wrapper.getBoundingClientRect()
+        const width = Math.max(1, Math.round(rect.width))
+        const height = Math.max(1, Math.round(rect.height))
+        const ghost = wrapper.cloneNode(true)
+        ghost.classList.add('dvn-voice-drag-ghost')
+        Object.assign(ghost.style, {
+          position: 'fixed',
+          left: '-10000px',
+          top: '-10000px',
+          width: `${width}px`,
+          height: `${height}px`,
+          margin: '0',
+          borderRadius: '12px',
+          overflow: 'hidden',
+          clipPath: 'inset(0 round 12px)',
+          webkitClipPath: 'inset(0 round 12px)',
+          pointerEvents: 'none',
+        })
+        document.body.appendChild(ghost)
+        dragGhost = ghost
+
+        const offsetX = Number.isFinite(event.clientX)
+          ? Math.max(0, Math.min(width, event.clientX - rect.left))
+          : Math.round(width / 2)
+        const offsetY = Number.isFinite(event.clientY)
+          ? Math.max(0, Math.min(height, event.clientY - rect.top))
+          : Math.round(height / 2)
+        dataTransfer.setDragImage(ghost, Math.round(offsetX), Math.round(offsetY))
+        document.addEventListener('dragend', removeDragGhost, true)
+      }
 
       // --- 构建 DOM ---
       const wrapper = document.createElement('div')
@@ -689,6 +733,8 @@ export const VoiceBlock = Node.create({
       }
 
 
+      wrapper.addEventListener('dragstart', onVoiceBoxDragStart)
+      wrapper.addEventListener('dragend', removeDragGhost)
       wrapper.addEventListener('beforeinput', onVoiceBoxBeforeInput)
       wrapper.addEventListener('input', onVoiceBoxInput)
       wrapper.addEventListener('keydown', onVoiceBoxKeyDown)
@@ -824,6 +870,9 @@ export const VoiceBlock = Node.create({
           if (destroyed) return
           destroyed = true
           unsubscribe()
+          wrapper.removeEventListener('dragstart', onVoiceBoxDragStart)
+          wrapper.removeEventListener('dragend', removeDragGhost)
+          removeDragGhost()
           wrapper.removeEventListener('beforeinput', onVoiceBoxBeforeInput)
           wrapper.removeEventListener('input', onVoiceBoxInput)
           wrapper.removeEventListener('keydown', onVoiceBoxKeyDown)
