@@ -59,6 +59,8 @@ public:
     } UI;
     //获取记事项最大id
     qint32 &maxNoteIdRef();
+    //获取记事项最大id（只读）
+    qint32 maxNoteIdRef() const;
     //获取记事项个数
     qint32 getNotesCount();
     //获取记事项数据

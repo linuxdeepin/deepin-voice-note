@@ -220,6 +220,31 @@ QString VNoteItemOper::getDefaultNoteName(qint64 folderId)
 }
 
 /**
+ * @brief VNoteItemOper::parseDefaultNoteSeq
+ * @param noteTitle 笔记标题
+ * @return 默认名后缀序号；非默认名或不匹配返回 0（不参与序号竞争）
+ *
+ * 与 getDefaultNoteName 互逆：默认名 = tr("Text") + 序号（见 getDefaultNoteName）。
+ * 已重命名为非「默认前缀+数字」形态的笔记返回 0，不计入 maxNoteId 推进，
+ * 其自定义名不会与后续默认「文本N」名冲突。
+ */
+qint32 VNoteItemOper::parseDefaultNoteSeq(const QString &noteTitle)
+{
+    static const QString defaultPrefix = DApplication::translate("DefaultName", "Text");
+
+    if (noteTitle.startsWith(defaultPrefix)) {
+        const QString rest = noteTitle.mid(defaultPrefix.size());
+        bool ok = false;
+        qint32 seq = rest.toInt(&ok);
+        if (ok && seq > 0) {
+            return seq;
+        }
+    }
+
+    return 0;
+}
+
+/**
  * @brief VNoteItemOper::getDefaultVoiceName
  * @return 语音项名称
  */

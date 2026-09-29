@@ -40,6 +40,8 @@ public:
     bool deleteVNoteFolder(VNoteFolder *folder);
     //重命名记事本
     bool renameVNoteFolder(const QString &folderName);
+    //更新记事本最大记事项序号（移动笔记后持久化 max_noteid）
+    bool updateFolderMaxNoteId(qint32 maxNoteId);
 
 protected:
     VNoteFolder *m_folder {nullptr};
