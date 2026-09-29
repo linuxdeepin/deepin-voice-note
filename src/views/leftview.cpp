@@ -18,6 +18,7 @@
 #include "common/setting.h"
 #include "widgets/vnoterightmenu.h"
 #include "db/vnoteitemoper.h"
+#include "db/vnotefolderoper.h"
 
 #include <DApplication>
 #include <DWindowManagerHelper>
@@ -557,10 +558,18 @@ bool LeftView::doNoteMove(const QModelIndexList &src, const QModelIndex &dst)
         VNoteItem *tmpData = static_cast<VNoteItem *>(StandardItemCommon::getStandardItemData(src[0]));
         if (selectFolder && tmpData->folderId != selectFolder->id) {
             VNoteItemOper noteOper;
-            VNOTE_ITEMS_MAP *srcNotes = noteOper.getFolderNotes(tmpData->folderId);
+            //移动后会改变 tmpData->folderId，提前记录源记事本 id，用于全部移出时定位源记事本
+            const qint64 srcFolderId = tmpData->folderId;
+            VNOTE_ITEMS_MAP *srcNotes = noteOper.getFolderNotes(srcFolderId);
             VNOTE_ITEMS_MAP *destNotes = noteOper.getFolderNotes(selectFolder->id);
+            //统计被拖笔记中默认名「文本N」的最大序号，用于推进目标记事本 maxNoteId
+            qint32 maxMovedSeq = 0;
             for (auto it : src) {
                 tmpData = static_cast<VNoteItem *>(StandardItemCommon::getStandardItemData(it));
+                const qint32 seq = VNoteItemOper::parseDefaultNoteSeq(tmpData->noteTitle);
+                if (seq > maxMovedSeq) {
+                    maxMovedSeq = seq;
+                }
                 //更新内存数据
                 srcNotes->lock.lockForWrite();
                 srcNotes->folderNotes.remove(tmpData->noteId);
@@ -574,12 +583,18 @@ bool LeftView::doNoteMove(const QModelIndexList &src, const QModelIndex &dst)
                 noteOper.updateFolderId(tmpData);
             }
 
-            //全部移除后重置当前记事本maxid
+            //目标记事本 maxNoteId 取「原值」与「被拖笔记最大序号+1」的较大者，避免新建默认名重号；
+            //并同步持久化，防止重启后计数器回退。序号来自默认名后缀，不是全局 noteId。
+            const qint32 newDestMaxNoteId = qMax(selectFolder->maxNoteIdRef(), maxMovedSeq + 1);
+            VNoteFolderOper(selectFolder).updateFolderMaxNoteId(newDestMaxNoteId);
+
+            //源记事本笔记全部移出时重置 maxNoteId 为 0（清空语义，与 deleteNote 一致），
+            //通过被拖笔记的 srcFolderId 定位源记事本，避免依赖 currentIndex() 的隐式假设。
             if (src.count() == m_notesNumberOfCurrentFolder) {
-                VNoteFolder *folder = reinterpret_cast<VNoteFolder *>(StandardItemCommon::getStandardItemData(currentIndex()));
-                folder->maxNoteIdRef() = 0;
-            } else {
-                selectFolder->maxNoteIdRef() += src.size();
+                VNoteFolder *srcFolder = VNoteFolderOper().getFolder(srcFolderId);
+                if (nullptr != srcFolder) {
+                    VNoteFolderOper(srcFolder).updateFolderMaxNoteId(0);
+                }
             }
             return true;
         }

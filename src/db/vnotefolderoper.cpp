@@ -100,6 +100,40 @@ bool VNoteFolderOper::renameVNoteFolder(const QString &folderName)
 }
 
 /**
+ * @brief VNoteFolderOper::updateFolderMaxNoteId
+ * @param maxNoteId 新的最大记事项序号
+ * @return true 成功
+ *
+ * 把记事本的 maxNoteId 写回 DB，用于移动笔记后持久化目标/源记事本的计数器，
+ * 避免重启后从 DB 重新加载导致计数器回退、新建默认名重号。失败时回滚内存值。
+ */
+bool VNoteFolderOper::updateFolderMaxNoteId(qint32 maxNoteId)
+{
+    bool isUpdateOK = true;
+
+    if (nullptr != m_folder) {
+        qint32 oldMaxNoteId = m_folder->maxNoteIdRef();
+        QDateTime oldModifyTime = m_folder->modifyTime;
+
+        m_folder->maxNoteIdRef() = maxNoteId;
+        m_folder->modifyTime = QDateTime::currentDateTime();
+
+        UpdateFolderMaxNoteIdDbVisitor updateFolderVisitor(VNoteDbManager::instance()->getVNoteDb(), m_folder, nullptr);
+
+        if (Q_UNLIKELY(!VNoteDbManager::instance()->updateData(&updateFolderVisitor))) {
+            m_folder->maxNoteIdRef() = oldMaxNoteId;
+            m_folder->modifyTime = oldModifyTime;
+
+            isUpdateOK = false;
+        }
+    } else {
+        isUpdateOK = false;
+    }
+
+    return isUpdateOK;
+}
+
+/**
  * @brief VNoteFolderOper::loadVNoteFolders
  * @return 所有记事本数据
  */

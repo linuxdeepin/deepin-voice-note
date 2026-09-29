@@ -222,6 +222,15 @@ public:
     virtual bool prepareSqls() override;
 };
 
+//更新记事本最大记事项序号（移动笔记后持久化 max_noteid）
+class UpdateFolderMaxNoteIdDbVisitor : public DbVisitor
+{
+public:
+    explicit UpdateFolderMaxNoteIdDbVisitor(QSqlDatabase &db, const void *inParam, void *result);
+
+    virtual bool prepareSqls() override;
+};
+
 //记事项删除
 class DelNoteDbVisitor : public DbVisitor
 {

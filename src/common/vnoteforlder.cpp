@@ -41,6 +41,15 @@ qint32 &VNoteFolder::maxNoteIdRef()
 }
 
 /**
+ * @brief VNoteFolder::maxNoteIdRef
+ * @return 最大记事项id（只读）
+ */
+qint32 VNoteFolder::maxNoteIdRef() const
+{
+    return maxNoteId;
+}
+
+/**
  * @brief VNoteFolder::getNotesCount
  * @return 记事项数目
  */

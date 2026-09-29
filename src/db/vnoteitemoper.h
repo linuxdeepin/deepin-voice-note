@@ -27,6 +27,8 @@ public:
     VNOTE_ITEMS_MAP *getFolderNotes(qint64 folderId);
     //生成默认名称
     QString getDefaultNoteName(qint64 folderId);
+    //解析默认名称后缀序号（默认名「文本N」→N，非默认名/不匹配返回 0，不参与序号竞争）
+    static qint32 parseDefaultNoteSeq(const QString &noteTitle);
     //生成默认语音名称
     QString getDefaultVoiceName() const;
     //删除记事项
