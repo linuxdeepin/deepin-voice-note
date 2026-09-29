@@ -1,3 +1,10 @@
+deepin-voice-note (6.6.2) unstable; urgency=medium
+
+  * chore: Update version to 6.6.2
+  * fix(packaging): add missing libxml2-dev to linglong buildext
+
+ -- zhanghongyuan <zhanghongyuan@uniontech.com>  Tue, 29 Sep 2026 19:51:31 +0800
+
 deepin-voice-note (6.6.1) unstable; urgency=medium
 
   * fix(tiptap): round voice block drag preview
