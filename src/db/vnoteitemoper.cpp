@@ -16,6 +16,8 @@
 #include <DLog>
 #include <DApplication>
 
+#include <QSet>
+
 /**
  * @brief VNoteItemOper::VNoteItemOper
  * @param note 操作对象
@@ -205,18 +207,68 @@ VNOTE_ITEMS_MAP *VNoteItemOper::getFolderNotes(qint64 folderId)
  * @brief VNoteItemOper::getDefaultNoteName
  * @param folderId
  * @return 记事项名称
+ *
+ * 默认名取当前记事本内未被占用的最小序号（缺口填充），而非依赖可能因跨记事本
+ * 移动而滞后的 maxNoteId 计数器。这样跨记事本拖拽较大序号笔记后，新建笔记会先
+ * 补齐空号、再递增，不会与被拖入的笔记重名。空记事本首条笔记仍为无序号「文本」。
  */
 QString VNoteItemOper::getDefaultNoteName(qint64 folderId)
 {
+    const QString defaultPrefix = DApplication::translate("DefaultName", "Text");
+
     VNoteFolder *folder = VNoteDataManager::instance()->getFolder(folderId);
-
-    QString defaultNoteName = DApplication::translate("DefaultName", "Text");
-
-    if (nullptr != folder && folder->maxNoteIdRef() != 0) {
-        defaultNoteName += QString("%1").arg(folder->maxNoteIdRef());
+    if (nullptr == folder) {
+        return defaultPrefix;
     }
 
-    return defaultNoteName;
+    VNOTE_ITEMS_MAP *folderNotes = folder->getNotes();
+    if (nullptr == folderNotes || folderNotes->folderNotes.isEmpty()) {
+        //空记事本首条笔记保持无序号默认名「文本」
+        return defaultPrefix;
+    }
+
+    //收集记事本内默认名「文本N」已占用的序号，取最小可用序号
+    QSet<qint32> usedNoteSeq;
+    folderNotes->lock.lockForRead();
+    for (VNoteItem *note : folderNotes->folderNotes) {
+        const qint32 seq = parseDefaultNoteSeq(note->noteTitle);
+        if (seq > 0) {
+            usedNoteSeq.insert(seq);
+        }
+    }
+    folderNotes->lock.unlock();
+
+    qint32 nextSeq = 1;
+    while (usedNoteSeq.contains(nextSeq)) {
+        ++nextSeq;
+    }
+
+    return defaultPrefix + QString::number(nextSeq);
+}
+
+/**
+ * @brief VNoteItemOper::parseDefaultNoteSeq
+ * @param noteTitle 笔记标题
+ * @return 默认名后缀序号；非默认名或不匹配返回 0（不参与序号竞争）
+ *
+ * 与 getDefaultNoteName 互逆：默认名 = tr("Text") + 序号（见 getDefaultNoteName）。
+ * 已重命名为非「默认前缀+数字」形态的笔记返回 0，不计入已占用序号，
+ * 其自定义名不会与后续默认「文本N」名冲突。
+ */
+qint32 VNoteItemOper::parseDefaultNoteSeq(const QString &noteTitle)
+{
+    static const QString defaultPrefix = DApplication::translate("DefaultName", "Text");
+
+    if (noteTitle.startsWith(defaultPrefix)) {
+        const QString rest = noteTitle.mid(defaultPrefix.size());
+        bool ok = false;
+        qint32 seq = rest.toInt(&ok);
+        if (ok && seq > 0) {
+            return seq;
+        }
+    }
+
+    return 0;
 }
 
 /**
