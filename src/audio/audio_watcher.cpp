@@ -1,4 +1,5 @@
 #include "audio_watcher.h"
+#include <QTimer>
 
 AudioWatcher::AudioWatcher(QObject *parent)
     : QObject(parent)
@@ -6,16 +7,8 @@ AudioWatcher::AudioWatcher(QObject *parent)
     qDebug() << "Initializing AudioWatcher...";
     m_isVirtualMachineHw = isVirtualMachineHw();
     initWatcherCofing();
-    initDeviceWacther();
+    QTimer::singleShot(0, this, &AudioWatcher::initDeviceWacther);
     initConnections();
-
-    // 初始获取 ReduceNoise 状态 (使用更简洁的property()方法)
-    if (m_audioDBusInterface->isValid()) {
-        m_isReduceNoise = m_audioDBusInterface->property("ReduceNoise").value<bool>();
-        qInfo() << "Initial ReduceNoise state:" << m_isReduceNoise;
-    } else {
-        qWarning() << "Failed to get initial ReduceNoise state: m_audioDBusInterface is invalid.";
-    }
 
     qDebug() << "AudioWatcher initialization completed";
 }
@@ -52,6 +45,9 @@ void AudioWatcher::initDeviceWacther()
                                               this,
                                               SLOT(onDBusAudioPropertyChanged(QDBusMessage))
                                               );
+        // 初始获取 ReduceNoise 状态 (使用更简洁的property()方法)
+        m_isReduceNoise = m_audioDBusInterface->property("ReduceNoise").value<bool>();
+        qInfo() << "Initial ReduceNoise state:" << m_isReduceNoise;
         updateDeviceEnabled(m_audioDBusInterface->property("CardsWithoutUnavailable").value<QString>(), false);
     } else {
         qCritical() << "Failed to initialize audio service. Audio service (" << AudioService << ") does not exist";
@@ -488,6 +484,10 @@ bool AudioWatcher::getMute(AudioMode mode)
 bool AudioWatcher::getDeviceEnable(AudioWatcher::AudioMode mode)
 {
     qInfo() << "Getting device enable";
+    if (!m_audioDBusInterface) {
+        qWarning() << "m_audioDBusInterface is nullptr, audio service not yet initialized";
+        return false;
+    }
     QString cards = m_audioDBusInterface->property("Cards").value<QString>();
     if (m_isVirtualMachineHw && (cards.isEmpty() || cards.toLower() == "null")) {
         qInfo() << "Device enable is true (virtual machine)";
