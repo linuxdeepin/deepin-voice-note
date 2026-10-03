@@ -18,6 +18,7 @@
 #include "common/setting.h"
 #include "widgets/vnoterightmenu.h"
 #include "db/vnoteitemoper.h"
+#include "db/vnotefolderoper.h"
 
 #include <DApplication>
 #include <DWindowManagerHelper>
@@ -559,6 +560,7 @@ bool LeftView::doNoteMove(const QModelIndexList &src, const QModelIndex &dst)
             VNoteItemOper noteOper;
             VNOTE_ITEMS_MAP *srcNotes = noteOper.getFolderNotes(tmpData->folderId);
             VNOTE_ITEMS_MAP *destNotes = noteOper.getFolderNotes(selectFolder->id);
+            qint32 maxMovedNoteId = 0;
             for (auto it : src) {
                 tmpData = static_cast<VNoteItem *>(StandardItemCommon::getStandardItemData(it));
                 //更新内存数据
@@ -572,15 +574,17 @@ bool LeftView::doNoteMove(const QModelIndexList &src, const QModelIndex &dst)
                 destNotes->lock.unlock();
                 //更新数据库
                 noteOper.updateFolderId(tmpData);
+                maxMovedNoteId = qMax(maxMovedNoteId, tmpData->noteId);
             }
 
             //全部移除后重置当前记事本maxid
             if (src.count() == m_notesNumberOfCurrentFolder) {
                 VNoteFolder *folder = reinterpret_cast<VNoteFolder *>(StandardItemCommon::getStandardItemData(currentIndex()));
                 folder->maxNoteIdRef() = 0;
-            } else {
-                selectFolder->maxNoteIdRef() += src.size();
             }
+            //更新目标记事本maxNoteId为max(目标maxNoteId, 被拖入笔记noteId最大值)
+            selectFolder->maxNoteIdRef() = qMax(selectFolder->maxNoteIdRef(), maxMovedNoteId);
+            VNoteFolderOper(selectFolder).updateFolderMaxNoteId();
             return true;
         }
     }
