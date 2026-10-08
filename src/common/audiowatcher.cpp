@@ -15,7 +15,7 @@
 #include <pulse/pulseaudio.h>
 
 namespace {
-constexpr qint64 kPulseProbeCacheDurationMs = 5000;
+constexpr qint64 kPulseProbeCacheDurationMs = 30000;
 
 struct PulseSourceProbe
 {
@@ -648,6 +648,12 @@ QString AudioWatcher::getDeviceName(AudioMode mode)
                 && (hasPorts || isPulseSourceRecordable(sourceName))) {
             device = sourceName;
         }
+        if (device.isEmpty()) {
+            qWarning() << "getDeviceName: microphone device name is empty,"
+                       << "source:" << sourceName
+                       << "hasPorts:" << hasPorts
+                       << "portAvailable:" << portAvailable;
+        }
     }
     return device;
 }
@@ -667,6 +673,11 @@ bool AudioWatcher::isMicrophoneSourceAvailable(const QString &sourceName,
 
 bool AudioWatcher::isPulseSourceRecordable(const QString &sourceName)
 {
+    if (sourceName.isEmpty()) {
+        qWarning() << "isPulseSourceRecordable: source name is empty, skipping probe";
+        return false;
+    }
+
     const bool hasCachedResult = sourceName == m_probedPulseSource;
     if (hasCachedResult
             && m_pulseProbeCacheTimer.isValid()
@@ -674,8 +685,20 @@ bool AudioWatcher::isPulseSourceRecordable(const QString &sourceName)
         return m_probedPulseSourceRecordable;
     }
 
-    startPulseSourceProbe(sourceName);
-    return hasCachedResult && m_probedPulseSourceRecordable;
+    const bool recordable = probePulseSource(sourceName);
+    if (sourceName != defaultSourceName()) {
+        return recordable;
+    }
+    const bool changed = m_probedPulseSource != sourceName
+            || m_probedPulseSourceRecordable != recordable;
+    m_probedPulseSource = sourceName;
+    m_probedPulseSourceRecordable = recordable;
+    m_pulseProbeCacheTimer.start();
+    m_probingPulseSource.clear();
+    if (changed) {
+        emit sigDeviceEnableChanged(Micphone, recordable);
+    }
+    return recordable;
 }
 
 void AudioWatcher::startPulseSourceProbe(const QString &sourceName)
