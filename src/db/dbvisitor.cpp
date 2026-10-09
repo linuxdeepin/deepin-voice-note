@@ -470,7 +470,7 @@ bool RenameFolderDbVisitor::prepareSqls()
     bool fPrepareOK = true;
     const VNoteFolder *folder = param.newFolder;
     if (nullptr != folder) {
-        static constexpr char const *RENAME_FOLDERS_FMT = "UPDATE %s SET %s='%s', %s='%s' WHERE %s=%s;";
+        static constexpr char const *RENAME_FOLDERS_FMT = "UPDATE %s SET %s='%s', %s=%s, %s='%s' WHERE %s=%s;";
         QString sqlFolderName = folder->name;
         checkSqlStr(sqlFolderName);
 
@@ -480,6 +480,8 @@ bool RenameFolderDbVisitor::prepareSqls()
                           VNoteDbManager::FOLDER_TABLE_NAME,
                           DBFolder::folderColumnsName[DBFolder::folder_name].toUtf8().data(),
                           folder->encryption ? sqlFolderName.toLocal8Bit().toBase64().data() : sqlFolderName.toUtf8().data(),
+                          DBFolder::folderColumnsName[DBFolder::max_noteid].toUtf8().data(),
+                          QString("%1").arg(folder->maxNoteIdRef()).toUtf8().data(),
                           DBFolder::folderColumnsName[DBFolder::modify_time].toUtf8().data(),
                           folder->modifyTime.toString(VNOTE_TIME_FMT).toUtf8().data(),
                           DBFolder::folderColumnsName[DBFolder::folder_id].toUtf8().data(),
