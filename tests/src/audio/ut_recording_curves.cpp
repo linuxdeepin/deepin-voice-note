@@ -98,3 +98,54 @@ TEST_F(UT_RecordingCurves, Paint_WithZeroGain_DoesNotCrash)
     curves.paint(&painter);
     SUCCEED();
 }
+
+// ============================================================================
+// PMS 补强回归用例（qt-autotest-generator Mode 7 → Mode 2 补强）
+// ============================================================================
+
+// BUG 277547: 录音动画除体现声音大小外需向右流动（91fca315 重写 paint，
+// 引入 m_phase 相位推进：sin((x - m_phase)...) 使波形随时间右移）。
+// PMS: https://pms.uniontech.com/bug-view-277547.html  commit: 91fca315
+TEST(RecordingCurvesFlowUT, BUG277547_updateCurvesAdvancesPhase)
+{
+    RecordingCurves curves;
+    curves.startRecording();
+    const double p0 = curves.m_phase;
+    curves.updateCurves();
+    curves.updateCurves();
+    // 相位每次 updateCurves 推进 π，驱动波形向右流动
+    EXPECT_DOUBLE_EQ(p0 + 2 * M_PI, curves.m_phase);
+
+    // 超过 170π 后回卷，避免长时间录制相位无界增长
+    curves.m_phase = 170 * M_PI;
+    curves.updateCurves();
+    EXPECT_DOUBLE_EQ(0.0, curves.m_phase);
+    curves.stopRecording();
+}
+
+// 相位差应导致渲染结果不同（波形确实移动了，而非静态曲线）
+// PMS: https://pms.uniontech.com/bug-view-277547.html  commit: 91fca315
+TEST(RecordingCurvesFlowUT, BUG277547_paintFlowShiftsWaveform)
+{
+    RecordingCurves c1, c2;
+    c1.setSize(QSizeF(100, 50));
+    c2.setSize(QSizeF(100, 50));
+    c1.updateVolume(1.0);
+    c2.updateVolume(1.0);
+    c2.m_phase = M_PI;   // 半周期相位差
+
+    QImage img1(200, 100, QImage::Format_ARGB32);
+    QImage img2(200, 100, QImage::Format_ARGB32);
+    img1.fill(Qt::transparent);
+    img2.fill(Qt::transparent);
+    QPainter p1(&img1);
+    QPainter p2(&img2);
+    c1.paint(&p1);
+    c2.paint(&p2);
+    p1.end();
+    p2.end();
+
+    EXPECT_FALSE(img1.isNull());
+    EXPECT_FALSE(img2.isNull());
+    EXPECT_NE(img1, img2);   // 不同相位 → 波形右移后的画面不同
+}

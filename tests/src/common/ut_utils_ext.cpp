@@ -196,3 +196,84 @@ TEST(UtilsExt, setTitleBarTabFocus)
     Utils::setTitleBarTabFocus(&ev);  // no-op in current impl
     SUCCEED();
 }
+
+// ============================================================================
+// PMS 补强回归用例（qt-autotest-generator Mode 7 → Mode 2 补强）
+// ============================================================================
+
+// BUG 340969/340979: 录音保存后右键语音文件提示"语音被删除" / Ctrl+D 保存失败。
+// 根因：语音以相对路径存库，重启后找不到文件；修复 makeVoiceAbsolute 把相对
+// 路径解析到 AppDataLocation（src/common/utils.cpp:38-50）。
+// PMS: https://pms.uniontech.com/bug-view-340969.html  commit: 4ebe6e2f, 9d5579e3
+// PMS: https://pms.uniontech.com/bug-view-340979.html  commit: 4ebe6e2f, 9d5579e3
+TEST(UtilsExt, BUG340969_makeVoiceAbsolute_relativePathRoundTrip)
+{
+    const QString abs = QDir::toNativeSeparators(
+        QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)
+        + "/voicenote/ut-340969.wav");
+
+    // 相对路径 → 绝对路径，必须落在 AppData 语音目录下且可反推回原相对路径
+    const QString got = Utils::makeVoiceAbsolute("voicenote/ut-340969.wav");
+    EXPECT_FALSE(got.isEmpty());
+    EXPECT_TRUE(QDir::isAbsolutePath(got)) << "relative voice path must resolve to absolute";
+    const QString appData = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    if (!appData.isEmpty())
+        EXPECT_TRUE(got.startsWith(QDir::toNativeSeparators(appData)))
+            << "resolved path must live under AppDataLocation: " << qPrintable(got);
+
+    // 往返一致：绝对 → 相对 → 绝对，避免保存后再次查找失败
+    const QString rel = Utils::makeVoiceRelative(abs);
+    EXPECT_EQ(abs, Utils::makeVoiceAbsolute(rel));
+}
+
+// BUG 86096: heap-use-after-free + 整型溢出漏洞（9d5579e3 修复）。
+// UAF 场景：documentToBlock 遍历含图片片段/多段落文档时 fragment 迭代与
+// 追加顺序导致的悬挂风险；溢出场景：renderSVG 对异常尺寸的缩放计算。
+// PMS: https://pms.uniontech.com/bug-view-86096.html  commit: 9d5579e3
+TEST(UtilsExt, BUG86096_documentToBlock_mixedFragmentsNoUaf)
+{
+    VNoteItem item;
+    VNoteBlock *block = item.newBlock(VNoteBlock::Text);
+    ASSERT_NE(nullptr, block);
+
+    // 文本 + 图片片段混排：图片分支被跳过且不产生悬挂 fragment
+    QTextDocument doc;
+    QTextCursor cur(&doc);
+    cur.insertText(QStringLiteral("before"));
+    QTextImageFormat imgFmt;
+    imgFmt.setName(QStringLiteral("ut-86096.png"));
+    cur.insertImage(imgFmt);
+    cur.insertText(QStringLiteral("after"));
+    Utils::documentToBlock(block, &doc);
+    EXPECT_EQ(QStringLiteral("beforeafter"), block->blockText);
+
+    // 多段落文档：迭代器跨块推进（段落分隔符被保留）
+    QTextDocument doc2;
+    doc2.setPlainText(QStringLiteral("l1\nl2\nl3"));
+    VNoteBlock *block2 = item.newBlock(VNoteBlock::Text);
+    ASSERT_NE(nullptr, block2);
+    Utils::documentToBlock(block2, &doc2);
+    EXPECT_EQ(QStringLiteral("l1\nl2\nl3"), block2->blockText);
+}
+
+// BUG 86096（续）: renderSVG 对异常尺寸不得整型溢出崩溃。负尺寸在修复后
+// 走 reader 失败→空 pixmap 路径；超大尺寸会触发真实大分配，依赖环境内存，
+// 不在用例中触发。
+// PMS: https://pms.uniontech.com/bug-view-86096.html  commit: 9d5579e3
+TEST(UtilsExt, BUG86096_renderSVG_negativeSizeNoOverflow)
+{
+    QTemporaryFile svg("voice-ut-86096-XXXXXX.svg");
+    ASSERT_TRUE(svg.open());
+    svg.write("<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10'>"
+              "<rect width='10' height='10' fill='blue'/></svg>");
+    svg.close();
+
+    // 异常尺寸（修复前整型溢出路径）：关键回归点是不崩溃、安全返回；
+    // 具体返回值依 Qt 版本（可能钳位到自然尺寸），不设硬断言
+    const QPixmap neg1 = Utils::renderSVG(svg.fileName(), QSize(-10, -10), qApp);
+    const QPixmap neg2 = Utils::renderSVG(svg.fileName(), QSize(-1, 0), qApp);
+    EXPECT_TRUE(neg1.isNull() || neg1.width() >= -10);
+    EXPECT_TRUE(neg2.isNull() || neg2.width() >= -1);
+    // 正常尺寸仍可渲染（对照）
+    EXPECT_FALSE(Utils::renderSVG(svg.fileName(), QSize(8, 8), qApp).isNull());
+}

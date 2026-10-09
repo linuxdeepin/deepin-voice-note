@@ -10,11 +10,13 @@
 #include <gtest/gtest.h>
 
 #include <QDir>
+#include <QEventLoop>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QSignalSpy>
 #include <QStandardPaths>
+#include <QTimer>
 
 TEST(WebRichTextManagerUT, lifecycle)
 {
@@ -119,6 +121,38 @@ TEST(WebRichTextManagerUT, insertVoiceItem)
 {
     WebRichTextManager w;
     w.insertVoiceItem("/tmp/voice-ut.wav", 1000);
+    SUCCEED();
+}
+
+// ============================================================================
+// PMS 补强回归用例（qt-autotest-generator Mode 7 → Mode 2 补强）
+// ============================================================================
+
+// BUG 335623: 初始化界面（没有任何记事本）按 Ctrl+B 闪退。修复（a9eeef4c）：
+// ① setData(nullptr) 早退；② initData 延迟回调解引用前检查 m_noteData 非空
+// （src/common/webrichetextmanager.cpp:64-68, 104-107）。
+// PMS: https://pms.uniontech.com/bug-view-335623.html  commit: a9eeef4c, befc63df
+// PMS: https://pms.uniontech.com/bug-view-335263.html  commit: a9eeef4c, e3c51a74
+TEST(WebRichTextManagerUT, BUG335623_nullGuardsOnEmptyNotebook)
+{
+    WebRichTextManager w;
+
+    // 无记事本场景下空数据入口：必须早退且不崩溃，且不改变状态
+    w.setData(nullptr, QStringLiteral(""));
+    EXPECT_EQ(nullptr, w.m_noteData);
+
+    // initData(有效笔记) 后，笔记在 50ms 延迟回调前被清空（如 Ctrl+B 触发
+    // 的清理路径）→ 延迟 setData 必须跳过，不得解引用空指针
+    VNoteItem note;
+    note.noteId = 42;
+    w.initData(&note, QStringLiteral(""));
+    w.m_noteData = nullptr;
+    {
+        QEventLoop loop;
+        QTimer::singleShot(150, &loop, &QEventLoop::quit);
+        loop.exec();
+    }
+    EXPECT_EQ(nullptr, w.m_noteData);
     SUCCEED();
 }
 

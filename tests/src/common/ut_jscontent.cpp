@@ -5,6 +5,7 @@
 
 #include "ut_jscontent.h"
 #include "jscontent.h"
+#include <QSignalSpy>
 
 UT_JsContent::UT_JsContent()
 {
@@ -84,4 +85,23 @@ TEST_F(UT_JsContent, UT_JsContent_jsCallCreateNote_001)
 TEST_F(UT_JsContent, UT_JsContent_jsCallSetClipData_001)
 {
     JsContent::instance()->jsCallSetClipData("", "");
+}
+
+// ============================================================================
+// PMS 补强回归用例（qt-autotest-generator Mode 7 → Mode 2 补强）
+// ============================================================================
+
+// BUG 277187: 编辑区 UI 问题——summernote 初始化完成后必须通知 QML 侧刷新
+// （eb04e50a 补上 loadFinsh 信号发射）。
+// PMS: https://pms.uniontech.com/bug-view-277187.html  commit: eb04e50a
+TEST(JsContentUT, BUG277187_summernoteInitEmitsLoadFinsh)
+{
+    JsContent *js = JsContent::instance();
+    ASSERT_NE(nullptr, js);
+
+    QSignalSpy spy(js, &JsContent::loadFinsh);
+    ASSERT_TRUE(spy.isValid());
+
+    js->jsCallSummernoteInitFinish();
+    EXPECT_EQ(1, spy.count());   // 修复前无信号 → 编辑区样式/光标异常
 }
