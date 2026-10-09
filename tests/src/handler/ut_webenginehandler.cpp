@@ -16,6 +16,10 @@
 #include <QMimeData>
 #include <QEvent>
 #include <QPointF>
+#include <QTemporaryDir>
+#include <QImage>
+#include <QFile>
+#include <QDir>
 
 TEST(WebEngineHandlerUT, lifecycleAndTarget)
 {
@@ -99,4 +103,58 @@ TEST(WebEngineHandlerUT, eventFilterDrag)
     QObject other;
     EXPECT_FALSE(h.eventFilter(&other, &leave));
     SUCCEED();
+}
+
+// ============================================================================
+// PMS 补强回归用例（qt-autotest-generator Mode 7 → Mode 2 补强）
+// ============================================================================
+
+// BUG 300535: 已接入输入/输出设备情况下拖拽操作异常。修复：eventFilter 对
+// DragEnter/DragMove/Drop 携带不可插入（非图片/不存在）URL 时置 IgnoreAction
+// 并拦截（src/handler/web_engine_handler.cpp:312-368）。
+// PMS: https://pms.uniontech.com/bug-view-300535.html  commit: 1c05a9e4, 4ebe6e2f
+TEST(WebEngineHandlerUT, BUG300535_eventFilterRejectsNonImageDrop)
+{
+    WebEngineHandler h;
+    QObject target;
+    h.setTarget(&target);
+
+    QTemporaryDir dir;
+    ASSERT_TRUE(dir.isValid());
+    const QString imgPath = dir.filePath("a.png");
+    ASSERT_TRUE(QImage(2, 2, QImage::Format_RGB32).save(imgPath, "PNG"));
+    QTemporaryDir dir2;
+    ASSERT_TRUE(dir2.isValid());
+    const QString txtPath = dir2.filePath("a.txt");
+    {
+        QFile f(txtPath);
+        ASSERT_TRUE(f.open(QIODevice::WriteOnly));
+        f.write("x", 1);
+    }
+
+    QMimeData mdImg;
+    mdImg.setUrls({QUrl::fromLocalFile(imgPath)});
+    QMimeData mdTxt;
+    mdTxt.setUrls({QUrl::fromLocalFile(txtPath)});
+
+    // 合法图片拖入：放行
+    QDropEvent enterImg(QPointF(0, 0), Qt::CopyAction, &mdImg,
+                        Qt::NoButton, Qt::NoModifier, QEvent::DragEnter);
+    EXPECT_FALSE(h.eventFilter(&target, &enterImg));
+
+    // 非图片文件：DragEnter / DragMove / Drop 三阶段均拦截
+    QDropEvent enterTxt(QPointF(0, 0), Qt::CopyAction, &mdTxt,
+                        Qt::NoButton, Qt::NoModifier, QEvent::DragEnter);
+    EXPECT_TRUE(h.eventFilter(&target, &enterTxt));
+    QDropEvent moveTxt(QPointF(0, 0), Qt::CopyAction, &mdTxt,
+                       Qt::NoButton, Qt::NoModifier, QEvent::DragMove);
+    EXPECT_TRUE(h.eventFilter(&target, &moveTxt));
+    QDropEvent dropTxt(QPointF(0, 0), Qt::CopyAction, &mdTxt,
+                       Qt::NoButton, Qt::NoModifier);
+    EXPECT_TRUE(h.eventFilter(&target, &dropTxt));
+
+    // 合法图片 Drop：不拦截
+    QDropEvent dropImg(QPointF(0, 0), Qt::CopyAction, &mdImg,
+                       Qt::NoButton, Qt::NoModifier);
+    EXPECT_FALSE(h.eventFilter(&target, &dropImg));
 }
