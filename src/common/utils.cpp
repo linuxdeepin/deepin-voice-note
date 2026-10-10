@@ -1,4 +1,4 @@
-// Copyright (C) 2019 ~ 2020 Uniontech Software Technology Co.,Ltd.
+// Copyright (C) 2019 ~ 2026 Uniontech Software Technology Co.,Ltd.
 // SPDX-FileCopyrightText: 2023 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
@@ -267,7 +267,8 @@ void Utils::documentToBlock(VNoteBlock *block, const QTextDocument *doc)
         block->blockText = "";
     }
 
-    if (doc != nullptr) {
+    // block 为空时后续无法写入 blockText，直接跳过，避免空指针崩溃
+    if (block != nullptr && doc != nullptr) {
         qInfo() << "Doc is not nullptr";
         QTextBlock currentBlock = doc->begin();
         QTextBlock::iterator it;
