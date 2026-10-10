@@ -69,10 +69,24 @@ TEST_F(UT_RecordingCurves, PauseRecording_TogglesTimer)
     EXPECT_TRUE(curves.isRecordingActive());
 }
 
-// 注：pauseRecording 在未 startRecording 时调用会启动定时器，
-// 这是 RecordingCurves 源码的已知行为（pauseRecording 内部用
-// m_timer->isActive() 做切换），此处不作为预期断言，避免将
-// 源码行为固化为"正确"。
+// pauseRecording 在未 startRecording 时调用不再启动定时器（源码已增加
+// m_recordingActive 录音态前置判断），录制中的暂停/恢复切换语义保持不变
+TEST_F(UT_RecordingCurves, PauseRecording_WithoutStart_DoesNotStartTimer)
+{
+    RecordingCurves curves;
+    EXPECT_FALSE(curves.isRecordingActive());
+
+    // 非录制态调用 pauseRecording 应被忽略，不能误启动定时器
+    curves.pauseRecording();
+    EXPECT_FALSE(curves.isRecordingActive());
+
+    // stopRecording 之后再调用同样应被忽略
+    curves.startRecording();
+    curves.stopRecording();
+    ASSERT_FALSE(curves.isRecordingActive());
+    curves.pauseRecording();
+    EXPECT_FALSE(curves.isRecordingActive());
+}
 
 TEST_F(UT_RecordingCurves, Paint_WithValidSize_DoesNotCrash)
 {
