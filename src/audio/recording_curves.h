@@ -31,6 +31,9 @@ private:
     QList<QPointF> m_volumeList;
     double m_gain {0.0};
     double m_phase;
+    // 录音流程是否进行中（startRecording 置位，stopRecording 复位）
+    // pauseRecording 仅在该标志为 true 时生效，避免非录制态误启动定时器
+    bool m_recordingActive {false};
     QTimer *m_timer;
 };
 

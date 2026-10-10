@@ -32,6 +32,7 @@ void RecordingCurves::updateVolume(const double &gain)
 void RecordingCurves::startRecording()
 {
     qInfo() << "startRecording called";
+    m_recordingActive = true;
     m_timer->start();
     qInfo() << "startRecording finished";
 }
@@ -39,6 +40,7 @@ void RecordingCurves::startRecording()
 void RecordingCurves::stopRecording()
 {
     qInfo() << "stopRecording called";
+    m_recordingActive = false;
     m_timer->stop();
     m_phase = 0.0;
     m_gain = 0.0;  // 添加这一行，重置增益为0
@@ -49,6 +51,12 @@ void RecordingCurves::stopRecording()
 void RecordingCurves::pauseRecording()
 {
     qInfo() << "pauseRecording called, timer active:" << m_timer->isActive();
+    // 仅在录音流程中生效：未 startRecording 或已 stopRecording 时忽略，
+    // 避免暂停接口在非录制态误启动定时器；录制中保持暂停/恢复切换语义
+    if (!m_recordingActive) {
+        qInfo() << "pauseRecording ignored: recording is not active";
+        return;
+    }
     if (m_timer->isActive()) {
         m_gain = 0.0;
         m_timer->stop();
