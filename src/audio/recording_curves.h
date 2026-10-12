@@ -27,7 +27,7 @@ private:
     QList<QPointF> m_pointList;
     QList<QPointF> m_volumeList;
     double m_gain {0.0};
-    double m_phase;
+    double m_phase {0.0};
     QTimer *m_timer;
 };
 

@@ -108,15 +108,15 @@ void RecordingCurves::paint(QPainter *painter)
     painter->setPen(shadows);
     painter->drawPolyline(points.constData(), points.size());
 
-#ifdef __mips64
-    // MIPS64 架构：避免直接使用 QLinearGradient 构造 QBrush
+#if defined(__mips64) || defined(__sw_64__)
+    // MIPS64/SW64 架构：避免直接使用 QLinearGradient 构造 QBrush
     // 分步创建以避免内存对齐问题
     QBrush gradientBrush;
     gradientBrush = QBrush(gradient);
     QPen gradientPen(gradientBrush, 1);
     painter->setPen(gradientPen);
 #else
-    // 非 MIPS64 架构使用原始方法
+    // 其他架构使用原始方法
     painter->setPen(QPen(QBrush(gradient), 1));
 #endif
     painter->drawPolyline(points.constData(), points.size());
