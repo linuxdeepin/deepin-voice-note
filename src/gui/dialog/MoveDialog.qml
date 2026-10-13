@@ -33,6 +33,9 @@ DialogWindow {
         Label {
             id: description
 
+            Layout.fillWidth: true
+            Layout.maximumWidth: 348
+            elide: Text.ElideMiddle
             Layout.alignment: Qt.AlignHCenter
             font: DTK.fontManager.t5
             text: name
