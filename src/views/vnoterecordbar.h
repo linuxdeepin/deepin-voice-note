@@ -74,6 +74,8 @@ public slots:
     void onChangeTheme();
     //控制中心中是否更改设备的使能状态
     void onDeviceEnableChanged(int mode,bool enabled);
+    //系统降噪(噪音抑制)状态改变
+    void onReduceNoiseChanged(bool reduceNoise);
 protected:
     //事件过滤器
     bool eventFilter(QObject *o, QEvent *e) override;

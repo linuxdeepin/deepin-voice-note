@@ -100,6 +100,74 @@ bool probePulseSource(const QString &sourceName)
             << "recordable:" << recordable;
     return recordable;
 }
+
+// 查询 PulseAudio 当前默认输入源。
+// 系统开启"噪音抑制"时会以 module-echo-cancel 创建降噪虚拟源并设为默认源，
+// 而 D-Bus 的 DefaultSource 可能未及时同步，故降噪场景直接以 PulseAudio 默认源为准。
+// 注意：UOS 20 的 PulseAudio 12.2 不支持 'pactl get-default-source'，这里用 libpulse API。
+struct PulseServerInfo
+{
+    QString defaultSource;
+    bool finished = false;
+};
+
+void onPulseServerInfo(pa_context *, const pa_server_info *info, void *userdata)
+{
+    auto result = static_cast<PulseServerInfo *>(userdata);
+    if (info && info->default_source_name) {
+        result->defaultSource = QString::fromUtf8(info->default_source_name);
+    }
+    result->finished = true;
+}
+
+QString queryPulseDefaultSource()
+{
+    pa_mainloop *mainloop = pa_mainloop_new();
+    if (!mainloop) {
+        return QString();
+    }
+
+    pa_context *context = pa_context_new(pa_mainloop_get_api(mainloop), "deepin-voice-note");
+    if (!context || pa_context_connect(context, nullptr, PA_CONTEXT_NOFLAGS, nullptr) < 0) {
+        if (context) {
+            pa_context_unref(context);
+        }
+        pa_mainloop_free(mainloop);
+        return QString();
+    }
+
+    QElapsedTimer timer;
+    timer.start();
+    pa_context_state_t contextState = PA_CONTEXT_UNCONNECTED;
+    while (timer.elapsed() < 500) {
+        pa_mainloop_iterate(mainloop, 0, nullptr);
+        contextState = pa_context_get_state(context);
+        if (contextState == PA_CONTEXT_READY || !PA_CONTEXT_IS_GOOD(contextState)) {
+            break;
+        }
+        QThread::msleep(5);
+    }
+
+    PulseServerInfo result;
+    pa_operation *operation = nullptr;
+    if (contextState == PA_CONTEXT_READY) {
+        operation = pa_context_get_server_info(context, onPulseServerInfo, &result);
+        timer.restart();
+        while (operation && !result.finished && timer.elapsed() < 500) {
+            pa_mainloop_iterate(mainloop, 0, nullptr);
+            QThread::msleep(5);
+        }
+    }
+
+    if (operation) {
+        pa_operation_unref(operation);
+    }
+    pa_context_disconnect(context);
+    pa_context_unref(context);
+    pa_mainloop_free(mainloop);
+
+    return result.defaultSource;
+}
 }
 
 bool AudioWatcher::kInIsEnable  = false;
@@ -118,6 +186,19 @@ AudioWatcher::AudioWatcher(QObject *parent)
     initWatcherCofing();
     initDeviceWacther();
     initConnections();
+
+    // 初始读取系统降噪(噪音抑制)状态
+    if (m_audioDBusInterface && m_audioDBusInterface->isValid()) {
+        m_isReduceNoise = m_audioDBusInterface->property("ReduceNoise").value<bool>();
+        qInfo() << "Initial ReduceNoise state:" << m_isReduceNoise;
+        if (m_isReduceNoise) {
+            // 提前异步查询默认源，避免录音时才发现缓存未就绪
+            startPulseDefaultSourceProbe();
+        }
+    } else {
+        qWarning() << "Failed to get initial ReduceNoise state: m_audioDBusInterface is invalid.";
+    }
+
     qDebug() <<"已初始化音频监听模块";
 }
 
@@ -407,6 +488,25 @@ void AudioWatcher::onDBusAudioPropertyChanged(QDBusMessage msg)
                 //控制中心中是否更改设备的使能状态
                 qInfo() << "控制中心改变默认设备使能状态！" << prop;
                 updateDeviceEnabled(changedProps[prop].toString(), true);
+            } else if (prop == QStringLiteral("ReduceNoise")) {
+                //系统降噪(噪音抑制)开关状态改变
+                const bool reduceNoise = qvariant_cast<bool>(changedProps[prop]);
+                if (m_isReduceNoise != reduceNoise) {
+                    m_isReduceNoise = reduceNoise;
+                    // 降噪源即将切换，清除缓存的源与探测状态，确保重新解析输入源
+                    m_probedPulseSource.clear();
+                    m_probedPulseSourceRecordable = false;
+                    m_probingPulseSource.clear();
+                    m_cachedPulseDefaultSource.clear();
+                    m_pulseDefaultCacheTimer.invalidate();
+                    m_probingPulseDefaultSource = false;
+                    qInfo() << "ReduceNoise state changed to:" << m_isReduceNoise;
+                    if (m_isReduceNoise) {
+                        // 提前异步查询默认源，避免录音时才发现缓存未就绪
+                        startPulseDefaultSourceProbe();
+                    }
+                    emit sigReduceNoiseChanged(m_isReduceNoise);
+                }
             }
         }
     } else if (interfaceName == SourceInterface) {
@@ -638,7 +738,24 @@ QString AudioWatcher::getDeviceName(AudioMode mode)
             }
         }
     } else {
-        const QString sourceName = defaultSourceName();
+        QString sourceName = defaultSourceName();
+        // 降噪(噪音抑制)开启时，系统会把 PulseAudio 默认源切换为降噪虚拟源(如 echoCancelSource)，
+        // 优先直接采用 PulseAudio 默认源，避免 D-Bus 未及时同步时录到未降噪的物理源。
+        if (m_isReduceNoise) {
+            const QString pulseSource = pulseDefaultSourceName();
+            if (!pulseSource.isEmpty()) {
+                sourceName = pulseSource;
+                qInfo() << "ReduceNoise is on, use PulseAudio default source:" << sourceName;
+            } else {
+                qWarning() << "ReduceNoise is on but empty PulseAudio default source, fallback to D-Bus name";
+            }
+        }
+
+        if (sourceName.isEmpty()) {
+            qWarning() << "getDeviceName: microphone source name is empty, reduceNoise:" << m_isReduceNoise;
+            return device;
+        }
+
         const bool hasPorts = !defaultSourcePorts().isEmpty();
         const bool portAvailable = m_inAudioPort.availability != 1;
         if (isMicrophoneSourceAvailable(sourceName,
@@ -701,6 +818,49 @@ void AudioWatcher::startPulseSourceProbe(const QString &sourceName)
         emit sigDeviceEnableChanged(Micphone, recordable);
     });
     watcher->setFuture(QtConcurrent::run(probePulseSource, sourceName));
+}
+
+/**
+ * @brief AudioWatcher::pulseDefaultSourceName 获取 PulseAudio 当前默认输入源
+ * 非阻塞：命中缓存直接返回；未命中时触发异步刷新并返回上次结果，
+ * 避免在 UI 线程同步查询 PulseAudio。
+ * @return 默认输入源名称，未知/查询中返回空(由调用方回退 D-Bus 默认源)
+ */
+QString AudioWatcher::pulseDefaultSourceName()
+{
+    constexpr qint64 kCacheDurationMs = 2000;
+    const bool cacheValid = m_pulseDefaultCacheTimer.isValid()
+            && m_pulseDefaultCacheTimer.elapsed() < kCacheDurationMs;
+    if (cacheValid) {
+        return m_cachedPulseDefaultSource;
+    }
+
+    // 缓存过期：异步刷新，本次先返回上次结果(可能为空)
+    startPulseDefaultSourceProbe();
+    return m_cachedPulseDefaultSource;
+}
+
+/**
+ * @brief AudioWatcher::startPulseDefaultSourceProbe 异步刷新 PulseAudio 默认输入源缓存
+ * 与 probePulseSource 一致在工作线程执行，避免阻塞主线程；查询失败也会刷新缓存计时，
+ * 形成短时退避，避免频繁查询。
+ */
+void AudioWatcher::startPulseDefaultSourceProbe()
+{
+    if (m_probingPulseDefaultSource) {
+        return;
+    }
+    m_probingPulseDefaultSource = true;
+    auto watcher = new QFutureWatcher<QString>(this);
+    connect(watcher, &QFutureWatcher<QString>::finished, this, [this, watcher]() {
+        m_cachedPulseDefaultSource = watcher->result();
+        watcher->deleteLater();
+        m_probingPulseDefaultSource = false;
+        // 无论成功与否都启动缓存计时：空结果时形成短时退避
+        m_pulseDefaultCacheTimer.start();
+        qInfo() << "PulseAudio default source (async refresh):" << m_cachedPulseDefaultSource;
+    });
+    watcher->setFuture(QtConcurrent::run(queryPulseDefaultSource));
 }
 
 /**
