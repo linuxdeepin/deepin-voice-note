@@ -18,6 +18,7 @@
 #include <DLog>
 
 #include <QVBoxLayout>
+#include <QTimer>
 
 /**
  * @brief VNoteRecordBar::VNoteRecordBar
@@ -298,6 +299,8 @@ void VNoteRecordBar::initAudioWatcher()
             this, &VNoteRecordBar::onAudioVolumeChange);
     connect(m_audioWatcher, &AudioWatcher::sigDeviceEnableChanged,
                 this, &VNoteRecordBar::onDeviceEnableChanged);
+    connect(m_audioWatcher, &AudioWatcher::sigReduceNoiseChanged,
+                this, &VNoteRecordBar::onReduceNoiseChanged);
 }
 
 /**
@@ -338,6 +341,24 @@ void VNoteRecordBar::onDeviceEnableChanged(int mode, bool enabled)
         qInfo() << "录制按钮是否可点击？" << available;
         m_recordBtn->setEnabled(available);
     }
+}
+
+/**
+ * @brief VNoteRecordBar::onReduceNoiseChanged
+ * 系统降噪(噪音抑制)开关切换时会切换输入源，录音中先结束当前录音，
+ * 再重新解析录音设备；系统侧创建/切换降噪源存在延迟，稍后再刷新一次按钮状态。
+ * @param reduceNoise 当前降噪状态
+ */
+void VNoteRecordBar::onReduceNoiseChanged(bool reduceNoise)
+{
+    qInfo() << "ReduceNoise state changed to:" << reduceNoise;
+    if (m_mainLayout->currentWidget() == m_recordPanel) {
+        stopRecord();
+    }
+    onAudioDeviceChange(m_currentMode);
+    QTimer::singleShot(300, this, [this]() {
+        onAudioDeviceChange(m_currentMode);
+    });
 }
 
 void VNoteRecordBar::stopPlay()

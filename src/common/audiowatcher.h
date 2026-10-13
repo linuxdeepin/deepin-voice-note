@@ -131,6 +131,8 @@ signals:
     void sigMuteChanged(AudioMode mode);
     //设备使能情况
     void sigDeviceEnableChanged(AudioMode mode, bool enable);
+    //降噪(噪音抑制)状态改变
+    void sigReduceNoiseChanged(bool reduceNoise);
 protected slots:
     //输入设备默认端口改变
     void onDefaultSourceActivePortChanged(AudioPort value);
@@ -256,6 +258,11 @@ private:
                                             bool needDeviceChecker);
     bool isPulseSourceRecordable(const QString &sourceName);
     void startPulseSourceProbe(const QString &sourceName);
+
+    // 查询 PulseAudio 当前默认输入源(降噪开启时即降噪虚拟源)
+    QString pulseDefaultSourceName();
+    // 异步刷新 PulseAudio 默认输入源缓存
+    void startPulseDefaultSourceProbe();
 private:
     /**
      * @brief 音频服务dbus接口
@@ -329,6 +336,12 @@ private:
     bool m_probedPulseSourceRecordable{false};
     QString m_probingPulseSource;
     QElapsedTimer m_pulseProbeCacheTimer;
+    // 系统降噪(噪音抑制)状态
+    bool m_isReduceNoise {false};
+    // PulseAudio 默认输入源缓存
+    QString m_cachedPulseDefaultSource;
+    QElapsedTimer m_pulseDefaultCacheTimer;
+    bool m_probingPulseDefaultSource {false};
 };
 
 #endif // AudioWatcher_H
