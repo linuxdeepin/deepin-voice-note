@@ -1,0 +1,185 @@
+diff --git a/src/task/exportnoteworker.cpp b/src/task/exportnoteworker.cpp
+index 401cc888..ec92d28f 100644
+--- a/src/task/exportnoteworker.cpp
++++ b/src/task/exportnoteworker.cpp
+@@ -18,6 +18,9 @@
+ #include <QFile>
+ #include <QFileInfo>
+ #include <QDebug>
++#include <QJsonDocument>
++#include <QJsonObject>
++#include <QTextDocument>
+ 
+ /**
+  * @brief ExportNoteWorker::ExportNoteWorker
+@@ -151,8 +154,9 @@ ExportNoteWorker::ExportError ExportNoteWorker::exportText()
+                 out.write(TiptapDocumentExporter::toPlainText(meta).toUtf8());
+             } else if (!noteData->htmlCode.isEmpty()) {
+                 qDebug() << "Converting HTML content to plain text";
++                QString htmlCode = stripVoiceUiElements(noteData->htmlCode);
+                 QTextDocument doc;
+-                doc.setHtml(noteData->htmlCode);
++                doc.setHtml(htmlCode);
+                 out.write(doc.toPlainText().toUtf8());
+             } else {
+                 qDebug() << "Writing plain text content";
+@@ -325,6 +329,99 @@ ExportNoteWorker::ExportError ExportNoteWorker::exportAsHtml()
+     return error;
+ }
+ 
++/**
++ * @brief ExportNoteWorker::stripVoiceUiElements
++ * 剥离语音块中的 UI 元素，从 jsonKey 属性中恢复转写文字。
++ *
++ * 导出 TXT 时，htmlCode 中的语音块包含 "正在转为文字" 占位文本、
++ * 时间字段、播放按钮等 UI 元素，而实际的转写文字仅存储在 jsonKey
++ * 的 JSON 属性中。本函数将整个语音块 div 替换为从 JSON 中提取的
++ * 转写文字（经过 HTML 转义），若 JSON 中无 text 字段则移除整个语音块。
++ *
++ * @param html 原始 HTML 字符串
++ * @return 处理后的 HTML 字符串
++ */
++QString ExportNoteWorker::stripVoiceUiElements(const QString &html)
++{
++    static const QRegularExpression voiceBoxRx(
++        QStringLiteral(R"(<div[^>]*\bjsonKey\s*=\s*"([^"]*)"[^>]*>)"),
++        QRegularExpression::CaseInsensitiveOption);
++
++    QString result = html;
++    int searchOffset = 0;
++
++    while (true) {
++        QRegularExpressionMatch match = voiceBoxRx.match(result, searchOffset);
++        if (!match.hasMatch()) {
++            break;
++        }
++
++        int divStart = match.capturedStart(0);
++        int divContentStart = match.capturedEnd(0);
++        QString jsonKeyRaw = match.captured(1);
++
++        // Find the matching closing </div> using depth counting
++        int depth = 1;
++        int pos = divContentStart;
++        static const QRegularExpression openDivRx(QStringLiteral(R"(<div\b)"), QRegularExpression::CaseInsensitiveOption);
++        static const QRegularExpression closeDivRx(QStringLiteral(R"(</div\s*>)"), QRegularExpression::CaseInsensitiveOption);
++
++        while (depth > 0 && pos < result.size()) {
++            QRegularExpressionMatch openMatch = openDivRx.match(result, pos);
++            QRegularExpressionMatch closeMatch = closeDivRx.match(result, pos);
++
++            int openPos = openMatch.hasMatch() ? openMatch.capturedStart(0) : -1;
++            int closePos = closeMatch.hasMatch() ? closeMatch.capturedStart(0) : -1;
++
++            if (openPos == -1 && closePos == -1) {
++                break;
++            }
++
++            if (closePos == -1 || (openPos != -1 && openPos < closePos)) {
++                depth++;
++                pos = openMatch.capturedEnd(0);
++            } else {
++                depth--;
++                pos = closeMatch.capturedEnd(0);
++                if (depth == 0) {
++                    break;
++                }
++            }
++        }
++
++        int divEnd = pos;
++
++        // Decode HTML entities in the jsonKey value
++        QString decodedJson = jsonKeyRaw;
++        decodedJson.replace(QStringLiteral("&amp;"), QStringLiteral("&"));
++        decodedJson.replace(QStringLiteral("&quot;"), QStringLiteral("\""));
++        decodedJson.replace(QStringLiteral("&lt;"), QStringLiteral("<"));
++        decodedJson.replace(QStringLiteral("&gt;"), QStringLiteral(">"));
++
++        // Parse JSON and extract text field
++        QString transcriptText;
++        QJsonParseError parseError;
++        QJsonDocument jsonDoc = QJsonDocument::fromJson(decodedJson.toUtf8(), &parseError);
++        if (jsonDoc.isObject()) {
++            QJsonObject jsonObj = jsonDoc.object();
++            transcriptText = jsonObj.value(QStringLiteral("text")).toString();
++        }
++
++        // Build replacement: escaped transcript text or empty
++        QString replacement;
++        if (!transcriptText.trimmed().isEmpty()) {
++            replacement = QStringLiteral("<p>%1</p>").arg(transcriptText.toHtmlEscaped());
++        }
++
++        result.replace(divStart, divEnd - divStart, replacement);
++
++        // Continue searching after the replacement
++        searchOffset = divStart + replacement.length();
++    }
++
++    return result;
++}
++
+ QString ExportNoteWorker::getExportFileName(const QString &baseName, const QString &fileSuffix)
+ {
+     qDebug() << "Generating unique filename for:" << baseName << fileSuffix;
+diff --git a/src/task/exportnoteworker.h b/src/task/exportnoteworker.h
+index 27c3371f..06d31c0b 100644
+--- a/src/task/exportnoteworker.h
++++ b/src/task/exportnoteworker.h
+@@ -11,6 +11,7 @@
+ 
+ #include <QObject>
+ #include <QRunnable>
++#include <QRegularExpression>
+ 
+ //一个记事项文本，语音导出线程
+ class ExportNoteWorker : public VNTask
+@@ -57,6 +58,8 @@ protected:
+     ExportError exportAsHtml();
+     //获取导出文件名，同名时创建副本
+     QString getExportFileName(const QString &baseName, const QString &fileSuffix);
++    //剥离语音块UI元素，恢复转写文字
++    static QString stripVoiceUiElements(const QString &html);
+ 
+     ExportType m_exportType {ExportNothing};
+     QString m_exportPath {""};
+diff --git a/src/web/index.js b/src/web/index.js
+index 69c895e2..fff9af63 100644
+--- a/src/web/index.js
++++ b/src/web/index.js
+@@ -784,7 +784,33 @@ function getHtml() {
+     $cloneCode.find('.voicebtn').removeClass('pause').addClass('play');
+     $cloneCode.find('.voicebtn').removeClass('now');
+     $cloneCode.find('.wifi-circle').removeClass('first').removeClass('second').removeClass('third').removeClass('four').removeClass('fifth').removeClass('sixth').removeClass('seventh');
+-    $cloneCode.find('.translate').html("");
++    // 保留转写文字：若 jsonKey 中有 text，将转写文字渲染到 .translateText 中，
++    // 避免导出 TXT 时丢失转写内容（显示"正在转为文字"占位文本）
++    $cloneCode.find('.voiceBox[jsonKey]').each(function () {
++        var $box = $(this);
++        var $translate = $box.find('.translate');
++        try {
++            var jsonStr = $box.attr('jsonKey');
++            var json = jsonStr ? JSON.parse(jsonStr) : {};
++            if (json.text && json.text.trim()) {
++                $translate.html(
++                    '<div class="translateHeader"><div class="translateIcon"></div>'
++                    + '<div class="translateLabel">' + divTranslateContent.translateLabel + '</div>'
++                    + '<div class="foldBtn"></div></div>'
++                    + '<div class="translateText noAirPopover"></div>'
++                );
++                $translate.find('.translateText').text(json.text);
++            } else {
++                $translate.html("");
++            }
++        } catch (e) {
++            $translate.html("");
++        }
++    });
++    // 清除"正在转为文字"占位文本
++    $cloneCode.find('.translatingLabel').empty();
++    // 清除未被 voiceBox 包含的孤立 .translate 元素
++    $cloneCode.find('.translate').not('.voiceBox .translate').html("");
+     // V2
+     $cloneCode.find('.voicePlayback').removeClass('now').removeClass('play').removeClass('pause').removeClass('voiceToText');
+     $cloneCode.find('.voiceInfoBox').removeClass('containText');

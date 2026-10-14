@@ -18,6 +18,9 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QDebug>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QTextDocument>
 
 /**
  * @brief ExportNoteWorker::ExportNoteWorker
@@ -151,8 +154,9 @@ ExportNoteWorker::ExportError ExportNoteWorker::exportText()
                 out.write(TiptapDocumentExporter::toPlainText(meta).toUtf8());
             } else if (!noteData->htmlCode.isEmpty()) {
                 qDebug() << "Converting HTML content to plain text";
+                QString htmlCode = stripVoiceUiElements(noteData->htmlCode);
                 QTextDocument doc;
-                doc.setHtml(noteData->htmlCode);
+                doc.setHtml(htmlCode);
                 out.write(doc.toPlainText().toUtf8());
             } else {
                 qDebug() << "Writing plain text content";
@@ -323,6 +327,105 @@ ExportNoteWorker::ExportError ExportNoteWorker::exportAsHtml()
     }
     qInfo() << "HTML export finished, result:" << error;
     return error;
+}
+
+/**
+ * @brief ExportNoteWorker::stripVoiceUiElements
+ * 剥离语音块中的 UI 元素，从 jsonKey 属性中恢复转写文字。
+ *
+ * 导出 TXT 时，htmlCode 中的语音块包含 "正在转为文字" 占位文本、
+ * 时间字段、播放按钮等 UI 元素，而实际的转写文字仅存储在 jsonKey
+ * 的 JSON 属性中。本函数将整个语音块 div 替换为从 JSON 中提取的
+ * 转写文字（经过 HTML 转义），若 JSON 中无 text 字段则移除整个语音块。
+ *
+ * @param html 原始 HTML 字符串
+ * @return 处理后的 HTML 字符串
+ */
+QString ExportNoteWorker::stripVoiceUiElements(const QString &html)
+{
+    static const QRegularExpression voiceBoxRx(
+        QStringLiteral(R"(<div[^>]*\bjsonKey\s*=\s*"([^"]*)"[^>]*>)"),
+        QRegularExpression::CaseInsensitiveOption);
+
+    QString result = html;
+    int searchOffset = 0;
+
+    while (true) {
+        QRegularExpressionMatch match = voiceBoxRx.match(result, searchOffset);
+        if (!match.hasMatch()) {
+            break;
+        }
+
+        int divStart = match.capturedStart(0);
+        int divContentStart = match.capturedEnd(0);
+        QString jsonKeyRaw = match.captured(1);
+
+        // Find the matching closing </div> using depth counting
+        int depth = 1;
+        int pos = divContentStart;
+        static const QRegularExpression openDivRx(QStringLiteral(R"(<div\b)"), QRegularExpression::CaseInsensitiveOption);
+        static const QRegularExpression closeDivRx(QStringLiteral(R"(</div\s*>)"), QRegularExpression::CaseInsensitiveOption);
+
+        while (depth > 0 && pos < result.size()) {
+            QRegularExpressionMatch openMatch = openDivRx.match(result, pos);
+            QRegularExpressionMatch closeMatch = closeDivRx.match(result, pos);
+
+            int openPos = openMatch.hasMatch() ? openMatch.capturedStart(0) : -1;
+            int closePos = closeMatch.hasMatch() ? closeMatch.capturedStart(0) : -1;
+
+            if (openPos == -1 && closePos == -1) {
+                break;
+            }
+
+            if (closePos == -1 || (openPos != -1 && openPos < closePos)) {
+                depth++;
+                pos = openMatch.capturedEnd(0);
+            } else {
+                depth--;
+                pos = closeMatch.capturedEnd(0);
+                if (depth == 0) {
+                    break;
+                }
+            }
+        }
+
+        int divEnd = pos;
+
+        if (depth > 0) {
+            // Malformed HTML: no matching </div>, skip this match
+            searchOffset = divContentStart;
+            continue;
+        }
+
+        // Decode HTML entities in the jsonKey value
+        QString decodedJson = jsonKeyRaw;
+        decodedJson.replace(QStringLiteral("&quot;"), QStringLiteral("\""));
+        decodedJson.replace(QStringLiteral("&lt;"), QStringLiteral("<"));
+        decodedJson.replace(QStringLiteral("&gt;"), QStringLiteral(">"));
+        decodedJson.replace(QStringLiteral("&amp;"), QStringLiteral("&"));
+
+        // Parse JSON and extract text field
+        QString transcriptText;
+        QJsonParseError parseError;
+        QJsonDocument jsonDoc = QJsonDocument::fromJson(decodedJson.toUtf8(), &parseError);
+        if (jsonDoc.isObject()) {
+            QJsonObject jsonObj = jsonDoc.object();
+            transcriptText = jsonObj.value(QStringLiteral("text")).toString();
+        }
+
+        // Build replacement: escaped transcript text or empty
+        QString replacement;
+        if (!transcriptText.trimmed().isEmpty()) {
+            replacement = QStringLiteral("<p>%1</p>").arg(transcriptText.toHtmlEscaped());
+        }
+
+        result.replace(divStart, divEnd - divStart, replacement);
+
+        // Continue searching after the replacement
+        searchOffset = divStart + replacement.length();
+    }
+
+    return result;
 }
 
 QString ExportNoteWorker::getExportFileName(const QString &baseName, const QString &fileSuffix)
