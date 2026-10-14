@@ -11,6 +11,7 @@
 
 #include <QObject>
 #include <QRunnable>
+#include <QRegularExpression>
 
 //一个记事项文本，语音导出线程
 class ExportNoteWorker : public VNTask
@@ -57,6 +58,8 @@ protected:
     ExportError exportAsHtml();
     //获取导出文件名，同名时创建副本
     QString getExportFileName(const QString &baseName, const QString &fileSuffix);
+    //剥离语音块UI元素，恢复转写文字
+    static QString stripVoiceUiElements(const QString &html);
 
     ExportType m_exportType {ExportNothing};
     QString m_exportPath {""};
