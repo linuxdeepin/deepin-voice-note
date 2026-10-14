@@ -4,6 +4,8 @@
 
 Voice Notes is a simple memo software with texts and voice recordings. With it, you are able to record your daily life and work in MP3 format or texts. 
 
+> ![notes](../common/notes.svg) Notes: Some features may vary by version and device model. The features actually available in your app take precedence.
+
 ## Guide
 
 You can run, exit, and create a shortcut for Voice Notes in the following ways.
@@ -89,7 +91,7 @@ The notebook created will be automatically saved as **Note (n)**. You can rename
 
 You can add pictures to notes in one of the following ways:
 
-- Click the ![icon](../common/pic.svg)icon  to import pictures from File Manager.
+- Click the ![icon](../common/pic.svg) icon on the right side of the top bar to import pictures from File Manager.
 - Drag the picture to the right column directly.
 - Copy and paste the picture to the the right column directly.
 
@@ -137,7 +139,7 @@ Select a text note or multiple text notes with **Ctrl/Shift** in the notes list 
 
 ![0|save](fig/save_notes.png)
 
-### Save Voices Recording
+### Save Voice Recording
 
 1.   Select a voice note or multiple voice notes with **Ctrl/Shift** in the notes list.
 2.   Right-click, and select **Save voice recording** to save the voice notes selected in MP3 format.
@@ -145,6 +147,33 @@ Select a text note or multiple text notes with **Ctrl/Shift** in the notes list 
 >![tips](../common/tips.svg) Tips:  You can also right-click a voice file in the voice notes and select **Save as MP3** to save it in the storage device.
 
 ![0|save](fig/savevoice.png)
+
+### Convert Voices to Texts
+
+Right-click a voice file on the Voice Notes interface to select **Voice to Text** to convert the voice contents to texts.
+
+![0|save](fig/voicetotext.png)
+
+ 
+
+### Covert Texts to Speech
+
+1. Select a paragraph of texts. Right-click it and select **Text to Speech**. The texts selected will be broadcast.
+1. During playback, you can stop the **Text to Speech** by clicking the close button on the reading control.
+
+ >![notes](../common/notes.svg) Notes:
+ >- When no text is selected, **Text to Speech** is grayed out and inoperable. 
+ >- When only an audio file is selected, **Text to Speech** is inoperable; if the audio file selected contains voice-to-text content, **Text to Speech** can be operated.
+
+![0|speech](fig/speech.png)
+
+### Convert Speech to Texts
+
+1. In the text editor area, right-click and select **Speech to Text**. Input speech through the microphone to insert transcribed text at the cursor position.
+2. During dictation, you can stop **Speech to Text**  by clicking the close button on the dictation control.
+
+> ![tips](../common/tips.svg) Tips: You can enable **Speech to Text** while recording audios. 
+
 
 ### Delete Notes
 
@@ -178,6 +207,7 @@ You can set up audio source from **Internal** and **Microphone** options.
 ### Theme
 
 There are three window themes, namely Light Theme, Dark Theme, and System Theme.
+
 1. Click ![icon_menu](../common/icon_menu.svg)on the Voice Notes interface.
 2. Click **Theme** to select one theme.
 
