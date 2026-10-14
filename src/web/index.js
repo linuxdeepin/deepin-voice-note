@@ -784,7 +784,32 @@ function getHtml() {
     $cloneCode.find('.voicebtn').removeClass('pause').addClass('play');
     $cloneCode.find('.voicebtn').removeClass('now');
     $cloneCode.find('.wifi-circle').removeClass('first').removeClass('second').removeClass('third').removeClass('four').removeClass('fifth').removeClass('sixth').removeClass('seventh');
-    $cloneCode.find('.translate').html("");
+    // 保留转写文字：若 jsonKey 中有 text，将转写文字渲染到 .translateText 中，
+    // 避免导出 TXT 时丢失转写内容（显示"正在转为文字"占位文本）
+    $cloneCode.find('.voiceBox[jsonKey]').each(function () {
+        var $box = $(this);
+        var $translate = $box.find('.translate');
+        try {
+            var jsonStr = $box.attr('jsonKey');
+            var json = jsonStr ? JSON.parse(jsonStr) : {};
+            if (json.text && json.text.trim()) {
+                $translate.html(
+                    '<div class="translateHeader"><div class="translateIcon"></div>'
+                    + '<div class="translateLabel">' + divTranslateContent.translateLabel + '</div>'
+                    + '<div class="foldBtn"></div></div>'
+                    + '<div class="translateText noAirPopover"></div>'
+                );
+                $box.find('.translatingLabel').empty();
+                $translate.find('.translateText').text(json.text);
+            } else {
+                $translate.html("");
+            }
+        } catch (e) {
+            $translate.html("");
+        }
+    });
+    // 清除未被 voiceBox 包含的孤立 .translate 元素
+    $cloneCode.find('.translate').not('.voiceBox .translate').html("");
     // V2
     $cloneCode.find('.voicePlayback').removeClass('now').removeClass('play').removeClass('pause').removeClass('voiceToText');
     $cloneCode.find('.voiceInfoBox').removeClass('containText');
