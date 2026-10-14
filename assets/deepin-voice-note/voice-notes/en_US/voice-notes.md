@@ -4,6 +4,8 @@
 
 Voice Notes is a simple memo software with texts and voice recordings. With it, you are able to record your daily life and work in MP3 format or texts. 
 
+> ![notes](../common/notes.svg) Notes: Some features may vary by version and device model. The features actually available in your app take precedence.
+
 ## Guide
 
 You can run, exit, and create a shortcut for Voice Notes in the following ways.
@@ -89,7 +91,7 @@ The notebook created will be automatically saved as **Note (n)**. You can rename
 
 You can add pictures to notes in one of the following ways:
 
-- Click the ![icon](../common/pic.svg)icon  to import pictures from File Manager.
+- Click the ![icon](../common/pic.svg) icon on the right side of the top bar to import pictures from File Manager.
 - Drag the picture to the right column directly.
 - Copy and paste the picture to the the right column directly.
 
