@@ -4,7 +4,7 @@
 import { Extension } from '@tiptap/core'
 import { Plugin } from '@tiptap/pm/state'
 
-import { isInListItem, liftActiveListItem, sinkActiveListItem } from './list-behavior.js'
+import { isInListItem, liftActiveListItem, sinkActiveListItem, getActiveListNestingDepth } from './list-behavior.js'
 
 const LIST_ITEM_TYPES = new Set(['listItem', 'taskItem'])
 const MAX_LIST_NESTING_DEPTH = 3
@@ -84,6 +84,18 @@ export const ListNestingGuard = Extension.create({
       'Shift-Tab': () => {
         if (!isInListItem(this.editor)) return false
         return liftActiveListItem(this.editor)
+      },
+      Backspace: () => {
+        if (!isInListItem(this.editor)) return false
+        if (getActiveListNestingDepth(this.editor) > 1) return false
+
+        const { selection } = this.editor.state
+        if (!selection.empty) return false
+
+        const { $from } = selection
+        if ($from.parentOffset !== 0) return false
+
+        return this.editor.commands.lift()
       },
     }
   },
