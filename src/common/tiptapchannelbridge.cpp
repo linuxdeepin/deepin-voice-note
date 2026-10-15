@@ -314,6 +314,9 @@ void TiptapChannelBridge::setSearchQuery(const QString &query)
 
     m_currentSearchQuery = normalized;
     if (m_currentSearchQuery.isEmpty()) {
+        // currentSearchQuery 的 NOTIFY 是 searchQueryChanged：清空同样必须
+        // 发出，否则 QWebChannel/QML 侧缓存的属性值会停留在旧 query。
+        emit searchQueryChanged(QString());
         emit searchCleared();
     } else {
         emit searchQueryChanged(m_currentSearchQuery);
@@ -325,7 +328,13 @@ void TiptapChannelBridge::clearSearchQuery()
     // 清除操作必须是幂等的。即使桥接层已经记录为空，前端仍可能
     // 保留旧的运行态 decoration（例如编辑器切换或 WebEngine 重载期间），
     // 因此每次清除都主动通知前端移除搜索高亮。
+    const bool hadQuery = !m_currentSearchQuery.isEmpty();
     m_currentSearchQuery.clear();
+    if (hadQuery) {
+        // 同步刷新 currentSearchQuery 的 QWebChannel 属性缓存，避免清空后
+        // 延迟到达的内容重载仍读到旧 query 而重新套上高亮。
+        emit searchQueryChanged(QString());
+    }
     emit searchCleared();
 }
 
