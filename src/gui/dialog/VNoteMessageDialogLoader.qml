@@ -41,7 +41,7 @@ Loader {
 
         readonly property int btnHeight: 30
         readonly property bool isUpdateUosAiDialog: loader.messageType === VNoteMessageDialogHandler.UpdateUosAi
-        readonly property int btnWidth: isUpdateUosAiDialog ? 171 : 167
+        readonly property int btnWidth: Math.floor((width - 20 - 6) / 2)
         readonly property int dialogContentHeight: isUpdateUosAiDialog ? 164 : 158
 
         flags: Qt.Window | Qt.WindowCloseButtonHint
@@ -148,8 +148,11 @@ Loader {
             }
 
             Row {
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignBottom
+                Layout.alignment: Qt.AlignLeft | Qt.AlignBottom
                 Layout.fillHeight: true
+                Layout.leftMargin: handler.singleButton
+                                    ? Math.max(0, (parent.width - btnWidth) / 2)
+                                    : 0
                 spacing: 6
 
                 Loader {
