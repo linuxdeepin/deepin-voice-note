@@ -85,6 +85,20 @@ export const ListNestingGuard = Extension.create({
         if (!isInListItem(this.editor)) return false
         return liftActiveListItem(this.editor)
       },
+      Backspace: () => {
+        const { selection } = this.editor.state
+        if (!selection.empty || selection.$from.parentOffset !== 0) return false
+        for (let depth = selection.$from.depth; depth > 0; depth -= 1) {
+          const node = selection.$from.node(depth)
+          if (LIST_ITEM_TYPES.has(node.type.name)) {
+            if ((Number(node.attrs?.dvnIndentLevel) || 0) > 0) {
+              return liftActiveListItem(this.editor)
+            }
+            return false
+          }
+        }
+        return false
+      },
     }
   },
 })
