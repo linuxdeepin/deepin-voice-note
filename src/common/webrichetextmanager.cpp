@@ -10,7 +10,6 @@
 #include "handler/voice_to_text_task_manager.h"
 #include "tiptapchannelbridge.h"
 #include "legacyformatdetector.h"
-#include "search/notesearchservice.h"
 
 #include <QTimer>
 #include <QEventLoop>
@@ -222,9 +221,6 @@ void WebRichTextManager::onUpdateNoteWithResult(VNoteItem *data, const QString &
     } else {
         qDebug() << "Note saved successfully";
     }
-    if (updateOk) {
-        NoteSearchService::instance()->updateNote(data);
-    }
     if (updateOk && data->noteId == m_textChangeNoteId && m_updateRequestSerial == m_textChangeSerial) {
         m_textChange = false;
         m_textChangeNoteId = -1;
@@ -252,9 +248,6 @@ void WebRichTextManager::onTiptapContentSaved(const QString &envelopeJson)
         qWarning() << "Failed to save Tiptap note";
     } else {
         qDebug() << "Tiptap note saved successfully";
-    }
-    if (updateOk) {
-        NoteSearchService::instance()->updateNote(m_noteData);
     }
     if (updateOk && m_noteData->noteId == m_textChangeNoteId && m_updateRequestSerial == m_textChangeSerial) {
         m_textChange = false;

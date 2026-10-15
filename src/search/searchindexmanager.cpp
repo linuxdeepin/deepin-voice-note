@@ -65,7 +65,7 @@ void SearchIndexManager::updateNote(const VNoteItem *note)
         return;
     }
 
-    const QString fingerprint = fingerprintForNote(note);
+    const quint64 fingerprint = fingerprintForNote(note);
     {
         QReadLocker locker(&m_lock);
         const auto it = m_entries.constFind(note->noteId);
@@ -79,7 +79,9 @@ void SearchIndexManager::updateNote(const VNoteItem *note)
     entry.fingerprint = fingerprint;
     entry.normalizedTitle = SearchTextNormalizer::normalize(entry.document.titlePlain);
     entry.normalizedCorpus = SearchTextNormalizer::normalize(corpusForDocument(entry.document));
-    entry.grams = gramsForText(entry.normalizedTitle + QLatin1Char(' ') + entry.normalizedCorpus);
+    const qint64 gramTextLength = static_cast<qint64>(entry.normalizedTitle.size())
+        + 1 + static_cast<qint64>(entry.normalizedCorpus.size());
+    entry.gramIndexed = gramTextLength <= MaxGramIndexedTextLength;
 
     QWriteLocker locker(&m_lock);
     upsertEntryUnlocked(std::move(entry));
@@ -101,15 +103,19 @@ QList<SearchResult> SearchIndexManager::search(const QString &query) const
 
     QReadLocker locker(&m_lock);
     QSet<int> candidates;
-    const QSet<QString> queryGrams = gramsForText(normalizedQuery);
+    const QSet<quint64> queryGrams = gramsForText(normalizedQuery);
     if (queryGrams.isEmpty()) {
         for (auto it = m_entries.constBegin(); it != m_entries.constEnd(); ++it) {
             candidates.insert(it.key());
         }
     } else {
         bool first = true;
-        for (const QString &gram : queryGrams) {
-            const QSet<int> ids = m_ngramIndex.value(gram);
+        for (quint64 gram : queryGrams) {
+            QSet<int> ids;
+            const QList<int> noteIds = m_ngramIndex.values(gram);
+            for (int noteId : noteIds) {
+                ids.insert(noteId);
+            }
             if (first) {
                 candidates = ids;
                 first = false;
@@ -118,6 +124,13 @@ QList<SearchResult> SearchIndexManager::search(const QString &query) const
             }
             if (candidates.isEmpty()) {
                 break;
+            }
+        }
+
+        // 超长笔记不进入 n-gram 索引，但仍然参与最终 contains 校验。
+        for (auto it = m_entries.constBegin(); it != m_entries.constEnd(); ++it) {
+            if (!it->gramIndexed) {
+                candidates.insert(it.key());
             }
         }
     }
@@ -157,18 +170,26 @@ int SearchIndexManager::size() const
     return m_entries.size();
 }
 
-QString SearchIndexManager::fingerprintForNote(const VNoteItem *note)
+quint64 SearchIndexManager::fingerprintForNote(const VNoteItem *note)
 {
     if (!note) {
-        return QString();
+        return 0;
     }
-    return QString::number(note->noteId)
-        + QLatin1Char('\x1f') + QString::number(note->folderId)
-        + QLatin1Char('\x1f') + QString::number(note->isTop)
-        + QLatin1Char('\x1f') + QString::number(note->modifyTime.toMSecsSinceEpoch())
-        + QLatin1Char('\x1f') + note->noteTitle
-        + QLatin1Char('\x1f') + note->htmlCode
-        + QLatin1Char('\x1f') + note->metaDataConstRef().toString();
+
+    // 只保留 64 位摘要，避免把整篇正文作为 fingerprint 常驻内存。
+    auto mix = [](quint64 hash, quint64 value) {
+        return hash ^ (value + 0x9e3779b97f4a7c15ULL + (hash << 6) + (hash >> 2));
+    };
+
+    quint64 hash = 0xcbf29ce484222325ULL;
+    hash = mix(hash, static_cast<quint64>(note->noteId));
+    hash = mix(hash, static_cast<quint64>(note->folderId));
+    hash = mix(hash, static_cast<quint64>(note->isTop));
+    hash = mix(hash, static_cast<quint64>(note->modifyTime.toMSecsSinceEpoch()));
+    hash = mix(hash, static_cast<quint64>(qHash(note->noteTitle)));
+    hash = mix(hash, static_cast<quint64>(qHash(note->htmlCode)));
+    hash = mix(hash, static_cast<quint64>(qHash(note->metaDataConstRef().toString())));
+    return hash;
 }
 
 QString SearchIndexManager::corpusForDocument(const SearchDocument &document)
@@ -186,17 +207,25 @@ QString SearchIndexManager::corpusForDocument(const SearchDocument &document)
     return corpus;
 }
 
-QSet<QString> SearchIndexManager::gramsForText(const QString &text)
+QSet<quint64> SearchIndexManager::gramsForText(const QString &text)
 {
-    QSet<QString> grams;
+    QSet<quint64> grams;
     if (text.size() < NGramSize) {
         return grams;
     }
-    for (int i = 0; i <= text.size() - NGramSize; ++i) {
-        const QString gram = text.mid(i, NGramSize);
-        if (!gram.trimmed().isEmpty()) {
-            grams.insert(gram);
+
+    for (qsizetype i = 0; i <= text.size() - NGramSize; ++i) {
+        const QChar first = text.at(i);
+        const QChar second = text.at(i + 1);
+        const QChar third = text.at(i + 2);
+        if (first.isSpace() && second.isSpace() && third.isSpace()) {
+            continue;
         }
+
+        const quint64 gram = (static_cast<quint64>(first.unicode()) << 32)
+            | (static_cast<quint64>(second.unicode()) << 16)
+            | static_cast<quint64>(third.unicode());
+        grams.insert(gram);
     }
     return grams;
 }
@@ -296,8 +325,11 @@ void SearchIndexManager::upsertEntryUnlocked(SearchIndexEntry &&entry)
 {
     removeEntryUnlocked(entry.document.noteId);
     const int noteId = entry.document.noteId;
-    for (const QString &gram : std::as_const(entry.grams)) {
-        m_ngramIndex[gram].insert(noteId);
+    if (entry.gramIndexed) {
+        const QSet<quint64> grams = gramsForText(entry.normalizedTitle + QLatin1Char(' ') + entry.normalizedCorpus);
+        for (quint64 gram : grams) {
+            m_ngramIndex.insert(gram, noteId);
+        }
     }
     m_entries.insert(noteId, std::move(entry));
 }
@@ -308,14 +340,10 @@ void SearchIndexManager::removeEntryUnlocked(int noteId)
     if (it == m_entries.end()) {
         return;
     }
-    for (const QString &gram : std::as_const(it->grams)) {
-        auto gramIt = m_ngramIndex.find(gram);
-        if (gramIt == m_ngramIndex.end()) {
-            continue;
-        }
-        gramIt->remove(noteId);
-        if (gramIt->isEmpty()) {
-            m_ngramIndex.erase(gramIt);
+    if (it->gramIndexed) {
+        const QSet<quint64> grams = gramsForText(it->normalizedTitle + QLatin1Char(' ') + it->normalizedCorpus);
+        for (quint64 gram : grams) {
+            m_ngramIndex.remove(gram, noteId);
         }
     }
     m_entries.erase(it);

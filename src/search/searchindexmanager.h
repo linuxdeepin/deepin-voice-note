@@ -10,6 +10,7 @@
 #include "datatypedef.h"
 
 #include <QHash>
+#include <QMultiHash>
 #include <QReadWriteLock>
 #include <QSet>
 #include <QStringList>
@@ -29,17 +30,20 @@ public:
     int size() const;
 
 private:
+    // 避免单个超长笔记把常驻 n-gram 索引放大到不可控规模。
+    static constexpr int MaxGramIndexedTextLength = 1000000;
+
     struct SearchIndexEntry {
         SearchDocument document;
-        QString fingerprint;
+        quint64 fingerprint {0};
         QString normalizedTitle;
         QString normalizedCorpus;
-        QSet<QString> grams;
+        bool gramIndexed {false};
     };
 
-    static QString fingerprintForNote(const VNoteItem *note);
+    static quint64 fingerprintForNote(const VNoteItem *note);
     static QString corpusForDocument(const SearchDocument &document);
-    static QSet<QString> gramsForText(const QString &text);
+    static QSet<quint64> gramsForText(const QString &text);
     static int fieldWeight(SearchField field);
     static QString highlightedHtml(const QString &text, const QString &query);
     static QString snippetHtml(const QString &text, const QString &query);
@@ -52,7 +56,7 @@ private:
 
     mutable QReadWriteLock m_lock;
     QHash<int, SearchIndexEntry> m_entries;
-    QHash<QString, QSet<int>> m_ngramIndex;
+    QMultiHash<quint64, int> m_ngramIndex;
 };
 
 #endif // SEARCHINDEXMANAGER_H

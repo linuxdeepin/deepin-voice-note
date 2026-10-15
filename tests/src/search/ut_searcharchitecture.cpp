@@ -136,6 +136,121 @@ TEST(SearchIndexManager, UpdatesChangedNoteAndRemovesOldNgrams)
     ASSERT_EQ(index.search(QStringLiteral("全新索引")).size(), 1);
 }
 
+TEST(SearchIndexManager, RefreshFromNotesPicksUpSavedEditsWithoutExplicitUpdate)
+{
+    // 保存后不再单独调用 updateNote，搜索会话入口的 refreshFromNotes 必须能命中最新正文。
+    VNoteItem note = makeNote(17, QStringLiteral("草稿标题"), QStringLiteral(R"json({
+        "format":"tiptap",
+        "schemaVersion":1,
+        "content":{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"旧索引内容"}]}]}
+    })json"));
+
+    VNOTE_ITEMS_MAP folderNotes;
+    folderNotes.folderNotes.insert(note.noteId, &note);
+    VNOTE_ALL_NOTES_MAP allNotes;
+    allNotes.notes.insert(note.folderId, &folderNotes);
+
+    SearchIndexManager index;
+    index.refreshFromNotes(&allNotes);
+    ASSERT_EQ(index.search(QStringLiteral("旧索引内容")).size(), 1);
+
+    // 模拟用户编辑并保存：只改数据库对象，不调用 SearchIndexManager::updateNote。
+    note.modifyTime = note.modifyTime.addSecs(30);
+    note.setMetadata(QStringLiteral(R"json({
+        "format":"tiptap",
+        "schemaVersion":1,
+        "content":{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"全新保存内容"}]}]}
+    })json"));
+
+    index.refreshFromNotes(&allNotes);
+
+    EXPECT_TRUE(index.search(QStringLiteral("旧索引内容")).isEmpty());
+    const QList<SearchResult> results = index.search(QStringLiteral("全新保存内容"));
+    ASSERT_EQ(results.size(), 1);
+    EXPECT_EQ(results.first().noteId, 17);
+}
+
+TEST(SearchIndexManager, RenameMakesNewTitleSearchableAndDropsOld)
+{
+    VNoteItem note = makeNote(18, QStringLiteral("旧标题关键词"), QStringLiteral(R"json({
+        "format":"tiptap",
+        "schemaVersion":1,
+        "content":{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"正文"}]}]}
+    })json"));
+
+    SearchIndexManager index;
+    index.updateNote(&note);
+    ASSERT_EQ(index.search(QStringLiteral("旧标题关键词")).size(), 1);
+
+    note.noteTitle = QStringLiteral("新标题关键词");
+    note.modifyTime = note.modifyTime.addSecs(1);
+    index.updateNote(&note);
+
+    EXPECT_TRUE(index.search(QStringLiteral("旧标题关键词")).isEmpty());
+    ASSERT_EQ(index.search(QStringLiteral("新标题关键词")).size(), 1);
+    EXPECT_EQ(index.search(QStringLiteral("新标题关键词")).first().noteId, 18);
+}
+
+TEST(SearchIndexManager, RemovedNoteDisappearsFromIndex)
+{
+    VNoteItem note = makeNote(19, QStringLiteral("待删除笔记"), QStringLiteral(R"json({
+        "format":"tiptap",
+        "schemaVersion":1,
+        "content":{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"删除前正文关键词"}]}]}
+    })json"));
+
+    SearchIndexManager index;
+    index.updateNote(&note);
+    ASSERT_EQ(index.search(QStringLiteral("删除前正文关键词")).size(), 1);
+
+    index.removeNote(note.noteId);
+    EXPECT_EQ(index.size(), 0);
+    EXPECT_TRUE(index.search(QStringLiteral("删除前正文关键词")).isEmpty());
+}
+
+TEST(SearchIndexManager, ClearThenRebuildKeepsSearchWorking)
+{
+    VNoteItem note = makeNote(20, QStringLiteral("会话重建"), QStringLiteral(R"json({
+        "format":"tiptap",
+        "schemaVersion":1,
+        "content":{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"会话重建正文关键词"}]}]}
+    })json"));
+
+    SearchIndexManager index;
+    index.updateNote(&note);
+    ASSERT_EQ(index.search(QStringLiteral("会话重建正文关键词")).size(), 1);
+
+    // 退出搜索会释放索引，再次进入搜索应能重新建立。
+    index.clear();
+    EXPECT_EQ(index.size(), 0);
+    EXPECT_TRUE(index.search(QStringLiteral("会话重建正文关键词")).isEmpty());
+
+    index.refreshFromNotes(nullptr); // noteAll 为空时保持空的索引
+    EXPECT_EQ(index.size(), 0);
+
+    index.updateNote(&note);
+    ASSERT_EQ(index.search(QStringLiteral("会话重建正文关键词")).size(), 1);
+    EXPECT_EQ(index.search(QStringLiteral("会话重建正文关键词")).first().noteId, 20);
+}
+
+TEST(SearchIndexManager, SearchesOverlongNoteWithoutGramIndex)
+{
+    const QString body(1000005, QLatin1Char('a'));
+    const QString envelope = QStringLiteral(R"json({
+        "format":"tiptap",
+        "schemaVersion":1,
+        "content":{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"%1"}]}]}
+    })json").arg(body);
+    VNoteItem note = makeNote(16, QStringLiteral("超长正文"), envelope);
+
+    SearchIndexManager index;
+    index.updateNote(&note);
+
+    const QList<SearchResult> results = index.search(QStringLiteral("aaa"));
+    ASSERT_EQ(results.size(), 1);
+    EXPECT_EQ(results.first().noteId, 16);
+}
+
 TEST(VNoteItemSearchCompatibility, DelegatesToUnifiedExtractor)
 {
     VNoteItem note = makeNote(13, QStringLiteral("兼容入口"), tiptapEnvelopeWithVoice());

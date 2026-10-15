@@ -1465,7 +1465,6 @@ void VNoteMainManager::renameNote(const int &index, const QString &newName)
                 item->noteTitle = newName;
             }
             // 标题变更统一通知列表和工作区，避免工作区标题只在播放状态下刷新。
-            NoteSearchService::instance()->updateNote(item);
             emit noteTitleChanged(index, newName);
             if (index == m_currentNoteId) {
                 emit currentNoteChanged(index, newName);
@@ -1715,6 +1714,8 @@ void VNoteMainManager::clearSearch()
 {
     qInfo() << "Clearing search";
     m_searchText = "";
+    // 搜索索引只在搜索会话期间保留，退出搜索后释放长文本索引占用的内存。
+    NoteSearchService::instance()->clearIndex();
     TiptapChannelBridge::instance()->clearSearchQuery();
     // 发出信号清除搜索高亮
     emit updateRichTextSearch("");
