@@ -638,6 +638,12 @@ export function bindTiptapChannel(editor, channelFactory, options = {}) {
       }))
       // voiceBlock 不注册写绝对路径的 load resolver —— 运行态由 NodeView 自行解析。
 
+      // 本地跟踪当前生效的搜索词。currentSearchQuery 的 NOTIFY 只在
+      // searchQueryChanged 时下发，而清除搜索走的是 searchCleared，因此该
+      // 属性的前端缓存会在清除后停留旧值。若在内容重载时直接读它，退出搜索
+      // 触发的延迟重载会把已经清除的高亮重新套回编辑器。
+      let activeSearchQuery = bridge.currentSearchQuery || ''
+
       // C++→JS：加载 envelope（loadEnvelopeRequested signal）
       bridge.loadEnvelopeRequested.connect(function (json) {
         let envelope
@@ -650,24 +656,26 @@ export function bindTiptapChannel(editor, channelFactory, options = {}) {
         const resolved = walkResolve(content, loadResolvers)
         options.clearResourceInsertionSelection?.()
         replaceEditorContentWithoutHistory(editor, resolved)
-        if (bridge.currentSearchQuery) {
-          setTiptapSearchQuery(editor, bridge.currentSearchQuery)
+        if (activeSearchQuery) {
+          setTiptapSearchQuery(editor, activeSearchQuery)
         }
       })
 
       // C++→JS：搜索 query 同步（Native 搜索框 → Tiptap 运行态高亮）
       if (bridge.searchQueryChanged?.connect) {
         bridge.searchQueryChanged.connect(function (query) {
+          activeSearchQuery = String(query ?? '')
           setTiptapSearchQuery(editor, query)
         })
       }
       if (bridge.searchCleared?.connect) {
         bridge.searchCleared.connect(function () {
+          activeSearchQuery = ''
           clearTiptapSearch(editor)
         })
       }
-      if (bridge.currentSearchQuery) {
-        setTiptapSearchQuery(editor, bridge.currentSearchQuery)
+      if (activeSearchQuery) {
+        setTiptapSearchQuery(editor, activeSearchQuery)
       }
 
       // C++→JS：宿主下发字体列表（fontListProvided signal）
