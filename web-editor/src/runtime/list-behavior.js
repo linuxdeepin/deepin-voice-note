@@ -542,7 +542,7 @@ function preserveDescendantListVisualDepths(editor, visualDepths, fallbackFromPo
   return true
 }
 
-export function liftActiveListItem(editor) {
+export function liftActiveListItem(editor, allowExitList = false) {
   const itemType = activeListItemType(editor)
   const info = activeListItemInfo(editor)
   if (!itemType || !info) return false
@@ -551,7 +551,9 @@ export function liftActiveListItem(editor) {
   // 产品规则：Tab / Shift+Tab 只负责在 1~3 级列表间调整层级；
   // 一级列表项不再通过 Shift+Tab 退出列表，避免把后续子项拆成
   // 没有结构父节点的“游离三级项”。取消列表交给工具栏列表按钮。
-  if (getActiveListNestingDepth(editor) <= 1) return true
+  // Backspace 场景（allowExitList=true）允许在 1 级退出列表，
+  // 执行后续结构性 lift 将列表项转换为段落。
+  if (getActiveListNestingDepth(editor) <= 1 && !allowExitList) return true
 
   if (liftMixedListItem(editor, info)) return true
 
