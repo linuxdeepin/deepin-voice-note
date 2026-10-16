@@ -85,6 +85,12 @@ export const ListNestingGuard = Extension.create({
         if (!isInListItem(this.editor)) return false
         return liftActiveListItem(this.editor)
       },
+      Backspace: () => {
+        if (!isInListItem(this.editor)) return false
+        const { $from, empty } = this.editor.state.selection
+        if (!empty || $from.parentOffset !== 0) return false
+        return liftActiveListItem(this.editor, true)
+      },
     }
   },
 })
