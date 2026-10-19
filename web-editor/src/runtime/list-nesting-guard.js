@@ -4,7 +4,15 @@
 import { Extension } from '@tiptap/core'
 import { Plugin } from '@tiptap/pm/state'
 
-import { isInListItem, liftActiveListItem, sinkActiveListItem } from './list-behavior.js'
+import {
+  isInListItem,
+  joinParagraphBackwardIntoPreviousList,
+  joinParagraphForwardIntoCurrentList,
+  liftActiveListItem,
+  normalizeWholeDocumentSelection,
+  selectionCoversListItems,
+  sinkActiveListItem,
+} from './list-behavior.js'
 
 const LIST_ITEM_TYPES = new Set(['listItem', 'taskItem'])
 const MAX_LIST_NESTING_DEPTH = 3
@@ -77,12 +85,40 @@ export const ListNestingGuard = Extension.create({
 
   addKeyboardShortcuts() {
     return {
+      // 入口门槛不能用 isInListItem()：全选 / 拖选全文后，文档首块可能已经是
+      // 被反缩进踢出列表的普通段落，$from 不在 listItem 里，但选区仍然覆盖着
+      // 一批列表项，必须继续处理，否则第一次 Shift+Tab 之后就再也按不动。
       Tab: () => {
-        if (!isInListItem(this.editor)) return false
+        normalizeWholeDocumentSelection(this.editor)
+        if (!isInListItem(this.editor) && !selectionCoversListItems(this.editor)) return false
         return sinkActiveListItem(this.editor)
       },
       'Shift-Tab': () => {
-        if (!isInListItem(this.editor)) return false
+        normalizeWholeDocumentSelection(this.editor)
+        if (!isInListItem(this.editor) && !selectionCoversListItems(this.editor)) return false
+        return liftActiveListItem(this.editor)
+      },
+      // 行首 Backspace 与 Shift+Tab 同语义：逐级反缩进，一级时退出列表
+      // （变成普通文本块）。旧实现走 core Keymap 的 joinBackward，会把当前项
+      // 并进上一个列表项、生成“一个 listItem 多个段落”的结构，于是无论按多少
+      // 次都降不到一级、也取消不掉列表属性。
+      // 只在“无选区 + 光标已在文本块行首”时接管，行内删除仍交回默认行为。
+      // Delete 方向与 Backspace 对称：光标在列表末项文本末尾时，ProseMirror 默认
+      // joinForward 会把紧随其后的普通段落包成新的列表项，空段落场景表现为“多出
+      // 一个空项再消失”，待办列表还会凭空多出一条未勾选项。这里改为把后一段落
+      // 直接并入当前项（空段落即删除该空行），保持三种列表行为一致。
+      Delete: () => joinParagraphForwardIntoCurrentList(this.editor),
+      Backspace: () => {
+        if (!isInListItem(this.editor)) {
+          // 紧跟列表块之后的普通段落：行首 Backspace 并入上一个列表项（删除该行），
+          // 不再让 ProseMirror 默认的 joinBackward 把它重新包成列表项。
+          return joinParagraphBackwardIntoPreviousList(this.editor)
+        }
+        const { selection } = this.editor.state
+        if (!selection.empty || selection.$from.parentOffset !== 0) return false
+        // 刚由输入规则（"- " / "1. " 等）生成的列表：优先撤销输入规则，
+        // 否则会把刚生成的列表项直接弹成段落，用户看不到自己输入的记号。
+        if (this.editor.commands.undoInputRule()) return true
         return liftActiveListItem(this.editor)
       },
     }

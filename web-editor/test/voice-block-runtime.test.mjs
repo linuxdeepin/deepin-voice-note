@@ -8,11 +8,11 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 import { Window } from 'happy-dom'
 import { Editor } from '@tiptap/core'
-import { NodeSelection } from '@tiptap/pm/state'
+import { AllSelection, NodeSelection } from '@tiptap/pm/state'
 import { Fragment, Slice } from '@tiptap/pm/model'
 import { createTiptapExtensions } from '../src/runtime/tiptap-extensions.js'
 import voiceBlockCss from '../src/extensions/voice-block.css?raw'
-import { currentTranscriptCopyText, writeTranscriptCopyEvent, copyTranscriptTextViaBridge, updateTranscriptSelectionCache, installTranscriptCopyHandler } from '../src/runtime/transcript-copy.js'
+import { currentTranscriptCopyText, currentTranscriptMenuCopyText, writeTranscriptCopyEvent, copyTranscriptTextViaBridge, updateTranscriptSelectionCache, installTranscriptCopyHandler } from '../src/runtime/transcript-copy.js'
 import { createEmptyDoc, createEnvelope, serializeEnvelope, validateEnvelope } from '../src/schema/document-envelope.js'
 import {
   bindTiptapChannel,
@@ -114,6 +114,35 @@ test('selection: selected voiceBlock gets legacy active visual class', () => {
   assert.ok(voiceBox.classList.contains('ProseMirror-selectednode'))
   assert.ok(voiceBox.classList.contains('active'))
 
+  editor.destroy()
+})
+
+test('selection: voiceBlock gets range-selected visual class under AllSelection', () => {
+  const { editor } = createEditor()
+  editor.commands.setContent({
+    type: 'doc',
+    content: [
+      { type: 'paragraph', content: [{ type: 'text', text: 'before' }] },
+      {
+        type: 'voiceBlock',
+        attrs: { voiceId: 'select-all-v1', voicePath: 'voicenote/select-all.wav', voiceSize: 1 },
+      },
+      { type: 'paragraph', content: [{ type: 'text', text: 'after' }] },
+    ],
+  })
+
+  const voiceBox = editor.view.dom.querySelector('.voiceBox')
+  assert.ok(voiceBox, 'voiceBox should render')
+  editor.commands.setTextSelection(1)
+  assert.equal(voiceBox.classList.contains('dvn-range-selected'), false)
+
+  editor.view.dispatch(editor.state.tr.setSelection(new AllSelection(editor.state.doc)))
+
+  assert.equal(editor.state.selection.constructor.name, 'AllSelection')
+  assert.ok(
+    voiceBox.classList.contains('dvn-range-selected'),
+    'AllSelection must decorate voice blocks even though selectNode() is not called',
+  )
   editor.destroy()
 })
 
@@ -366,6 +395,66 @@ test('transcript copy: context menu falls back to whole transcript without selec
 })
 
 
+test('transcript copy: context menu state ignores whole-transcript fallback and keeps captured selection', () => {
+  const { editor, window } = createEditor()
+  const uninstall = installTranscriptCopyHandler()
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{
+      type: 'voiceBlock',
+      attrs: {
+        voiceId: 'copy-menu-state-v1',
+        voicePath: 'voicenote/copy-menu-state.wav',
+        voiceSize: 1,
+        text: '右键菜单只按真实选区启用复制',
+        translateUnfold: true,
+      },
+    }],
+  })
+
+  const translateText = editor.view.dom.querySelector('.translateText')
+  const textNode = translateText.firstChild
+  const selectedRange = document.createRange()
+  selectedRange.setStart(textNode, 4)
+  selectedRange.setEnd(textNode, 8)
+  const selection = window.getSelection()
+  selection.removeAllRanges()
+  selection.addRange(selectedRange)
+
+  translateText.dispatchEvent(new window.MouseEvent('pointerdown', {
+    bubbles: true,
+    cancelable: true,
+    button: 2,
+  }))
+  translateText.dispatchEvent(new window.MouseEvent('contextmenu', { bubbles: true, cancelable: true }))
+
+  // Qt/WebEngine may collapse the live DOM selection while the native menu is
+  // opening.  The state captured before the collapse must still enable Copy.
+  const collapsed = document.createRange()
+  collapsed.setStart(textNode, 0)
+  collapsed.setEnd(textNode, 0)
+  selection.removeAllRanges()
+  selection.addRange(collapsed)
+  assert.equal(currentTranscriptMenuCopyText(), '只按真实')
+
+  // A fresh collapsed caret has no selection snapshot and therefore no menu
+  // Copy/Text-to-Speech state, even though explicit Copy still has a fallback.
+  translateText.dispatchEvent(new window.MouseEvent('pointerdown', {
+    bubbles: true,
+    cancelable: true,
+    button: 2,
+  }))
+  translateText.dispatchEvent(new window.MouseEvent('contextmenu', { bubbles: true, cancelable: true }))
+  assert.equal(currentTranscriptMenuCopyText(), '')
+  assert.equal(currentTranscriptCopyText({ useContext: true, allowWholeContext: true }), '右键菜单只按真实选区启用复制')
+
+  uninstall()
+  editor.destroy()
+  window.__dvnTiptapContextTranscript = null
+  window.__dvnTiptapContextPointer = null
+})
+
+
 test('transcript copy: contextmenu listener records transcript target before QML probe', () => {
   const { editor, window } = createEditor()
   const uninstall = installTranscriptCopyHandler()
@@ -539,6 +628,7 @@ test('themeProvided writes CSS variables on document root', () => {
   assert.equal(document.documentElement.style.getPropertyValue('--dvn-transcript-selection-bg'), 'rgba(0, 122, 255, 0.4)')
   assert.equal(document.documentElement.style.getPropertyValue('--dvn-text-selection-bg'), '#007AFF')
   assert.equal(document.documentElement.style.getPropertyValue('--dvn-active-selection-bg'), 'rgba(0, 122, 255, 0.6)')
+  assert.equal(document.documentElement.style.getPropertyValue('--dvn-image-selection-bg'), 'rgba(0, 122, 255, 0.8)')
   assert.equal(document.documentElement.style.getPropertyValue('--dvn-selection-fg'), '#ffffff')
   assert.equal(document.documentElement.style.getPropertyValue('--dvn-search-match-bg'), '#007AFF')
   assert.equal(document.documentElement.style.getPropertyValue('--dvn-search-current-bg'), '#007AFF')
@@ -583,25 +673,46 @@ test('voice block drag preview keeps rounded clipping on the snapshot root', () 
   assert.match(voiceBlockCss, /\.voiceBox\.dvn-voice-drag-ghost \{[\s\S]*border-radius: 12px;[\s\S]*overflow: hidden;[\s\S]*clip-path: inset\(0 round 12px\);/)
 })
 
+test('voice block in bullet/ordered list uses the content column, not the marker gutter', () => {
+  assert.match(
+    voiceBlockCss,
+    /\.ProseMirror ul:not\(\[data-type="taskList"\]\) > li > \.voiceBox,[\s\S]*\.ProseMirror ol > li > \.voiceBox \{[\s\S]*grid-column: 2;[\s\S]*min-width: 0;/,
+  )
+})
+
 test('voice block active state uses active background and white foreground', () => {
   assert.match(
     voiceBlockCss,
-    /\.voiceBox\.ProseMirror-selectednode \.voiceInfoBox,[\s\S]*\.voiceBox\.active \.voiceInfoBox \{[\s\S]*background: var\(--dvn-text-selection-bg, var\(--highlightColor, #0081ff\)\);[\s\S]*color: var\(--dvn-selection-fg, #ffffff\);/,
+    /\.voiceBox\.ProseMirror-selectednode \.voiceInfoBox,[\s\S]*\.voiceBox\.active \.voiceInfoBox,[\s\S]*\.voiceBox\.dvn-range-selected \.voiceInfoBox \{[\s\S]*background: var\(--dvn-text-selection-bg, var\(--highlightColor, #0081ff\)\);[\s\S]*color: var\(--dvn-selection-fg, #ffffff\);/,
   )
   assert.match(
     voiceBlockCss,
-    /\.voiceBox\.ProseMirror-selectednode \.voicePlayback \.title,[\s\S]*\.voiceBox\.active \.translateText \{[\s\S]*color: var\(--dvn-selection-fg, #ffffff\);/,
+    /\.voiceBox\.ProseMirror-selectednode \.voicePlayback \.title,[\s\S]*\.voiceBox\.active \.translateText,[\s\S]*\.voiceBox\.dvn-range-selected \.translateText \{[\s\S]*color: var\(--dvn-selection-fg, #ffffff\);/,
   )
   assert.match(
     voiceBlockCss,
-    /\.voiceBox\.ProseMirror-selectednode \.voicePlayback\.play \.voiceBtn,[\s\S]*\.voiceBox\.active \.translateHeader \.foldBtn \{[\s\S]*background-color: var\(--dvn-selection-fg, #ffffff\);/,
+    /\.voiceBox\.ProseMirror-selectednode \.voiceToTextLabel \.translatingLabel,[\s\S]*\.voiceBox\.active \.voiceToTextLabel \.translatingLabel,[\s\S]*\.voiceBox\.dvn-range-selected \.voiceToTextLabel \.translatingLabel \{[\s\S]*color: var\(--dvn-selection-fg, #ffffff\);/,
+  )
+  assert.match(
+    voiceBlockCss,
+    /\.voiceBox\.ProseMirror-selectednode \.voicePlayback\.play \.voiceBtn,[\s\S]*\.voiceBox\.active \.translateHeader \.foldBtn,[\s\S]*\.voiceBox\.dvn-range-selected \.translateHeader \.foldBtn \{[\s\S]*background-color: var\(--dvn-selection-fg, #ffffff\);/,
+  )
+  assert.match(
+    voiceBlockCss,
+    /\.voicePlayback input\[type="range"\]::-webkit-slider-runnable-track \{[\s\S]*var\(--voice-progress-color\)[\s\S]*background-size: var\(--progressValue\);/,
+    'voice playback progress must use a state-controlled color while preserving the played-range width',
+  )
+  assert.match(
+    voiceBlockCss,
+    /\.voiceBox\.ProseMirror-selectednode \.voicePlayback input\[type="range"\],[\s\S]*\.voiceBox\.active \.voicePlayback input\[type="range"\],[\s\S]*\.voiceBox\.dvn-range-selected \.voicePlayback input\[type="range"\] \{[\s\S]*--voice-progress-color: var\(--dvn-selection-fg, #ffffff\);/,
+    'selected voice playback progress must contrast with the highlight-colored voice background',
   )
 })
 
 test('voice transcript selection uses text selection background and white foreground', () => {
   assert.match(
     voiceBlockCss,
-    /\.voiceBox\.ProseMirror-selectednode \.translateText::selection,[\s\S]*background: var\(--dvn-text-selection-bg, var\(--highlightColor, #0081ff\)\) !important;[\s\S]*color: var\(--dvn-selection-fg, #ffffff\);/,
+    /\.voiceBox\.ProseMirror-selectednode \.translateText::selection,[\s\S]*\.voiceBox\.active \.translateText::selection,[\s\S]*\.voiceBox\.dvn-range-selected \.translateText::selection \{[\s\S]*background: var\(--dvn-text-selection-bg, var\(--highlightColor, #0081ff\)\) !important;[\s\S]*color: var\(--dvn-selection-fg, #ffffff\);/,
   )
   assert.match(
     voiceBlockCss,

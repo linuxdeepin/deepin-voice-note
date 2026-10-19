@@ -169,7 +169,7 @@ test('hasRemoteImageInHtml: true when any remote src present', () => {
 // ---------------------------------------------------------------------------
 
 import { Editor } from '@tiptap/core'
-import { NodeSelection } from '@tiptap/pm/state'
+import { AllSelection, NodeSelection, TextSelection } from '@tiptap/pm/state'
 import { createTiptapExtensions } from '../src/runtime/tiptap-extensions.js'
 import { createEmptyDoc } from '../src/schema/document-envelope.js'
 import { setupImageViewAndMenu } from '../src/runtime/image-interactions.js'
@@ -225,8 +225,11 @@ test('image insertion and click expose theme-color selected overlay bound to ima
   assert.ok(style, 'image selection style should be injected')
   const imageBlockCss = readFileSync(new URL('../src/extensions/image-block.css', import.meta.url), 'utf8')
   assert.match(imageBlockCss, /dvn-image-node-selection/)
-  assert.match(imageBlockCss, /--dvn-active-selection-bg/)
-  assert.doesNotMatch(imageBlockCss, /control-holder|control-sizing|dvn-image-selection-bg/)
+  assert.match(imageBlockCss, /--dvn-image-selection-bg/)
+  assert.match(imageBlockCss, /rgba\(0, 129, 255, 0\.8\)/)
+  assert.match(imageBlockCss, /box-shadow: inset 0 0 0 4px var\(--dvn-text-selection-bg/)
+  assert.doesNotMatch(imageBlockCss, /--dvn-active-selection-bg/)
+  assert.doesNotMatch(imageBlockCss, /control-holder|control-sizing/)
   assert.doesNotMatch(
     imageBlockCss,
     /p:has\([^{}]+\)\s*\{[^}]*line-height:\s*0/s,
@@ -242,6 +245,82 @@ test('image insertion and click expose theme-color selected overlay bound to ima
   img.dispatchEvent(new Event('click', { bubbles: true, cancelable: true }))
   assert.equal(editor.state.selection.node?.type?.name, 'image')
   assert.ok(wrapper.classList.contains('dvn-image-node-selected'), 'clicked image node should expose selected state')
+  destroy()
+  editor.destroy()
+})
+
+
+test('image gets range-selected highlighting under Ctrl+A AllSelection', () => {
+  const { editor, img, destroy } = setupEditorWithImage()
+  assert.ok(img, 'image element should be rendered')
+
+  const wrapper = img.closest('[data-dvn-image-node]')
+  assert.ok(wrapper, 'image wrapper should exist')
+  assert.equal(wrapper.classList.contains('dvn-range-selected'), false)
+
+  editor.view.dispatch(editor.state.tr.setSelection(new AllSelection(editor.state.doc)))
+
+  assert.equal(editor.state.selection.constructor.name, 'AllSelection')
+  assert.ok(
+    wrapper.classList.contains('dvn-range-selected'),
+    'range selection must decorate image nodes instead of relying on NodeSelection callbacks',
+  )
+
+  editor.commands.setTextSelection(1)
+  assert.equal(
+    wrapper.classList.contains('dvn-range-selected'),
+    false,
+    'collapsed selection must clear the range-selected decoration',
+  )
+  destroy()
+  editor.destroy()
+})
+
+
+test('image gets range-selected highlighting when a text range crosses it', () => {
+  const { editor, destroy } = setupEditorWithImage()
+  editor.commands.setContent({
+    type: 'doc',
+    content: [
+      { type: 'paragraph', content: [{ type: 'text', text: 'before' }] },
+      {
+        type: 'paragraph',
+        content: [{
+          type: 'image',
+          attrs: {
+            src: 'file:///usr/share/x/images/photo.png',
+            relPath: 'images/photo.png',
+            alt: '',
+            title: null,
+          },
+        }],
+      },
+      { type: 'paragraph', content: [{ type: 'text', text: 'after' }] },
+    ],
+  })
+
+  let imagePos = null
+  editor.state.doc.descendants((node, pos) => {
+    if (node.type.name === 'image') imagePos = pos
+  })
+  assert.notEqual(imagePos, null)
+
+  const wrapper = editor.view.dom.querySelector('.dvn-image-node')
+  const selection = TextSelection.create(editor.state.doc, 1, imagePos + 1)
+  editor.view.dispatch(editor.state.tr.setSelection(selection))
+
+  assert.equal(editor.state.selection.constructor.name, 'TextSelection')
+  assert.ok(
+    wrapper.classList.contains('dvn-range-selected'),
+    'a normal text range crossing the image must show the same selected overlay',
+  )
+
+  editor.commands.setTextSelection(1)
+  assert.equal(
+    wrapper.classList.contains('dvn-range-selected'),
+    false,
+    'moving the selection outside the image must clear the overlay',
+  )
   destroy()
   editor.destroy()
 })

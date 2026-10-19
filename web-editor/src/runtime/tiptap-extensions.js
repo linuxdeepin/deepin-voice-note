@@ -28,9 +28,12 @@ import { FontWeightMark } from '../extensions/font-weight-mark.js'
 import { ImageBlock } from '../extensions/image-block.js'
 import { VoiceBlock } from '../extensions/voice-block.js'
 import { ListNestingGuard } from './list-nesting-guard.js'
+import { NormalListMarkers } from './normal-list-markers.js'
 import { TaskListCascade } from './task-list-cascade.js'
 import { UndoRedo } from './undo-redo.js'
+import { SelectionClickReset } from './selection-click-reset.js'
 import { SearchExtension } from './search-extension.js'
+import { RangeSelectionHighlight } from '../extensions/range-selection-highlight.js'
 
 export function createTiptapExtensions() {
   return [
@@ -57,8 +60,11 @@ export function createTiptapExtensions() {
     ColorMark,
     Highlight.configure({ multicolor: true }),
     UndoRedo,
+    SelectionClickReset,
+    RangeSelectionHighlight,
     SearchExtension,
     TaskListCascade,
     ListNestingGuard,
+    NormalListMarkers,
   ]
 }

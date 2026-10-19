@@ -100,6 +100,20 @@
     white-space: nowrap;
 }
 
+/*
+ * 标题/字体/字号混合时保留默认选项文字作为隐藏布局文本，使控件宽度和
+ * 箭头位置与默认态一致。QtWebEngine 对 visibility:hidden 的超宽文本仍可能
+ * 绘制 text-overflow 省略号，因此空白态必须同时关闭按钮和标签的省略号。
+ */
+.tiptap-select-wrap.is-layout-blank .tiptap-select-button,
+.tiptap-select-wrap.is-layout-blank .tiptap-select-label {
+    text-overflow: clip;
+}
+
+.tiptap-select-wrap.is-layout-blank .tiptap-select-label {
+    visibility: hidden;
+}
+
 .tiptap-select-arrow {
     flex: 0 0 12px;
     width: 12px;
@@ -184,7 +198,8 @@
 }
 
 .tiptap-select-option:hover,
-.tiptap-select-option:focus-visible {
+.tiptap-select-option:focus-visible,
+.tiptap-select-option[aria-selected="true"] {
     background-color: var(--dvn-menu-selected-bg, var(--highlightColor, #2878e8)) !important;
     color: var(--dvn-menu-selected-fg, #ffffff) !important;
     outline: none;
@@ -295,11 +310,20 @@
 
 .tiptap-toolbar button:hover,
 .tiptap-toolbar select:hover,
-.tiptap-toolbar button.is-active,
-.tiptap-toolbar button[aria-pressed="true"],
 .tiptap-toolbar .tiptap-select-wrap.is-open .tiptap-select-button,
 .tiptap-toolbar .tiptap-color-menu-button[aria-expanded="true"] {
     background: var(--dvn-hover-bg, rgba(0, 0, 0, 0.06));
+}
+
+/*
+ * 选中/激活态统一使用主题色（与文本选区、右键菜单选中项、语音块选中一致）。
+ * press 是独立的交互反馈，不能复用选中色，否则鼠标按下时会看起来像直接
+ * 切换成了选中态。active/check 仍是主题色，长按先显示灰色 press，松开后
+ * 才落到最终的选中态。
+ */
+.tiptap-toolbar button.is-active,
+.tiptap-toolbar button[aria-pressed="true"] {
+    background: var(--dvn-menu-selected-bg, var(--highlightColor, #2878e8));
 }
 
 .tiptap-toolbar button:active:not(:disabled),
@@ -307,16 +331,23 @@
     background: var(--dvn-press-bg, rgba(0, 0, 0, 0.10));
 }
 
-/* hover 只作用于普通态；已选中/展开/press 的按钮必须保持 check/active 的主题色。 */
+/* hover 只作用于普通态；已选中/展开/press 的按钮使用各自的交互色。 */
 .tiptap-toolbar button:hover:not(:disabled):not(:active):not(.is-pressing):not(.is-active):not([aria-pressed="true"]):not([aria-expanded="true"]) .tiptap-icon {
     color: var(--dvn-toolbar-hover-fg, #000000);
 }
 
-/* press 长按态与 check/active 一致：按下即临时呈现选中样式。 */
-.tiptap-toolbar button:active:not(:disabled) .tiptap-icon,
-.tiptap-toolbar button.is-pressing:not(:disabled) .tiptap-icon,
 .tiptap-toolbar button.is-active .tiptap-icon,
-.tiptap-toolbar button[aria-pressed="true"] .tiptap-icon,
+.tiptap-toolbar button[aria-pressed="true"] .tiptap-icon {
+    color: var(--dvn-menu-selected-fg, #ffffff);
+}
+
+/* press 使用普通工具栏前景色；主动按钮松开后才进入 white-on-theme 选中态。 */
+.tiptap-toolbar button:active:not(:disabled) .tiptap-icon,
+.tiptap-toolbar button.is-pressing:not(:disabled) .tiptap-icon {
+    color: var(--dvn-toolbar-hover-fg, #000000);
+}
+
+/* 展开态只表示“面板已打开”，不属于选中，保持主题色图标 + 灰色浮层。 */
 .tiptap-toolbar .tiptap-more-button[aria-expanded="true"] .tiptap-icon,
 .tiptap-toolbar .tiptap-select-wrap.is-open .tiptap-select-button .tiptap-icon,
 .tiptap-toolbar .tiptap-color-menu-button[aria-expanded="true"] .tiptap-icon {
@@ -582,9 +613,14 @@
     letter-spacing: 0;
 }
 
-/* Native title tooltips are misplaced by QtWebEngine for this sticky toolbar.
-   Anchor the hint to the more button itself, matching the Summernote tooltip. */
-.tiptap-more-button[data-tooltip]::after {
+/* Native title tooltips are misplaced by QtWebEngine in both the sticky
+   toolbar and the fixed overflow panel. Every toolbar control therefore uses
+   a hint anchored to the control itself, matching the Summernote tooltip. */
+.tiptap-toolbar button[data-tooltip] {
+    position: relative;
+}
+
+.tiptap-toolbar button[data-tooltip]::after {
     content: attr(data-tooltip);
     position: absolute;
     top: calc(100% + 6px);
@@ -607,8 +643,8 @@
     transition: opacity 120ms ease, transform 120ms ease, visibility 120ms ease;
 }
 
-.tiptap-more-button[data-tooltip]:hover::after,
-.tiptap-more-button[data-tooltip]:focus-visible::after {
+.tiptap-toolbar button[data-tooltip]:not(:disabled):hover::after,
+.tiptap-toolbar button[data-tooltip]:not(:disabled):focus-visible::after {
     opacity: 1;
     visibility: visible;
     transform: translate(-50%, 0);
