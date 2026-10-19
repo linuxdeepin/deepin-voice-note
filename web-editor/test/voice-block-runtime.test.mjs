@@ -45,17 +45,76 @@ function setupDom() {
   return window
 }
 
-function createEditor() {
+function createEditor(uiStrings) {
   const window = setupDom()
   const element = document.createElement('div')
   document.body.appendChild(element)
   const editor = new Editor({
     element,
-    extensions: createTiptapExtensions(),
+    extensions: createTiptapExtensions(uiStrings),
     content: createEmptyDoc(),
   })
   return { editor, window }
 }
+
+test('voice block labels follow host strings applied after editor creation', () => {
+  const strings = {
+    convertingVoiceToText: '旧文案',
+    toText: '旧转文字',
+    voiceToText: '旧语音转文字',
+  }
+  const { editor } = createEditor(strings)
+  Object.assign(strings, {
+    convertingVoiceToText: 'Converting voice to text',
+    toText: 'To Text',
+    voiceToText: 'Voice To Text',
+  })
+
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{
+      type: 'voiceBlock',
+      attrs: {
+        voiceId: 'voice-i18n-after-ready',
+        voicePath: 'voicenote/i18n-after-ready.wav',
+        voiceSize: 1,
+        text: 'transcript',
+      },
+    }],
+  })
+
+  const voiceBox = editor.view.dom.querySelector('.voiceBox')
+  assert.equal(voiceBox.querySelector('.translatingLabel')?.textContent, 'Converting voice to text')
+  assert.equal(voiceBox.querySelector('.voiceToTextTrigger')?.textContent, 'To Text')
+  assert.equal(voiceBox.querySelector('.translateLabel')?.textContent, 'Voice To Text')
+  editor.destroy()
+})
+
+test('voice block runtime labels use localized UI strings', () => {
+  const { editor } = createEditor({
+    convertingVoiceToText: 'Converting voice to text',
+    toText: 'To Text',
+    voiceToText: 'Voice To Text',
+  })
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{
+      type: 'voiceBlock',
+      attrs: {
+        voiceId: 'voice-i18n',
+        voicePath: 'voicenote/i18n.wav',
+        voiceSize: 1,
+        text: 'transcript',
+      },
+    }],
+  })
+
+  const voiceBox = editor.view.dom.querySelector('.voiceBox')
+  assert.equal(voiceBox.querySelector('.translatingLabel')?.textContent, 'Converting voice to text')
+  assert.equal(voiceBox.querySelector('.voiceToTextTrigger')?.textContent, 'To Text')
+  assert.equal(voiceBox.querySelector('.translateLabel')?.textContent, 'Voice To Text')
+  editor.destroy()
+})
 
 function createMockBridge(resourceBaseUrl = 'file:///home/user/.local/share/deepin-voice-note') {
   const handlers = {}

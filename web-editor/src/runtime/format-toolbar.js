@@ -19,31 +19,32 @@ import taskListIconUrl from './icons/task.svg?url'
 import checkIconUrl from './icons/check.svg?url'
 import { FORE_COLORS, BACK_COLORS, FONT_SIZES, HEADING_FONT_SIZES, colorPaletteForTheme, toPxSize } from './format-palette.js'
 import { activeListType, canIndentActiveListItem, canOutdentActiveListItem, liftActiveListItem, sinkActiveListItem, switchActiveListType, switchSelectedListType } from './list-behavior.js'
+import { DEFAULT_TIPTAP_UI_STRINGS, formatHeadingLevelLabel } from './ui-strings.js'
 
 const TOGGLE_BUTTONS = [
-  { format: 'bold', icon: 'bold', title: '粗体', className: 'tiptap-format-bold' },
-  { format: 'italic', icon: 'italic', title: '斜体', className: 'tiptap-format-italic' },
-  { format: 'underline', icon: 'underline', title: '下划线', className: 'tiptap-format-underline' },
-  { format: 'strike', icon: 'strike', title: '删除线', className: 'tiptap-format-strike' },
+  { format: 'bold', icon: 'bold', titleKey: 'bold', className: 'tiptap-format-bold' },
+  { format: 'italic', icon: 'italic', titleKey: 'italic', className: 'tiptap-format-italic' },
+  { format: 'underline', icon: 'underline', titleKey: 'underline', className: 'tiptap-format-underline' },
+  { format: 'strike', icon: 'strike', titleKey: 'strikethrough', className: 'tiptap-format-strike' },
 ]
 
 const INLINE_TOGGLE_FORMATS = new Set(['bold', 'italic', 'underline', 'strike'])
 const TOOLBAR_PRESS_CLEAR_EVENTS = ['pointerup', 'pointercancel', 'pointerleave', 'blur']
 
-const HEADING_OPTIONS = [
-  { value: 'p', label: '正文' },
-  { value: '1', label: '标题1' },
-  { value: '2', label: '标题2' },
-  { value: '3', label: '标题3' },
-  { value: '4', label: '标题4' },
-  { value: '5', label: '标题5' },
-]
+const HEADING_OPTION_VALUES = ['p', '1', '2', '3', '4', '5']
 
 const LIST_TOGGLE_BUTTONS = [
-  { format: 'bulletList', icon: 'bulletList', title: '无序列表' },
-  { format: 'orderedList', icon: 'orderedList', title: '有序列表' },
-  { format: 'taskList', icon: 'taskList', title: '待办列表' },
+  { format: 'bulletList', icon: 'bulletList', titleKey: 'bullets' },
+  { format: 'orderedList', icon: 'orderedList', titleKey: 'numbering' },
+  { format: 'taskList', icon: 'taskList', titleKey: 'taskList' },
 ]
+
+function headingOptions(strings) {
+  return HEADING_OPTION_VALUES.map((value) => ({
+    value,
+    label: value === 'p' ? strings.paragraph : formatHeadingLevelLabel(strings, value),
+  }))
+}
 
 
 const TOOLBAR_STYLE_ID = 'dvn-tiptap-format-toolbar-style'
@@ -501,10 +502,10 @@ function clearMarkColor(editor, markName) {
   editor.chain().focus().unsetMark(markName).run()
 }
 
-function buildColorPicker(editor, kind, colors, apply, clear, readActive, onOpen) {
+function buildColorPicker(editor, kind, colors, apply, clear, readActive, onOpen, strings) {
   // kind: 'foreColor' | 'backColor'
   const wrapper = createEl('span', { class: 'tiptap-color-picker' })
-  const title = kind === 'foreColor' ? '文字颜色' : '背景颜色'
+  const title = kind === 'foreColor' ? strings.fontColor : strings.textHighlightColor
   let currentColor = ''
 
   const icon = createEl('span', { class: 'tiptap-color-icon' }, [
@@ -524,8 +525,8 @@ function buildColorPicker(editor, kind, colors, apply, clear, readActive, onOpen
     type: 'button',
     class: 'tiptap-color-menu-button',
     'data-color-menu': kind,
-    'data-tooltip': '更多颜色',
-    'aria-label': '更多颜色',
+    'data-tooltip': strings.moreColors,
+    'aria-label': strings.moreColors,
   }, [arrow])
   menuButton.setAttribute('aria-haspopup', 'true')
   menuButton.setAttribute('aria-expanded', 'false')
@@ -534,7 +535,7 @@ function buildColorPicker(editor, kind, colors, apply, clear, readActive, onOpen
     class: 'tiptap-color-panel',
     'data-panel': kind,
     role: 'menu',
-    'aria-label': kind === 'foreColor' ? '文字颜色' : '背景颜色',
+    'aria-label': title,
   })
 
   function openPanel() {
@@ -625,7 +626,7 @@ function buildColorPicker(editor, kind, colors, apply, clear, readActive, onOpen
     panel.replaceChildren()
     for (const row of nextColors) {
       for (const color of row) {
-        const colorLabel = color === 'transparent' ? '透明' : color
+        const colorLabel = color === 'transparent' ? strings.transparent : color
         const cell = createEl('button', {
           type: 'button',
           'data-color': color,
@@ -812,9 +813,10 @@ function currentToolbarTheme() {
   return document.documentElement.dataset.dvnTheme === 'dark' ? 'dark' : 'light'
 }
 
-export function createFormatToolbar(editor, host) {
+export function createFormatToolbar(editor, host, uiStrings = DEFAULT_TIPTAP_UI_STRINGS) {
   if (!editor) throw new Error('editor instance is required')
   if (!host) throw new Error('toolbar host element is required')
+  const strings = { ...DEFAULT_TIPTAP_UI_STRINGS, ...(uiStrings || {}) }
 
   injectToolbarStyles()
   injectTaskListStyles()
@@ -843,9 +845,9 @@ export function createFormatToolbar(editor, host) {
 
   const headingControl = createStyledSelect({
     control: 'heading',
-    title: '标题',
+    title: strings.heading,
     onOpen: (current) => closeStyleSelects(current),
-    options: HEADING_OPTIONS.map(({ value, label }) => ({ value, label })),
+    options: headingOptions(strings),
     onChange(value) {
       const level = value === 'p' ? null : Number(value)
       const { selection } = editor.state
@@ -894,9 +896,9 @@ export function createFormatToolbar(editor, host) {
 
   const fontControl = createStyledSelect({
     control: 'fontFamily',
-    title: '字体',
+    title: strings.font,
     onOpen: (current) => closeStyleSelects(current),
-    options: [{ value: '', label: '字体' }],
+    options: [{ value: '', label: strings.font }],
     onChange(value) {
       if (!value) {
         clearMarkColor(editor, 'fontFamily')
@@ -909,7 +911,7 @@ export function createFormatToolbar(editor, host) {
 
   const sizeControl = createStyledSelect({
     control: 'fontSize',
-    title: '字号',
+    title: strings.fontSize,
     onOpen: (current) => closeStyleSelects(current),
     // Keep the size menu as a plain numeric list. The paragraph default is
     // 14px, so it is a normal option rather than a special first row.
@@ -985,15 +987,15 @@ export function createFormatToolbar(editor, host) {
 
   // 开关式按钮区：粗体 / 斜体 / 下划线 / 删除线
   const toggleGroup = createEl('span', { class: 'tiptap-toolbar-group tiptap-toggle-group' })
-  for (const { format, icon, title, className } of TOGGLE_BUTTONS) {
-    const btn = createToolbarButton({ format, title, className, children: createSvgIcon(icon) })
+  for (const { format, icon, titleKey, className } of TOGGLE_BUTTONS) {
+    const btn = createToolbarButton({ format, title: strings[titleKey], className, children: createSvgIcon(icon) })
     btn.setAttribute('aria-pressed', 'false')
     btn.addEventListener('click', () => applyToolbarToggle(format))
     toggleGroup.appendChild(btn)
     buttons[format] = btn
   }
   // 保留引用命令供测试/快捷入口复用，但截图样式不显示引用按钮。
-  const quoteBtn = createToolbarButton({ format: 'blockquote', title: '引用', children: '"', className: 'tiptap-hidden-command' })
+  const quoteBtn = createToolbarButton({ format: 'blockquote', title: strings.quote, children: '"', className: 'tiptap-hidden-command' })
   quoteBtn.setAttribute('aria-pressed', 'false')
   quoteBtn.addEventListener('click', () => applyToggle(editor, 'blockquote'))
   toggleGroup.appendChild(quoteBtn)
@@ -1018,6 +1020,7 @@ export function createFormatToolbar(editor, host) {
       fontControl.close()
       sizeControl.close()
     },
+    strings,
   )
   colorGroup.appendChild(forePicker.wrapper)
 
@@ -1035,6 +1038,7 @@ export function createFormatToolbar(editor, host) {
       fontControl.close()
       sizeControl.close()
     },
+    strings,
   )
   colorGroup.appendChild(backPicker.wrapper)
 
@@ -1051,20 +1055,20 @@ export function createFormatToolbar(editor, host) {
   // 列表/待办区
   const listGroup = createEl('span', { class: 'tiptap-toolbar-group tiptap-list-group' })
   const listButtons = {}
-  for (const { format, icon, title } of LIST_TOGGLE_BUTTONS) {
-    const btn = createToolbarButton({ format, title, children: createSvgIcon(icon) })
+  for (const { format, icon, titleKey } of LIST_TOGGLE_BUTTONS) {
+    const btn = createToolbarButton({ format, title: strings[titleKey], children: createSvgIcon(icon) })
     btn.setAttribute('aria-pressed', 'false')
     btn.addEventListener('click', () => applyListToggle(editor, format))
     listGroup.appendChild(btn)
     listButtons[format] = btn
   }
-  const indentBtn = createToolbarButton({ format: 'indentList', title: '增加缩进', children: '缩进', className: 'tiptap-hidden-command' })
+  const indentBtn = createToolbarButton({ format: 'indentList', title: strings.increaseIndent, children: strings.increaseIndent, className: 'tiptap-hidden-command' })
   indentBtn.disabled = true
   indentBtn.addEventListener('click', () => sinkActiveListItem(editor))
   listGroup.appendChild(indentBtn)
   listButtons.indentList = indentBtn
 
-  const outdentBtn = createToolbarButton({ format: 'outdentList', title: '减少缩进', children: '反缩进', className: 'tiptap-hidden-command' })
+  const outdentBtn = createToolbarButton({ format: 'outdentList', title: strings.decreaseIndent, children: strings.decreaseIndent, className: 'tiptap-hidden-command' })
   outdentBtn.disabled = true
   outdentBtn.addEventListener('click', () => liftActiveListItem(editor))
   listGroup.appendChild(outdentBtn)
@@ -1076,13 +1080,13 @@ export function createFormatToolbar(editor, host) {
   // 资源插入区：录音图标 / 图片按钮
   const resourceGroup = createEl('span', { class: 'tiptap-toolbar-group tiptap-resource-group' })
   let onRecordVoice = null
-  const voiceBtn = createToolbarButton({ format: 'insertVoice', title: '录音', children: createSvgIcon('mic') })
+  const voiceBtn = createToolbarButton({ format: 'insertVoice', title: strings.recordVoice, children: createSvgIcon('mic') })
   voiceBtn.addEventListener('click', () => {
     if (onRecordVoice) onRecordVoice()
   })
   resourceGroup.appendChild(voiceBtn)
 
-  const imageBtn = createToolbarButton({ format: 'insertImage', title: '插入图片', children: createSvgIcon('image') })
+  const imageBtn = createToolbarButton({ format: 'insertImage', title: strings.insertPicture, children: createSvgIcon('image') })
   let onPickImage = null
   imageBtn.addEventListener('click', () => {
     if (onPickImage) onPickImage()
@@ -1099,7 +1103,7 @@ export function createFormatToolbar(editor, host) {
   moreSeparator.classList.add('tiptap-more-separator')
   const moreBtn = createToolbarButton({
     format: 'more',
-    title: '更多格式',
+    title: strings.moreFormats,
     className: 'tiptap-more-button',
     children: createSvgIcon('more'),
   })
@@ -1107,7 +1111,7 @@ export function createFormatToolbar(editor, host) {
   // “更多”按钮的面板语义。
   moreBtn.setAttribute('aria-haspopup', 'true')
   moreBtn.setAttribute('aria-expanded', 'false')
-  const overflowPanel = createEl('div', { class: 'tiptap-overflow-panel', role: 'group', 'aria-label': '更多格式' })
+  const overflowPanel = createEl('div', { class: 'tiptap-overflow-panel', role: 'group', 'aria-label': strings.moreFormats })
   const overflowGroups = {
     toggle: createEl('span', { class: 'tiptap-toolbar-group tiptap-toggle-group' }),
     color: createEl('span', { class: 'tiptap-toolbar-group tiptap-color-group' }),
@@ -1334,7 +1338,7 @@ export function createFormatToolbar(editor, host) {
       ? textblockStyleContext(editor.state)
       : { value: 'p', mixed: false }
     if (headingContext.mixed) {
-      headingControl.setValue('', { mixed: true, label: '', layoutLabel: '正文' })
+      headingControl.setValue('', { mixed: true, label: '', layoutLabel: strings.paragraph })
     } else {
       headingControl.setValue(headingContext.value || 'p')
     }
@@ -1345,7 +1349,7 @@ export function createFormatToolbar(editor, host) {
       ? uniformMarkContext(editor.state, 'fontFamily', 'fontFamily', value => value || effectiveDefaultFontFamily)
       : { value: '', normalizedValue: '', mixed: false }
     if (fontContext.mixed) {
-      fontControl.setValue('', { mixed: true, label: '', layoutLabel: effectiveDefaultFontFamily || '字体' })
+      fontControl.setValue('', { mixed: true, label: '', layoutLabel: effectiveDefaultFontFamily || strings.font })
     } else {
       const currentFont = fontContext.normalizedValue || ''
       fontControl.setValue(currentFont === effectiveDefaultFontFamily ? '' : currentFont)
@@ -1443,7 +1447,7 @@ export function createFormatToolbar(editor, host) {
 
       // 与 Summernote 保持一致：下拉项按各自字体渲染；默认项仍代表当前系统字体。
       fontControl.setOptions([
-        { value: '', label: effectiveDefaultFont || '字体', style: effectiveDefaultFont ? { fontFamily: effectiveDefaultFont } : {} },
+        { value: '', label: effectiveDefaultFont || strings.font, style: effectiveDefaultFont ? { fontFamily: effectiveDefaultFont } : {} },
         ...list.map((name) => ({ value: name, label: name, style: { fontFamily: name } })),
       ])
       syncActiveStates()

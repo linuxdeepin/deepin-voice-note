@@ -32,7 +32,7 @@
     /* Match legacy summernote .note-editable geometry for migration display fidelity. */
     .ProseMirror { box-sizing: border-box; outline: none; width: 100%; min-height: 100%; overflow: visible; padding: 0 20px 50px 30px; cursor: text; caret-color: var(--dvn-editor-fg, rgba(0, 0, 0, 1)); font-family: var(--dvn-editor-default-font), sans-serif; font-size: 14px; line-height: 1.72; color: var(--dvn-editor-fg, rgba(0, 0, 0, 1)); word-wrap: break-word; }
     .ProseMirror::selection, .ProseMirror ::selection { background: var(--dvn-text-selection-bg, var(--highlightColor, #0081ff)); color: var(--dvn-selection-fg, #ffffff); }
-    #app.is-empty .ProseMirror::before { content: '请输入正文'; display: block; height: 0; color: var(--dvn-placeholder-fg, rgba(0, 0, 0, 0.30)); pointer-events: none; }
+    #app.is-empty .ProseMirror::before { content: attr(data-empty-placeholder); display: block; height: 0; color: var(--dvn-placeholder-fg, rgba(0, 0, 0, 0.30)); pointer-events: none; }
     #app.is-empty[data-empty-block="heading"] .ProseMirror::before { font-weight: 700; line-height: 1.2; }
     #app.is-empty[data-empty-heading-level="1"] .ProseMirror::before { font-size: 24px; line-height: 32px; }
     #app.is-empty[data-empty-heading-level="2"] .ProseMirror::before { font-size: 20px; line-height: 28px; }
@@ -189,9 +189,9 @@
   <div id="toolbar-host"></div>
   <div id="content-scroll">
     <div id="note-title-host">
-      <textarea id="note-title-input" maxlength="24" rows="1" autocomplete="off" spellcheck="false" aria-label="Note title"></textarea>
+      <textarea id="note-title-input" maxlength="24" rows="1" autocomplete="off" spellcheck="false" aria-label="笔记标题"></textarea>
     </div>
-    <div id="app"></div>
+    <div id="app" data-empty-placeholder="请输入正文"></div>
   </div>
   <script src="qrc:///qtwebchannel/qwebchannel.js"></script>
   <script type="module" src="./tiptap-editor.js"></script>

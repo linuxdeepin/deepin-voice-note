@@ -147,6 +147,48 @@ QString TiptapChannelBridge::resourceBaseUrl() const
     return QUrl::fromLocalFile(appDataPath).toString();
 }
 
+QString TiptapChannelBridge::uiStringsJson() const
+{
+    const auto webText = [](const char *source) {
+        return QApplication::translate("web", source);
+    };
+
+    QJsonObject strings;
+    // 默认笔记标题必须与 VNoteItemOper::getDefaultNoteName 使用同一翻译，
+    // 前端才能把生成标题识别为可覆盖的占位文本。
+    strings.insert(QStringLiteral("generatedTitlePrefix"),
+                   QApplication::translate("DefaultName", "Text"));
+    strings.insert(QStringLiteral("noteTitle"), webText("Note title"));
+    strings.insert(QStringLiteral("bodyPlaceholder"), webText("Enter text"));
+    strings.insert(QStringLiteral("bold"), webText("Bold"));
+    strings.insert(QStringLiteral("italic"), webText("Italic"));
+    strings.insert(QStringLiteral("underline"), webText("Underline"));
+    strings.insert(QStringLiteral("strikethrough"), webText("Strikethrough"));
+    strings.insert(QStringLiteral("bullets"), webText("Bullets"));
+    strings.insert(QStringLiteral("numbering"), webText("Numbering"));
+    strings.insert(QStringLiteral("taskList"), webText("Task list"));
+    strings.insert(QStringLiteral("heading"), webText("Heading"));
+    strings.insert(QStringLiteral("headingLevel"), webText("Heading %1"));
+    strings.insert(QStringLiteral("paragraph"), webText("Paragraph"));
+    strings.insert(QStringLiteral("font"), webText("Font"));
+    strings.insert(QStringLiteral("fontSize"), webText("Font size"));
+    strings.insert(QStringLiteral("fontColor"), webText("Font color"));
+    strings.insert(QStringLiteral("textHighlightColor"), webText("Text highlight color"));
+    strings.insert(QStringLiteral("moreColors"), webText("More colors"));
+    strings.insert(QStringLiteral("transparent"), webText("Transparent"));
+    strings.insert(QStringLiteral("quote"), webText("Quote"));
+    strings.insert(QStringLiteral("increaseIndent"), webText("Increase indent"));
+    strings.insert(QStringLiteral("decreaseIndent"), webText("Decrease indent"));
+    strings.insert(QStringLiteral("recordVoice"), webText("Record voice"));
+    strings.insert(QStringLiteral("insertPicture"), webText("Insert picture"));
+    strings.insert(QStringLiteral("moreFormats"), webText("More formats"));
+    strings.insert(QStringLiteral("voiceToText"), webText("Voice To Text"));
+    strings.insert(QStringLiteral("convertingVoiceToText"), webText("Converting voice to text"));
+    strings.insert(QStringLiteral("toText"), webText("To Text"));
+
+    return QString::fromUtf8(QJsonDocument(strings).toJson(QJsonDocument::Compact));
+}
+
 // ---------------------------------------------------------------------------
 // 加载就绪缓存语义（R6）
 // ---------------------------------------------------------------------------

@@ -88,6 +88,7 @@ function createMockBridge(resourceBaseUrl = 'file:///home/user/.local/share/deep
 
   const bridge = {
     resourceBaseUrl,
+    uiStringsJson: '{}',
     // JS→C++ 回告方法（记录调用）
     jsEditorReady() {
       calls.editorReady = (calls.editorReady || 0) + 1
@@ -135,6 +136,28 @@ test('bindTiptapChannel: editorReady called on bind', async () => {
 
   await bindTiptapChannel(editor, factory)
 
+  assert.equal(calls.editorReady, 1)
+  editor.destroy()
+})
+
+test('bindTiptapChannel: UI strings are delivered before editorReady', async () => {
+  const { editor } = createEditor()
+  const { bridge, calls } = createMockBridge()
+  bridge.uiStringsJson = JSON.stringify({ bodyPlaceholder: 'Enter text', bold: 'Bold' })
+  bridge.jsEditorReady = function () {
+    calls.editorReady = (calls.editorReady || 0) + 1
+  }
+  const factory = createMockChannelFactory(bridge)
+  let received = null
+
+  await bindTiptapChannel(editor, factory, {
+    onUiStrings: (json) => {
+      received = json
+      assert.equal(calls.editorReady || 0, 0, 'UI strings must be applied before editorReady')
+    },
+  })
+
+  assert.deepEqual(JSON.parse(received), { bodyPlaceholder: 'Enter text', bold: 'Bold' })
   assert.equal(calls.editorReady, 1)
   editor.destroy()
 })

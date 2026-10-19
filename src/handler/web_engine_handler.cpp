@@ -32,6 +32,7 @@
 #include <QDropEvent>
 #include <QFile>
 #include <QFileInfo>
+#include <QFontDatabase>
 #include <QTimer>
 #include <QCursor>
 #include <QMimeData>
@@ -252,6 +253,9 @@ WebEngineHandler::WebEngineHandler(QObject *parent)
 {
     qInfo() << "WebEngineHandler constructor called";
     initFontsInformation();
+    // 字体服务可能在应用启动阶段尚未就绪。这里先把已取得的系统字体
+    // 缓存到 Tiptap 通道，编辑器就绪后会立即补发，避免下拉只剩占位项。
+    TiptapChannelBridge::instance()->sendFontList(m_fontList, m_defaultFont);
     connectWebContent();
 
     connect(DGuiApplicationHelper::instance(), &DGuiApplicationHelper::themeTypeChanged, this, &WebEngineHandler::onThemeChanged);
@@ -453,6 +457,26 @@ void WebEngineHandler::initFontsInformation()
     } else {
         qWarning() << "Font service initialization failed. Service:" << DEEPIN_DAEMON_APPEARANCE_SERVICE << "not found";
     }
+
+    // 外观服务不可用时仍使用 Qt 的系统字体库兜底。字体名保持系统原值，
+    // 不翻译、不改写，确保简中与繁体行为一致且下拉不会为空。
+    if (m_fontList.isEmpty()) {
+        m_fontList = QFontDatabase::families();
+        m_fontList.removeAll(QString());
+        m_fontList.removeDuplicates();
+        if (m_defaultFont.isEmpty()) {
+            m_defaultFont = QApplication::font().family();
+        }
+        std::sort(m_fontList.begin(), m_fontList.end(), [](const QString &left, const QString &right) {
+            QCollator collator;
+            return collator.compare(left, right) < 0;
+        });
+    }
+    if (m_defaultFont.isEmpty() && !m_fontList.isEmpty()) {
+        m_defaultFont = m_fontList.first();
+    }
+    qInfo() << "System font list ready, total fonts:" << m_fontList.size()
+            << "default font:" << m_defaultFont;
     qInfo() << "Fonts information initialization finished";
 }
 

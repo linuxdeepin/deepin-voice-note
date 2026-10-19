@@ -624,6 +624,11 @@ export function bindTiptapChannel(editor, channelFactory, options = {}) {
       // 获取宿主资源根路径（供前端拼接 images/ 等相对路径）
       const resourceBaseUrl = bridge.resourceBaseUrl || ''
 
+      // 宿主在 jsEditorReady 后会立即下发字体、主题和首篇内容；界面文案必须
+      // 在通知就绪前同步到编辑器和工具栏，避免默认标题、占位符、提示及语音块
+      // 首次渲染时短暂或永久停留在兜底语言。
+      options.onUiStrings?.(bridge.uiStringsJson || '')
+
       // 注册 image 保存归一：丢弃绝对显示 src，落库只存相对 relPath
       registerSaveNormalizer('image', (node) => ({
         src: node.attrs?.relPath || node.attrs?.src,

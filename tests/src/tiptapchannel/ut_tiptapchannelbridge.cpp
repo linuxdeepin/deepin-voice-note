@@ -31,6 +31,26 @@ TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_signal_editorReady_001)
     EXPECT_EQ(spy.count(), 1);
 }
 
+TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_uiStringsJson_001)
+{
+    TiptapChannelBridge bridge;
+    const QJsonObject strings = QJsonDocument::fromJson(bridge.uiStringsJson().toUtf8()).object();
+    const QStringList requiredKeys = {
+        QStringLiteral("generatedTitlePrefix"),
+        QStringLiteral("noteTitle"),
+        QStringLiteral("bodyPlaceholder"),
+        QStringLiteral("bold"),
+        QStringLiteral("taskList"),
+        QStringLiteral("headingLevel"),
+        QStringLiteral("fontColor"),
+        QStringLiteral("moreFormats"),
+        QStringLiteral("voiceToText"),
+    };
+    for (const QString &key : requiredKeys) {
+        EXPECT_FALSE(strings.value(key).toString().isEmpty()) << key.toStdString();
+    }
+}
+
 // contentChanged signal 存在
 TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_signal_contentChanged_001)
 {

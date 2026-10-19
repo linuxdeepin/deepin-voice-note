@@ -41,7 +41,7 @@ function setupDom() {
   return window
 }
 
-function createEditorWithToolbar() {
+function createEditorWithToolbar(uiStrings) {
   const window = setupDom()
   const element = document.createElement('div')
   document.body.appendChild(element)
@@ -53,7 +53,7 @@ function createEditorWithToolbar() {
   const host = document.createElement('div')
   host.id = 'toolbar-host'
   document.body.appendChild(host)
-  const toolbar = createFormatToolbar(editor, host)
+  const toolbar = createFormatToolbar(editor, host, uiStrings)
   return { editor, host, toolbar, window, appElement: element }
 }
 
@@ -274,6 +274,41 @@ test('toolbar controls anchor tooltips to themselves instead of native title', (
 
   assert.match(toolbarCss, /\.tiptap-toolbar button\[data-tooltip\]::after/)
   assert.match(toolbarCss, /button\[data-tooltip\]:not\(:disabled\):hover::after/)
+  editor.destroy()
+})
+
+test('toolbar applies localized host strings to controls and heading options', () => {
+  const { host, editor } = createEditorWithToolbar({
+    bodyPlaceholder: 'Enter text',
+    bold: 'Bold',
+    bullets: 'Bullets',
+    numbering: 'Numbering',
+    taskList: 'Task list',
+    heading: 'Heading',
+    headingLevel: 'Heading %1',
+    paragraph: 'Paragraph',
+    font: 'Font',
+    fontSize: 'Font size',
+    fontColor: 'Font color',
+    textHighlightColor: 'Text highlight color',
+    moreColors: 'More colors',
+    transparent: 'Transparent',
+    recordVoice: 'Record voice',
+    insertPicture: 'Insert picture',
+    moreFormats: 'More formats',
+  })
+  const toolbar = host.querySelector('[data-testid="format-toolbar"]')
+
+  assert.equal(toolbar.querySelector('button[data-format="bold"]')?.getAttribute('data-tooltip'), 'Bold')
+  assert.equal(toolbar.querySelector('button[data-format="taskList"]')?.getAttribute('data-tooltip'), 'Task list')
+  assert.equal(toolbar.querySelector('button[data-format="insertVoice"]')?.getAttribute('data-tooltip'), 'Record voice')
+  assert.equal(toolbar.querySelector('button[data-format="insertImage"]')?.getAttribute('data-tooltip'), 'Insert picture')
+  assert.equal(toolbar.querySelector('button[data-color-menu="foreColor"]')?.getAttribute('data-tooltip'), 'More colors')
+
+  const headingOptions = Array.from(
+    toolbar.querySelectorAll('.tiptap-select-heading .tiptap-select-option-label'),
+  ).map((node) => node.textContent)
+  assert.deepEqual(headingOptions, ['Paragraph', 'Heading 1', 'Heading 2', 'Heading 3', 'Heading 4', 'Heading 5'])
   editor.destroy()
 })
 
