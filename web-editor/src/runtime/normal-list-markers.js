@@ -27,6 +27,7 @@ const MARKER_GUTTER_MIN = 20
 const MARKER_GUTTER_PER_DIGIT = 8
 const MARKER_GUTTER_BASE = 9
 const LIST_ITEM_TYPES = new Set(['listItem', 'taskItem'])
+const LIST_TYPES = new Set(['bulletList', 'orderedList', 'taskList'])
 
 export const normalListMarkerPluginKey = new PluginKey('dvnNormalListMarkers')
 
@@ -95,31 +96,97 @@ export function listItemMarkerGutter() {
 export function orderedListMarkerGutter(itemCount = 1, start = 1) {
   const count = Number.isFinite(itemCount) ? Math.max(0, itemCount) : 0
   const lastNumber = Math.max(1, orderedListStart(start) + count - 1)
-  const digits = String(lastNumber).length
+  return orderedListMarkerGutterForLastNumber(lastNumber)
+}
+
+function orderedListMarkerGutterForLastNumber(lastNumber) {
+  const number = Number.isFinite(lastNumber) ? Math.max(1, Math.floor(lastNumber)) : 1
+  const digits = String(number).length
   return Math.max(MARKER_GUTTER_MIN, digits * MARKER_GUTTER_PER_DIGIT + MARKER_GUTTER_BASE)
 }
 
-export function normalListMarkerStyle(itemCount, start) {
-  const resetValue = orderedListStart(start) - 1
-  return `--dvn-ordered-marker-gutter: ${orderedListMarkerGutter(itemCount, start)}px; counter-reset: dvn-ordered-list ${resetValue}`
+function hasDirectChildList(node) {
+  if (!node || !Number.isFinite(node.childCount)) return false
+  for (let index = 0; index < node.childCount; index += 1) {
+    if (LIST_TYPES.has(node.child(index)?.type?.name)) return true
+  }
+  return false
 }
 
-export function listItemMarkerStyle(fontSize, gutterPx) {
+// 列表项可能因为取消/重新应用、Tab/Shift+Tab 而暂时以“扁平列表 +
+// dvnIndentLevel”的形式存在。视觉上它们仍是多级节点，序号必须按可见层级
+// 分组，而不能把一整个扁平 <ol> 当成同一组连续编号。
+//
+// 例如截图中的 A(0) B(1) C(2) D(2) E(0) 应显示 1,1,1,2,2；
+// 只有回到根层级后的 E 才继续根组编号。每进入更深一层，更深层计数器清零；
+// 每回到较浅层，只重置它下面的层级，较浅层自己的编号继续递增。
+export function orderedListMarkerNumbers(listNode) {
+  const numbers = []
+  const counters = []
+  const start = orderedListStart(listNode?.attrs?.start)
+
+  listNode?.forEach?.((item) => {
+    const rawDepth = Number(item?.attrs?.dvnIndentLevel)
+    const visualDepth = Number.isFinite(rawDepth) ? Math.max(0, Math.floor(rawDepth)) : 0
+    // 带真实子列表的项按 Tab 时只给当前行补视觉缩进，它在当前 <ol> 中仍是
+    // 原来的直接兄弟，不能因此重置外层编号。子列表会递归独立编号。
+    const depth = visualDepth > 0 && hasDirectChildList(item) ? 0 : visualDepth
+    for (let index = depth + 1; index < counters.length; index += 1) {
+      counters[index] = null
+    }
+    if (!Number.isFinite(counters[depth])) {
+      counters[depth] = depth === 0 ? start : 1
+    }
+    numbers.push(counters[depth])
+    counters[depth] += 1
+  })
+
+  return numbers
+}
+
+export function normalListMarkerStyleForNumbers(numbers, start = 1) {
+  const resetValue = orderedListStart(start) - 1
+  const widestNumber = numbers?.length ? Math.max(1, ...numbers) : 1
+  const gutter = orderedListMarkerGutterForLastNumber(widestNumber)
+  return `--dvn-ordered-marker-gutter: ${gutter}px; counter-reset: dvn-ordered-list ${resetValue}`
+}
+
+export function normalListMarkerStyle(itemCount, start) {
+  const count = Number.isFinite(itemCount) ? Math.max(0, itemCount) : 0
+  return normalListMarkerStyleForNumbers(
+    Array.from({ length: count }, (_, index) => orderedListStart(start) + index),
+    start,
+  )
+}
+
+export function listItemMarkerStyle(fontSize, gutterPx, orderedNumber = null) {
   const gutter = Number.isFinite(gutterPx) ? gutterPx : listItemMarkerGutter()
-  return `--dvn-marker-ratio: ${markerRatio(fontSize)}; --dvn-marker-gutter: ${gutter}px`
+  const numberStyle = Number.isFinite(orderedNumber)
+    // content: var(...) 需要字符串 token；裸数字会在生成内容时被 CSS 视为
+    // 无效类型，最终 ::before 变成 content: none，序号直接消失。
+    ? `; --dvn-list-number: "${Math.max(1, Math.floor(orderedNumber))}"`
+    : ''
+  return `--dvn-marker-ratio: ${markerRatio(fontSize)}; --dvn-marker-gutter: ${gutter}px${numberStyle}`
 }
 
 // 自顶向下递归：进有序列表时先算出该列表的编号槽位，再把它作为
 // orderedGutter 传给直接子项，保证同一列表内所有列表项的
 // --dvn-marker-gutter 与列表槽位一致（网格首列 / 折行缩进都依赖它）。
-function collectMarkerDecorations(node, pos, orderedGutter, decorations) {
+function collectMarkerDecorations(node, pos, orderedGutter, decorations, orderedNumber = null) {
   const name = node?.type?.name
   if (name === 'orderedList') {
-    const gutter = orderedListMarkerGutter(node.childCount, node.attrs?.start)
+    const numbers = orderedListMarkerNumbers(node)
+    const gutter = orderedListMarkerGutterForLastNumber(numbers.length ? Math.max(...numbers) : 1)
     decorations.push(Decoration.node(pos, pos + node.nodeSize, {
-      style: normalListMarkerStyle(node.childCount, node.attrs?.start),
+      style: normalListMarkerStyleForNumbers(numbers, node.attrs?.start),
     }))
-    node.forEach((child, offset) => collectMarkerDecorations(child, pos + 1 + offset, gutter, decorations))
+    node.forEach((child, offset, index) => collectMarkerDecorations(
+      child,
+      pos + 1 + offset,
+      gutter,
+      decorations,
+      numbers[index],
+    ))
     return
   }
   if (name === 'bulletList' || name === 'taskList') {
@@ -129,7 +196,7 @@ function collectMarkerDecorations(node, pos, orderedGutter, decorations) {
   if (LIST_ITEM_TYPES.has(name)) {
     const size = listItemMarkerFontSize(node)
     decorations.push(Decoration.node(pos, pos + node.nodeSize, {
-      style: listItemMarkerStyle(size, orderedGutter ?? undefined),
+      style: listItemMarkerStyle(size, orderedGutter ?? undefined, orderedNumber),
     }))
     node.forEach((child, offset) => collectMarkerDecorations(child, pos + 1 + offset, null, decorations))
     return

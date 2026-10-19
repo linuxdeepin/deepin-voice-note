@@ -2026,7 +2026,7 @@ test('normal list markers stay on the first line for wrapped items', () => {
     'marker 不得再退回文字基线对齐',
   )
   assert.match(tiptapEditorHtml, /\.ProseMirror ul:not\(\[data-type="taskList"\]\) > li > p:first-child::before \{[\s\S]*content: "•";/)
-  assert.match(tiptapEditorHtml, /\.ProseMirror ol > li > p:first-child::before \{[\s\S]*content: counter\(dvn-ordered-list\) "\.";/)
+  assert.match(tiptapEditorHtml, /\.ProseMirror ol > li > p:first-child::before \{[\s\S]*content: var\(--dvn-list-number, counter\(dvn-ordered-list\)\) "\.";/)
 })
 
 test('multi-paragraph list items keep each block on its own grid row', () => {
@@ -2467,6 +2467,46 @@ test('Shift+Tab in a mixed nested list preserves order and keeps following sibli
   editor.destroy()
 })
 
+test('Shift+Tab from the first of multiple mixed child lists must not jump behind later children', () => {
+  const { editor, window } = createEditorWithToolbar()
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{
+      type: 'orderedList',
+      content: [
+        listItemForListType('orderedList', 'root', [
+          {
+            type: 'bulletList',
+            content: [listItemForListType('bulletList', 'active')],
+          },
+          {
+            type: 'orderedList',
+            content: [listItemForListType('orderedList', 'later-child')],
+          },
+        ]),
+        listItemForListType('orderedList', 'next-root'),
+      ],
+    }],
+  })
+  markEditorFocused(editor)
+  editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'active')).run()
+  pressTab(editor, window, true)
+  const json = editor.getJSON()
+
+  assert.deepEqual(
+    textOrder(json),
+    ['root', 'active', 'later-child', 'next-root'],
+    'outdent must not jump the active item behind a later child list',
+  )
+  assert.equal(listTypeForText(json, 'root'), 'orderedList')
+  assert.equal(listTypeForText(json, 'active'), 'bulletList')
+  assert.equal(listTypeForText(json, 'later-child'), 'orderedList')
+  assert.equal(listItemDepthForText(json, 'active'), 1)
+  assert.equal(listItemDepthForText(json, 'later-child'), 2)
+  assert.equal(listItemDepthForText(json, 'next-root'), 1)
+  editor.destroy()
+})
+
 test('switching current list item type preserves Chinese caret position', () => {
   const { editor, host } = createEditorWithToolbar()
   editor.commands.setContent({
@@ -2771,7 +2811,56 @@ for (const { name, listType, itemType, attrs } of [
     assert.ok(maxListItemVisualDepth(editor.getJSON()) <= 3, `${name} promoted sibling must stay capped at three levels`)
     editor.destroy()
   })
+
 }
+
+test('一级有序项 Shift+Tab 后点击原列表按钮，应恢复原结构和后续序号', () => {
+  const { editor, host, window } = createEditorWithToolbar()
+  const item = (text, indent = 0) => ({
+    type: 'listItem',
+    attrs: { dvnIndentLevel: indent },
+    content: [{ type: 'paragraph', attrs: { dvnIndentLevel: 0 }, content: [{ type: 'text', text }] }],
+  })
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{
+      type: 'orderedList',
+      attrs: { start: 1, type: null },
+      content: [
+        item('一级A'),
+        item('中间项'),
+        item('子项A', 1),
+        item('一级B'),
+        item('一级C'),
+        item('子项B', 1),
+        item('子项C', 1),
+      ],
+    }],
+  })
+  markEditorFocused(editor)
+  const before = editor.getJSON()
+
+  for (let round = 0; round < 3; round += 1) {
+    editor.chain().focus().setTextSelection(findTextEndPosition(editor, '中间项')).run()
+    assert.equal(pressTab(editor, window, true).defaultPrevented, true)
+    assert.deepEqual(editor.getJSON().content.map((node) => node.type), ['orderedList', 'paragraph', 'orderedList'])
+    if (round === 1) {
+      editor.chain().focus().setTextSelection(findTextRange(editor, '中间项').from + 1).run()
+    }
+
+    host.querySelector('button[data-format="orderedList"]').click()
+    assert.deepEqual(editor.getJSON(), before, `第 ${round + 1} 轮重新应用原列表后必须恢复为原来的单个列表`)
+    assert.equal(editor.state.selection.$from.parent.textContent, '中间项', `第 ${round + 1} 轮恢复后光标应仍在被反缩进的项内`)
+  }
+  assert.deepEqual(
+    Array.from(editor.view.dom.querySelectorAll('ol > li'))
+      .map((li) => Number(/--dvn-list-number: "(\d+)"/.exec(li.getAttribute('style'))?.[1])),
+    [1, 2, 1, 3, 4, 1, 2],
+    '恢复后根组应继续为 1~4，子组分别从 1 重新编号',
+  )
+  editor.destroy()
+})
+
 
 for (const { name, listType, itemType, attrs } of [
   { name: 'bullet list', listType: 'bulletList', itemType: 'listItem' },
@@ -3007,6 +3096,79 @@ test('visual-indented task children update their Shift+Tab-created parent when a
   editor.destroy()
 })
 
+test('一级待办只有三级视觉子项时，子项全部勾选也要回写父项', () => {
+  const { editor, window } = createEditorWithToolbar()
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{
+      type: 'taskList',
+      content: [
+        { type: 'taskItem', attrs: { checked: false, dvnIndentLevel: 0 }, content: [{ type: 'paragraph', content: [{ type: 'text', text: '萨达' }] }] },
+        { type: 'taskItem', attrs: { checked: false, dvnIndentLevel: 2 }, content: [{ type: 'paragraph', content: [{ type: 'text', text: '打' }] }] },
+        { type: 'taskItem', attrs: { checked: false, dvnIndentLevel: 2 }, content: [{ type: 'paragraph', content: [{ type: 'text', text: '大萨达' }] }] },
+      ],
+    }],
+  })
+
+  let checkboxes = editor.view.dom.querySelectorAll('input[type="checkbox"]')
+  checkboxes[1].checked = true
+  checkboxes[1].dispatchEvent(new window.Event('change', { bubbles: true }))
+  assert.deepEqual(
+    collectTaskCheckedStates(editor.getJSON()),
+    [false, true, false],
+    '只勾选一个三级子项时父项应保持未完成',
+  )
+
+  checkboxes = editor.view.dom.querySelectorAll('input[type="checkbox"]')
+  checkboxes[2].checked = true
+  checkboxes[2].dispatchEvent(new window.Event('change', { bubbles: true }))
+  assert.deepEqual(
+    collectTaskCheckedStates(editor.getJSON()),
+    [true, true, true],
+    '一级父项没有二级节点时，应把最近的三级节点视为直接子项并完成父项',
+  )
+  editor.destroy()
+})
+
+test('一级待办的嵌套三级视觉子项全部勾选后也回写父项', () => {
+  const { editor, window } = createEditorWithToolbar()
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{
+      type: 'taskList',
+      content: [{
+        type: 'taskItem',
+        attrs: { checked: false, dvnIndentLevel: 0 },
+        content: [
+          { type: 'paragraph', content: [{ type: 'text', text: '萨达' }] },
+          {
+            type: 'taskList',
+            content: [
+              { type: 'taskItem', attrs: { checked: false, dvnIndentLevel: 1 }, content: [{ type: 'paragraph', content: [{ type: 'text', text: '打' }] }] },
+              { type: 'taskItem', attrs: { checked: false, dvnIndentLevel: 1 }, content: [{ type: 'paragraph', content: [{ type: 'text', text: '大萨达' }] }] },
+            ],
+          },
+        ],
+      }],
+    }],
+  })
+
+  let checkboxes = editor.view.dom.querySelectorAll('input[type="checkbox"]')
+  checkboxes[1].checked = true
+  checkboxes[1].dispatchEvent(new window.Event('change', { bubbles: true }))
+  assert.deepEqual(collectTaskCheckedStates(editor.getJSON()), [false, true, false])
+
+  checkboxes = editor.view.dom.querySelectorAll('input[type="checkbox"]')
+  checkboxes[2].checked = true
+  checkboxes[2].dispatchEvent(new window.Event('change', { bubbles: true }))
+  assert.deepEqual(
+    collectTaskCheckedStates(editor.getJSON()),
+    [true, true, true],
+    '嵌套三级子项全部完成后，一级父项也必须完成',
+  )
+  editor.destroy()
+})
+
 test('user-created third-level task siblings cascade to the second-level parent after Shift+Tab', () => {
   const { editor, window } = createEditorWithToolbar()
   editor.commands.setContent({
@@ -3169,6 +3331,23 @@ test('clicking a list toggle immediately shows its active state', () => {
     for (const other of ['bulletList', 'orderedList', 'taskList'].filter((item) => item !== format)) {
       assert.equal(host.querySelector(`button[data-format="${other}"]`).getAttribute('aria-pressed'), 'false')
     }
+    editor.destroy()
+  }
+})
+
+test('clicking a list toggle twice on an empty paragraph applies then cancels without stale state', () => {
+  for (const format of ['bulletList', 'orderedList', 'taskList']) {
+    const { editor, host } = createEditorWithToolbar()
+    markEditorFocused(editor)
+    const button = host.querySelector(`button[data-format="${format}"]`)
+
+    button.click()
+    assert.equal(button.getAttribute('aria-pressed'), 'true')
+    assert.equal(editor.state.doc.firstChild.type.name, format)
+
+    button.click()
+    assert.equal(button.getAttribute('aria-pressed'), 'false')
+    assert.equal(editor.state.doc.firstChild.type.name, 'paragraph')
     editor.destroy()
   }
 })

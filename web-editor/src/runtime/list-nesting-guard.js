@@ -2,12 +2,13 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import { Extension } from '@tiptap/core'
-import { Plugin } from '@tiptap/pm/state'
+import { Plugin, TextSelection } from '@tiptap/pm/state'
 
 import {
   isInListItem,
   joinParagraphBackwardIntoPreviousList,
   joinParagraphForwardIntoCurrentList,
+  joinAdjacentSameTypeLists,
   liftActiveListItem,
   normalizeWholeDocumentSelection,
   selectionCoversListItems,
@@ -15,7 +16,35 @@ import {
 } from './list-behavior.js'
 
 const LIST_ITEM_TYPES = new Set(['listItem', 'taskItem'])
+const TEXTBLOCK_TYPES = new Set(['paragraph', 'heading'])
 const MAX_LIST_NESTING_DEPTH = 3
+const PLAIN_TEXT_TAB = '\u00a0'.repeat(4)
+
+function insertPlainText(editor, from, to = from) {
+  const tr = editor.state.tr.insertText(PLAIN_TEXT_TAB, from, to)
+  tr.setSelection(TextSelection.create(tr.doc, from + PLAIN_TEXT_TAB.length))
+  editor.view.dispatch(tr.scrollIntoView())
+  return true
+}
+
+// 有文本选区时，与旧版 Summernote 的 insertTab 一致：删除选区后插入 4 个 NBSP。
+function insertPlainTextTab(editor) {
+  const { selection } = editor.state
+  if (selection.empty || !(selection instanceof TextSelection)) return false
+  return insertPlainText(editor, selection.from, selection.to)
+}
+
+// 普通段落行首或空段落中的空光标按 Tab，插入纯文本缩进。
+// 行中仍保留默认 Tab 焦点行为；列表内空光标继续走列表缩进。
+function insertParagraphIndent(editor) {
+  const { selection } = editor.state
+  if (!selection.empty || !(selection instanceof TextSelection)) return false
+
+  const { $from } = selection
+  if ($from.parent.type.name !== 'paragraph' || $from.parentOffset !== 0) return false
+  if (isInListItem(editor)) return false
+  return insertPlainText(editor, selection.from)
+}
 
 function listItemDepthAt(doc, pos) {
   const $pos = doc.resolve(Math.min(pos + 1, doc.content.size))
@@ -33,25 +62,38 @@ function normalizedIndentLevel(value, structuralDepth) {
   return Math.min(maxExtraIndent, Math.floor(level))
 }
 
+// 取消嵌套列表后，原列表项会变成顶层普通文本块。给文本块保留视觉缩进，
+// 不能让它从原位置直接跳到页面最左侧；最多保留三级列表所需的两个缩进档位。
+function normalizedTextblockIndentLevel(value) {
+  const level = Number(value)
+  if (!Number.isFinite(level) || level <= 0) return 0
+  return Math.min(MAX_LIST_NESTING_DEPTH - 1, Math.floor(level))
+}
+
 // 统一列表/待办列表键盘缩进规则：Tab 最多进入三层，Shift+Tab 反缩进。
 export const ListNestingGuard = Extension.create({
   name: 'listNestingGuard',
   priority: 1000,
 
   addGlobalAttributes() {
-    return [{
-      types: ['listItem', 'taskItem'],
-      attributes: {
-        dvnIndentLevel: {
-          default: 0,
-          parseHTML: (element) => Number(element.getAttribute('data-dvn-indent-level')) || 0,
-          renderHTML: (attributes) => {
-            const level = Number(attributes.dvnIndentLevel) || 0
-            return level > 0 ? { 'data-dvn-indent-level': String(level) } : {}
-          },
-        },
+    const indentAttribute = {
+      default: 0,
+      parseHTML: (element) => Number(element.getAttribute('data-dvn-indent-level')) || 0,
+      renderHTML: (attributes) => {
+        const level = Number(attributes.dvnIndentLevel) || 0
+        return level > 0 ? { 'data-dvn-indent-level': String(level) } : {}
       },
-    }]
+    }
+    return [
+      {
+        types: ['listItem', 'taskItem'],
+        attributes: { dvnIndentLevel: indentAttribute },
+      },
+      {
+        types: [...TEXTBLOCK_TYPES],
+        attributes: { dvnIndentLevel: indentAttribute },
+      },
+    ]
   },
 
 
@@ -62,12 +104,16 @@ export const ListNestingGuard = Extension.create({
 
         let tr = null
         newState.doc.descendants((node, pos) => {
-          if (!LIST_ITEM_TYPES.has(node.type.name)) return true
-
-          const nextIndentLevel = normalizedIndentLevel(
-            node.attrs?.dvnIndentLevel,
-            listItemDepthAt(newState.doc, pos),
-          )
+          let nextIndentLevel = null
+          if (LIST_ITEM_TYPES.has(node.type.name)) {
+            nextIndentLevel = normalizedIndentLevel(
+              node.attrs?.dvnIndentLevel,
+              listItemDepthAt(newState.doc, pos),
+            )
+          } else if (TEXTBLOCK_TYPES.has(node.type.name)) {
+            nextIndentLevel = normalizedTextblockIndentLevel(node.attrs?.dvnIndentLevel)
+          }
+          if (nextIndentLevel == null) return true
           if ((Number(node.attrs?.dvnIndentLevel) || 0) === nextIndentLevel) return true
 
           tr ||= newState.tr
@@ -78,7 +124,13 @@ export const ListNestingGuard = Extension.create({
           return true
         })
 
-        return tr
+        // 全局只合并同父级、同视觉层级的相邻同类列表。不能在这里做
+        // “深层相邻列表挂回”：用户取消嵌套项的过程中，文档本来就会短暂
+        // 呈现扁平结构，过早归一会把待取消的项重新挂回父级。
+        tr ||= newState.tr
+        joinAdjacentSameTypeLists(tr)
+
+        return tr.docChanged ? tr : null
       },
     })]
   },
@@ -90,6 +142,15 @@ export const ListNestingGuard = Extension.create({
       // 一批列表项，必须继续处理，否则第一次 Shift+Tab 之后就再也按不动。
       Tab: () => {
         normalizeWholeDocumentSelection(this.editor)
+
+        // 选区：任意位置都替换成 4 个 NBSP。
+        if (insertPlainTextTab(this.editor)) return true
+
+        // 空光标：普通段落行首/空段落插入纯文本缩进；列表内仍执行列表缩进。
+        if (insertParagraphIndent(this.editor)) return true
+
+        // 上游列表范围选区的入口判断必须保留：全选/拖选后，$from 可能已不在
+        // listItem 内，但选区仍覆盖列表项。
         if (!isInListItem(this.editor) && !selectionCoversListItems(this.editor)) return false
         return sinkActiveListItem(this.editor)
       },

@@ -63,8 +63,29 @@ function walkApply(node, table) {
   return clone
 }
 
+function stripDefaultTextblockIndent(node) {
+  if (!node || typeof node !== 'object') return node
+  const clone = { ...node }
+  if ((clone.type === 'paragraph' || clone.type === 'heading')
+    && Number(clone.attrs?.dvnIndentLevel) === 0) {
+    const attrs = { ...clone.attrs }
+    delete attrs.dvnIndentLevel
+    if (Object.keys(attrs).length) clone.attrs = attrs
+    else delete clone.attrs
+  }
+  if (Array.isArray(clone.content)) {
+    clone.content = clone.content.map((child) => stripDefaultTextblockIndent(child))
+  }
+  if (Array.isArray(clone.marks)) {
+    clone.marks = clone.marks.map((mark) => stripDefaultTextblockIndent(mark))
+  }
+  return clone
+}
+
 function walkNormalize(doc, table) {
-  return walkApply(doc, table)
+  // dvnIndentLevel=0 是文本块的 schema 默认值，不应写进每段正文而撑大持久化数据。
+  // 只有取消嵌套列表后留下的非零视觉缩进需要落库。
+  return stripDefaultTextblockIndent(walkApply(doc, table))
 }
 
 function walkResolve(doc, table) {

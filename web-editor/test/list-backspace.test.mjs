@@ -76,6 +76,45 @@ function createEditor(window, content) {
   return new Editor({ element, extensions: createTiptapExtensions(), content })
 }
 
+function textStartPositionOccurrence(editor, text, occurrence = 0) {
+  let found = null
+  let seen = 0
+  editor.state.doc.descendants((node, pos) => {
+    if (found !== null) return false
+    if (node.isText && node.text === text) {
+      if (seen === occurrence) {
+        found = pos
+        return false
+      }
+      seen += 1
+    }
+    return true
+  })
+  if (found === null) throw new Error(`text occurrence not found: ${text}#${occurrence}`)
+  return found
+}
+
+function textOccurrenceContext(editor, text, occurrence = 0) {
+  const pos = textStartPositionOccurrence(editor, text, occurrence)
+  const $pos = editor.state.doc.resolve(pos + 1)
+  let listType = null
+  let structuralDepth = 0
+  let indentLevel = 0
+  for (let depth = 1; depth <= $pos.depth; depth += 1) {
+    const node = $pos.node(depth)
+    if (['bulletList', 'orderedList', 'taskList'].includes(node.type.name)) listType = node.type.name
+    if (node.type.name === 'listItem' || node.type.name === 'taskItem') {
+      structuralDepth += 1
+      indentLevel = Number(node.attrs?.dvnIndentLevel) || 0
+    }
+  }
+  return {
+    listType,
+    structuralDepth,
+    visualDepth: listType ? Math.min(3, structuralDepth + indentLevel) : 0,
+  }
+}
+
 function textStartPosition(editor, text) {
   let found = null
   editor.state.doc.descendants((node, pos) => {
@@ -114,6 +153,12 @@ function pressBackspace(editor, window) {
   const event = new window.KeyboardEvent('keydown', { key: 'Backspace', bubbles: true, cancelable: true })
   editor.view.dom.dispatchEvent(event)
   return event
+}
+
+function backspaceAtTextOccurrence(editor, window, text, occurrence = 0) {
+  markFocused(editor)
+  editor.chain().focus().setTextSelection(textStartPositionOccurrence(editor, text, occurrence)).run()
+  return pressBackspace(editor, window)
 }
 
 function backspaceAtTextStart(editor, window, text) {
@@ -347,6 +392,146 @@ test('nested item keeps its child list when outdented', () => {
   editor.destroy()
 })
 
+test('repeated Backspace from a nested item preserves the parent and its child list', () => {
+  const window = setupDom()
+  const editor = createEditor(window, {
+    type: 'doc',
+    content: [list('orderedList', [
+      listItem('头部一'),
+      listItem('头部二', [list('orderedList', [listItem('头部二子项')])]),
+      listItem('父级', [list('orderedList', [
+        listItem('目标子项', [list('bulletList', [listItem('目标孙项')])]),
+      ])]),
+      listItem('后续一'),
+      listItem('后续二'),
+    ])],
+  })
+
+  const first = backspaceAtTextStart(editor, window, '目标子项')
+  let json = editor.getJSON()
+  assert.equal(first.defaultPrevented, true, 'first Backspace must be handled')
+  assert.equal(listTypeForText(json, '父级'), 'orderedList', 'parent must remain in the ordered list')
+  assert.equal(listTypeForText(json, '目标子项'), 'orderedList', 'target must first stop at level one')
+  assert.equal(visualDepthForText(json, '目标子项'), 1, 'target must move exactly one level out')
+  assert.equal(listTypeForText(json, '目标孙项'), 'bulletList', 'grandchild list must survive the first lift')
+  assert.equal(visualDepthForText(json, '目标孙项'), 3, 'unselected grandchild must keep its visual depth')
+
+  const second = backspaceAtTextStart(editor, window, '目标子项')
+  json = editor.getJSON()
+  assert.equal(second.defaultPrevented, true, 'second Backspace must also be handled')
+  assert.equal(listTypeForText(json, '父级'), 'orderedList', 'cancelling the target must not cancel its parent')
+  assert.equal(listTypeForText(json, '目标子项'), null, 'target must become a plain text block at level one')
+  assert.equal(listTypeForText(json, '目标孙项'), 'bulletList', 'grandchild list must survive the target exit')
+  assert.equal(listTypeForText(json, '后续一'), 'orderedList', 'following root item must stay in a list')
+  assert.deepEqual(
+    textOrder(json),
+    ['头部一', '头部二', '头部二子项', '父级', '目标子项', '目标孙项', '后续一', '后续二'],
+    'repeated Backspace must not merge or delete adjacent items',
+  )
+  assert.equal(textOrder(json).some((text) => text === '父级目标子项'), false, 'parent and target must not be merged')
+  editor.destroy()
+})
+
+test('repeated Backspace with duplicate item text never merges into the previous level', () => {
+  const window = setupDom()
+  const editor = createEditor(window, {
+    type: 'doc',
+    content: [list('orderedList', [
+      listItem('的吃撒'),
+      listItem('打大萨达', [list('orderedList', [listItem('大萨达')])]),
+      listItem('发申房', [list('orderedList', [
+        listItem('大萨达', [list('bulletList', [listItem('大萨达')])]),
+      ])]),
+      listItem('大萨达'),
+      listItem('打上'),
+      listItem('阿打算'),
+      listItem('打'),
+    ])],
+  })
+
+  const first = backspaceAtTextOccurrence(editor, window, '大萨达', 1)
+  let target = textOccurrenceContext(editor, '大萨达', 1)
+  let parent = textOccurrenceContext(editor, '发申房')
+  let grandchild = textOccurrenceContext(editor, '大萨达', 2)
+  assert.equal(first.defaultPrevented, true, 'first Backspace must be handled')
+  assert.deepEqual(target, { listType: 'orderedList', structuralDepth: 1, visualDepth: 1 })
+  assert.deepEqual(parent, { listType: 'orderedList', structuralDepth: 1, visualDepth: 1 })
+  assert.deepEqual(grandchild, { listType: 'bulletList', structuralDepth: 2, visualDepth: 3 })
+
+  const second = backspaceAtTextOccurrence(editor, window, '大萨达', 1)
+  target = textOccurrenceContext(editor, '大萨达', 1)
+  parent = textOccurrenceContext(editor, '发申房')
+  grandchild = textOccurrenceContext(editor, '大萨达', 2)
+  const nextRoot = textOccurrenceContext(editor, '大萨达', 3)
+  assert.equal(second.defaultPrevented, true, 'second Backspace must be handled')
+  assert.deepEqual(target, { listType: null, structuralDepth: 0, visualDepth: 0 })
+  assert.deepEqual(parent, { listType: 'orderedList', structuralDepth: 1, visualDepth: 1 })
+  assert.deepEqual(grandchild, { listType: 'bulletList', structuralDepth: 1, visualDepth: 3 })
+  assert.deepEqual(nextRoot, { listType: 'orderedList', structuralDepth: 1, visualDepth: 1 })
+  assert.deepEqual(
+    textOrder(editor.getJSON()),
+    ['的吃撒', '打大萨达', '大萨达', '发申房', '大萨达', '大萨达', '大萨达', '打上', '阿打算', '打'],
+    'repeated Backspace must preserve every block and its order',
+  )
+  assert.equal(editor.getHTML().includes('发申房大萨达'), false, 'parent and target must never be merged')
+  editor.destroy()
+})
+
+const REPEATED_BACKSPACE_WITH_CHILD_CASES = [
+  { name: 'bullet > bullet > bullet', outer: 'bulletList', inner: 'bulletList', child: 'bulletList' },
+  { name: 'ordered > ordered > bullet', outer: 'orderedList', inner: 'orderedList', child: 'bulletList' },
+  { name: 'task > task > task', outer: 'taskList', inner: 'taskList', child: 'taskList' },
+  { name: 'bullet > ordered > task', outer: 'bulletList', inner: 'orderedList', child: 'taskList' },
+  { name: 'task > ordered > bullet', outer: 'taskList', inner: 'orderedList', child: 'bulletList' },
+]
+
+for (const spec of REPEATED_BACKSPACE_WITH_CHILD_CASES) {
+  test(`repeated Backspace with child lists: ${spec.name}`, () => {
+    const window = setupDom()
+    const makeItem = (listType, text, extra = []) => (
+      listType === 'taskList'
+        ? taskItem(text, extra)
+        : listItem(text, extra)
+    )
+    const target = makeItem(spec.inner, '目标项', [
+      list(spec.child, [makeItem(spec.child, '目标孙项')]),
+    ])
+    const parent = makeItem(spec.outer, '父级', [list(spec.inner, [target])])
+    const editor = createEditor(window, {
+      type: 'doc',
+      content: [list(spec.outer, [
+        makeItem(spec.outer, '前置项'),
+        parent,
+        makeItem(spec.outer, '后续项'),
+      ])],
+    })
+
+    const first = backspaceAtTextStart(editor, window, '目标项')
+    let json = editor.getJSON()
+    assert.equal(first.defaultPrevented, true)
+    assert.equal(listTypeForText(json, '父级'), spec.outer)
+    assert.equal(listTypeForText(json, '目标项'), spec.inner)
+    assert.equal(visualDepthForText(json, '目标项'), 1)
+    assert.equal(listTypeForText(json, '目标孙项'), spec.child)
+    assert.equal(visualDepthForText(json, '目标孙项'), 3)
+
+    const second = backspaceAtTextStart(editor, window, '目标项')
+    json = editor.getJSON()
+    assert.equal(second.defaultPrevented, true)
+    assert.equal(listTypeForText(json, '父级'), spec.outer, 'parent list must survive')
+    assert.equal(listTypeForText(json, '目标项'), null, 'only target item exits the list')
+    assert.equal(listTypeForText(json, '目标孙项'), spec.child, 'grandchild list must survive')
+    assert.equal(listTypeForText(json, '后续项'), spec.outer, 'following sibling must remain in its list')
+    assert.deepEqual(
+      textOrder(json),
+      ['前置项', '父级', '目标项', '目标孙项', '后续项'],
+      'text order must remain stable',
+    )
+    assert.equal(editor.getHTML().includes('父级目标项'), false, 'adjacent levels must not be merged')
+    editor.destroy()
+  })
+}
+
 test('cancelling a level-one item lifts its child list instead of dropping it', () => {
   const window = setupDom()
   const editor = createEditor(window, {
@@ -450,6 +635,20 @@ function textContentOf(node) {
   if (node.type === 'text') out += node.text || ''
   if (Array.isArray(node.content)) node.content.forEach((child) => { out += textContentOf(child) })
   return out
+}
+
+function textOrderForTest(node) {
+  const order = []
+  const walk = (entry) => {
+    if (!entry || typeof entry !== 'object') return
+    if (entry.type === 'paragraph') {
+      order.push(textContentOf(entry))
+      return
+    }
+    if (Array.isArray(entry.content)) entry.content.forEach(walk)
+  }
+  walk(node)
+  return order
 }
 
 function hasEmptyParagraph(node) {
@@ -638,6 +837,71 @@ test('taskList 后的段落行首 Backspace 并入待办项', () => {
   editor.destroy()
 })
 
+test('段落回删并入前项时，跨过深缩进子列表仍合并根有序列表并连续编号', () => {
+  const window = setupDom()
+  const editor = createEditor(window, {
+    type: 'doc',
+    content: [
+      list('orderedList', [listItem('前置项')]),
+      paragraph('父级'),
+      list('taskList', [taskItem('大萨达', [], 2)]),
+      list('orderedList', [listItem('目标项'), listItem('目标孙项'), listItem('后续项')]),
+    ],
+  })
+
+  const event = backspaceAtTextStart(editor, window, '父级')
+
+  assert.equal(event.defaultPrevented, true, 'Backspace 应被列表行首处理器接管')
+  const json = editor.getJSON()
+  assert.equal(json.content.length, 1, '深缩进子列表不能把后续有序列表隔成独立块')
+  assert.equal(json.content[0].type, 'orderedList', '合并后应只剩一个根有序列表')
+  assert.equal(json.content[0].content.length, 4, '四个根项应按 1..4 连续编号')
+  const firstItem = json.content[0].content[0]
+  assert.equal(textContentOf(firstItem.content[0]), '前置项父级', '文字应并入前一个根项')
+  assert.equal(firstItem.content[1].type, 'taskList', '深缩进待办应挂回前一个根项')
+  assert.equal(firstItem.content[1].content[0].attrs.dvnIndentLevel, 1, '挂回后应保持原视觉层级')
+
+  const numbers = Array.from(editor.view.dom.querySelectorAll('ol > li'))
+    .map((itemNode) => Number(/--dvn-list-number: "(\d+)"/.exec(itemNode.getAttribute('style'))?.[1]))
+  assert.deepEqual(numbers, [1, 2, 3, 4], '后续根项必须继续编号，不能重新从 1 开始')
+  editor.destroy()
+})
+
+test('跨深缩进子列表并入后，光标停在两段文字的拼接处', () => {
+  const window = setupDom()
+  const editor = createEditor(window, {
+    type: 'doc',
+    content: [
+      list('orderedList', [listItem('S11B0T0'), listItem('S11B1T1')]),
+      paragraph('大萨达'),
+      list('bulletList', [listItem('打上', [], 1)]),
+      list('orderedList', [
+        listItem('S11B1T1-0'),
+        listItem('S11B1T1-1'),
+        listItem('S11B1T2'),
+      ]),
+    ],
+  })
+
+  const event = backspaceAtTextStart(editor, window, '大萨达')
+
+  assert.equal(event.defaultPrevented, true, 'Backspace 应被列表行首处理器接管')
+  const json = editor.getJSON()
+  assert.equal(json.content.length, 1, '删行后应只剩一个根有序列表')
+  assert.equal(json.content[0].content.length, 5, '前后根项与并入项应连续编号')
+  assert.equal(
+    editor.state.selection.$from.parent.textContent,
+    'S11B1T1大萨达',
+    '光标应留在并入后的文本块中',
+  )
+  assert.equal(
+    editor.state.selection.$from.parentOffset,
+    'S11B1T1'.length,
+    '光标应停在上一项原文与新并入文字的拼接处',
+  )
+  editor.destroy()
+})
+
 // ---------------------------------------------------------------------------
 // 列表末项末尾按 Delete：与 Backspace 方向对称
 //
@@ -646,6 +910,85 @@ test('taskList 后的段落行首 Backspace 并入待办项', () => {
 // ---------------------------------------------------------------------------
 
 for (const { name, listType, makeItem } of LIST_CASES) {
+  test(`${name}: Delete at the end of a non-last item joins the next item instead of skipping to the trailing paragraph`, () => {
+    const window = setupDom()
+    const editor = createEditor(window, {
+      type: 'doc',
+      content: [
+        list(listType, [makeItem('A'), makeItem('B'), makeItem('C')]),
+        paragraph('尾部'),
+      ],
+    })
+
+    const event = deleteAtTextEnd(editor, window, 'A')
+    const json = editor.getJSON()
+
+    assert.equal(event.defaultPrevented, true, `${name} Delete must be taken over at the non-last item boundary`)
+    assert.deepEqual(blockTypes(json), [listType, 'paragraph'], `${name} must keep the trailing paragraph outside the list`)
+    assert.equal(json.content[0].content.length, 2, `${name} only the next list item may be joined`)
+    assert.deepEqual(listItemTexts(json, listType), ['AB', 'C'], `${name} text order must remain A, B, C`)
+    assert.equal(json.content[0].content[0].content.length, 1, `${name} joined item must contain one merged paragraph`)
+    assert.equal(textContentOf(json.content[0].content[0]), 'AB', `${name} next item text must merge into the current paragraph`)
+    assert.equal(textContentOf(json.content[1]), '尾部', `${name} trailing paragraph must not be skipped into A`)
+    assert.equal(editor.state.selection.empty, true, `${name} Delete must not create a range selection`)
+    assert.equal(editor.state.selection.$from.parent.textContent, 'AB', `${name} caret must stay in the merged item`)
+    assert.equal(editor.state.selection.$from.parentOffset, 'A'.length, `${name} caret must stay at the splice`)
+
+    editor.commands.insertContent('X')
+    assert.equal(textContentOf(editor.getJSON().content[0].content[0]), 'AXB', `${name} typing must insert at the splice`)
+    editor.destroy()
+  })
+
+  test(`${name}: Delete joins the next item without losing its nested subtree`, () => {
+    const window = setupDom()
+    const editor = createEditor(window, {
+      type: 'doc',
+      content: [list(listType, [
+        makeItem('A'),
+        makeItem('B', [list('taskList', [taskItem('B1', [list('bulletList', [listItem('B1a')])])])]),
+        makeItem('C'),
+      ])],
+    })
+
+    deleteAtTextEnd(editor, window, 'A')
+    const json = editor.getJSON()
+    const rootItems = json.content[0].content
+
+    assert.equal(rootItems.length, 2, `${name} B must merge into A instead of remaining a separate item`)
+    assert.equal(textContentOf(rootItems[0].content[0]), 'AB', `${name} B text must join A's paragraph`)
+    assert.equal(rootItems[0].content[1].type, 'taskList', `${name} B's child list must remain under the merged item`)
+    assert.equal(textContentOf(rootItems[0].content[1].content[0].content[0]), 'B1', `${name} nested child text must survive`)
+    assert.equal(visualDepthForText(json, 'B1'), 2, `${name} nested child must keep level two`)
+    assert.equal(visualDepthForText(json, 'B1a'), 3, `${name} nested grandchild must keep level three`)
+    assert.equal(editor.state.selection.$from.parent.textContent, 'AB', `${name} caret must remain in the merged paragraph`)
+    assert.equal(editor.state.selection.$from.parentOffset, 1, `${name} caret must remain at the splice`)
+  })
+
+  test(`${name}: Delete at the end of a parent line with a nested list is a safe no-op`, () => {
+    const window = setupDom()
+    const editor = createEditor(window, {
+      type: 'doc',
+      content: [
+        list(listType, [
+          makeItem('A', [list(listType, [makeItem('A1'), makeItem('A2')])]),
+          makeItem('B'),
+        ]),
+        paragraph('尾部'),
+      ],
+    })
+    const before = editor.getJSON()
+
+    const event = deleteAtTextEnd(editor, window, 'A')
+    const json = editor.getJSON()
+
+    assert.equal(event.defaultPrevented, true, `${name} Delete must be taken over before the child list`)
+    assert.deepEqual(json, before, `${name} deleting before a child list must not flatten or move the subtree`)
+    assert.equal(editor.state.selection.empty, true, `${name} Delete must not select the child subtree`)
+    assert.equal(editor.state.selection.$from.parent.textContent, 'A', `${name} caret must stay on the parent line`)
+    assert.equal(editor.state.selection.$from.parentOffset, 'A'.length, `${name} caret must stay after A`)
+    editor.destroy()
+  })
+
   test(`${name}: Delete at the end of the last item removes the following empty paragraph`, () => {
     const window = setupDom()
     const editor = createEditor(window, {
@@ -663,7 +1006,7 @@ for (const { name, listType, makeItem } of LIST_CASES) {
     assert.equal(editor.state.selection.$from.parent.textContent, '乙', `${name} caret should stay at the end of the last item`)
   })
 
-  test(`${name}: Delete at the end of the last item merges the following paragraph in one step`, () => {
+  test(`${name}: Delete at the end of the last item merges the following paragraph at the splice`, () => {
     const window = setupDom()
     const editor = createEditor(window, {
       type: 'doc',
@@ -675,7 +1018,12 @@ for (const { name, listType, makeItem } of LIST_CASES) {
 
     assert.deepEqual(blockTypes(json), [listType], `${name} paragraph block should disappear`)
     assert.deepEqual(listItemTexts(json, listType), ['甲', '乙尾巴'], `${name} text must merge into the current item in one step`)
-    assert.equal(editor.state.selection.$from.parent.textContent, '乙尾巴', `${name} caret should follow the merged text`)
+    assert.equal(editor.state.selection.$from.parent.textContent, '乙尾巴', `${name} caret must stay in the merged block`)
+    assert.equal(editor.state.selection.$from.parentOffset, '乙'.length, `${name} caret must stay at the splice`)
+
+    editor.commands.insertContent('X')
+    assert.deepEqual(listItemTexts(editor.getJSON(), listType), ['甲', '乙X尾巴'], `${name} typing must insert at the splice`)
+    assert.equal(editor.state.selection.$from.parentOffset, '乙X'.length, `${name} caret must follow inserted text`)
   })
 
   test(`${name}: Delete in the middle of an item is not taken over`, () => {
@@ -694,7 +1042,7 @@ for (const { name, listType, makeItem } of LIST_CASES) {
     assert.deepEqual(listItemTexts(json, listType), ['甲', '乙'], `${name} list must not be changed by inline Delete`)
   })
 
-  test(`${name}: Delete at the end of a non-last item keeps the default item join`, () => {
+  test(`${name}: Delete at the end of a non-last item merges the next item at the splice`, () => {
     const window = setupDom()
     const editor = createEditor(window, {
       type: 'doc',
@@ -704,15 +1052,147 @@ for (const { name, listType, makeItem } of LIST_CASES) {
     deleteAtTextEnd(editor, window, '乙')
     const json = editor.getJSON()
 
-    // 非末项走 ProseMirror 默认 joinForward：后一项并入当前项的第二个段落，
-    // 不生成新的列表项。这里只锁住“默认行为没有被 Delete 定制逻辑改写”。
+    // Delete 与编辑器中的文本拼接语义一致：下一项文字并入当前段落，
+    // 不能遗留一个无项目符号的“第二个段落”，也不能多保留一个空列表项。
     assert.equal(countListBlocks(json), 1, `${name} list wrapper must survive`)
     assert.deepEqual(blockTypes(json), [listType], `${name} no paragraph block should be created`)
-    assert.equal(json.content[0].content.length, 2, `${name} item count must stay unchanged`)
+    assert.equal(json.content[0].content.length, 2, `${name} only the next item may be joined`)
     const joinedItem = json.content[0].content[1]
-    assert.equal(joinedItem.content.length, 2, `${name} next item should join as a second paragraph`)
-    assert.equal(textContentOf(joinedItem.content[0]), '乙', `${name} first paragraph must stay`)
-    assert.equal(textContentOf(joinedItem.content[1]), '丙', `${name} joined paragraph text must be kept`)
+    assert.equal(joinedItem.content.length, 1, `${name} joined item must contain one merged paragraph`)
+    assert.equal(textContentOf(joinedItem.content[0]), '乙丙', `${name} next item text must merge at the splice`)
+    assert.equal(editor.state.selection.$from.parentOffset, '乙'.length, `${name} caret must stay at the splice`)
+  })
+}
+
+for (const { name, listType, makeItem } of LIST_CASES) {
+  test(`${name}: Delete at a paragraph end before a list keeps the caret instead of selecting the list`, () => {
+    const window = setupDom()
+    const editor = createEditor(window, {
+      type: 'doc',
+      content: [
+        paragraph('前文'),
+        list(listType, [makeItem('A'), makeItem('B')]),
+      ],
+    })
+    const before = editor.getJSON()
+
+    const event = deleteAtTextEnd(editor, window, '前文')
+    const json = editor.getJSON()
+
+    assert.equal(event.defaultPrevented, true, `${name} Delete must be taken over at the paragraph/list boundary`)
+    assert.deepEqual(json, before, `${name} paragraph/list boundary must not mutate the document`)
+    assert.equal(editor.state.selection.empty, true, `${name} Delete must not select the following list`)
+    assert.equal(editor.state.selection.$from.parent.textContent, '前文', `${name} caret must stay in the paragraph`)
+    assert.equal(editor.state.selection.$from.parentOffset, '前文'.length, `${name} caret must stay at paragraph end`)
+    editor.destroy()
+  })
+}
+
+test('Tab at a two-level item with a child list uses visual indent instead of creating a fourth level', () => {
+  const window = setupDom()
+  const editor = createEditor(window, {
+    type: 'doc',
+    content: [
+      list('bulletList', [
+        listItem('P', [
+          list('orderedList', [
+            listItem('B0'),
+            listItem('B', [list('taskList', [taskItem('C')])]),
+          ]),
+        ]),
+      ]),
+    ],
+  })
+
+  editor.chain().focus().setTextSelection(textEndPosition(editor, 'B')).run()
+  assert.equal(sinkActiveListItem(editor), true, 'Tab must be handled')
+  const json = editor.getJSON()
+
+  assert.deepEqual(textOrderForTest(json), ['P', 'B0', 'B', 'C'], 'text order must remain unchanged')
+  assert.equal(visualDepthForText(json, 'B'), 3, 'target item must move to the third visual level')
+  assert.equal(visualDepthForText(json, 'C'), 3, 'child item must stay at the third visual level')
+  assert.equal(editor.state.selection.empty, true, 'Tab must keep a collapsed caret')
+  assert.equal(editor.state.selection.$from.parent.textContent, 'B', 'caret must stay on the target item')
+  assert.equal(editor.state.selection.$from.parentOffset, 'B'.length, 'caret offset must not drift')
+  editor.destroy()
+})
+
+test('Backspace at the start of a mixed-type nested item keeps the caret on that item', () => {
+  const window = setupDom()
+  const editor = createEditor(window, {
+    type: 'doc',
+    content: [
+      list('bulletList', [
+        listItem('P', [
+          list('orderedList', [
+            listItem('T', [list('bulletList', [listItem('T1')])]),
+          ]),
+        ]),
+      ]),
+    ],
+  })
+
+  editor.chain().focus().setTextSelection(textStartPosition(editor, 'T')).run()
+  assert.equal(liftActiveListItem(editor), true, 'Backspace lift must be handled')
+  const json = editor.getJSON()
+
+  assert.deepEqual(textOrderForTest(json), ['P', 'T', 'T1'], 'text order must remain unchanged')
+  assert.equal(editor.state.selection.empty, true, 'Backspace must keep a collapsed caret')
+  assert.equal(editor.state.selection.$from.parent.textContent, 'T', 'caret must not jump to the parent item')
+  assert.equal(editor.state.selection.$from.parentOffset, 0, 'caret must stay at the start of T')
+  editor.destroy()
+})
+
+test('Delete at the end of a list item before another list is a safe no-op', () => {
+  for (const { name, listType, makeItem } of LIST_CASES) {
+    const window = setupDom()
+    const nextType = listType === 'taskList' ? 'bulletList' : 'taskList'
+    const nextItem = nextType === 'taskList' ? taskItem('下一列表') : listItem('下一列表')
+    const content = {
+      type: 'doc',
+      content: [
+        list(listType, [makeItem('当前项')]),
+        list(nextType, [nextItem]),
+      ],
+    }
+    const editor = createEditor(window, content)
+    const before = editor.getJSON()
+
+    const event = deleteAtTextEnd(editor, window, '当前项')
+    const json = editor.getJSON()
+
+    assert.equal(event.defaultPrevented, true, `${name}: Delete must be taken over at the list/list boundary`)
+    assert.deepEqual(json, before, `${name}: list/list boundary must not mutate the document`)
+    assert.equal(editor.state.selection.empty, true, `${name}: Delete must not select the following list subtree`)
+    assert.equal(editor.state.selection.$from.parent.textContent, '当前项', `${name}: caret must stay in the current item`)
+    assert.equal(editor.state.selection.$from.parentOffset, '当前项'.length, `${name}: caret must stay at item end`)
+    editor.destroy()
+  }
+})
+
+// 混合转换和粘贴会形成同类型列表的真实嵌套。此时 ProseMirror 的
+// liftListItem 可能直接返回 false；若继续交给默认 Backspace，父项整行会被
+// 选成范围。三种列表都必须逐级提升并保持光标在当前项行首。
+for (const { name, listType, makeItem } of LIST_CASES) {
+  test(`${name}: Backspace lifts a same-type nested item without selecting its parent`, () => {
+    const window = setupDom()
+    const editor = createEditor(window, {
+      type: 'doc',
+      content: [list(listType, [
+        makeItem('父项', [list(listType, [makeItem('子项')])]),
+      ])],
+    })
+
+    const event = backspaceAtTextStart(editor, window, '子项')
+    const json = editor.getJSON()
+
+    assert.equal(event.defaultPrevented, true, `${name}: same-type nested Backspace must be handled`)
+    assert.deepEqual(textOrderForTest(json), ['父项', '子项'], `${name}: text order must remain unchanged`)
+    assert.equal(visualDepthForText(json, '子项'), 1, `${name}: child must move up exactly one visual level`)
+    assert.equal(editor.state.selection.empty, true, `${name}: Backspace must not select the parent item`)
+    assert.equal(editor.state.selection.$from.parent.textContent, '子项', `${name}: caret must stay on the lifted item`)
+    assert.equal(editor.state.selection.$from.parentOffset, 0, `${name}: caret must stay at line start`)
+    editor.destroy()
   })
 }
 
@@ -1119,4 +1599,45 @@ test('range selection: mixed internal representation indents every selected item
   assert.equal(visualDepthForText(json, '甲一'), 1, '甲一 未选中，必须保持一级')
   assert.equal(visualDepthForText(json, '末尾'), 1, '末尾 未选中，必须保持一级')
   editor.destroy()
+})
+
+// 真实应用回归：三级列表的最后一项后面没有同级文本块时，Delete 不能落回
+// ProseMirror 默认 joinForward，否则会把后一个外层兄弟的整个子树选成范围。
+test('Delete at the last item of a nested inner list is a safe no-op for all list-type combinations', () => {
+  const failures = []
+  for (const outer of LIST_CASES) {
+    for (const inner of LIST_CASES) {
+      const window = setupDom()
+      const outerItem = (text, extra = []) => (
+        outer.listType === 'taskList' ? taskItem(text, extra) : listItem(text, extra)
+      )
+      const innerItem = (text) => (
+        inner.listType === 'taskList' ? taskItem(text) : listItem(text)
+      )
+      const editor = createEditor(window, {
+        type: 'doc',
+        content: [list(outer.listType, [
+          outerItem('父项', [
+            list(inner.listType, [innerItem('前项'), innerItem('目标末项')]),
+          ]),
+          outerItem('外层后续项'),
+        ])],
+      })
+      const before = editor.getJSON()
+      const event = deleteAtTextEnd(editor, window, '目标末项')
+      const label = `${outer.name} > ${inner.name}`
+
+      try {
+        assert.equal(event.defaultPrevented, true, `${label}: Delete must be handled at the nested list tail`)
+        assert.deepEqual(editor.getJSON(), before, `${label}: Delete must not mutate the nested subtree`)
+        assert.equal(editor.state.selection.empty, true, `${label}: Delete must not select the following outer subtree`)
+        assert.equal(editor.state.selection.$from.parent.textContent, '目标末项', `${label}: caret must stay on the target item`)
+        assert.equal(editor.state.selection.$from.parentOffset, '目标末项'.length, `${label}: caret must stay at item end`)
+      } catch (error) {
+        failures.push(error.message)
+      }
+      editor.destroy()
+    }
+  }
+  assert.deepEqual(failures, [], `nested Delete matrix failed ${failures.length} cases:\n${failures.join('\n')}`)
 })

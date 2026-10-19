@@ -204,7 +204,10 @@ test('bindTiptapChannel: invalid envelope falls back to empty doc', async () => 
   emit('loadEnvelopeRequested', 'not valid json')
 
   const json = editor.getJSON()
-  assert.deepEqual(json, { type: 'doc', content: [{ type: 'paragraph' }] })
+  assert.deepEqual(JSON.parse(JSON.stringify(json)), {
+    type: 'doc',
+    content: [{ type: 'paragraph', attrs: { dvnIndentLevel: 0 } }],
+  })
   editor.destroy()
 })
 

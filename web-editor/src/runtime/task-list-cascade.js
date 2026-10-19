@@ -4,7 +4,7 @@
 import { Extension } from '@tiptap/core'
 import { Plugin, PluginKey } from '@tiptap/pm/state'
 
-const pluginKey = new PluginKey('taskListCascade')
+export const taskListCascadePluginKey = new PluginKey('taskListCascade')
 
 function isTaskItem(node) {
   return node?.type?.name === 'taskItem'
@@ -146,7 +146,22 @@ function taskItemDescendants(doc, node, basePos) {
 }
 
 function directChildTaskItems(doc, node, basePos) {
-  return visualTaskItemsUnder(doc, node, basePos, 'children')
+  const candidates = visualTaskItemsUnder(doc, node, basePos, 'descendants')
+  if (!candidates.length) return []
+
+  // 历史数据/连续 Shift+Tab 可能让一级父项下面直接出现三级视觉子项，
+  // 中间没有二级节点。此时不能要求“恰好父级 + 1”才算直接子项，否则
+  // 子项全部完成后父项永远不更新。取当前子树里最接近父项的可见层级；
+  // 如果存在二级节点，仍然只由二级节点决定父项，三级节点继续向二级冒泡。
+  let nearestDepth = Infinity
+  const candidatesWithDepth = candidates.map((candidate) => {
+    const liveNode = safeNodeAt(doc, candidate.pos) || candidate.node
+    const visualDepth = taskItemVisualDepthAt(doc, candidate.pos, liveNode)
+    nearestDepth = Math.min(nearestDepth, visualDepth)
+    return { ...candidate, visualDepth }
+  }).filter((candidate) => candidate.visualDepth === nearestDepth)
+
+  return candidatesWithDepth.map(({ visualDepth, ...candidate }) => candidate)
 }
 
 function collectTaskItems(doc) {
@@ -246,18 +261,18 @@ export const TaskListCascade = Extension.create({
   addProseMirrorPlugins() {
     return [
       new Plugin({
-        key: pluginKey,
+        key: taskListCascadePluginKey,
 
         appendTransaction: (transactions, oldState, newState) => {
           if (!transactions.some((transaction) => isTaskRelatedTransaction(transaction))) return null
-          if (transactions.some((transaction) => transaction.getMeta(pluginKey))) return null
+          if (transactions.some((transaction) => transaction.getMeta(taskListCascadePluginKey))) return null
 
           const tr = newState.tr
           let changed = cascadeManualParentChanges(tr, oldState.doc, newState.doc)
           changed = normalizeParentCheckedStates(tr) || changed
           if (!changed) return null
 
-          tr.setMeta(pluginKey, true)
+          tr.setMeta(taskListCascadePluginKey, true)
           return tr
         },
       }),
