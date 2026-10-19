@@ -115,7 +115,10 @@
     .ProseMirror ol { counter-reset: dvn-ordered-list; }
     .ProseMirror ol > li { counter-increment: dvn-ordered-list; }
     .ProseMirror ol > li > p:first-child::before {
-      content: counter(dvn-ordered-list) ".";
+      /* 扁平列表可能通过 dvnIndentLevel 表达视觉层级；运行态 decoration
+         会给每个列表项下发按可见节点分组后的编号。counter 仅作为极端情况下
+         的兜底，不能直接使用，否则会表现为 1,2,3,4,5 而不是 1,1,1,2,2。 */
+      content: var(--dvn-list-number, counter(dvn-ordered-list)) ".";
       justify-content: flex-end;
       padding-right: 4px;
     }
@@ -135,6 +138,21 @@
     .ProseMirror li li li ul, .ProseMirror li li li ol { padding-left: 0; }
     .ProseMirror li[data-dvn-indent-level="1"] { margin-left: 20px; }
     .ProseMirror li[data-dvn-indent-level="2"] { margin-left: 40px; }
+    /* 取消嵌套列表后，文本块本身仍保留原视觉层级，不能跳到页面最左侧。 */
+    .ProseMirror > p[data-dvn-indent-level="1"],
+    .ProseMirror > h1[data-dvn-indent-level="1"],
+    .ProseMirror > h2[data-dvn-indent-level="1"],
+    .ProseMirror > h3[data-dvn-indent-level="1"],
+    .ProseMirror > h4[data-dvn-indent-level="1"],
+    .ProseMirror > h5[data-dvn-indent-level="1"],
+    .ProseMirror > h6[data-dvn-indent-level="1"] { margin-left: 20px; }
+    .ProseMirror > p[data-dvn-indent-level="2"],
+    .ProseMirror > h1[data-dvn-indent-level="2"],
+    .ProseMirror > h2[data-dvn-indent-level="2"],
+    .ProseMirror > h3[data-dvn-indent-level="2"],
+    .ProseMirror > h4[data-dvn-indent-level="2"],
+    .ProseMirror > h5[data-dvn-indent-level="2"],
+    .ProseMirror > h6[data-dvn-indent-level="2"] { margin-left: 40px; }
     .ProseMirror li[data-dvn-indent-level="1"] > ul,
     .ProseMirror li[data-dvn-indent-level="1"] > ol,
     .ProseMirror li[data-dvn-indent-level="1"] > div > ul,

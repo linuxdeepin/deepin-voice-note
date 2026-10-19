@@ -18,7 +18,7 @@ import imageIconUrl from './icons/image.svg?url'
 import taskListIconUrl from './icons/task.svg?url'
 import checkIconUrl from './icons/check.svg?url'
 import { FORE_COLORS, BACK_COLORS, FONT_SIZES, HEADING_FONT_SIZES, colorPaletteForTheme, toPxSize } from './format-palette.js'
-import { activeListType, canIndentActiveListItem, canOutdentActiveListItem, liftActiveListItem, sinkActiveListItem, switchActiveListType, switchSelectedListType } from './list-behavior.js'
+import { activeListType, canIndentActiveListItem, canOutdentActiveListItem, liftActiveListItem, sinkActiveListItem, toggleActiveListFormatting } from './list-behavior.js'
 import { DEFAULT_TIPTAP_UI_STRINGS, formatHeadingLevelLabel } from './ui-strings.js'
 
 const TOGGLE_BUTTONS = [
@@ -351,13 +351,10 @@ function applyToggle(editor, format) {
 }
 
 function applyListToggle(editor, kind) {
-  // 折叠光标按“当前行/当前列表项”互切；显式选中完整列表块时
-  // 递归转换整个选区列表块，避免只转换选区起点或打散嵌套结构。
-  if (switchSelectedListType(editor, kind)) return
-  if (editor.state.selection.empty && switchActiveListType(editor, kind)) return
-
-  const command = `toggle${kind.charAt(0).toUpperCase()}${kind.slice(1)}`
-  editor.chain().focus()[command]().run()
+  // 列表按钮只做“应用/取消应用”，全部由显式文档重建完成。
+  // 不调用 Tiptap 默认 toggleList：它在嵌套列表和父项目里的普通段落上
+  // 会产生提升、拆块或圆点错位，看起来像按钮触发了缩进。
+  toggleActiveListFormatting(editor, kind)
 }
 const TASK_LIST_STYLE_ID = 'dvn-tiptap-tasklist-style'
 

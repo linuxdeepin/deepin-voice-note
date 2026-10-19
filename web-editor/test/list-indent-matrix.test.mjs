@@ -690,6 +690,10 @@ test('B04：一级唯一项无论在文档哪个位置，Tab 都不得产生悬�
       const command = `toggle${listType.charAt(0).toUpperCase()}${listType.slice(1)}`
       editor.chain().focus()[command]().run()
 
+      // 产品语义：文本选区上按 Tab 会替换为纯文本空格；B04 校验的是空光标
+      // 对一级列表项的缩进行为，因此转换后把光标收敛到该项行首。
+      editor.chain().focus().setTextSelection(findTextRange(editor, '唯一的图片行').from).run()
+
       const beforeBlocks = enumerateDocBlocks(editor.state.doc)
       const item = beforeBlocks.find((block) => block.blockKind === 'item' && block.text === '唯一的图片行')
       if (!item) {

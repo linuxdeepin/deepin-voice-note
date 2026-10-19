@@ -125,7 +125,10 @@ test('empty document produces single empty paragraph envelope', () => {
   const json = editor.getJSON()
   const envelope = createEnvelope(json)
 
-  assert.deepEqual(json, { type: 'doc', content: [{ type: 'paragraph' }] })
+  assert.deepEqual(JSON.parse(JSON.stringify(json)), {
+    type: 'doc',
+    content: [{ type: 'paragraph', attrs: { dvnIndentLevel: 0 } }],
+  })
 
   const result = validateEnvelope(envelope)
   assert.equal(result.ok, true, JSON.stringify(result.errors, null, 2))

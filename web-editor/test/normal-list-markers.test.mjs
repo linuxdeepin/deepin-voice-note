@@ -16,7 +16,9 @@ import {
   listItemMarkerStyle,
   markerRatio,
   orderedListMarkerGutter,
+  orderedListMarkerNumbers,
   normalListMarkerStyle,
+  normalListMarkerStyleForNumbers,
 } from '../src/runtime/normal-list-markers.js'
 import { createTiptapExtensions } from '../src/runtime/tiptap-extensions.js'
 import { createEmptyDoc } from '../src/schema/document-envelope.js'
@@ -275,6 +277,107 @@ test('marker gutter only depends on the rendered last number', () => {
 test('marker style keeps counter reset in sync with start attr', () => {
   assert.equal(normalListMarkerStyle(2, 3), '--dvn-ordered-marker-gutter: 20px; counter-reset: dvn-ordered-list 2')
   assert.equal(normalListMarkerStyle(13, 1), '--dvn-ordered-marker-gutter: 25px; counter-reset: dvn-ordered-list 0')
+})
+
+test('扁平视觉层级按可见节点分组编号，不按整个 ol 连续编号', () => {
+  setupDom()
+  const { editor, element } = createEditorWithMarkers()
+  const visualItem = (text, dvnIndentLevel) => ({
+    type: 'listItem',
+    attrs: { dvnIndentLevel },
+    content: [{ type: 'paragraph', content: [{ type: 'text', text }] }],
+  })
+
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{
+      type: 'orderedList',
+      attrs: { start: 1 },
+      content: [
+        visualItem('A', 0),
+        visualItem('B', 1),
+        visualItem('C', 2),
+        visualItem('D', 2),
+        visualItem('E', 0),
+        visualItem('F', 1),
+        visualItem('大萨达', 1),
+      ],
+    }],
+  })
+
+  const list = editor.state.doc.firstChild
+  assert.deepEqual(orderedListMarkerNumbers(list), [1, 1, 1, 2, 2, 1, 2])
+  assert.equal(
+    normalListMarkerStyleForNumbers(orderedListMarkerNumbers(list), 1),
+    '--dvn-ordered-marker-gutter: 20px; counter-reset: dvn-ordered-list 0',
+  )
+
+  const styles = Array.from(element.querySelectorAll('.ProseMirror ol > li'))
+    .map((item) => item.getAttribute('style'))
+  assert.deepEqual(
+    styles.map((style) => Number(/--dvn-list-number: "(\d+)"/.exec(style)?.[1])),
+    [1, 1, 1, 2, 2, 1, 2],
+    '每个列表项必须收到按视觉层级计算的显式编号',
+  )
+  editor.destroy()
+})
+
+test('视觉层级编号矩阵：回退层级继续父组，进入子层重新从 1 开始', () => {
+  const item = (dvnIndentLevel) => ({ attrs: { dvnIndentLevel } })
+  const numbersFor = (depths, start = 1) => orderedListMarkerNumbers({
+    attrs: { start },
+    forEach: (callback) => depths.forEach((depth, index) => callback(item(depth), index, index)),
+  })
+
+  assert.deepEqual(numbersFor([0, 1, 2, 1, 2, 2, 0, 1, 0]), [1, 1, 1, 2, 1, 2, 2, 1, 3])
+  assert.deepEqual(numbersFor([0, 0, 0], 5), [5, 6, 7])
+  assert.deepEqual(numbersFor([0, 1, 0, 1], 5), [5, 1, 6, 1])
+  assert.deepEqual(numbersFor([1, 1, 0, 2], 5), [1, 2, 5, 1])
+})
+
+test('带直接子列表的项不会被 dvnIndentLevel 重置外层编号', () => {
+  setupDom()
+  const { editor } = createEditorWithMarkers()
+  const item = (text, dvnIndentLevel, children = []) => ({
+    type: 'listItem',
+    attrs: { dvnIndentLevel },
+    content: [
+      { type: 'paragraph', content: [{ type: 'text', text }] },
+      ...children,
+    ],
+  })
+  const childList = {
+    type: 'orderedList',
+    attrs: { start: 1 },
+    content: [item('B1', 0), item('B2', 0)],
+  }
+
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{
+      type: 'orderedList',
+      attrs: { start: 1 },
+      content: [
+        item('A', 0),
+        item('B', 1, [childList]),
+        item('C', 0),
+        item('D', 0),
+      ],
+    }],
+  })
+
+  const outer = editor.state.doc.firstChild
+  assert.deepEqual(
+    orderedListMarkerNumbers(outer),
+    [1, 2, 3, 4],
+    '带真实子列表的项即使保留视觉缩进，也必须继续外层编号',
+  )
+  assert.deepEqual(
+    orderedListMarkerNumbers(outer.child(1).lastChild),
+    [1, 2],
+    '子列表应独立从自己的 start 编号',
+  )
+  editor.destroy()
 })
 
 test('extension exposes the marker plugin', () => {
