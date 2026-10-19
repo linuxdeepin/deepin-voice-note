@@ -15637,6 +15637,19 @@ const voiceBlockCss = `/* SPDX-FileCopyrightText: 2026 UnionTech Software Techno
     outline: none;
 }
 
+/*
+ * 普通无序/有序列表项本身是两列 grid：第一列是 marker 槽位，第二列是正文。
+ * voiceBox 是 block，放在 li 下会被 grid 自动排到第一列（20px），导致音频
+ * 卡片被裁成槽位宽度。待办项多一层 content div，不受影响；这里显式放到
+ * 正文列，与待办项的音频卡片保持同一条左边界。min-width:0 避免长标题的
+ * intrinsic min-content 宽度把内容列撑出列表范围。
+ */
+.ProseMirror ul:not([data-type="taskList"]) > li > .voiceBox,
+.ProseMirror ol > li > .voiceBox {
+    grid-column: 2;
+    min-width: 0;
+}
+
 .voiceBox.dvn-voice-drag-ghost {
     /* The native drag preview is a snapshot of this temporary node. Keep the
        clipping boundary on the snapshot root so transparent square corners do
@@ -15650,7 +15663,8 @@ const voiceBlockCss = `/* SPDX-FileCopyrightText: 2026 UnionTech Software Techno
 
 
 .voiceBox.ProseMirror-selectednode .voiceInfoBox,
-.voiceBox.active .voiceInfoBox {
+.voiceBox.active .voiceInfoBox,
+.voiceBox.dvn-range-selected .voiceInfoBox {
     background: var(--dvn-text-selection-bg, var(--highlightColor, #0081ff));
     color: var(--dvn-selection-fg, #ffffff);
 }
@@ -15664,7 +15678,12 @@ const voiceBlockCss = `/* SPDX-FileCopyrightText: 2026 UnionTech Software Techno
 .voiceBox.active .voicePlayback .createTime,
 .voiceBox.active .voicePlayback .timeField,
 .voiceBox.active .translateHeader .translateLabel,
-.voiceBox.active .translateText {
+.voiceBox.active .translateText,
+.voiceBox.dvn-range-selected .voicePlayback .title,
+.voiceBox.dvn-range-selected .voicePlayback .createTime,
+.voiceBox.dvn-range-selected .voicePlayback .timeField,
+.voiceBox.dvn-range-selected .translateHeader .translateLabel,
+.voiceBox.dvn-range-selected .translateText {
     color: var(--dvn-selection-fg, #ffffff);
 }
 
@@ -15677,17 +15696,33 @@ const voiceBlockCss = `/* SPDX-FileCopyrightText: 2026 UnionTech Software Techno
 .voiceBox.active .voicePlayback.pause .voiceBtn,
 .voiceBox.active .voiceToTextLabel .voiceToTextIcon,
 .voiceBox.active .translateHeader .translateIcon,
-.voiceBox.active .translateHeader .foldBtn {
+.voiceBox.active .translateHeader .foldBtn,
+.voiceBox.dvn-range-selected .voicePlayback.play .voiceBtn,
+.voiceBox.dvn-range-selected .voicePlayback.pause .voiceBtn,
+.voiceBox.dvn-range-selected .voiceToTextLabel .voiceToTextIcon,
+.voiceBox.dvn-range-selected .translateHeader .translateIcon,
+.voiceBox.dvn-range-selected .translateHeader .foldBtn {
     background-color: var(--dvn-selection-fg, #ffffff);
 }
 
+/* 转文字进行中如果语音块处于选中/激活态，卡片会使用主题高亮色。
+   转圈图标已经切到 selection foreground，但“正在转为文字”仍保留
+   highlightColor，会与背景同色而看起来完全消失。这里同步前景色。 */
+.voiceBox.ProseMirror-selectednode .voiceToTextLabel .translatingLabel,
+.voiceBox.active .voiceToTextLabel .translatingLabel,
+.voiceBox.dvn-range-selected .voiceToTextLabel .translatingLabel {
+    color: var(--dvn-selection-fg, #ffffff);
+}
+
 .voiceBox.ProseMirror-selectednode .voiceInfoBox.containText .translate,
-.voiceBox.active .voiceInfoBox.containText .translate {
+.voiceBox.active .voiceInfoBox.containText .translate,
+.voiceBox.dvn-range-selected .voiceInfoBox.containText .translate {
     border-top-color: rgba(255, 255, 255, 0.25);
 }
 
 .voiceBox.ProseMirror-selectednode .translateText::selection,
-.voiceBox.active .translateText::selection {
+.voiceBox.active .translateText::selection,
+.voiceBox.dvn-range-selected .translateText::selection {
     background: var(--dvn-text-selection-bg, var(--highlightColor, #0081ff)) !important;
     color: var(--dvn-selection-fg, #ffffff);
 }
@@ -15827,16 +15862,26 @@ const voiceBlockCss = `/* SPDX-FileCopyrightText: 2026 UnionTech Software Techno
     background-size: 100% 2px;
     background-position: center;
     --progressValue: 0%;
+    --voice-progress-color: var(--highlightColor, #007aff);
 }
 
 .voicePlayback input[type="range"]::-webkit-slider-runnable-track {
     width: 100px;
     height: 2px;
-    background: repeating-linear-gradient(to right, var(--highlightColor, #007aff), var(--highlightColor, #007aff) 2px, transparent 2px, transparent 3px);
+    background: repeating-linear-gradient(to right, var(--voice-progress-color), var(--voice-progress-color) 2px, transparent 2px, transparent 3px);
     background-repeat: no-repeat;
     background-size: var(--progressValue);
     border: none;
     border-radius: 0;
+}
+
+/* 选中/激活时语音卡片背景本身就是 highlightColor，已播放进度如果继续
+   使用 highlightColor 会与背景完全重合。这里只改变 input 上的颜色变量，
+   避免 QtWebEngine 对动态变化的伪元素选择器不重新计算 track 样式。 */
+.voiceBox.ProseMirror-selectednode .voicePlayback input[type="range"],
+.voiceBox.active .voicePlayback input[type="range"],
+.voiceBox.dvn-range-selected .voicePlayback input[type="range"] {
+    --voice-progress-color: var(--dvn-selection-fg, #ffffff);
 }
 
 .voicePlayback input[type="range"]::-webkit-slider-thumb {

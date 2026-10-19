@@ -23,13 +23,14 @@
     #toolbar-host > .tiptap-toolbar { position: relative; z-index: 1; }
     #content-scroll { position: absolute; left: 0; right: 0; top: var(--dvn-toolbar-host-height); bottom: 0; overflow-x: hidden; overflow-y: auto; background: var(--dvn-editor-bg, #ffffff); cursor: text; }
     #note-title-host { min-height: var(--dvn-title-host-height, 68px); box-sizing: border-box; display: flex; align-items: flex-start; padding: 13px 20px 4px 30px; background: var(--dvn-editor-bg, #ffffff); transform-origin: left top; }
-    #note-title-input { display: block; width: 100%; min-width: 0; min-height: 34px; height: auto; box-sizing: border-box; border: 0; outline: none; padding: 0; resize: none; overflow: hidden; background: transparent; color: var(--dvn-title-fg, rgba(0, 0, 0, 0.30)); caret-color: var(--highlightColor, #0086cc); font: 600 24px/1.4 var(--dvn-editor-default-font), sans-serif; white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word; }
+    #note-title-input { display: block; width: 100%; min-width: 0; min-height: 34px; height: auto; box-sizing: border-box; border: 0; outline: none; padding: 0; resize: none; overflow: hidden; background: transparent; color: var(--dvn-title-fg, rgba(0, 0, 0, 0.30)); caret-color: var(--dvn-editor-fg, rgba(0, 0, 0, 1)); font: 600 24px/1.4 var(--dvn-editor-default-font), sans-serif; white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word; }
     #note-title-input.is-custom { color: var(--dvn-editor-fg, rgba(0, 0, 0, 1)); }
+    #note-title-input::placeholder { color: var(--dvn-title-fg, rgba(0, 0, 0, 0.30)); opacity: 1; }
     #note-title-input::selection { background: var(--dvn-text-selection-bg, var(--highlightColor, #0081ff)); color: var(--dvn-selection-fg, #ffffff); }
     #app { width: 100%; min-height: calc(100% - var(--dvn-title-host-height, 68px)); box-sizing: border-box; overflow: visible; transform-origin: left top; }
     .tiptap { width: 100%; min-height: 100%; box-sizing: border-box; overflow: visible; }
     /* Match legacy summernote .note-editable geometry for migration display fidelity. */
-    .ProseMirror { box-sizing: border-box; outline: none; width: 100%; min-height: 100%; overflow: visible; padding: 0 20px 50px 30px; cursor: text; font-family: var(--dvn-editor-default-font), sans-serif; font-size: 14px; line-height: 1.72; color: var(--dvn-editor-fg, rgba(0, 0, 0, 1)); word-wrap: break-word; }
+    .ProseMirror { box-sizing: border-box; outline: none; width: 100%; min-height: 100%; overflow: visible; padding: 0 20px 50px 30px; cursor: text; caret-color: var(--dvn-editor-fg, rgba(0, 0, 0, 1)); font-family: var(--dvn-editor-default-font), sans-serif; font-size: 14px; line-height: 1.72; color: var(--dvn-editor-fg, rgba(0, 0, 0, 1)); word-wrap: break-word; }
     .ProseMirror::selection, .ProseMirror ::selection { background: var(--dvn-text-selection-bg, var(--highlightColor, #0081ff)); color: var(--dvn-selection-fg, #ffffff); }
     #app.is-empty .ProseMirror::before { content: '请输入正文'; display: block; height: 0; color: var(--dvn-placeholder-fg, rgba(0, 0, 0, 0.30)); pointer-events: none; }
     #app.is-empty[data-empty-block="heading"] .ProseMirror::before { font-weight: 700; line-height: 1.2; }
@@ -55,31 +56,78 @@
     .ProseMirror ol > li {
       list-style: none;
       display: grid;
-      grid-template-columns: 20px minmax(0, 1fr);
-      align-items: center;
+      /* 首列宽度 = marker 槽位。marker 固定默认尺寸，槽位也保持固定宽度，
+         仅按序号位数变宽；嵌套列表缩进不再随正文字号漂移。 */
+      grid-template-columns: var(--dvn-marker-gutter, 20px) minmax(0, 1fr);
       column-gap: 0;
     }
-    .ProseMirror ul:not([data-type="taskList"]) > li::before,
-    .ProseMirror ol > li::before {
-      grid-column: 1;
-      grid-row: 1;
-      align-self: center;
-      justify-self: center;
-      font-size: 14px;
-      line-height: 1;
-      color: currentColor;
+    /* Marker 放在首段行内，随第一行一起排版；多行时不会按整个列表项
+       高度居中。
+
+       注意 1：下面 li > p 的通用规则里不能再写 grid-row（尤其不能写
+       grid-row: 1）。一个 listItem 里出现多个段落是合法结构 —— 行首
+       BackSpace 合并两个列表项、粘贴多段文本、导入旧笔记都会产生；一旦把
+       所有段落固定到同一行，它们会落在同一个网格单元里互相重叠，表现为
+       同一行文字画两遍、错位重叠（历史 bug）。
+
+       注意 2：只有 :first-child 参与第一行，marker 才始终贴列表项第一行
+       （方案 A：首行为空时编号也留在第一行，不跳到第一个有字的行）。 */
+    .ProseMirror ul:not([data-type="taskList"]) > li > p,
+    .ProseMirror ol > li > p {
+      /* 所有段落都进正文列；不要在这里写 grid-row，第二段起靠自动排版落行 */
+      grid-column: 1 / -1;
+      padding-left: var(--dvn-marker-gutter, 20px);
     }
-    .ProseMirror ul:not([data-type="taskList"]) > li::before { content: "•"; }
+    .ProseMirror ul:not([data-type="taskList"]) > li > p:first-child,
+    .ProseMirror ol > li > p:first-child {
+      /* 只有首段可以参与第一行；其余段落必须落到后续行 */
+      grid-row: 1;
+      text-indent: calc(-1 * var(--dvn-marker-gutter, 20px));
+    }
+    /* marker 字形固定 14px，不跟随正文字号、字体、加粗变化。
+       位置靠“行盒跟踪”解决：
+         - ::before 的 height 用 1lh * max(1, ratio) 得到首行有效行盒高度；
+           ratio 来自 normal-list-markers.js 对首段首个自然行内最大字号的计算。
+         - max(1, ratio) 同时覆盖小于 14px 的正文：此时 p 自身 14px 的
+           strut 仍然撑起 24.08px 的行盒，marker 盒子必须跟这个高度走。
+         - vertical-align: top 把 marker 盒子顶边贴到首行行盒顶边；盒子
+           高度与首行行盒一致时，盒子中心就是首行行盒中心。
+         - 内层字符用 inline-flex 居中，因此 marker 字形中心落在盒子中心。
+       这里没有按字号/字体逐个写补偿像素；字号只参与盒高计算，不参与字形大小。 */
+    .ProseMirror ul:not([data-type="taskList"]) > li > p:first-child::before,
+    .ProseMirror ol > li > p:first-child::before {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: var(--dvn-marker-gutter, 20px);
+      box-sizing: border-box;
+      font-size: 14px;
+      height: calc(1lh * max(1, var(--dvn-marker-ratio, 1)));
+      line-height: inherit;
+      color: currentColor;
+      text-indent: 0;
+      vertical-align: top;
+    }
+    .ProseMirror ul:not([data-type="taskList"]) > li > p:first-child::before {
+      content: "•";
+      justify-content: center;
+    }
     .ProseMirror ol { counter-reset: dvn-ordered-list; }
     .ProseMirror ol > li { counter-increment: dvn-ordered-list; }
-    .ProseMirror ol > li::before {
+    .ProseMirror ol > li > p:first-child::before {
       content: counter(dvn-ordered-list) ".";
-      justify-self: end;
+      justify-content: flex-end;
       padding-right: 4px;
-      box-sizing: border-box;
     }
-    .ProseMirror ul:not([data-type="taskList"]) > li > p,
-    .ProseMirror ol > li > p { grid-column: 2; grid-row: 1; }
+    /* 序号超过一位时（10. / 11. ...）marker 会撑出 20px 槽位压住正文，
+       槽位宽度改由运行态变量给出（按列表最大序号位数计算）；变量未设置
+       时回退到原有 20px，单位数列表排版保持不变。 */
+    .ProseMirror ol > li {
+      grid-template-columns: var(--dvn-ordered-marker-gutter, 20px) minmax(0, 1fr);
+    }
+    .ProseMirror ol > li > p { padding-left: var(--dvn-ordered-marker-gutter, 20px); }
+    .ProseMirror ol > li > p:first-child { text-indent: calc(-1 * var(--dvn-ordered-marker-gutter, 20px)); }
+    .ProseMirror ol > li > p:first-child::before { width: var(--dvn-ordered-marker-gutter, 20px); }
     .ProseMirror ul:not([data-type="taskList"]) > li > ul,
     .ProseMirror ul:not([data-type="taskList"]) > li > ol,
     .ProseMirror ol > li > ul,
