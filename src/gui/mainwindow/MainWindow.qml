@@ -119,6 +119,14 @@ Item {
         onCopy: {
             webEngineView.copy();
         }
+        onSelectAll: {
+            // 焦点已被 QML 控件（笔记列表、工具栏等）抢走时，Ctrl+A 到不了 Web 编辑器，
+            // 这里把它交回正文；焦点本来就在 Web 侧（含页内标题输入框）时交给 Web 自己
+            // 处理，避免把标题里的全选抢成全选正文。
+            if (!webEngineView.editorOwnsKeyboardFocus) {
+                webEngineView.selectAll();
+            }
+        }
         onCreateFolder: {
             // 录音或播放时不允许创建记事本
             if (isRecordingAudio || folderListView.isPlay) {
@@ -959,7 +967,10 @@ Item {
                         }
 
                         ToolTip {
-                            text: qsTr("Create Note")
+                            // 与标题栏的“新建笔记”复用同一翻译 key。当前 QML
+                            // 文件没有 MainWindow 上下文的 Create Note 翻译，
+                            // 直接 qsTr() 会回退为英文。
+                            text: qsTranslate("WindowTitleBar", "Create Note")
                             visible: newNoteBtn.hovered
                         }
                     }
@@ -1057,7 +1068,10 @@ Item {
             x: rightDragHandle.x + rightDragHandle.width
             height: parent.height
             width: parent.width - x
-            color: Qt.rgba(0, 0, 0, 0.01)
+            // 删除当前记事本的最后一条笔记后，Tiptap Loader 会整体隐藏，
+            // 避免残留上一条笔记。这里必须继续铺满编辑器画布色；若保持
+            // 半透明，会把主窗口灰底直接暴露出来，和正常空白编辑器不一致。
+            color: DTK.themeType === ApplicationHelper.LightType ? "#FFFFFF" : "#242424"
 
             BoxShadow {
                 anchors.fill: rightBgArea

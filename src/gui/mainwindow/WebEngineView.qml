@@ -297,6 +297,33 @@ Item {
         }
     }
 
+    // Web 侧（正文或页内标题输入框）是否持有键盘焦点。窗口级 Ctrl+A 用它判断是否
+    // 需要接管：Web 侧有焦点时按键由 Web 自己处理，宿主不能抢。
+    readonly property bool editorOwnsKeyboardFocus: {
+        if (TiptapChannel.tiptapEnabled) {
+            return tiptapLoader.item ? tiptapLoader.item.editor.activeFocus : false;
+        }
+        return webView.activeFocus;
+    }
+
+    function selectAll() {
+        // 键盘焦点被 QML 控件（笔记列表、工具栏按钮等）抢走后，Ctrl+A 不会进入
+        // WebEngine，表现为"全选没反应"；这里显式聚焦 Web 编辑器再执行全选。
+        if (!webVisible) {
+            return;
+        }
+        if (TiptapChannel.tiptapEnabled && tiptapLoader.item) {
+            var tiptapView = tiptapLoader.item.editor;
+            tiptapView.forceActiveFocus();
+            tiptapView.runJavaScript(
+                "if(window.__dvnTiptapEditor){window.__dvnTiptapEditor.commands.focus();"
+                + "window.__dvnTiptapEditor.chain().selectAll().run();}");
+        } else {
+            webView.forceActiveFocus();
+            webView.triggerWebAction(9);
+        }
+    }
+
     Timer {
         id: resourceButtonSyncTimer
         interval: 0
@@ -830,32 +857,45 @@ Item {
                         if (isNaN(rawX) || isNaN(rawY)) return;
                         var sx = String(Math.round(rawX));
                         var sy = String(Math.round(rawY));
-                        // Qt WebEngine 已经根据系统剪贴板计算了 CanPaste；
-                        // Tiptap 文本菜单不能仅以“位于编辑器内”判定可粘贴。
+                        // QtWebEngine 在 Tiptap 空白正文处给出的 editFlags 不稳定；
+                        // 粘贴可用性最终还会结合宿主查询到的系统剪贴板状态。
                         var nativeEditFlags = Number(req.editFlags);
                         tiptapWebView.runJavaScript(
                             "(function(){"
                             + "function flags(canSelectAll,canCopy,canCut,canPaste,canDelete){return {canSelectAll:!!canSelectAll,canCopy:!!canCopy,canCut:!!canCut,canPaste:!!canPaste,canDelete:!!canDelete,canSpeech:!!canCopy,canDictation:!!canPaste};}"
+                            + "function selectionInside(target){var sel=window.getSelection();if(!target||!sel||sel.rangeCount===0)return false;for(var i=0;i<sel.rangeCount;i++){var r=sel.getRangeAt(i);var a=r.startContainer;var b=r.endContainer;if(target===a||target.contains(a)||target===b||target.contains(b))return true;}return false;}"
                             + "function selectionTouches(target){var sel=window.getSelection();if(!sel||sel.rangeCount===0||sel.isCollapsed||!sel.toString())return false;for(var i=0;i<sel.rangeCount;i++){var r=sel.getRangeAt(i);if(r.intersectsNode){try{if(r.intersectsNode(target))return true;}catch(e){}}else{var cr=document.createRange();cr.selectNodeContents(target);if(r.compareBoundaryPoints(Range.END_TO_START,cr)>0&&r.compareBoundaryPoints(Range.START_TO_END,cr)<0)return true;}}return false;}"
                             + "var el=document.elementFromPoint(" + sx + "," + sy + ");"
+                            + "var pointer=window.__dvnTiptapContextPointer||null;"
                             + "var capturedTranscript=(window.__dvnTiptapContextTranscript&&document.contains(window.__dvnTiptapContextTranscript))?window.__dvnTiptapContextTranscript:null;"
-                            + "if(!el&&capturedTranscript){var copyText0=window.__dvnTiptapGetContextTranscriptCopyText?window.__dvnTiptapGetContextTranscriptCopyText():'';return JSON.stringify({type:2,json:'__tiptap_transcript_text:'+copyText0,flags:flags(true,!!copyText0,false,false,false),transcript:true});}"
+                            + "var clickedTranscript=(el&&el.closest)?el.closest('.translateText'):null;"
+                            + "var transcript=clickedTranscript||capturedTranscript;"
+                            + "var pointerTranscript=(pointer&&pointer.transcript===transcript)?pointer:null;"
+                            + "var transcriptSelectionActive=pointerTranscript?!!pointerTranscript.selectionInsideTranscript:!!(transcript&&selectionInside(transcript));"
+                            + "var pmSelection=window.__dvnTiptapEditor?window.__dvnTiptapEditor.state.selection:null;"
+                            + "var selectedVoiceDom=null;"
+                            + "if(pmSelection&&!pmSelection.empty&&pmSelection.node&&pmSelection.node.type&&pmSelection.node.type.name==='voiceBlock'){selectedVoiceDom=window.__dvnTiptapEditor.view.nodeDOM(pmSelection.from);}"
+                            + "var selectedVoiceBox=(selectedVoiceDom&&selectedVoiceDom.closest)?selectedVoiceDom.closest('.voiceBox'):null;"
+                            + "var clickedSelectedVoice=!!(selectedVoiceBox&&el&&selectedVoiceBox.contains(el));"
+                            + "var transcriptInSelectedVoice=!!(selectedVoiceBox&&transcript&&selectedVoiceBox.contains(transcript));"
+                            + "if(clickedSelectedVoice&&transcriptInSelectedVoice&&!transcriptSelectionActive){var selectedInfo=selectedVoiceBox.querySelector('.voiceInfoBox')||selectedVoiceBox;window.__dvnTiptapContextTranscript=null;return JSON.stringify({type:1,json:selectedInfo.getAttribute('data-voice-meta')||''});}"
+                            + "if(!el&&transcript){var copyText0=window.__dvnTiptapGetContextTranscriptCopyText?window.__dvnTiptapGetContextTranscriptCopyText():'';var menuCopy0=window.__dvnTiptapGetContextTranscriptMenuCopyText?window.__dvnTiptapGetContextTranscriptMenuCopyText():(selectionTouches(transcript)?copyText0:'');return JSON.stringify({type:2,json:'__tiptap_transcript_text:'+copyText0,flags:flags(true,!!menuCopy0,false,false,false),transcript:true});}"
                             + "if(!el){window.__dvnTiptapContextTranscript=null;return JSON.stringify({type:2,json:'',flags:flags(true,false,false,true,false)});}"
-                            + "var transcript=el.closest?el.closest('.translateText'):null;"
-                            + "if(!transcript) transcript=capturedTranscript;"
-                            + "if(transcript){window.__dvnTiptapContextTranscript=transcript;var copyText=window.__dvnTiptapGetContextTranscriptCopyText?window.__dvnTiptapGetContextTranscriptCopyText():'';var canCopy=selectionTouches(transcript)||!!copyText;return JSON.stringify({type:2,json:'__tiptap_transcript_text:'+copyText,flags:flags(true,canCopy,false,false,false),transcript:true});}"
+                            + "var contextProgressBar=el.closest?el.closest('.progressBar'):null;var contextPlayback=contextProgressBar&&contextProgressBar.closest('.voicePlayback');if(contextPlayback&&(contextPlayback.classList.contains('play')||contextPlayback.classList.contains('pause')))return JSON.stringify({type:3,suppress:true});"
+                            + "if(transcript){window.__dvnTiptapContextTranscript=transcript;var copyText=window.__dvnTiptapGetContextTranscriptCopyText?window.__dvnTiptapGetContextTranscriptCopyText():'';var menuCopy=window.__dvnTiptapGetContextTranscriptMenuCopyText?window.__dvnTiptapGetContextTranscriptMenuCopyText():(selectionTouches(transcript)?copyText:'');return JSON.stringify({type:2,json:'__tiptap_transcript_text:'+copyText,flags:flags(true,!!menuCopy,false,false,false),transcript:true});}"
                             + "window.__dvnTiptapContextTranscript=null;"
                             + "var vb=el.closest?el.closest('.voiceInfoBox'):null;"
                             + "if(vb&&vb.getAttribute('data-type')==='voice-block'){if(window.__dvnTiptapSelectVoiceBlockFromElement)window.__dvnTiptapSelectVoiceBlockFromElement(vb);return JSON.stringify({type:1,json:vb.getAttribute('data-voice-meta')||''});}"
                             + "var img=el.closest?el.closest('img[data-rel-path]'):null;"
                             + "if(img){if(window.__dvnTiptapSelectImageFromElement)window.__dvnTiptapSelectImageFromElement(img);return JSON.stringify({type:0,json:img.getAttribute('src')||img.getAttribute('data-rel-path')||''});}"
                             + "var sel=window.getSelection();var hasSelection=!!(sel&&sel.rangeCount>0&&!sel.isCollapsed&&sel.toString());var inEditor=!!(el.closest&&el.closest('.ProseMirror'));"
-                            + "return JSON.stringify({type:2,json:'',flags:flags(inEditor,hasSelection,hasSelection&&inEditor,inEditor,hasSelection&&inEditor)});"
+                            + "return JSON.stringify({type:2,json:'',transcript:false,inEditor:inEditor,flags:flags(inEditor,hasSelection,hasSelection&&inEditor,inEditor,hasSelection&&inEditor)});"
                             + "})()",
                             function(result) {
                                 var info = null;
                                 try { info = JSON.parse(result); } catch(e) {}
                                 if (!info) return;
+                                if (info.suppress) return;
                                 if (info.type === 0) {
                                     handler.onSaveMenuParam(info.type, info.json);
                                     handler.onContextMenuRequested(req);
@@ -866,10 +906,13 @@ Item {
                                     ActionManager.resetCtxMenu(ActionManager.TxtCtxMenu, false);
                                     ActionManager.visibleAction(ActionManager.TxtStopreading, false);
                                     var flags = info.flags || {};
-                                    // 普通文本菜单使用 Qt 的实际剪贴板状态；
-                                    // 转写文本仍保持只读语义，只允许选择/复制。
-                                    if (!info.transcript && Number.isFinite(nativeEditFlags)) {
-                                        flags.canPaste = (nativeEditFlags & 8) !== 0;
+                                    // 空白正文处 Qt 的 CanPaste 可能为 false，但系统剪贴板实际
+                                    // 有内容。仅在 DOM 判断为可编辑文字时，用剪贴板状态和
+                                    // native flag 的并集修正；转写文字仍保持只读语义。
+                                    if (!info.transcript && info.inEditor) {
+                                        var clipboardCanPaste = TiptapChannel.clipboardHasPasteContent();
+                                        flags.canPaste = !!flags.canPaste
+                                                && (clipboardCanPaste || (Number.isFinite(nativeEditFlags) && (nativeEditFlags & 8) !== 0));
                                         flags.canDictation = flags.canPaste;
                                     }
                                     ActionManager.enableAction(ActionManager.TxtSelectAll, !!flags.canSelectAll);
@@ -1290,22 +1333,27 @@ Item {
     Connections {
         target: Webobj
 
+        // tiptapWebView 声明在 tiptapLoader 的内部组件中，文件级 Connections 作用域取不到；
+        // 必须经 tiptapLoader.item.editor 跨 Loader 访问，否则会抛
+        // ReferenceError: tiptapWebView is not defined，导致右键菜单“全选/删除”无声失效。
         onCallJsSelectAll: {
-            if (TiptapChannel.tiptapEnabled && tiptapLoader.item) {
-                tiptapWebView.runJavaScript(
+            if (TiptapChannel.tiptapEnabled && tiptapLoader.item && tiptapLoader.item.editor) {
+                var tiptapView = tiptapLoader.item.editor;
+                tiptapView.forceActiveFocus();
+                tiptapView.runJavaScript(
                     "if(window.__dvnTiptapSelectContextAll)window.__dvnTiptapSelectContextAll();" +
                     "else if(window.__dvnTiptapEditor)window.__dvnTiptapEditor.chain().selectAll().run();");
             }
         }
         onCallJsDeleteSelection: {
-            if (TiptapChannel.tiptapEnabled && tiptapLoader.item) {
-                tiptapWebView.runJavaScript(
+            if (TiptapChannel.tiptapEnabled && tiptapLoader.item && tiptapLoader.item.editor) {
+                tiptapLoader.item.editor.runJavaScript(
                     "if(window.__dvnTiptapEditor)window.__dvnTiptapEditor.chain().deleteSelection().run()");
             }
         }
         onCallJsFocusEditor: {
-            if (TiptapChannel.tiptapEnabled && tiptapLoader.item) {
-                tiptapWebView.runJavaScript(
+            if (TiptapChannel.tiptapEnabled && tiptapLoader.item && tiptapLoader.item.editor) {
+                tiptapLoader.item.editor.runJavaScript(
                     "if(window.__dvnTiptapEditor)window.__dvnTiptapEditor.commands.focus()");
             }
         }

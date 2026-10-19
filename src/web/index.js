@@ -1551,14 +1551,21 @@ function setVoiceButColor(color, shdow) {
     ::selection {
         background: ${color}!important;
     }
-    .btn-default.active i {
-        color:${color}!important
+    .btn-default.active,
+    .btn-default:active,
+    .open > .dropdown-toggle.btn-default {
+        background-color: ${color}!important;
+        border-color: ${color}!important;
+        color: #ffffff!important;
     }
-    .btn-default:active {
-        color:${color}!important
-    }
-    .btn-default i:active {
-        color:${color}!important
+    .btn-default.active i,
+    .btn-default:active i,
+    .btn-default i:active,
+    .btn-default.active .note-icon,
+    .btn-default:active .note-icon,
+    .open > .dropdown-toggle.btn-default i,
+    .open > .dropdown-toggle.btn-default .note-icon {
+        color: #ffffff!important
     }
     .selectColor {
         box-shadow: 0 0 0 1.5px ${color};

@@ -295,8 +295,8 @@
 
 /* translateText 选中效果 */
 .voiceInfoBox .translateText::selection {
-    background: rgba(0, 129, 255, 0.3);
-    color: inherit;
+    background: var(--highlightColor, rgba(0, 129, 255, 0.3));
+    color: #ffffff;
 }
 
 /********** 状态控制，不同状态下各组件显示 **********/

@@ -1,6 +1,7 @@
 :root {
     --color: rgba(65, 77, 104, 1);
     --highlightColor: rgb(0, 91, 255);
+    --selectionForeground: #ffffff;
     --backgroundColor: rgba(255, 255,255, 0.7);
 }
 
@@ -48,7 +49,8 @@ body {
 }
 
 .active {
-    background: rgba(0, 129, 255, 0.5);
+    background: var(--highlightColor, rgba(0, 129, 255, 0.5));
+    color: var(--selectionForeground, #ffffff);
 }
 
 .voicebtn {
@@ -174,7 +176,8 @@ body {
 }
 
 ::selection {
-    color: #fff;
+    background: var(--highlightColor, #0081ff);
+    color: var(--selectionForeground, #ffffff);
 }
 
 u {
