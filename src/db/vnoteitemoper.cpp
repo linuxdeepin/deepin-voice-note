@@ -261,7 +261,7 @@ QString VNoteItemOper::getDefaultNoteName(qint64 folderId)
 
     // maxNoteId is incremented by addNote(), so the next title uses the
     // number that will be assigned to this new note.
-    QString defaultNoteName = QStringLiteral("未命名文本");
+    QString defaultNoteName = DApplication::translate("DefaultName", "Text");
     const int nextNoteNumber = folder ? folder->maxNoteIdRef() + 1 : 1;
     defaultNoteName += QString::number(nextNoteNumber);
     qDebug() << "Generated default note name:" << defaultNoteName;

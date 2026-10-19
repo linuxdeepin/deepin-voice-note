@@ -44,6 +44,7 @@ class TiptapChannelBridge : public QObject
     Q_PROPERTY(int currentNoteId READ currentNoteId NOTIFY currentNoteChanged)
     Q_PROPERTY(QString currentNoteTitle READ currentNoteTitle NOTIFY currentNoteChanged)
     Q_PROPERTY(QString currentSearchQuery READ currentSearchQuery NOTIFY searchQueryChanged)
+    Q_PROPERTY(QString uiStringsJson READ uiStringsJson CONSTANT)
 
 public:
     explicit TiptapChannelBridge(QObject *parent = nullptr);
@@ -65,6 +66,10 @@ public:
     // 返回宿主资源根 URL（file:// + WEB_PATH 或 TIPTAP_WEB_PATH），
     // 前端用此根 + "images/xxx" 拼接图片绝对路径
     Q_INVOKABLE QString resourceBaseUrl() const;
+
+    // 当前系统语言下的 Tiptap 界面文案（JSON）。包含默认标题前缀、正文占位符、
+    // 工具栏提示以及语音转写标签；前端在 editorReady 前读取并应用。
+    Q_INVOKABLE QString uiStringsJson() const;
 
     // --- 加载就绪缓存语义（R6） ---
     // 前端就绪后调用；宿主收到后才下发缓存请求，不丢数据

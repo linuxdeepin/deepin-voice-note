@@ -35,7 +35,11 @@ import { SelectionClickReset } from './selection-click-reset.js'
 import { SearchExtension } from './search-extension.js'
 import { RangeSelectionHighlight } from '../extensions/range-selection-highlight.js'
 
-export function createTiptapExtensions() {
+export function createTiptapExtensions(uiStrings) {
+  const voiceBlock = uiStrings
+    ? VoiceBlock.configure({ strings: uiStrings, getStrings: () => uiStrings })
+    : VoiceBlock
+
   return [
     Document,
     Paragraph,
@@ -49,7 +53,7 @@ export function createTiptapExtensions() {
     TaskList,
     TaskItem.configure({ nested: true }),
     ImageBlock,
-    VoiceBlock,
+    voiceBlock,
     Bold,
     Italic,
     FontFamilyMark,

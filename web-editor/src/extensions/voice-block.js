@@ -5,6 +5,7 @@ import { Node, mergeAttributes } from '@tiptap/core'
 import { Plugin, PluginKey, TextSelection } from '@tiptap/pm/state'
 import { Slice, Fragment } from '@tiptap/pm/model'
 import voiceBlockCss from './voice-block.css?inline'
+import { DEFAULT_TIPTAP_UI_STRINGS } from '../runtime/ui-strings.js'
 import playNormalLightIconUrl from '../../../src/web/img/audio_file_play/Normal/Light.svg?url'
 import playHoverLightIconUrl from '../../../src/web/img/audio_file_play/Hover/Light.svg?url'
 import playPressedLightIconUrl from '../../../src/web/img/audio_file_play/Pressed/Light.svg?url'
@@ -329,12 +330,19 @@ export const VoiceBlock = Node.create({
     return [{ tag: 'div[data-type="voice-block"]' }]
   },
 
+  addOptions() {
+    return { strings: DEFAULT_TIPTAP_UI_STRINGS, getStrings: null }
+  },
+
   renderHTML({ HTMLAttributes }) {
     return ['div', mergeAttributes(HTMLAttributes, { 'data-type': 'voice-block' })]
   },
 
   addNodeView() {
     return ({ node, view, getPos, editor }) => {
+      // 编辑器先创建、宿主文案随后下发时，configure() 深合并得到的 strings
+      // 是快照；getStrings 保持对运行时文案对象的引用，NodeView 创建时再读取。
+      const strings = this.options.getStrings?.() || this.options.strings || DEFAULT_TIPTAP_UI_STRINGS
       // --- 运行态（视图态，不进 addAttributes，不进持久化 JSON） ---
       let playing = false
       let paused = false
@@ -467,7 +475,7 @@ export const VoiceBlock = Node.create({
       toTextIcon.className = 'voiceToTextIcon'
       const translatingLabel = document.createElement('span')
       translatingLabel.className = 'translatingLabel'
-      translatingLabel.textContent = '正在转为文字'
+      translatingLabel.textContent = strings.convertingVoiceToText
       toTextLabel.appendChild(toTextIcon)
       toTextLabel.appendChild(translatingLabel)
       right.appendChild(toTextLabel)
@@ -475,7 +483,7 @@ export const VoiceBlock = Node.create({
       const toTextTrigger = document.createElement('div')
       toTextTrigger.className = 'voiceToTextTrigger'
       toTextTrigger.setAttribute('contenteditable', 'false')
-      toTextTrigger.textContent = '转文字'
+      toTextTrigger.textContent = strings.toText
       right.appendChild(toTextTrigger)
 
       const closePlaybackBarBtn = document.createElement('div')
@@ -495,7 +503,7 @@ export const VoiceBlock = Node.create({
       translateIcon.className = 'translateIcon'
       const translateLabel = document.createElement('span')
       translateLabel.className = 'translateLabel'
-      translateLabel.textContent = '语音转文字'
+      translateLabel.textContent = strings.voiceToText
       const foldBtn = document.createElement('div')
       foldBtn.className = 'foldBtn'
       translateHeader.appendChild(translateIcon)

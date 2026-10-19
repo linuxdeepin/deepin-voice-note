@@ -22,17 +22,23 @@ import { installEmptyPlaceholderState } from './empty-placeholder-state.js'
 import { installClipboardCopyNormalizer } from './clipboard-copy.js'
 import { createResourceInsertionSelection } from './resource-insertion-selection.js'
 import { isGeneratedNoteTitle, normalizeNoteTitle, noteTitlePresentation, sanitizeNoteTitleInput } from './note-title.js'
+import { DEFAULT_TIPTAP_UI_STRINGS, normalizeTiptapUiStrings } from './ui-strings.js'
+
+const uiStrings = { ...DEFAULT_TIPTAP_UI_STRINGS }
 
 // ---------------------------------------------------------------------------
 // 编辑器初始化模块（本接口不替换此模块）
 // ---------------------------------------------------------------------------
 
 function createTiptapEditor(element) {
-  return new Editor({
+  const editor = new Editor({
     element,
-    extensions: createTiptapExtensions(),
+    extensions: createTiptapExtensions(uiStrings),
     content: createEmptyDoc(),
   })
+  // CSS pseudo-element reads attr() from ProseMirror itself, not #app.
+  editor.view.dom.dataset.emptyPlaceholder = uiStrings.bodyPlaceholder
+  return editor
 }
 
 
@@ -223,13 +229,43 @@ if (typeof window !== 'undefined') {
 }
 installEditorContentZoomShortcuts()
 applyEditorContentZoom(1)
-const toolbar = createFormatToolbar(editor, document.getElementById('toolbar-host'))
+const toolbarHost = document.getElementById('toolbar-host')
 const titleInput = document.getElementById('note-title-input')
 let pendingPickImage = false
 let pendingRecordVoice = false
 let currentTitleNoteId = -1
 let savedTitle = ''
 let titleSyncing = false
+let toolbar = null
+const resourceButtonsEnabled = { voice: true, image: true }
+
+function mountToolbar() {
+  toolbar?.destroy()
+  toolbarHost.replaceChildren()
+  toolbar = createFormatToolbar(editor, toolbarHost, uiStrings)
+  toolbar.setResourceButtonsEnabled(resourceButtonsEnabled.voice, resourceButtonsEnabled.image)
+
+  // 工具栏可能先于 QWebChannel 完成绑定就已经可见。先缓存用户操作，
+  // 避免首次点击在 bridge 尚未就绪时被静默丢弃。
+  toolbar.setOnPickImage(() => {
+    resourceInsertionSelection.capture()
+    if (tiptapBridge?.jsRequestPickImage) {
+      tiptapBridge.jsRequestPickImage()
+    } else {
+      pendingPickImage = true
+    }
+  })
+  toolbar.setOnRecordVoice(() => {
+    if (tiptapBridge?.jsRequestRecordVoice) {
+      tiptapBridge.jsRequestRecordVoice()
+    } else {
+      pendingRecordVoice = true
+    }
+  })
+  return toolbar
+}
+
+mountToolbar()
 
 function updateTitleLayout() {
   if (!titleInput) return
@@ -245,11 +281,11 @@ function updateTitleLayout() {
 }
 
 function syncNoteTitleStyle(value) {
-  titleInput.classList.toggle('is-custom', Boolean(value) && !isGeneratedNoteTitle(value))
+  titleInput.classList.toggle('is-custom', Boolean(value) && !isGeneratedNoteTitle(value, uiStrings.generatedTitlePrefix))
 }
 
 function setNoteTitle(value) {
-  const presentation = noteTitlePresentation(value)
+  const presentation = noteTitlePresentation(value, uiStrings.generatedTitlePrefix)
   titleSyncing = true
   // 系统生成的默认标题只作为占位提示，不写进 textarea 的真实 value。
   // 这样新建笔记后直接输入就是新标题，不需要先全选删除“未命名文本N”。
@@ -296,26 +332,10 @@ window.addEventListener('resize', updateTitleLayout)
 window.addEventListener('dvn-tiptap-content-zoom-changed', updateTitleLayout)
 updateTitleLayout()
 
-// 工具栏可能先于 QWebChannel 完成绑定就已经可见。先缓存用户操作，
-// 避免首次点击在 bridge 尚未就绪时被静默丢弃。
-toolbar.setOnPickImage(() => {
-  resourceInsertionSelection.capture()
-  if (tiptapBridge?.jsRequestPickImage) {
-    tiptapBridge.jsRequestPickImage()
-  } else {
-    pendingPickImage = true
-  }
-})
-toolbar.setOnRecordVoice(() => {
-  if (tiptapBridge?.jsRequestRecordVoice) {
-    tiptapBridge.jsRequestRecordVoice()
-  } else {
-    pendingRecordVoice = true
-  }
-})
-
 if (typeof window !== 'undefined') {
   window.__dvnTiptapSetResourceButtonsEnabled = function (voiceEnabled, imageEnabled) {
+    resourceButtonsEnabled.voice = Boolean(voiceEnabled)
+    resourceButtonsEnabled.image = Boolean(imageEnabled)
     toolbar.setResourceButtonsEnabled(Boolean(voiceEnabled), Boolean(imageEnabled))
   }
 }
@@ -332,6 +352,13 @@ document.addEventListener('mousedown', function (event) {
 })
 
 bindTiptapChannel(editor, undefined, {
+  onUiStrings: (json) => {
+    Object.assign(uiStrings, normalizeTiptapUiStrings(json))
+    titleInput.setAttribute('aria-label', uiStrings.noteTitle)
+    appElement.dataset.emptyPlaceholder = uiStrings.bodyPlaceholder
+    editor.view.dom.dataset.emptyPlaceholder = uiStrings.bodyPlaceholder
+    mountToolbar()
+  },
   onFontList: (fonts, defaultFont) => toolbar.setFontList(fonts, defaultFont),
   beforeInsertImage: () => resourceInsertionSelection.restoreAndConsume(),
   clearResourceInsertionSelection: () => resourceInsertionSelection.clear(),

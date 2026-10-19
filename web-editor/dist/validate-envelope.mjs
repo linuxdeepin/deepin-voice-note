@@ -16050,6 +16050,36 @@ const voiceBlockCss = `/* SPDX-FileCopyrightText: 2026 UnionTech Software Techno
     color: var(--dvn-selection-fg, #ffffff);
 }
 `;
+const DEFAULT_TIPTAP_UI_STRINGS = Object.freeze({
+  generatedTitlePrefix: "文本",
+  noteTitle: "笔记标题",
+  bodyPlaceholder: "请输入正文",
+  bold: "粗体",
+  italic: "斜体",
+  underline: "下划线",
+  strikethrough: "删除线",
+  bullets: "无序列表",
+  numbering: "有序列表",
+  taskList: "待办列表",
+  heading: "标题",
+  headingLevel: "标题%1",
+  paragraph: "正文",
+  font: "字体",
+  fontSize: "字号",
+  fontColor: "文字颜色",
+  textHighlightColor: "背景颜色",
+  moreColors: "更多颜色",
+  transparent: "透明",
+  quote: "引用",
+  increaseIndent: "增加缩进",
+  decreaseIndent: "减少缩进",
+  recordVoice: "录音",
+  insertPicture: "插入图片",
+  moreFormats: "更多格式",
+  voiceToText: "语音转文字",
+  convertingVoiceToText: "正在转为文字",
+  toText: "转文字"
+});
 const playNormalLightIconUrl = "data:image/svg+xml,%3c?xml%20version='1.0'%20encoding='UTF-8'?%3e%3csvg%20width='24px'%20height='24px'%20viewBox='0%200%2024%2024'%20version='1.1'%20xmlns='http://www.w3.org/2000/svg'%20xmlns:xlink='http://www.w3.org/1999/xlink'%3e%3ctitle%3eD/audio_file_play/Normal/Light%3c/title%3e%3cg%20id='D/audio_file_play/Normal/Light'%20stroke='none'%20stroke-width='1'%20fill='none'%20fill-rule='evenodd'%3e%3cg%20id='ICON/audio/file/normal'%3e%3cpath%20d='M12,0%20C18.627417,0%2024,5.372583%2024,12%20C24,18.627417%2018.627417,24%2012,24%20C5.372583,24%200,18.627417%200,12%20C0,5.372583%205.372583,0%2012,0%20Z'%20id='路径'%20fill='%23FFFFFF'%3e%3c/path%3e%3cpath%20d='M10.9503642,7.29356059%20C9.8732078,6.58879434%209,7.19749521%209,8.64330786%20L9,15.3569453%20C9,16.8071564%209.87674829,17.4091424%2010.9503642,16.7066926%20L16.1934598,13.2762188%20C17.2706162,12.5714525%2017.2670757,11.4264842%2016.1934598,10.7240344%20L10.9503642,7.29356059%20Z'%20id='play'%20fill='%230058DE'%3e%3c/path%3e%3c/g%3e%3c/g%3e%3c/svg%3e";
 const playHoverLightIconUrl = "data:image/svg+xml,%3c?xml%20version='1.0'%20encoding='UTF-8'?%3e%3csvg%20width='24px'%20height='24px'%20viewBox='0%200%2024%2024'%20version='1.1'%20xmlns='http://www.w3.org/2000/svg'%20xmlns:xlink='http://www.w3.org/1999/xlink'%3e%3ctitle%3eD/audio_file_play/Hover/Light%3c/title%3e%3cg%20id='D/audio_file_play/Hover/Light'%20stroke='none'%20stroke-width='1'%20fill='none'%20fill-rule='evenodd'%3e%3cg%20id='ICON/audio/file/normal'%3e%3cpath%20d='M12,0%20C18.627417,0%2024,5.372583%2024,12%20C24,18.627417%2018.627417,24%2012,24%20C5.372583,24%200,18.627417%200,12%20C0,5.372583%205.372583,0%2012,0%20Z'%20id='路径'%20fill='%23E6E6E6'%3e%3c/path%3e%3cpath%20d='M10.9503642,7.29356059%20C9.8732078,6.58879434%209,7.19749521%209,8.64330786%20L9,15.3569453%20C9,16.8071564%209.87674829,17.4091424%2010.9503642,16.7066926%20L16.1934598,13.2762188%20C17.2706162,12.5714525%2017.2670757,11.4264842%2016.1934598,10.7240344%20L10.9503642,7.29356059%20Z'%20id='play'%20fill='%230058DE'%3e%3c/path%3e%3c/g%3e%3c/g%3e%3c/svg%3e";
 const playPressedLightIconUrl = "data:image/svg+xml,%3c?xml%20version='1.0'%20encoding='UTF-8'?%3e%3csvg%20width='24px'%20height='24px'%20viewBox='0%200%2024%2024'%20version='1.1'%20xmlns='http://www.w3.org/2000/svg'%20xmlns:xlink='http://www.w3.org/1999/xlink'%3e%3ctitle%3eD/audio_file_play/Pressed/Light%3c/title%3e%3cdefs%3e%3clinearGradient%20x1='50%25'%20y1='-1.92762473e-12%25'%20x2='50%25'%20y2='99.2378715%25'%20id='linearGradient-1'%3e%3cstop%20stop-color='%23A9A9A9'%20stop-opacity='0.6'%20offset='0%25'%3e%3c/stop%3e%3cstop%20stop-color='%23CACACA'%20stop-opacity='0.5'%20offset='100%25'%3e%3c/stop%3e%3c/linearGradient%3e%3c/defs%3e%3cg%20id='D/audio_file_play/Pressed/Light'%20stroke='none'%20stroke-width='1'%20fill='none'%20fill-rule='evenodd'%3e%3cg%20id='ICON/audio/file/normal'%3e%3cpath%20d='M12,0%20C18.627417,0%2024,5.372583%2024,12%20C24,18.627417%2018.627417,24%2012,24%20C5.372583,24%200,18.627417%200,12%20C0,5.372583%205.372583,0%2012,0%20Z'%20id='路径'%20fill='url(%23linearGradient-1)'%3e%3c/path%3e%3cpath%20d='M10.9503642,7.29356059%20C9.8732078,6.58879434%209,7.19749521%209,8.64330786%20L9,15.3569453%20C9,16.8071564%209.87674829,17.4091424%2010.9503642,16.7066926%20L16.1934598,13.2762188%20C17.2706162,12.5714525%2017.2670757,11.4264842%2016.1934598,10.7240344%20L10.9503642,7.29356059%20Z'%20id='play'%20fill='%230058DE'%3e%3c/path%3e%3c/g%3e%3c/g%3e%3c/svg%3e";
@@ -17061,11 +17091,15 @@ const VoiceBlock = Node3.create({
   parseHTML() {
     return [{ tag: 'div[data-type="voice-block"]' }];
   },
+  addOptions() {
+    return { strings: DEFAULT_TIPTAP_UI_STRINGS, getStrings: null };
+  },
   renderHTML({ HTMLAttributes }) {
     return ["div", mergeAttributes(HTMLAttributes, { "data-type": "voice-block" })];
   },
   addNodeView() {
     return ({ node, view, getPos, editor }) => {
+      const strings = this.options.getStrings?.() || this.options.strings || DEFAULT_TIPTAP_UI_STRINGS;
       let playing = false;
       let paused = false;
       let translating = false;
@@ -17170,14 +17204,14 @@ const VoiceBlock = Node3.create({
       toTextIcon.className = "voiceToTextIcon";
       const translatingLabel = document.createElement("span");
       translatingLabel.className = "translatingLabel";
-      translatingLabel.textContent = "正在转为文字";
+      translatingLabel.textContent = strings.convertingVoiceToText;
       toTextLabel.appendChild(toTextIcon);
       toTextLabel.appendChild(translatingLabel);
       right.appendChild(toTextLabel);
       const toTextTrigger = document.createElement("div");
       toTextTrigger.className = "voiceToTextTrigger";
       toTextTrigger.setAttribute("contenteditable", "false");
-      toTextTrigger.textContent = "转文字";
+      toTextTrigger.textContent = strings.toText;
       right.appendChild(toTextTrigger);
       const closePlaybackBarBtn = document.createElement("div");
       closePlaybackBarBtn.className = "closePlaybackBarBtn";
@@ -17193,7 +17227,7 @@ const VoiceBlock = Node3.create({
       translateIcon.className = "translateIcon";
       const translateLabel = document.createElement("span");
       translateLabel.className = "translateLabel";
-      translateLabel.textContent = "语音转文字";
+      translateLabel.textContent = strings.voiceToText;
       const foldBtn = document.createElement("div");
       foldBtn.className = "foldBtn";
       translateHeader.appendChild(translateIcon);

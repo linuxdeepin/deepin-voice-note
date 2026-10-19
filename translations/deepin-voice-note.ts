@@ -22,7 +22,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/db/vnoteitemoper.cpp" line="226"/>
+        <location filename="../src/db/vnoteitemoper.cpp" line="264"/>
         <source>Text</source>
         <translation type="unfinished"></translation>
     </message>
@@ -811,6 +811,76 @@ All notes in it will be deleted</source>
     <message>
         <location filename="../src/common/jscontent.cpp" line="174"/>
         <source>Converting voice to text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/common/tiptapchannelbridge.cpp" line="161"/>
+        <source>Note title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/common/tiptapchannelbridge.cpp" line="162"/>
+        <source>Enter text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/common/tiptapchannelbridge.cpp" line="168"/>
+        <source>Task list</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/common/tiptapchannelbridge.cpp" line="169"/>
+        <source>Heading</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/common/tiptapchannelbridge.cpp" line="170"/>
+        <source>Heading %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/common/tiptapchannelbridge.cpp" line="171"/>
+        <source>Paragraph</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/common/tiptapchannelbridge.cpp" line="177"/>
+        <source>Transparent</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/common/tiptapchannelbridge.cpp" line="178"/>
+        <source>Quote</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/common/tiptapchannelbridge.cpp" line="179"/>
+        <source>Increase indent</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/common/tiptapchannelbridge.cpp" line="180"/>
+        <source>Decrease indent</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/common/tiptapchannelbridge.cpp" line="181"/>
+        <source>Record voice</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/common/tiptapchannelbridge.cpp" line="182"/>
+        <source>Insert picture</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/common/tiptapchannelbridge.cpp" line="183"/>
+        <source>More formats</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/common/tiptapchannelbridge.cpp" line="186"/>
+        <source>To Text</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

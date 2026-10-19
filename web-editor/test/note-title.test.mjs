@@ -53,6 +53,19 @@ test('生成标题识别不把普通标题误判为默认标题', () => {
   assert.equal(isGeneratedNoteTitle('未命名文本1（副本）'), false)
 })
 
+test('生成标题识别使用宿主下发的当前语言前缀', () => {
+  assert.equal(isGeneratedNoteTitle('Text12', 'Text'), true)
+  assert.equal(isGeneratedNoteTitle('文本12', '文本'), true)
+  assert.equal(isGeneratedNoteTitle('TexT12', 'Text'), false)
+  assert.equal(isGeneratedNoteTitle('My Text12', 'Text'), false)
+  assert.deepEqual(noteTitlePresentation('Text12', 'Text'), {
+    normalized: 'Text12',
+    value: '',
+    placeholder: 'Text12',
+    isCustom: false,
+  })
+})
+
 test('正文和标题输入使用同一个默认前景色作为 caret-color', () => {
   const editorHtml = fs.readFileSync(new URL('../src/runtime/tiptap-editor.html', import.meta.url), 'utf8')
   assert.match(editorHtml, /#note-title-input \{[^\n]*caret-color: var\(--dvn-editor-fg, rgba\(0, 0, 0, 1\)\)/)
@@ -66,4 +79,12 @@ test('标题入口确实把生成标题写入 placeholder，而不是 textarea v
   assert.match(editorSource, /titleInput\.value = presentation\.value/)
   assert.match(editorSource, /titleInput\.placeholder = presentation\.placeholder/)
   assert.match(editorHtml, /#note-title-input::placeholder \{[\s\S]*opacity: 1;/)
+})
+
+test('正文占位符由宿主下发的文案驱动，不在 CSS 中固定单一语言', () => {
+  const editorSource = fs.readFileSync(new URL('../src/runtime/tiptap-editor.js', import.meta.url), 'utf8')
+  const editorHtml = fs.readFileSync(new URL('../src/runtime/tiptap-editor.html', import.meta.url), 'utf8')
+  assert.match(editorHtml, /content: attr\(data-empty-placeholder\)/)
+  assert.match(editorHtml, /<div id="app" data-empty-placeholder="[^"]+"><\/div>/)
+  assert.match(editorSource, /editor\.view\.dom\.dataset\.emptyPlaceholder = uiStrings\.bodyPlaceholder/)
 })

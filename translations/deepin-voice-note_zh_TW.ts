@@ -22,9 +22,9 @@
         <translation>語音</translation>
     </message>
     <message>
-        <location filename="../src/db/vnoteitemoper.cpp" line="228"/>
+        <location filename="../src/db/vnoteitemoper.cpp" line="264"/>
         <source>Text</source>
-        <translation>文本</translation>
+        <translation>未命名文字</translation>
     </message>
 </context>
 <context>
@@ -733,6 +733,76 @@
         <location filename="../src/common/jscontent.cpp" line="220"/>
         <source>Voice To Text</source>
         <translation>語音轉文字</translation>
+    </message>
+    <message>
+        <location filename="../src/common/tiptapchannelbridge.cpp" line="161"/>
+        <source>Note title</source>
+        <translation>筆記標題</translation>
+    </message>
+    <message>
+        <location filename="../src/common/tiptapchannelbridge.cpp" line="162"/>
+        <source>Enter text</source>
+        <translation>請輸入正文</translation>
+    </message>
+    <message>
+        <location filename="../src/common/tiptapchannelbridge.cpp" line="169"/>
+        <source>Task list</source>
+        <translation>待辦清單</translation>
+    </message>
+    <message>
+        <location filename="../src/common/tiptapchannelbridge.cpp" line="170"/>
+        <source>Heading</source>
+        <translation>標題</translation>
+    </message>
+    <message>
+        <location filename="../src/common/tiptapchannelbridge.cpp" line="171"/>
+        <source>Heading %1</source>
+        <translation>標題%1</translation>
+    </message>
+    <message>
+        <location filename="../src/common/tiptapchannelbridge.cpp" line="172"/>
+        <source>Paragraph</source>
+        <translation>正文</translation>
+    </message>
+    <message>
+        <location filename="../src/common/tiptapchannelbridge.cpp" line="178"/>
+        <source>Transparent</source>
+        <translation>透明</translation>
+    </message>
+    <message>
+        <location filename="../src/common/tiptapchannelbridge.cpp" line="179"/>
+        <source>Quote</source>
+        <translation>引用</translation>
+    </message>
+    <message>
+        <location filename="../src/common/tiptapchannelbridge.cpp" line="180"/>
+        <source>Increase indent</source>
+        <translation>增加縮排</translation>
+    </message>
+    <message>
+        <location filename="../src/common/tiptapchannelbridge.cpp" line="181"/>
+        <source>Decrease indent</source>
+        <translation>減少縮排</translation>
+    </message>
+    <message>
+        <location filename="../src/common/tiptapchannelbridge.cpp" line="182"/>
+        <source>Record voice</source>
+        <translation>錄音</translation>
+    </message>
+    <message>
+        <location filename="../src/common/tiptapchannelbridge.cpp" line="183"/>
+        <source>Insert picture</source>
+        <translation>插入圖片</translation>
+    </message>
+    <message>
+        <location filename="../src/common/tiptapchannelbridge.cpp" line="184"/>
+        <source>More formats</source>
+        <translation>更多格式</translation>
+    </message>
+    <message>
+        <location filename="../src/common/tiptapchannelbridge.cpp" line="187"/>
+        <source>To Text</source>
+        <translation>轉文字</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="221"/>

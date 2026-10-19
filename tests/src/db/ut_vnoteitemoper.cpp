@@ -10,6 +10,8 @@
 #include "vnoteforlder.h"
 #include "vnoteitemoper.h"
 #include "vnoteitem.h"
+#include <QCoreApplication>
+#include <QRegularExpression>
 #include <stub.h>
 
 static bool stub_true()
@@ -54,6 +56,15 @@ TEST_F(UT_VNoteItemOper, UT_VNoteItemOper_loadAllVNotes_001)
     VNOTE_ALL_NOTES_MAP *notes = m_vnoteitemoper->loadAllVNotes();
     EXPECT_FALSE(nullptr == notes);
     delete notes;
+}
+
+TEST_F(UT_VNoteItemOper, UT_VNoteItemOper_getDefaultNoteName_usesTranslatedPrefix)
+{
+    ASSERT_NE(nullptr, m_note);
+    const QString prefix = QCoreApplication::translate("DefaultName", "Text");
+    const QString title = m_vnoteitemoper->getDefaultNoteName(m_note->folderId);
+    const QRegularExpression generated(QStringLiteral("^%1\\d+$").arg(QRegularExpression::escape(prefix)));
+    EXPECT_TRUE(generated.match(title).hasMatch()) << title.toStdString();
 }
 
 TEST_F(UT_VNoteItemOper, UT_VNoteItemOper_modifyNoteTitle_001)

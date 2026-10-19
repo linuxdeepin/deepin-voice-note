@@ -136,6 +136,13 @@ TEST(WebEngineHandlerCoverageUT, ConstructorLambda_RecoderStateChange)
 // 2. connectWebContent() lambdas (L332-L410)
 // ===========================================================================
 
+TEST(WebEngineHandlerCoverageUT, Constructor_AlwaysProvidesSystemFonts)
+{
+    WebEngineHandler h;
+    EXPECT_FALSE(h.m_fontList.isEmpty());
+    EXPECT_FALSE(h.m_defaultFont.isEmpty());
+}
+
 // L332 lambda: getfontinfo -> callJsSetFontList(fontList, defaultFont)
 TEST(WebEngineHandlerCoverageUT, ConnectWebContent_GetFontInfo)
 {
