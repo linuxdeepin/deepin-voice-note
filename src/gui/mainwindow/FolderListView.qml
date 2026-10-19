@@ -496,7 +496,8 @@ Item {
             // 录音时：当前文件夹保持正常显示，其他文件夹置灰
             opacity: (isRecordingAudio && index !== folderListView.currentIndex) ? 0.5 : 1.0
 
-            color: index === folderListView.currentIndex ? (root.activeFocus ? palette.highlight : DTK.themeType === ApplicationHelper.LightType ? "#33000000" : "#33FFFFFF") : (folderListView.hoverIndex === index || isHovered ? (DTK.themeType === ApplicationHelper.LightType ? "#1A000000" : "#1AFFFFFF") : "transparent")
+            // 当前分组属于持续选中态，焦点移到编辑器后仍保持主题高亮色。
+            color: index === folderListView.currentIndex ? palette.highlight : (folderListView.hoverIndex === index || isHovered ? (DTK.themeType === ApplicationHelper.LightType ? "#1A000000" : "#1AFFFFFF") : "transparent")
             clip: true
             enabled: !isPlay || index === folderListView.currentIndex
             height: itemHeight
@@ -631,7 +632,7 @@ Item {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     Layout.alignment: Qt.AlignVCenter
-                    color: index === folderListView.currentIndex ? (root.activeFocus ? palette.highlightedText : (DTK.themeType === ApplicationHelper.LightType ? "black" : "#B2FFFFFF")) : (DTK.themeType === ApplicationHelper.LightType ? "black" : "#B2FFFFFF")
+                    color: index === folderListView.currentIndex ? palette.highlightedText : (DTK.themeType === ApplicationHelper.LightType ? "black" : "#B2FFFFFF")
                     elide: Text.ElideRight
                     horizontalAlignment: Text.AlignLeft
                     text: model.name

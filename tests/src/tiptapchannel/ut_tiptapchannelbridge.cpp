@@ -6,6 +6,7 @@
 
 #include <QResource>
 #include <QFile>
+#include <QUrl>
 #include <QSignalSpy>
 #include <QApplication>
 #include <QClipboard>
@@ -107,6 +108,10 @@ TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_jsCopyPlainTextToClipboard
     bridge.jsCopyPlainTextToClipboard(QStringLiteral("转写复制文本"));
     ASSERT_NE(QApplication::clipboard(), nullptr);
     EXPECT_EQ(QApplication::clipboard()->text(), QStringLiteral("转写复制文本"));
+    EXPECT_TRUE(bridge.clipboardHasPasteContent());
+
+    QApplication::clipboard()->clear();
+    EXPECT_FALSE(bridge.clipboardHasPasteContent());
 }
 
 // 双击查看原图：相对路径归一化后下发本地路径
@@ -257,17 +262,20 @@ TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_resourceBaseUrl_001)
     EXPECT_TRUE(url.startsWith("file://")) << url.toStdString();
 }
 
-// tiptapHtmlPath 优先返回 file://，文件不存在时回退 qrc
+// tiptapHtmlPath 只在编辑器页面必须用 file:// 打开时才允许加载本地图片：
+// 只要存在任一可用的本地编辑器页面副本就返回 file://，仅当所有候选都不存在
+// 时才回退 qrc。返回 file:// 时必须指向真实存在的文件，否则又会退化成
+// “Not allowed to load local resource”。
 TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_tiptapHtmlPath_001)
 {
     TiptapChannelBridge bridge;
-    QString path = bridge.tiptapHtmlPath();
-    if (QFile::exists(QStringLiteral(TIPTAP_WEB_PATH "/tiptap-editor.html"))) {
-        EXPECT_TRUE(path.startsWith("file://")) << path.toStdString();
+    const QString path = bridge.tiptapHtmlPath();
+    EXPECT_TRUE(path.contains("tiptap-editor.html")) << path.toStdString();
+    if (path.startsWith("file://")) {
+        EXPECT_TRUE(QFile::exists(QUrl(path).toLocalFile())) << path.toStdString();
     } else {
         EXPECT_TRUE(path.startsWith("qrc:")) << path.toStdString();
     }
-    EXPECT_TRUE(path.contains("tiptap-editor.html")) << path.toStdString();
 }
 
 // Tiptap 默认启用，显式环境变量可临时回退 Summernote。

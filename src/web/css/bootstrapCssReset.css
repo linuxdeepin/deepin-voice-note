@@ -175,7 +175,7 @@ p {
 .selectColor {
     border: 1px solid #FFF !important;
     /* outline: 1px outset #0883FB; */
-    box-shadow: 0 0 0 1.5px #0883FB;
+    box-shadow: 0 0 0 1.5px var(--highlightColor, #0883FB);
     transform: scale(1.08);
 }
 
@@ -232,12 +232,28 @@ ul {
 .btn-default:active,
 .btn-default.active,
 .open>.dropdown-toggle.btn-default {
-    background-color: rgba(0, 0, 0, 0.1) !important;
+    background-color: var(--highlightColor, #0081ff) !important;
+    color: #ffffff !important;
+}
+
+.btn-default:active i,
+.btn-default.active i,
+.open>.dropdown-toggle.btn-default i,
+.btn-default:active .note-icon,
+.btn-default.active .note-icon,
+.open>.dropdown-toggle.btn-default .note-icon {
+    color: #ffffff !important;
 }
 
 .btn-default:hover:active {
-    background-color: rgba(0, 0, 0, 0.2) !important;
+    background-color: var(--highlightColor, #0081ff) !important;
+    color: #ffffff !important;
     box-shadow: none;
+}
+
+.btn-default:hover:active i,
+.btn-default:hover:active .note-icon {
+    color: #ffffff !important;
 }
 
 /* 浮动工具栏按钮 */

@@ -24,6 +24,7 @@ Item {
     signal saveNote
     signal saveVoice
     signal showShortCutView
+    signal selectAll
     signal startRecording
     signal showJsContextMenu
 
@@ -150,7 +151,9 @@ Item {
         sequence: "Ctrl+A"
 
         enabled: !item.isDragging && !item.initialOnlyCreateFolder
-        onActivated: {}
+        onActivated: {
+            selectAll();
+        }
     }
 
     Shortcut {

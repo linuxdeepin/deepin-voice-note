@@ -5,12 +5,17 @@
 #include "jscontent.h"
 #include "db/vnoteitemoper.h"
 #include "metadataparser.h"
+#include "migrationhtmlconverter.h"
 #include "migrationjsonbuilder.h"
+#include "migrationnotedataconverter.h"
 #include "common/utils.h"
 #include "handler/voice_to_text_task_manager.h"
 #include "tiptapchannelbridge.h"
 #include "legacyformatdetector.h"
 
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QTimer>
 #include <QEventLoop>
 #include <QDebug>
@@ -24,6 +29,71 @@ namespace {
 QString emptyTiptapEnvelopeJson()
 {
     return MigrationJsonBuilder::toCompactJson(MigrationJsonBuilder::makeEnvelope());
+}
+
+QString legacyHtmlFromPayload(const QString &payload, const QString &parsedHtml)
+{
+    if (!parsedHtml.isEmpty()) {
+        return parsedHtml;
+    }
+
+    const QJsonDocument document = QJsonDocument::fromJson(payload.toUtf8());
+    if (document.isObject()) {
+        return document.object().value(QStringLiteral("htmlCode")).toString();
+    }
+    return payload;
+}
+
+QString envelopeForNote(const VNoteItem &data)
+{
+    const QString payload = data.metaDataConstRef().toString();
+    const LegacyFormat format = LegacyFormatDetector::detect(payload);
+
+    switch (format) {
+    case LegacyFormat::TiptapEnvelope:
+        return payload;
+    case LegacyFormat::LegacyHtmlCode: {
+        const MigrationHtmlConversionResult converted =
+            MigrationHtmlConverter::convert(legacyHtmlFromPayload(payload, data.htmlCode));
+        if (converted.ok()) {
+            return MigrationJsonBuilder::toCompactJson(converted.envelope);
+        }
+        qWarning() << "Failed to convert legacy HTML note to Tiptap envelope:" << converted.errors.size();
+        break;
+    }
+    case LegacyFormat::LegacyNoteDatas: {
+        const MigrationNoteDataConversionResult converted =
+            MigrationNoteDataConverter::convertBlocks(payload);
+        if (converted.ok()) {
+            return MigrationJsonBuilder::toCompactJson(converted.envelope);
+        }
+        qWarning() << "Failed to convert legacy note data to Tiptap envelope:" << converted.errors.size();
+        break;
+    }
+    case LegacyFormat::ProseMirrorDoc: {
+        const QJsonDocument document = QJsonDocument::fromJson(payload.toUtf8());
+        if (document.isObject()) {
+            return MigrationJsonBuilder::toCompactJson(
+                MigrationJsonBuilder::makeEnvelope(document.object()));
+        }
+        break;
+    }
+    case LegacyFormat::PlainText: {
+        QJsonArray paragraphContent;
+        if (!payload.isEmpty()) {
+            paragraphContent.append(MigrationJsonBuilder::makeText(payload));
+        }
+        return MigrationJsonBuilder::toCompactJson(
+            MigrationJsonBuilder::makeEnvelope(
+                MigrationJsonBuilder::makeDoc(
+                    QJsonArray{MigrationJsonBuilder::makeParagraph(paragraphContent)})));
+    }
+    case LegacyFormat::Invalid:
+        break;
+    }
+
+    // A note switch must never leave the previous note's document visible.
+    return emptyTiptapEnvelopeJson();
 }
 
 } // namespace
@@ -108,9 +178,8 @@ void WebRichTextManager::setData(VNoteItem *data, const QString reg)
     m_noteData = data;
     m_updateTimer->stop();
 
-    if (TiptapChannelBridge::instance()->tiptapEnabled()
-        && LegacyFormatDetector::detect(data->metaDataConstRef().toString()) == LegacyFormat::TiptapEnvelope) {
-        TiptapChannelBridge::instance()->loadEnvelope(data->metaDataConstRef().toString());
+    if (TiptapChannelBridge::instance()->tiptapEnabled()) {
+        TiptapChannelBridge::instance()->loadEnvelope(envelopeForNote(*data));
         m_updateTimer->start();
         emit updateSearch();
         return;
@@ -296,7 +365,10 @@ void WebRichTextManager::onLoadFinsh()
     qDebug() << "Web communication established";
     //再次设置笔记内容
     if (m_noteData && !m_loadFinshSign) {
-        if (m_noteData->htmlCode.isEmpty()) {
+        if (TiptapChannelBridge::instance()->tiptapEnabled()) {
+            qDebug() << "Reloading Tiptap envelope after load";
+            TiptapChannelBridge::instance()->loadEnvelope(envelopeForNote(*m_noteData));
+        } else if (m_noteData->htmlCode.isEmpty()) {
             qDebug() << "Initializing with metadata after load";
             emit JsContent::instance()->callJsInitData(m_noteData->metaDataRef().toString());
         } else {

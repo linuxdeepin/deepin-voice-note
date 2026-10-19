@@ -117,9 +117,22 @@ QString TiptapChannelBridge::tiptapHtmlPath() const
 {
     // Tiptap needs to resolve AppData images through file:// URLs. Loading the
     // editor itself from file:// keeps the page in QtWebEngine's local-file path.
-    const QString filePath = QStringLiteral(TIPTAP_WEB_PATH "/tiptap-editor.html");
-    if (QFile::exists(filePath)) {
-        return QUrl::fromLocalFile(filePath).toString();
+    // A qrc: page cannot load file:// images (QtWebEngine reports
+    // "Not allowed to load local resource"), so only use qrc as the final fallback
+    // when no filesystem copy exists.
+    const QString appDir = QCoreApplication::applicationDirPath();
+    const QStringList candidates = {
+        QStringLiteral(TIPTAP_WEB_PATH "/tiptap-editor.html"),
+        // Installed layout: <prefix>/bin/deepin-voice-note -> <prefix>/share/deepin-voice-note/tiptap
+        QDir(appDir).filePath(QStringLiteral("../share/deepin-voice-note/tiptap/tiptap-editor.html")),
+        // Source-tree build layout: <repo>/build/src/deepin-voice-note -> <repo>/web-editor/dist
+        QDir(appDir).filePath(QStringLiteral("../../web-editor/dist/tiptap-editor.html")),
+    };
+    for (const QString &candidate : candidates) {
+        const QString filePath = QDir::cleanPath(candidate);
+        if (QFile::exists(filePath)) {
+            return QUrl::fromLocalFile(filePath).toString();
+        }
     }
     return QStringLiteral("qrc:/tiptap-editor.html");
 }
@@ -380,6 +393,35 @@ void TiptapChannelBridge::jsCopyPlainTextToClipboard(const QString &text)
     mimeData->setText(text);
     clipboard->setMimeData(mimeData);
     qInfo() << "Tiptap copied plain text to clipboard, length:" << text.length();
+}
+
+void TiptapChannelBridge::jsClearClipboard()
+{
+    QClipboard *clipboard = QApplication::clipboard();
+    if (!clipboard) {
+        qWarning() << "Tiptap clear clipboard: clipboard is unavailable";
+        return;
+    }
+    clipboard->clear();
+    qInfo() << "Tiptap cleared clipboard";
+}
+
+bool TiptapChannelBridge::clipboardHasPasteContent() const
+{
+    QClipboard *clipboard = QApplication::clipboard();
+    if (!clipboard) {
+        return false;
+    }
+
+    const QMimeData *mimeData = clipboard->mimeData();
+    if (!mimeData) {
+        return false;
+    }
+
+    return mimeData->hasText()
+        || mimeData->hasHtml()
+        || mimeData->hasImage()
+        || mimeData->hasUrls();
 }
 
 void TiptapChannelBridge::jsPasteImage(const QString &dataUrl)

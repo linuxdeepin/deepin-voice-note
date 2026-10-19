@@ -824,7 +824,9 @@ Item {
             property bool isSelected: selectedNoteItem.indexOf(index) !== -1
             property var startMove: [-1, -1]
 
-            color: isSelected ? (rootItem.activeFocus ? palette.highlight : (DTK.themeType === ApplicationHelper.LightType ? "#33000000" : "#33FFFFFF")) : (DTK.themeType === ApplicationHelper.LightType ? "white" : "#0CFFFFFF")
+            // 选中态始终使用系统主题高亮色；失焦时也不退化成灰色，
+            // 避免编辑器获得焦点后笔记选中项看起来像未选中。
+            color: isSelected ? palette.highlight : (DTK.themeType === ApplicationHelper.LightType ? "white" : "#0CFFFFFF")
             enabled: !isPlay || itemListView.currentIndex === index
             // 录音时：当前项保持正常显示，其他项置灰
             opacity: (isRecordingAudio && index !== itemListView.currentIndex) ? 0.5 : 1.0
@@ -898,7 +900,7 @@ Item {
 
                     // width: parent.width - 10
                     Layout.fillWidth: true
-                    color: DTK.themeType === ApplicationHelper.LightType ? (isSelected ? (rootItem.activeFocus ? palette.highlightedText : "black") : "black") : "white"
+                    color: isSelected ? palette.highlightedText : (DTK.themeType === ApplicationHelper.LightType ? "black" : "white")
                     elide: Text.ElideRight
                     font: DTK.fontManager.t6
                     height: implicitHeight
@@ -911,7 +913,7 @@ Item {
                     id: timeLabel
 
                     Layout.fillWidth: true
-                    color: isSelected ? (rootItem.activeFocus ? "#7FFFFFFF" : DTK.themeType === ApplicationHelper.LightType ? "#7F000000" : "#7FFFFFFF") : (DTK.themeType === ApplicationHelper.LightType ? "#7F000000" : "#7FFFFFFF")
+                    color: isSelected ? "#7FFFFFFF" : (DTK.themeType === ApplicationHelper.LightType ? "#7F000000" : "#7FFFFFFF")
                     font.pixelSize: 10
                     height: implicitHeight
                     horizontalAlignment: Text.AlignHLeft
@@ -1043,7 +1045,7 @@ Item {
 
                         Layout.fillHeight: true
                         Layout.fillWidth: true
-                        color: isSelected ? (rootItem.activeFocus ? "#7FFFFFFF" : DTK.themeType === ApplicationHelper.LightType ? "#7F000000" : "#7FFFFFFF") : (DTK.themeType === ApplicationHelper.LightType ? "#7F000000" : "#7FFFFFFF")
+                        color: isSelected ? "#7FFFFFFF" : (DTK.themeType === ApplicationHelper.LightType ? "#7F000000" : "#7FFFFFFF")
                         font.pixelSize: 10
                         horizontalAlignment: Text.AlignLeft
                         text: model.folderName

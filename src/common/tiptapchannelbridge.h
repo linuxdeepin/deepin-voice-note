@@ -119,6 +119,13 @@ public:
     // 这类文本不在 ProseMirror 文档可编辑 selection 中，不能依赖 WebAction Copy。
     Q_INVOKABLE void jsCopyPlainTextToClipboard(const QString &text);
 
+    // 光标无选区且所在块为空时，清空系统剪贴板，避免"复制"到的其实是上一次的残留内容。
+    Q_INVOKABLE void jsClearClipboard();
+
+    // 右键菜单需要查询系统剪贴板是否存在可粘贴内容。
+    // QtWebEngine 在 Tiptap 空白区域给出的 editFlags 不稳定，不能作为唯一依据。
+    Q_INVOKABLE bool clipboardHasPasteContent() const;
+
     // 前端上报编辑器滚动位置（scrollTop），宿主据此驱动标题栏阴影状态
     Q_INVOKABLE void jsReportScroll(int scrollTop);
 
