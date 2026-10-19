@@ -32,11 +32,19 @@
     inset: 0;
     box-sizing: border-box;
     pointer-events: none;
-    background: var(--dvn-active-selection-bg, rgba(0, 129, 255, 0.6));
+    /*
+     * 对齐 Summernote 的原生图片选区视觉：图片内容保留明暗关系并覆盖较重
+     * 的主题色，而不是用 100% 平铺色块把原图完全盖住。
+     * 图片自身有 4px padding，原生选区会把这段 padding 画成完整主题色边框；
+     * 这里用 inset box-shadow 复现该边框，且不改变图片布局尺寸。
+     */
+    background: var(--dvn-image-selection-bg, rgba(0, 129, 255, 0.8));
+    box-shadow: inset 0 0 0 4px var(--dvn-text-selection-bg, var(--highlightColor, #0081ff));
 }
 
 .dvn-image-node.ProseMirror-selectednode > .dvn-image-node-selection,
-.dvn-image-node.dvn-image-node-selected > .dvn-image-node-selection {
+.dvn-image-node.dvn-image-node-selected > .dvn-image-node-selection,
+.dvn-image-node.dvn-range-selected > .dvn-image-node-selection {
     display: block;
 }
 

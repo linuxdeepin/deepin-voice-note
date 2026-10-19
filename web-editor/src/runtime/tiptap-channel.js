@@ -463,6 +463,8 @@ function applyTheme(theme, highlightColor, disableHighlightColor, backgroundColo
   root.style.setProperty('--dvn-active-bg', colorWithAlpha(activeBaseColor, 0.5, 'rgba(0, 129, 255, 0.5)'))
   root.style.setProperty('--dvn-transcript-selection-bg', colorWithAlpha(activeBaseColor, 0.4, 'rgba(0, 129, 255, 0.4)'))
   root.style.setProperty('--dvn-active-selection-bg', colorWithAlpha(activeBaseColor, 0.6, 'rgba(0, 129, 255, 0.6)'))
+  // 图片对齐 Summernote 原生选区：使用较重的主题色遮罩，并保留原图明暗轮廓。
+  root.style.setProperty('--dvn-image-selection-bg', colorWithAlpha(activeBaseColor, 0.8, 'rgba(0, 129, 255, 0.8)'))
   root.style.setProperty('--dvn-text-selection-bg', activeBaseColor)
   root.style.setProperty('--dvn-selection-fg', '#ffffff')
   // 搜索高亮直接使用主题的 Active Highlight。不能再叠加透明度，

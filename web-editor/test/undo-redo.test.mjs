@@ -5,6 +5,7 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 import { Window } from 'happy-dom'
 import { Editor } from '@tiptap/core'
+import { AllSelection } from '@tiptap/pm/state'
 
 import { createTiptapExtensions } from '../src/runtime/tiptap-extensions.js'
 import { createEmptyDoc } from '../src/schema/document-envelope.js'
@@ -81,3 +82,24 @@ test('loading saved content does not create an undo event', () => {
   editor.destroy()
 })
 
+test('loading content drops the select-all selection of the previous note', () => {
+  const editor = createEditor()
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{ type: 'paragraph', content: [{ type: 'text', text: 'first' }] }],
+  })
+  editor.commands.selectAll()
+  assert.equal(editor.state.selection instanceof AllSelection, true)
+
+  replaceEditorContentWithoutHistory(editor, {
+    type: 'doc',
+    content: [{ type: 'paragraph', content: [{ type: 'text', text: 'second' }] }],
+  })
+
+  assert.equal(editor.getText(), 'second')
+  // 切换笔记后不得把上一个笔记的全选带过来：AllSelection.map() 会原样映射到新文档
+  assert.equal(editor.state.selection instanceof AllSelection, false)
+  assert.equal(editor.state.selection.empty, true)
+  assert.equal(editor.state.selection.from, 1)
+  editor.destroy()
+})

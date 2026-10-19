@@ -26,6 +26,20 @@ function setContextTranscript(transcript) {
   return window.__dvnTiptapContextTranscript
 }
 
+function selectionInsideElement(element, selection = (hasDom() ? window.getSelection?.() : null)) {
+  if (!element || !selection || selection.rangeCount === 0) return false
+
+  for (let i = 0; i < selection.rangeCount; i++) {
+    const range = selection.getRangeAt(i)
+    const start = range.startContainer
+    const end = range.endContainer
+    if (element === start || element.contains(start) || element === end || element.contains(end)) {
+      return true
+    }
+  }
+  return false
+}
+
 function hasDom() {
   return typeof window !== 'undefined' && typeof document !== 'undefined'
 }
@@ -170,6 +184,28 @@ export function currentTranscriptCopyText({ useContext = false, allowCachedConte
   return ''
 }
 
+// Context-menu enabled state must follow a real selection only.  The whole
+// transcript fallback above is still available for an explicit Copy action,
+// but it must not make Copy/Text-to-Speech look enabled on a collapsed caret.
+export function currentTranscriptMenuCopyText() {
+  if (!hasDom()) return ''
+
+  const transcript = currentTranscriptElement({ useContext: true })
+  if (!transcript) return ''
+
+  const liveText = selectedTextWithinElement(transcript)
+  if (liveText) return liveText
+
+  const pointer = window.__dvnTiptapContextPointer
+  if (pointer
+    && pointer.transcript === transcript
+    && pointer.selectionInsideTranscript
+    && pointer.selectionText) {
+    return pointer.selectionText
+  }
+  return ''
+}
+
 function htmlFromPlainText(text) {
   const div = document.createElement('div')
   div.textContent = text
@@ -200,6 +236,24 @@ export function setContextTranscriptFromEvent(event) {
   return transcript
 }
 
+function snapshotContextPointer(event) {
+  if (!hasDom()) return null
+  if (!event || event.button !== 2) {
+    window.__dvnTiptapContextPointer = null
+    return null
+  }
+
+  const transcript = event.target?.closest?.('.translateText') || null
+  const selection = window.getSelection?.()
+  const insideTranscript = !!transcript && selectionInsideElement(transcript, selection)
+  window.__dvnTiptapContextPointer = {
+    transcript,
+    selectionInsideTranscript: insideTranscript,
+    selectionText: insideTranscript ? selectedTextWithinElement(transcript, selection) : '',
+  }
+  return window.__dvnTiptapContextPointer
+}
+
 export function installTranscriptCopyHandler() {
   if (!hasDom()) return () => {}
   const onCopy = (event) => {
@@ -217,7 +271,12 @@ export function installTranscriptCopyHandler() {
   const onContextMenu = (event) => {
     setContextTranscriptFromEvent(event)
   }
+  const onPointerDown = (event) => {
+    snapshotContextPointer(event)
+  }
   document.addEventListener('copy', onCopy, true)
+  document.addEventListener('mousedown', onPointerDown, true)
+  document.addEventListener('pointerdown', onPointerDown, true)
   document.addEventListener('mousedown', clearCacheWhenStartingOutsideTranscript, true)
   document.addEventListener('pointerdown', clearCacheWhenStartingOutsideTranscript, true)
   document.addEventListener('contextmenu', onContextMenu, true)
@@ -228,6 +287,8 @@ export function installTranscriptCopyHandler() {
   document.addEventListener('keyup', updateCache, true)
   return () => {
     document.removeEventListener('copy', onCopy, true)
+    document.removeEventListener('mousedown', onPointerDown, true)
+    document.removeEventListener('pointerdown', onPointerDown, true)
     document.removeEventListener('mousedown', clearCacheWhenStartingOutsideTranscript, true)
     document.removeEventListener('pointerdown', clearCacheWhenStartingOutsideTranscript, true)
     document.removeEventListener('contextmenu', onContextMenu, true)

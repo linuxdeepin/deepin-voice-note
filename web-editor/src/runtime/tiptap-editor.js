@@ -17,10 +17,11 @@ import { createFormatToolbar } from './format-toolbar.js'
 import { setupImagePaste, setupImageViewAndMenu } from './image-interactions.js'
 import { shouldFocusEditorOnDocumentMouseDown } from './focus-behavior.js'
 import { setTiptapSearchQuery, clearTiptapSearch } from './search-extension.js'
-import { currentTranscriptCopyText, copyTranscriptTextViaBridge, installTranscriptCopyHandler } from './transcript-copy.js'
+import { currentTranscriptCopyText, currentTranscriptMenuCopyText, copyTranscriptTextViaBridge, installTranscriptCopyHandler } from './transcript-copy.js'
 import { installEmptyPlaceholderState } from './empty-placeholder-state.js'
+import { installClipboardCopyNormalizer } from './clipboard-copy.js'
 import { createResourceInsertionSelection } from './resource-insertion-selection.js'
-import { installNormalListMarkerSync } from './normal-list-markers.js'
+import { isGeneratedNoteTitle, normalizeNoteTitle, noteTitlePresentation, sanitizeNoteTitleInput } from './note-title.js'
 
 // ---------------------------------------------------------------------------
 // 编辑器初始化模块（本接口不替换此模块）
@@ -138,13 +139,25 @@ const appElement = document.getElementById('app')
 const editor = createTiptapEditor(appElement)
 const resourceInsertionSelection = createResourceInsertionSelection(editor)
 installEmptyPlaceholderState(editor, appElement)
-installNormalListMarkerSync(editor)
 let tiptapBridge = null
+// TTP-023：复制/剪切统一走纯文本 + 去掉 data-pm-slice 的 HTML，避免粘贴时另起一段；
+// 光标所在块为空时通过宿主清空剪贴板，避免复制到上一次的残留内容。
+installClipboardCopyNormalizer(editor, {
+  clearClipboard: () => {
+    if (tiptapBridge?.jsClearClipboard) {
+      tiptapBridge.jsClearClipboard()
+    }
+  },
+})
 if (typeof window !== 'undefined') {
   window.__dvnTiptapEditor = editor
   window.__dvnTiptapContextTranscript = null
+  window.__dvnTiptapContextPointer = null
   window.__dvnTiptapGetContextTranscriptCopyText = function () {
     return currentTranscriptCopyText({ useContext: true, allowCachedContext: true, allowWholeContext: true, allowCachedRecent: true })
+  }
+  window.__dvnTiptapGetContextTranscriptMenuCopyText = function () {
+    return currentTranscriptMenuCopyText()
   }
   window.__dvnTiptapGetShortcutTranscriptCopyText = function () {
     return currentTranscriptCopyText({ useContext: false, allowCachedRecent: true })
@@ -162,7 +175,7 @@ if (typeof window !== 'undefined') {
       selection.addRange(range)
       return true
     }
-    return editor.chain().selectAll().run()
+    return editor.chain().focus().selectAll().run()
   }
   window.__dvnTiptapSelectVoiceBlockFromElement = function (element) {
     const voiceBox = element && element.closest ? element.closest('.voiceBox') : null
@@ -218,14 +231,6 @@ let currentTitleNoteId = -1
 let savedTitle = ''
 let titleSyncing = false
 
-function normalizeNoteTitle(value) {
-  return String(value ?? '').replace(/[\r\n]+/g, ' ').trim().slice(0, 24)
-}
-
-function sanitizeTitleInputValue(value) {
-  return String(value ?? '').replace(/[\r\n]+/g, ' ').slice(0, 24)
-}
-
 function updateTitleLayout() {
   if (!titleInput) return
   titleInput.style.height = 'auto'
@@ -239,18 +244,18 @@ function updateTitleLayout() {
   document.documentElement.style.setProperty('--dvn-title-host-height', `${titleHeight}px`)
 }
 
-function isGeneratedNoteTitle(value) {
-  return /^未命名文本\d+$/.test(String(value ?? ''))
-}
-
 function syncNoteTitleStyle(value) {
   titleInput.classList.toggle('is-custom', Boolean(value) && !isGeneratedNoteTitle(value))
 }
 
 function setNoteTitle(value) {
+  const presentation = noteTitlePresentation(value)
   titleSyncing = true
-  titleInput.value = value
-  syncNoteTitleStyle(value)
+  // 系统生成的默认标题只作为占位提示，不写进 textarea 的真实 value。
+  // 这样新建笔记后直接输入就是新标题，不需要先全选删除“未命名文本N”。
+  titleInput.value = presentation.value
+  titleInput.placeholder = presentation.placeholder
+  titleInput.classList.toggle('is-custom', presentation.isCustom)
   updateTitleLayout()
   titleSyncing = false
 }
@@ -274,7 +279,7 @@ function commitNoteTitle() {
 }
 
 titleInput.addEventListener('input', () => {
-  const sanitized = sanitizeTitleInputValue(titleInput.value)
+  const sanitized = sanitizeNoteTitleInput(titleInput.value)
   if (titleInput.value !== sanitized) titleInput.value = sanitized
   syncNoteTitleStyle(titleInput.value.trim())
   updateTitleLayout()

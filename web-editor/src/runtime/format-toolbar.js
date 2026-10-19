@@ -27,7 +27,7 @@ const TOGGLE_BUTTONS = [
   { format: 'strike', icon: 'strike', title: '删除线', className: 'tiptap-format-strike' },
 ]
 
-const PERSISTENT_INLINE_FORMATS = new Set(['bold', 'italic', 'underline', 'strike'])
+const INLINE_TOGGLE_FORMATS = new Set(['bold', 'italic', 'underline', 'strike'])
 const TOOLBAR_PRESS_CLEAR_EVENTS = ['pointerup', 'pointercancel', 'pointerleave', 'blur']
 
 const HEADING_OPTIONS = [
@@ -85,6 +85,184 @@ function sameCssColor(left, right) {
   return normalizeCssColor(left) === normalizeCssColor(right)
 }
 
+function collapsedMarks(state) {
+  // storedMarks 是 ProseMirror 对“下一次输入”的权威格式；只有它为空时才
+  // 回退到光标位置继承的 marks。不能用二者做并集，否则刚取消的格式会从
+  // 光标前后的文字里被重新读回来。
+  return state.storedMarks ?? state.selection.$from.marks()
+}
+
+function selectedTextRuns(state) {
+  const { doc, selection } = state
+  if (selection.empty) return []
+  const runs = []
+  doc.nodesBetween(selection.from, selection.to, (node, pos) => {
+    if (!node.isText) return true
+    const from = Math.max(selection.from, pos)
+    const to = Math.min(selection.to, pos + node.nodeSize)
+    if (to > from) runs.push({ node, pos, from, to })
+    return false
+  })
+  return runs
+}
+
+function nearestTextblockAt(doc, pos) {
+  const $pos = doc.resolve(Math.max(0, Math.min(doc.content.size, pos + 1)))
+  for (let depth = $pos.depth; depth > 0; depth -= 1) {
+    const node = $pos.node(depth)
+    if (node.isTextblock) return { node, pos: $pos.before(depth) }
+  }
+  return null
+}
+
+function nearestTextblockAtSelection(state) {
+  const { $from } = state.selection
+  for (let depth = $from.depth; depth > 0; depth -= 1) {
+    const node = $from.node(depth)
+    if (node.isTextblock) return { node, pos: $from.before(depth) }
+  }
+  return null
+}
+
+function selectionTouchesTextblock(selection, pos, node) {
+  const from = pos + 1
+  const to = from + node.content.size
+  return selection.from <= to && selection.to >= from
+}
+
+// 返回当前光标/选区中同一种 mark 属性是否一致。显式选区的判定口径是：
+// 选区覆盖到的每段文字都必须有该 mark；任何一段缺失或取值不同都视为混合。
+function uniformMarkContext(state, markName, attrName = '', normalize = value => value) {
+  const { selection } = state
+  if (selection.empty) {
+    const mark = collapsedMarks(state).find((item) => item.type.name === markName)
+    const value = mark ? (attrName ? mark.attrs?.[attrName] : true) : (attrName ? '' : false)
+    return {
+      value: value ?? '',
+      normalizedValue: normalize(value ?? ''),
+      mixed: false,
+      hasMark: Boolean(mark),
+      hasText: false,
+    }
+  }
+
+  const runs = selectedTextRuns(state)
+  if (runs.length === 0) {
+    return { value: attrName ? '' : false, normalizedValue: normalize(''), mixed: false, hasMark: false, hasText: false }
+  }
+
+  let firstRaw
+  let firstNormalized
+  let mixed = false
+  for (const { node } of runs) {
+    const mark = node.marks.find((item) => item.type.name === markName)
+    const raw = mark ? (attrName ? mark.attrs?.[attrName] : true) : (attrName ? '' : false)
+    const value = raw ?? ''
+    const normalized = normalize(value)
+    if (firstRaw === undefined) {
+      firstRaw = value
+      firstNormalized = normalized
+    } else if (!mixed && normalized !== firstNormalized) {
+      mixed = true
+    }
+  }
+
+  return {
+    value: mixed ? (attrName ? '' : false) : firstRaw,
+    normalizedValue: mixed ? undefined : firstNormalized,
+    mixed,
+    hasMark: !mixed && Boolean(firstRaw),
+    hasText: true,
+  }
+}
+
+function isUniformInlineMarkActive(state, markName) {
+  const context = uniformMarkContext(state, markName)
+  return !context.mixed && context.hasMark
+}
+
+function isNormalFontWeight(value) {
+  const normalized = String(value ?? '').trim().toLowerCase()
+  return normalized === 'normal' || normalized === '400'
+}
+
+function textRunIsBold(doc, node, pos) {
+  const weightMark = node.marks.find((mark) => mark.type.name === 'fontWeight')
+  const weight = weightMark?.attrs?.fontWeight
+  if (isNormalFontWeight(weight)) return false
+  if (node.marks.some((mark) => mark.type.name === 'bold')) return true
+  if (weight) return true
+  return nearestTextblockAt(doc, pos)?.node?.type?.name === 'heading'
+}
+
+function isBoldContextActive(state) {
+  const { selection, doc } = state
+  if (selection.empty) {
+    const marks = collapsedMarks(state)
+    const weight = marks.find((mark) => mark.type.name === 'fontWeight')?.attrs?.fontWeight
+    if (isNormalFontWeight(weight)) return false
+    if (marks.some((mark) => mark.type.name === 'bold') || weight) return true
+    return nearestTextblockAtSelection(state)?.node?.type?.name === 'heading'
+  }
+
+  const runs = selectedTextRuns(state)
+  return runs.length > 0 && runs.every(({ node, pos }) => textRunIsBold(doc, node, pos))
+}
+
+function textblockStyleContext(state) {
+  const { doc, selection } = state
+  if (selection.empty) {
+    const textblock = nearestTextblockAtSelection(state)
+    const level = textblock?.node?.type?.name === 'heading' ? textblock.node.attrs?.level : null
+    return { value: level ? String(level) : 'p', mixed: false, hasText: false }
+  }
+
+  const styles = []
+  doc.nodesBetween(selection.from, selection.to, (node, pos) => {
+    if (!node.isTextblock || !selectionTouchesTextblock(selection, pos, node)) return true
+    const level = node.type.name === 'heading' ? node.attrs?.level : null
+    styles.push(level ? String(level) : 'p')
+    return false
+  })
+  if (styles.length === 0) return { value: 'p', mixed: false, hasText: false }
+
+  const first = styles[0]
+  const mixed = styles.some((value) => value !== first)
+  return { value: mixed ? '' : first, mixed, hasText: true }
+}
+
+function explicitFontSizeFromMarks(marks) {
+  const raw = marks.find((mark) => mark.type.name === 'fontSize')?.attrs?.fontSize
+  const value = Number.parseInt(String(raw ?? ''), 10)
+  return Number.isFinite(value) ? String(value) : ''
+}
+
+function effectiveFontSizeAt(doc, pos, marks) {
+  const explicit = explicitFontSizeFromMarks(marks)
+  if (explicit) return explicit
+  const textblock = nearestTextblockAt(doc, pos)
+  const level = textblock?.node?.type?.name === 'heading' ? textblock.node.attrs?.level : null
+  return HEADING_FONT_SIZES[level] || '14'
+}
+
+function effectiveFontSizeContext(state) {
+  const { selection, doc } = state
+  if (selection.empty) {
+    return {
+      value: effectiveFontSizeAt(doc, selection.from, collapsedMarks(state)),
+      mixed: false,
+      hasText: false,
+    }
+  }
+
+  const runs = selectedTextRuns(state)
+  if (runs.length === 0) return { value: '14', mixed: false, hasText: false }
+  const values = runs.map(({ node, pos }) => effectiveFontSizeAt(doc, pos, node.marks))
+  const first = values[0]
+  const mixed = values.some((value) => value !== first)
+  return { value: mixed ? '' : first, mixed, hasText: true }
+}
+
 function injectToolbarStyles() {
   if (document.getElementById(TOOLBAR_STYLE_ID)) return
   const style = document.createElement('style')
@@ -134,7 +312,16 @@ function createSeparator() {
 }
 
 function createToolbarButton({ format, title, children, className = '' }) {
-  const btn = createEl('button', { type: 'button', 'data-format': format, title, class: className }, children)
+  // QtWebEngine 在 sticky 工具栏和 fixed 溢出面板中无法稳定地定位原生
+  // title tooltip，偶尔会跑到编辑器左上角。统一使用按钮自身锚定的
+  // data-tooltip，原生 title 不再参与定位。
+  const btn = createEl('button', {
+    type: 'button',
+    'data-format': format,
+    'data-tooltip': title,
+    'aria-label': title,
+    class: className,
+  }, children)
   return btn
 }
 
@@ -186,9 +373,15 @@ function injectTaskListStyles() {
     'ul[data-type="taskList"] > li > div > ul[data-type="taskList"] > li > div > ul[data-type="taskList"] > li > div > ul[data-type="taskList"] { padding-left: 0; }',
     'ul[data-type="taskList"] > li[data-dvn-indent-level="1"] > div > ul[data-type="taskList"] { margin-left: -40px; }',
     'ul[data-type="taskList"] > li[data-dvn-indent-level="2"] > div > ul[data-type="taskList"] { margin-left: -60px; }',
-    'ul[data-type="taskList"] > li { display: flex; align-items: center; gap: 0; }',
-    'ul[data-type="taskList"] > li > label { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 20px; width: 20px; height: 1.72em; margin: 0; background: transparent; }',
-    'ul[data-type="taskList"] > li > label > input[type="checkbox"] { margin: 0; accent-color: var(--highlightColor, #007AFF); }',
+    // 勾选框与 • / 1. 用同一套规则：勾选框固定 13px，不跟随正文字号；
+    // label 盒高用 1lh * max(1, ratio) 跟踪首行有效行盒，align-items:center
+    // 把勾选框放在首行中心。li 用 flex-start 让 label 从首行顶部开始，
+    // 折行/多段时也不会掉到整个列表项中间。
+    'ul[data-type="taskList"] > li { display: flex; align-items: flex-start; gap: 0; }',
+    'ul[data-type="taskList"] > li > label { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 var(--dvn-marker-gutter, 20px); width: var(--dvn-marker-gutter, 20px); height: calc(1lh * max(1, var(--dvn-marker-ratio, 1))); font-size: 14px; line-height: inherit; margin: 0; background: transparent; }',
+    // 原生 checkbox 是固定 13px 的替换元素，不跟随 font-size；宽高保持默认，
+    // 只由 label 的居中布局决定位置。
+    'ul[data-type="taskList"] > li > label > input[type="checkbox"] { margin: 0; width: 13px; height: 13px; accent-color: var(--highlightColor, #007AFF); }',
     'ul[data-type="taskList"] > li > div { flex: 1 1 auto; min-width: 0; }',
     'ul[data-type="taskList"] > li > div > p { margin: 0; }',
     'ul[data-type="taskList"] > li[data-checked="true"] > div > p:first-child { opacity: 0.55; }',
@@ -257,6 +450,25 @@ function clearUniformBlockFontSize(tr, state, level) {
   }
 }
 
+// 标题下拉是块级样式入口：无论转换前文字带了什么字体，应用标题级别
+// （或切回正文）时都清掉显式 font-family，让文字重新继承宿主 initFont
+// 下发的默认字体。这里清理被选中的完整文本块，避免只清选区后同一标题
+// 的后半段仍保留旧字体。
+function clearAppliedBlockFontFamily(tr, state, blockTypeName, level = null) {
+  const blockType = state.schema.nodes[blockTypeName]
+  const fontFamilyType = state.schema.marks.fontFamily
+  if (!blockType || !fontFamilyType) return
+  for (const { node, pos } of selectedTextblocks(state)) {
+    if (node.type !== blockType) continue
+    if (blockTypeName === 'heading' && Number(node.attrs?.level) !== level) continue
+    tr.removeMark(pos + 1, pos + node.nodeSize - 1, fontFamilyType)
+  }
+  const storedMarks = state.storedMarks ?? tr.storedMarks
+  if (storedMarks?.some((mark) => mark.type === fontFamilyType)) {
+    tr.setStoredMarks(storedMarks.filter((mark) => mark.type !== fontFamilyType))
+  }
+}
+
 function selectedTextRange(selection) {
   if (selection.empty || (!(selection instanceof TextSelection) && !(selection instanceof AllSelection))) return null
   return { from: selection.from, to: selection.to }
@@ -305,14 +517,14 @@ function buildColorPicker(editor, kind, colors, apply, clear, readActive, onOpen
     type: 'button',
     class: 'tiptap-color-button tiptap-color-apply-button',
     'data-format': kind,
-    title,
+    'data-tooltip': title,
     'aria-label': title,
   }, [icon])
   const menuButton = createEl('button', {
     type: 'button',
     class: 'tiptap-color-menu-button',
     'data-color-menu': kind,
-    title: '更多颜色',
+    'data-tooltip': '更多颜色',
     'aria-label': '更多颜色',
   }, [arrow])
   menuButton.setAttribute('aria-haspopup', 'true')
@@ -385,9 +597,10 @@ function buildColorPicker(editor, kind, colors, apply, clear, readActive, onOpen
     }
   }
 
-  function setCurrentColor(color) {
+  function setCurrentColor(color, mixed = false) {
     // 颜色指示条跟随当前输入上下文；无颜色时恢复 Summernote 的默认值。
     currentColor = color || ''
+    wrapper.classList.toggle('is-mixed', Boolean(mixed))
     applyButton.style.setProperty('--dvn-current-color', currentColor || (kind === 'foreColor' ? DEFAULT_FORE_COLOR : DEFAULT_BACK_COLOR))
   }
 
@@ -412,13 +625,14 @@ function buildColorPicker(editor, kind, colors, apply, clear, readActive, onOpen
     panel.replaceChildren()
     for (const row of nextColors) {
       for (const color of row) {
+        const colorLabel = color === 'transparent' ? '透明' : color
         const cell = createEl('button', {
           type: 'button',
           'data-color': color,
           'data-kind': kind,
-          title: color === 'transparent' ? '透明' : color,
+          'data-tooltip': colorLabel,
           role: 'menuitemradio',
-          'aria-label': color === 'transparent' ? '透明' : color,
+          'aria-label': colorLabel,
           'aria-pressed': 'false',
           style: `background: ${color};`,
         })
@@ -477,6 +691,10 @@ function createStyledSelect({ control, title, options, onChange, onOpen }) {
   button.appendChild(label)
   button.appendChild(arrow)
   let currentOptions = []
+  let labelOverride = ''
+  let hasLabelOverride = false
+  let mixedLayoutLabel = ''
+  let mixedState = false
 
   function close() {
     wrapper.classList.remove('is-open')
@@ -484,16 +702,32 @@ function createStyledSelect({ control, title, options, onChange, onOpen }) {
   }
 
   function sync() {
-    const selected = currentOptions.find((option) => option.value === select.value) || currentOptions[0]
-    label.textContent = selected?.label || ''
+    const blankLabelState = mixedState && Boolean(mixedLayoutLabel) && !labelOverride
+    wrapper.classList.toggle('is-mixed', mixedState)
+    wrapper.classList.toggle('is-layout-blank', blankLabelState)
+    let displayLabel = hasLabelOverride ? labelOverride : (currentOptions.find((option) => option.value === select.value)?.label || currentOptions[0]?.label || '')
+    if (blankLabelState) {
+      // 混合态显示为空，但保留默认选项文字作为隐藏布局文本，使控件宽度和
+      // 箭头位置与默认态一致。用真实文本而不是伪元素，避免 WebEngine 把
+      // 隐藏占位文字渲染成可见的省略号“...”。
+      displayLabel = mixedLayoutLabel
+      label.setAttribute('aria-hidden', 'true')
+    } else {
+      label.removeAttribute('aria-hidden')
+    }
+    label.textContent = displayLabel
     for (const item of menu.querySelectorAll('.tiptap-select-option')) {
-      const active = item.getAttribute('data-value') === select.value
+      const active = !mixedState && item.getAttribute('data-value') === select.value
       item.setAttribute('aria-selected', active ? 'true' : 'false')
     }
   }
 
   function setOptions(nextOptions) {
     currentOptions = Array.isArray(nextOptions) ? nextOptions : []
+    labelOverride = ''
+    hasLabelOverride = false
+    mixedLayoutLabel = ''
+    mixedState = false
     select.replaceChildren()
     menu.replaceChildren()
     for (const option of currentOptions) {
@@ -537,6 +771,10 @@ function createStyledSelect({ control, title, options, onChange, onOpen }) {
     button.setAttribute('aria-expanded', open ? 'true' : 'false')
   })
   select.addEventListener('change', () => {
+    labelOverride = ''
+    hasLabelOverride = false
+    mixedLayoutLabel = ''
+    mixedState = false
     sync()
     onChange?.(select.value)
   })
@@ -552,8 +790,19 @@ function createStyledSelect({ control, title, options, onChange, onOpen }) {
     menu,
     close,
     setOptions,
-    setValue(value) {
+    setValue(value, options = {}) {
+      mixedState = Boolean(options.mixed)
+      hasLabelOverride = options.label !== undefined
+      labelOverride = hasLabelOverride ? String(options.label) : ''
+      mixedLayoutLabel = options.layoutLabel !== undefined ? String(options.layoutLabel) : ''
       select.value = value
+      // 粘贴内容可能带有宿主字体列表里没有的字体。按钮仍应显示真实字体名，
+      // 不能因为 select 中找不到对应 option 就回落显示成列表第一项。
+      if (!mixedState && value && !currentOptions.some((option) => option.value === value)) {
+        labelOverride = labelOverride || String(value)
+        hasLabelOverride = true
+        mixedState = true
+      }
       sync()
     },
   }
@@ -590,6 +839,7 @@ export function createFormatToolbar(editor, host) {
   const styleGroup = createEl('span', { class: 'tiptap-toolbar-group tiptap-style-group' })
 
   let closeStyleSelects = () => {}
+  let effectiveDefaultFontFamily = ''
 
   const headingControl = createStyledSelect({
     control: 'heading',
@@ -597,42 +847,47 @@ export function createFormatToolbar(editor, host) {
     onOpen: (current) => closeStyleSelects(current),
     options: HEADING_OPTIONS.map(({ value, label }) => ({ value, label })),
     onChange(value) {
+      const level = value === 'p' ? null : Number(value)
+      const { selection } = editor.state
+      const textSelection = selectedTextRange(selection)
+      const chain = editor.chain().focus()
+      if (textSelection) {
+        // Ctrl+A 产生 AllSelection。块级转换在这种选区下容易把文档边界
+        // 也算进去；先规范成文本选区，转换后再恢复用户原来的选择范围。
+        chain.command(({ tr }) => {
+          tr.setSelection(textSelectionFromRange(tr.doc, textSelection))
+          return true
+        })
+      }
+
       if (value === 'p') {
-        editor.chain().focus().setParagraph().run()
+        chain.setParagraph()
       } else {
         // 选择标题后，标题自身的默认粗体就是当前视觉状态；必须先清掉
         // 手动粗体开关遗留状态，否则切换标题等级的事务同步会重新写入
         // fontWeight: normal，导致标题看起来不再自动加粗。
-        persistentInlineFormats.delete('bold')
-        const level = Number(value)
-        const { selection } = editor.state
-        const textSelection = selectedTextRange(selection)
-        const chain = editor.chain().focus()
-        if (textSelection) {
-          // Ctrl+A 产生 AllSelection。Heading.toggleNode 在这种选区下会把
-          // 文档边界也算入活动范围，多段落时可能因此不转换；先规范成文本选区。
-          chain.command(({ tr }) => {
-            tr.setSelection(textSelectionFromRange(tr.doc, textSelection))
-            return true
-          })
-        }
         chain
           .unsetMark('fontWeight', { extendEmptyMarkRange: true })
-          .toggleHeading({ level })
-          // 跨资源节点时 toggleHeading 可能将选区落到语音块/图片；转换后再恢复
-          // 有效文本范围，确保字号清理和工具栏状态作用于文本块。
-          .command(({ tr }) => {
-            if (textSelection) tr.setSelection(textSelectionFromRange(tr.doc, textSelection))
-            return true
-          })
-          // 同一事务里清理整段显式字号，保证一次撤销即可回到标题切换前的状态。
-          .command(({ tr, state }) => {
-            clearUniformBlockFontSize(tr, state, level)
-            return true
-          })
-          .run()
-        syncActiveStates()
+          // 下拉表达的是“设为该标题级别”，不是切换开关；重复选择当前级别
+          // 也必须保持标题，不能像 toggleHeading 那样降回正文。
+          .setHeading({ level })
       }
+
+      chain
+        // 跨资源节点时 toggleHeading 可能将选区落到语音块/图片；转换后再恢复
+        // 有效文本范围，确保字体、字号清理和工具栏状态作用于文本块。
+        .command(({ tr }) => {
+          if (textSelection) tr.setSelection(textSelectionFromRange(tr.doc, textSelection))
+          return true
+        })
+        // 同一事务里清理字族和整段显式字号，保证一次撤销即可回到切换前状态。
+        .command(({ tr, state }) => {
+          clearAppliedBlockFontFamily(tr, state, value === 'p' ? 'paragraph' : 'heading', level)
+          if (value !== 'p') clearUniformBlockFontSize(tr, state, level)
+          return true
+        })
+        .run()
+      syncActiveStates()
     },
   })
   styleGroup.appendChild(headingControl.wrapper)
@@ -673,66 +928,55 @@ export function createFormatToolbar(editor, host) {
   }
   toolbar.appendChild(styleGroup)
 
-  // 折叠光标下的手动开关需要像 Summernote 一样作为“待输入格式”保持，
-  // 不能因为切换行、切换列表项导致 Tiptap 临时 storedMarks 被清空后按钮失焦。
-  const persistentInlineFormats = new Map()
-  let applyingPersistentInlineFormats = false
-
   function isInlineFormatActive(format) {
-    if (format === 'bold') {
-      if (editor.isActive('fontWeight', { fontWeight: 'normal' })) return false
-      return editor.isActive('bold') || editor.isActive('heading')
-    }
-    return editor.isActive(format)
+    if (format === 'bold') return isBoldContextActive(editor.state)
+    return isUniformInlineMarkActive(editor.state, format)
   }
 
   function applyStoredInlineFormat(format, active) {
-    let chain = editor.chain().focus()
-    if (format === 'bold' && editor.isActive('heading')) {
-      // 标题在块级样式上天然表现为粗体。用户在标题文本上关闭“粗体”
-      // 时，不能把标题降级成正文，而是给所选文本/后续输入加 normal
-      // 字重 mark；再次开启时移除该 mark，恢复标题默认粗体。
-      chain = chain.unsetMark('bold')
-      if (active) {
-        return chain.unsetMark('fontWeight').run()
+    if (format === 'bold') {
+      // 标题的粗体来自块级样式，正文的粗体来自 bold mark；两者混选时不能
+      // 只走其中一种命令。关闭时只给标题文字写 fontWeight: normal，正文则
+      // 清掉 bold/fontWeight；开启时先清 normal 覆盖，再给整个选区补 bold。
+      const selection = editor.state.selection
+      let chain = editor.chain().focus().unsetMark('bold').unsetMark('fontWeight')
+      if (active) return chain.setMark('bold').run()
+
+      if (selection.empty) {
+        if (nearestTextblockAtSelection(editor.state)?.node?.type?.name === 'heading') {
+          chain = chain.setMark('fontWeight', { fontWeight: 'normal' })
+        }
+        return chain.run()
       }
-      return chain.setMark('fontWeight', { fontWeight: 'normal' }).run()
+
+      return chain.command(({ tr, state }) => {
+        const fontWeightType = state.schema.marks.fontWeight
+        if (!fontWeightType) return true
+        for (const run of selectedTextRuns(state)) {
+          if (nearestTextblockAt(state.doc, run.pos)?.node?.type?.name !== 'heading') continue
+          tr.addMark(run.from, run.to, fontWeightType.create({ fontWeight: 'normal' }))
+        }
+        return true
+      }).run()
     }
 
+    let chain = editor.chain().focus()
     if (active) {
       return chain.setMark(format).run()
     }
     return chain.unsetMark(format).run()
   }
 
-  function applyPersistentInlineFormats() {
-    if (applyingPersistentInlineFormats || !editor.isFocused || !editor.state.selection.empty || persistentInlineFormats.size === 0) return
-
-    for (const [format, active] of persistentInlineFormats) {
-      const currentlyActive = isInlineFormatActive(format)
-      if (active === currentlyActive) continue
-
-      applyingPersistentInlineFormats = true
-      try {
-        applyStoredInlineFormat(format, active)
-      } finally {
-        applyingPersistentInlineFormats = false
-      }
-      return
-    }
-  }
-
   function applyToolbarToggle(format) {
-    if (!PERSISTENT_INLINE_FORMATS.has(format)) {
+    if (!INLINE_TOGGLE_FORMATS.has(format)) {
       applyToggle(editor, format)
       return
     }
 
-    const current = persistentInlineFormats.has(format)
-      ? persistentInlineFormats.get(format)
-      : isInlineFormatActive(format)
-    const nextActive = !current
-    persistentInlineFormats.set(format, nextActive)
+    // 按钮状态和点击取反都以当前真实上下文为准：有选区时是选区格式，
+    // 折叠光标时是光标位置 marks 或 ProseMirror 的 storedMarks。手动开启的
+    // 待输入格式只作用于当前位置，光标移到别处后自动回到目标位置的真实格式。
+    const nextActive = !isInlineFormatActive(format)
     applyStoredInlineFormat(format, nextActive)
     syncActiveStates()
   }
@@ -859,11 +1103,8 @@ export function createFormatToolbar(editor, host) {
     className: 'tiptap-more-button',
     children: createSvgIcon('more'),
   })
-  // QtWebEngine 的原生 title tooltip 在 sticky 工具栏中会以页面左侧
-  // 为参考定位。改用按钮自身锚定的 CSS tooltip，避免提示浮到错误位置。
-  moreBtn.removeAttribute('title')
-  moreBtn.setAttribute('data-tooltip', '更多格式')
-  moreBtn.setAttribute('aria-label', '更多格式')
+  // createToolbarButton 已统一改为按钮自身锚定的 data-tooltip；这里只补充
+  // “更多”按钮的面板语义。
   moreBtn.setAttribute('aria-haspopup', 'true')
   moreBtn.setAttribute('aria-expanded', 'false')
   const overflowPanel = createEl('div', { class: 'tiptap-overflow-panel', role: 'group', 'aria-label': '更多格式' })
@@ -1075,58 +1316,67 @@ export function createFormatToolbar(editor, host) {
   }
 
   function syncActiveStates() {
-    // 开关式格式按钮表达当前输入位置的格式上下文。折叠光标下点击
-    // 加粗/斜体/下划线/删除线会写入待输入格式，后续输入应直接带格式；
-    // 该手动状态需要跨行/跨列表项保持，直到用户再次点击关闭。
+    // 开关式格式按钮始终表达当前编辑器上下文：
+    // - 显式选区：整个选区都带该格式才激活；
+    // - 折叠光标：读取光标位置 marks / storedMarks；
+    // - 手动开启待输入格式后 typing 使用该格式，光标移动则重新读取新位置。
     const hasEditorContext = Boolean(editor.isFocused)
-    applyPersistentInlineFormats()
 
     for (const format of ['bold', 'italic', 'underline', 'strike']) {
       const btn = buttons[format]
-      const persistentActive = persistentInlineFormats.has(format)
-        ? persistentInlineFormats.get(format)
-        : isInlineFormatActive(format)
-      setPressed(btn, hasEditorContext && persistentActive)
+      setPressed(btn, hasEditorContext && isInlineFormatActive(format))
     }
     setPressed(buttons.blockquote, hasEditorContext && editor.isActive('blockquote'))
 
-    // 标题下拉表达“当前输入位置的块级样式”。即使是空标题/折叠光标，
-    // 用户下一步输入的内容也会按该标题级别落盘，因此这里必须跟随光标上下文，
-    // 不能像列表按钮那样只在显式选区时反馈。
-    let activeLevel = 'p'
-    if (hasEditorContext) {
-      for (let level = 1; level <= 5; level++) {
-        if (editor.isActive('heading', { level })) {
-          activeLevel = String(level)
-          break
-        }
-      }
+    // 标题下拉表达“当前输入位置的块级样式”。显式选区跨越标题和正文、
+    // 或跨不同标题级别时直接留空，不能取选区第一段的标题冒充整体状态。
+    const headingContext = hasEditorContext
+      ? textblockStyleContext(editor.state)
+      : { value: 'p', mixed: false }
+    if (headingContext.mixed) {
+      headingControl.setValue('', { mixed: true, label: '', layoutLabel: '正文' })
+    } else {
+      headingControl.setValue(headingContext.value || 'p')
     }
-    headingControl.setValue(activeLevel)
 
-    // 字体/字号下拉同样表达当前输入上下文。选择字体或字号后，即使还没有
-    // 输入文字，stored mark 也会影响下一次输入；工具栏必须立即反馈，避免误以为修改失败。
-    const fontFamily = hasEditorContext ? editor.getAttributes('fontFamily').fontFamily : ''
-    fontControl.setValue(fontFamily || '')
+    // 字体下拉同样读取整个选区。没有显式字体 mark 的文字按宿主默认字体
+    // 计算，因此“默认字体 + 显式设置成同一默认字体”不会被误报为混合。
+    const fontContext = hasEditorContext
+      ? uniformMarkContext(editor.state, 'fontFamily', 'fontFamily', value => value || effectiveDefaultFontFamily)
+      : { value: '', normalizedValue: '', mixed: false }
+    if (fontContext.mixed) {
+      fontControl.setValue('', { mixed: true, label: '', layoutLabel: effectiveDefaultFontFamily || '字体' })
+    } else {
+      const currentFont = fontContext.normalizedValue || ''
+      fontControl.setValue(currentFont === effectiveDefaultFontFamily ? '' : currentFont)
+    }
 
-    const explicitFontSize = hasEditorContext ? editor.getAttributes('fontSize').fontSize : ''
-    // Heading size is a block-level default, not a fontSize mark. Reflect the
-    // effective size in the dropdown so selecting a heading updates both
-    // controls without writing a redundant inline font-size mark.
-    const headingFontSize = activeLevel !== 'p' ? HEADING_FONT_SIZES[activeLevel] : ''
-    const effectiveFontSize = explicitFontSize
-      ? String(parseInt(explicitFontSize, 10))
-      : (hasEditorContext ? (headingFontSize || '14') : '14')
-    sizeControl.setValue(effectiveFontSize)
+    // 字号按“实际视觉字号”比较：显式 font-size 优先，否则使用标题级别
+    // 自带字号，正文回落到 14px。这样标题与正文、不同级别标题混选时
+    // 不会显示选区里第一个文字的字号。
+    const sizeContext = hasEditorContext
+      ? effectiveFontSizeContext(editor.state)
+      : { value: '14', mixed: false }
+    if (sizeContext.mixed) {
+      sizeControl.setValue('', { mixed: true, label: '', layoutLabel: '14' })
+    } else {
+      sizeControl.setValue(sizeContext.value || '14')
+    }
 
-    // 颜色按钮与颜色面板同样表达当前输入上下文；折叠光标下选择颜色后，
-    // stored mark 会影响下一次输入，当前色必须立即更新。
-    const foreColor = hasEditorContext ? editor.getAttributes('color').color : ''
-    const backColor = hasEditorContext ? editor.getAttributes('highlight').color : ''
-    forePicker.setCurrentColor(foreColor)
-    backPicker.setCurrentColor(backColor)
-    syncColorCells(forePicker.panel, foreColor)
-    syncColorCells(backPicker.panel, backColor)
+    // 颜色同样按整个选区判断。混合颜色时不选中调色板里的任何一格，
+    // 避免把选区中第一个颜色误当成整体已激活的颜色。
+    const foreContext = hasEditorContext
+      ? uniformMarkContext(editor.state, 'color', 'color', normalizeCssColor)
+      : { value: '', mixed: false }
+    const backContext = hasEditorContext
+      ? uniformMarkContext(editor.state, 'highlight', 'color', value => normalizeCssColor(value || 'transparent'))
+      : { value: '', mixed: false }
+    const foreColor = foreContext.mixed ? '' : foreContext.value
+    const backColor = backContext.mixed ? '' : (backContext.value || 'transparent')
+    forePicker.setCurrentColor(foreColor, foreContext.mixed)
+    backPicker.setCurrentColor(backColor, backContext.mixed)
+    syncColorCells(forePicker.panel, foreColor, foreContext.mixed)
+    syncColorCells(backPicker.panel, backColor, backContext.mixed)
 
     // 列表/待办按钮表达当前输入位置的列表类型。用户点击序列号/序列点后
     // 会生成折叠光标所在的列表上下文，按钮需要立即进入 active 状态。
@@ -1140,7 +1390,7 @@ export function createFormatToolbar(editor, host) {
     listButtons.outdentList.disabled = !hasEditorContext || !canOutdentActiveListItem(editor)
   }
 
-  function syncColorCells(panel, activeColor) {
+  function syncColorCells(panel, activeColor, mixed = false) {
     const cells = Array.from(panel.querySelectorAll('button[data-color]'))
     const hasActiveColor = Boolean(activeColor)
     for (const [index, cell] of cells.entries()) {
@@ -1148,9 +1398,9 @@ export function createFormatToolbar(editor, host) {
       // When the current context has no explicit color, keep the first palette
       // item selected as the default option.  This matches the palette's
       // visual default without applying a mark to the document.
-      const isDefault = !hasActiveColor && index === 0
+      const isDefault = !mixed && !hasActiveColor && index === 0
       const isActive = (hasActiveColor && sameCssColor(color, activeColor)) || isDefault
-      cell.setAttribute('aria-pressed', isActive ? 'true' : 'false')
+      cell.setAttribute('aria-pressed', !mixed && isActive ? 'true' : 'false')
     }
   }
 
@@ -1185,6 +1435,7 @@ export function createFormatToolbar(editor, host) {
         list.unshift(defaultFont)
       }
       const effectiveDefaultFont = defaultFont || list[0] || ''
+      effectiveDefaultFontFamily = effectiveDefaultFont
       if (effectiveDefaultFont) {
         document.body.style.fontFamily = effectiveDefaultFont
         document.documentElement.style.setProperty('--dvn-editor-default-font', effectiveDefaultFont)
@@ -1195,8 +1446,7 @@ export function createFormatToolbar(editor, host) {
         { value: '', label: effectiveDefaultFont || '字体', style: effectiveDefaultFont ? { fontFamily: effectiveDefaultFont } : {} },
         ...list.map((name) => ({ value: name, label: name, style: { fontFamily: name } })),
       ])
-      const currentFont = editor.getAttributes('fontFamily').fontFamily
-      fontControl.setValue(currentFont && list.includes(currentFont) ? currentFont : '')
+      syncActiveStates()
       updateOverflowMode()
     },
     destroy() {
