@@ -648,3 +648,147 @@ TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_jsReportScroll_scrolled_00
     ASSERT_EQ(spy.count(), 1);
     EXPECT_EQ(spy.takeFirst().at(0).toBool(), false);
 }
+
+// ---------------------------------------------------------------------------
+// 搜索查询管理（setSearchQuery / clearSearchQuery）
+// 覆盖提交 90aac726：清空搜索时同步下发 searchQueryChanged 信号
+// ---------------------------------------------------------------------------
+
+// setSearchQuery：空→非空，发出 searchQueryChanged 携带查询词，不发出 searchCleared
+TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_setSearchQuery_nonEmpty_001)
+{
+    TiptapChannelBridge bridge;
+    QSignalSpy changedSpy(&bridge, &TiptapChannelBridge::searchQueryChanged);
+    QSignalSpy clearedSpy(&bridge, &TiptapChannelBridge::searchCleared);
+
+    bridge.setSearchQuery(QStringLiteral("hello"));
+    ASSERT_EQ(changedSpy.count(), 1);
+    EXPECT_EQ(changedSpy.takeFirst().at(0).toString(), QStringLiteral("hello"));
+    EXPECT_EQ(clearedSpy.count(), 0);
+    EXPECT_EQ(bridge.currentSearchQuery(), QStringLiteral("hello"));
+}
+
+// setSearchQuery：非空→空，发出 searchQueryChanged(QString()) + searchCleared
+TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_setSearchQuery_clearAfterQuery_001)
+{
+    TiptapChannelBridge bridge;
+    bridge.setSearchQuery(QStringLiteral("hello"));
+
+    QSignalSpy changedSpy(&bridge, &TiptapChannelBridge::searchQueryChanged);
+    QSignalSpy clearedSpy(&bridge, &TiptapChannelBridge::searchCleared);
+
+    bridge.setSearchQuery(QString());
+    ASSERT_EQ(changedSpy.count(), 1);
+    EXPECT_TRUE(changedSpy.takeFirst().at(0).toString().isEmpty());
+    ASSERT_EQ(clearedSpy.count(), 1);
+    EXPECT_TRUE(bridge.currentSearchQuery().isEmpty());
+}
+
+// setSearchQuery：空→空，提前返回，不发出任何信号
+TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_setSearchQuery_emptyWhenEmpty_001)
+{
+    TiptapChannelBridge bridge;
+    QSignalSpy changedSpy(&bridge, &TiptapChannelBridge::searchQueryChanged);
+    QSignalSpy clearedSpy(&bridge, &TiptapChannelBridge::searchCleared);
+
+    bridge.setSearchQuery(QString());
+    EXPECT_EQ(changedSpy.count(), 0);
+    EXPECT_EQ(clearedSpy.count(), 0);
+    EXPECT_TRUE(bridge.currentSearchQuery().isEmpty());
+}
+
+// setSearchQuery：相同非空查询（editor 未 ready），提前返回不发出 searchQueryChanged
+TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_setSearchQuery_sameQueryNoReady_001)
+{
+    TiptapChannelBridge bridge;
+    bridge.setSearchQuery(QStringLiteral("hello"));
+
+    QSignalSpy changedSpy(&bridge, &TiptapChannelBridge::searchQueryChanged);
+    QSignalSpy clearedSpy(&bridge, &TiptapChannelBridge::searchCleared);
+
+    bridge.setSearchQuery(QStringLiteral("hello"));
+    EXPECT_EQ(changedSpy.count(), 0);
+    EXPECT_EQ(clearedSpy.count(), 0);
+}
+
+// setSearchQuery：查询词被 trim 后匹配已有查询，提前返回
+TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_setSearchQuery_trimNormalize_001)
+{
+    TiptapChannelBridge bridge;
+    bridge.setSearchQuery(QStringLiteral("hello"));
+
+    QSignalSpy changedSpy(&bridge, &TiptapChannelBridge::searchQueryChanged);
+    QSignalSpy clearedSpy(&bridge, &TiptapChannelBridge::searchCleared);
+
+    bridge.setSearchQuery(QStringLiteral("  hello  "));
+    EXPECT_EQ(changedSpy.count(), 0);
+    EXPECT_EQ(clearedSpy.count(), 0);
+    EXPECT_EQ(bridge.currentSearchQuery(), QStringLiteral("hello"));
+}
+
+// clearSearchQuery：有查询词时清空，发出 searchQueryChanged(QString()) + searchCleared
+TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_clearSearchQuery_withQuery_001)
+{
+    TiptapChannelBridge bridge;
+    bridge.setSearchQuery(QStringLiteral("hello"));
+
+    QSignalSpy changedSpy(&bridge, &TiptapChannelBridge::searchQueryChanged);
+    QSignalSpy clearedSpy(&bridge, &TiptapChannelBridge::searchCleared);
+
+    bridge.clearSearchQuery();
+    ASSERT_EQ(changedSpy.count(), 1);
+    EXPECT_TRUE(changedSpy.takeFirst().at(0).toString().isEmpty());
+    ASSERT_EQ(clearedSpy.count(), 1);
+    EXPECT_TRUE(bridge.currentSearchQuery().isEmpty());
+}
+
+// clearSearchQuery：已为空时调用，不发出 searchQueryChanged（hadQuery=false），仍发出 searchCleared
+TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_clearSearchQuery_alreadyEmpty_001)
+{
+    TiptapChannelBridge bridge;
+    QSignalSpy changedSpy(&bridge, &TiptapChannelBridge::searchQueryChanged);
+    QSignalSpy clearedSpy(&bridge, &TiptapChannelBridge::searchCleared);
+
+    bridge.clearSearchQuery();
+    EXPECT_EQ(changedSpy.count(), 0);
+    ASSERT_EQ(clearedSpy.count(), 1);
+    EXPECT_TRUE(bridge.currentSearchQuery().isEmpty());
+}
+
+// clearSearchQuery：幂等性——连续两次调用，第二次不发出 searchQueryChanged
+TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_clearSearchQuery_idempotent_001)
+{
+    TiptapChannelBridge bridge;
+    bridge.setSearchQuery(QStringLiteral("hello"));
+
+    QSignalSpy changedSpy(&bridge, &TiptapChannelBridge::searchQueryChanged);
+    QSignalSpy clearedSpy(&bridge, &TiptapChannelBridge::searchCleared);
+
+    bridge.clearSearchQuery();
+    ASSERT_EQ(changedSpy.count(), 1);
+    ASSERT_EQ(clearedSpy.count(), 1);
+
+    changedSpy.clear();
+    clearedSpy.clear();
+    bridge.clearSearchQuery();
+    EXPECT_EQ(changedSpy.count(), 0);
+    ASSERT_EQ(clearedSpy.count(), 1);
+    EXPECT_TRUE(bridge.currentSearchQuery().isEmpty());
+}
+
+// clearSearchQuery 后 setSearchQuery 恢复查询，searchQueryChanged 正常携带新查询词
+TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_clearThenSearch_restored_001)
+{
+    TiptapChannelBridge bridge;
+    bridge.setSearchQuery(QStringLiteral("hello"));
+    bridge.clearSearchQuery();
+
+    QSignalSpy changedSpy(&bridge, &TiptapChannelBridge::searchQueryChanged);
+    QSignalSpy clearedSpy(&bridge, &TiptapChannelBridge::searchCleared);
+
+    bridge.setSearchQuery(QStringLiteral("world"));
+    ASSERT_EQ(changedSpy.count(), 1);
+    EXPECT_EQ(changedSpy.takeFirst().at(0).toString(), QStringLiteral("world"));
+    EXPECT_EQ(clearedSpy.count(), 0);
+    EXPECT_EQ(bridge.currentSearchQuery(), QStringLiteral("world"));
+}
