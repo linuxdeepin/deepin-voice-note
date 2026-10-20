@@ -72,14 +72,14 @@
 
 1. 在笔记列表中，选择一个笔记。
 2. 将光标移入右侧详情页内，单击鼠标左键后输入文字。
-3. 选中文字内容，弹出文本工具栏，您可以在工具栏中设置文本样式，例如：字体、字号、字体颜色、加粗等。
+3. 选中文字内容后，您可以在顶部工具栏中设置文本样式，例如：字体、字号、字体颜色、加粗等。
 
 ![0|txtinput](fig/txtinput.png)
 
 #### 添加语音至笔记
 
 1. 在笔记列表中，选择一个笔记。
-2. 在顶部单击录音按钮 ![record_normal](../common/record_normal.svg)，添加语音。
+2. 在顶部工具栏单击录音按钮 ![record_normal](../common/record_normal.svg)，添加语音。
 3. 单击完成按钮 ![finish](../common/finish_normal.svg) 完成语音录制。
    
    > ![notes](../common/notes.svg) 说明：添加语音的过程中您可以单击暂停按钮 ![pause](../common/pause_red_normal.svg) 暂停录音，再次单击录音按钮 ![record_normal](../common/continue.svg) 继续录音。录音的限制时长为60分钟。
@@ -92,7 +92,7 @@
 
 您可以通过以下方法之一添加图片至笔记中。
 
-- 单击菜单栏中的图标 ![icon](../common/pic.svg)，在弹出的窗口中选择图片文件并导入。
+- 在顶部工具栏单击菜单栏中的图标 ![icon](../common/pic.svg)，在弹出的窗口中选择图片文件并导入。
 - 拖拽图片至右侧详情页中。
 - 通过复制粘贴添加图片。
 
