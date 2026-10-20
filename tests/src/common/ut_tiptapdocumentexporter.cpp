@@ -102,6 +102,14 @@ QJsonObject taskList()
     });
 }
 
+QJsonObject orderedList()
+{
+    return blockNode(QStringLiteral("orderedList"), QJsonArray {
+        listItem(QJsonArray { paragraph(QJsonArray { textNode(QStringLiteral("第一项")) }) }),
+        listItem(QJsonArray { paragraph(QJsonArray { textNode(QStringLiteral("第二项")) }) }),
+    });
+}
+
 QJsonObject imageNode(const QString &relPath, const QString &alt, const QString &title)
 {
     QJsonObject attrs;
@@ -150,6 +158,7 @@ QString sampleEnvelope()
                                           textNode(QStringLiteral("彩色"), QJsonArray { mark(QStringLiteral("color"), colorAttrs) }),
                                           textNode(QStringLiteral("字重"), QJsonArray { mark(QStringLiteral("fontWeight"), weightAttrs) }) }),
                    nestedBulletList(),
+                   orderedList(),
                    taskList(),
                    paragraph(QJsonArray { imageNode(QStringLiteral("images/export-test.png"), QStringLiteral("截图Alt"), QStringLiteral("截图标题")) }),
                    voiceNode(),
@@ -197,8 +206,13 @@ TEST(UT_TiptapDocumentExporter, plainTextExportsStructuredNodes)
 
     EXPECT_TRUE(text.contains(QStringLiteral("导出标题")));
     EXPECT_TRUE(text.contains(QStringLiteral("正文加粗彩色字重")));
-    EXPECT_TRUE(text.contains(QStringLiteral("- 父项\n  - 子项")));
-    EXPECT_TRUE(text.contains(QStringLiteral("[x] 任务完成")));
+    EXPECT_TRUE(text.contains(QStringLiteral("父项\n子项")));
+    EXPECT_TRUE(text.contains(QStringLiteral("第一项\n第二项")));
+    EXPECT_TRUE(text.contains(QStringLiteral("任务完成")));
+    EXPECT_FALSE(text.contains(QStringLiteral("- 父项")));
+    EXPECT_FALSE(text.contains(QStringLiteral("1. 第一项")));
+    EXPECT_FALSE(text.contains(QStringLiteral("[x] 任务完成")));
+    EXPECT_FALSE(text.contains(QStringLiteral("[ ] 任务完成")));
     EXPECT_TRUE(text.contains(QStringLiteral("[图片: 截图标题]")));
     EXPECT_TRUE(text.contains(QStringLiteral("语音转写结果\n第二行")));
     EXPECT_FALSE(text.contains(QStringLiteral("[语音:")));
@@ -281,6 +295,45 @@ TEST(UT_TiptapDocumentExporter, exportWorkerWritesTiptapPlainText)
     EXPECT_FALSE(text.contains(QStringLiteral("[语音:")));
     EXPECT_FALSE(text.contains(QStringLiteral("会议录音")));
     EXPECT_FALSE(text.contains(QStringLiteral("playing")));
+}
+
+TEST(UT_TiptapDocumentExporter, exportWorkerWritesVoiceBlockTranscriptInPlace)
+{
+    QTemporaryDir dir;
+    ASSERT_TRUE(dir.isValid());
+
+    QJsonObject doc;
+    doc.insert(QStringLiteral("type"), QStringLiteral("doc"));
+    doc.insert(QStringLiteral("content"), QJsonArray {
+                   paragraph(QJsonArray { textNode(QStringLiteral("开始前")) }),
+                   voiceNode(),
+                   paragraph(QJsonArray { textNode(QStringLiteral("结束后")) }),
+               });
+
+    QJsonObject envelope;
+    envelope.insert(QStringLiteral("format"), QStringLiteral("tiptap"));
+    envelope.insert(QStringLiteral("schemaVersion"), 1);
+    envelope.insert(QStringLiteral("content"), doc);
+
+    VNoteItem note;
+    note.metaDataRef() = QString::fromUtf8(QJsonDocument(envelope).toJson(QJsonDocument::Compact));
+    ASSERT_TRUE(note.haveText());
+
+    QList<VNoteItem *> notes = tiptapNoteList(&note);
+    note.metaDataRef() = QString::fromUtf8(QJsonDocument(envelope).toJson(QJsonDocument::Compact));
+    ExportNoteWorker worker(dir.path(), ExportNoteWorker::ExportText, notes);
+    EXPECT_EQ(worker.exportText(), ExportNoteWorker::ExportOK);
+
+    QFile file(dir.filePath(QStringLiteral("tiptap-note.txt")));
+    ASSERT_TRUE(file.open(QIODevice::ReadOnly | QIODevice::Text));
+    const QString text = QString::fromUtf8(file.readAll());
+    EXPECT_EQ(text, QStringLiteral("开始前\n语音转写结果\n第二行\n结束后"));
+    EXPECT_FALSE(text.contains(QStringLiteral("会议录音")));
+    EXPECT_FALSE(text.contains(QStringLiteral("voice-export-1")));
+    EXPECT_FALSE(text.contains(QStringLiteral("voicenote/export.mp3")));
+    EXPECT_FALSE(text.contains(QStringLiteral("2026-08-29")));
+    EXPECT_FALSE(text.contains(QStringLiteral("playing")));
+    EXPECT_FALSE(text.contains(QStringLiteral("progress")));
 }
 
 TEST(UT_TiptapDocumentExporter, exportWorkerWritesTiptapStandaloneHtml)
