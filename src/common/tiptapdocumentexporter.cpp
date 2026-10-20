@@ -294,15 +294,6 @@ QString plainBlockChildren(const QJsonObject &node)
     return blocks.join(QStringLiteral("\n"));
 }
 
-QString withListMarker(QString text, const QString &marker)
-{
-    text = text.trimmed();
-    if (text.isEmpty()) {
-        return QString();
-    }
-    return marker + text.replace(QStringLiteral("\n"), QStringLiteral("\n") + QString(marker.size(), QLatin1Char(' ')));
-}
-
 QString plainInline(const QJsonObject &node)
 {
     const QString type = node.value(QStringLiteral("type")).toString();
@@ -330,34 +321,22 @@ QString plainBlock(const QJsonObject &node)
     if (type == QStringLiteral("paragraph") || type == QStringLiteral("heading")) {
         return plainChildren(node);
     }
-    if (type == QStringLiteral("blockquote") || type == QStringLiteral("listItem")) {
+    if (type == QStringLiteral("blockquote") || type == QStringLiteral("listItem")
+        || type == QStringLiteral("taskItem")) {
         return plainBlockChildren(node);
-    }
-    if (type == QStringLiteral("taskItem")) {
-        const QString marker = node.value(QStringLiteral("attrs")).toObject().value(QStringLiteral("checked")).toBool(false)
-            ? QStringLiteral("[x] ") : QStringLiteral("[ ] ");
-        return withListMarker(plainBlockChildren(node), marker);
     }
     if (type == QStringLiteral("bulletList") || type == QStringLiteral("orderedList") || type == QStringLiteral("taskList")) {
         QStringList items;
-        int index = 1;
         const QJsonArray children = node.value(QStringLiteral("content")).toArray();
         for (const QJsonValue &child : children) {
             if (!child.isObject()) {
                 continue;
             }
-            QString text = plainBlock(child.toObject()).trimmed();
+            const QString text = plainBlock(child.toObject()).trimmed();
             if (text.isEmpty()) {
                 continue;
             }
-            if (type == QStringLiteral("bulletList")) {
-                text = withListMarker(text, QStringLiteral("- "));
-            } else if (type == QStringLiteral("orderedList")) {
-                text = withListMarker(text, QString::number(index++) + QStringLiteral(". "));
-            }
-            if (!text.isEmpty()) {
-                items.append(text);
-            }
+            items.append(text);
         }
         return items.join(QStringLiteral("\n"));
     }

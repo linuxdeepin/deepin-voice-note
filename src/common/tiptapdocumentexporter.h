@@ -12,9 +12,10 @@ class TiptapDocumentExporter
 public:
     static bool isTiptapEnvelope(const QString &payload);
 
-    // Export a Tiptap envelope to deterministic plain text. Images are emitted
-    // as explicit placeholders; voice blocks contribute persisted transcript
-    // text only so recording metadata does not pollute text export.
+    // Export a Tiptap envelope to deterministic plain text. List, task and
+    // blockquote structure markers are omitted so only user text remains;
+    // images are emitted as explicit placeholders and voice blocks contribute
+    // persisted transcript text only.
     static QString toPlainText(const QString &payload);
 
     // Export a Tiptap envelope to standalone HTML. Local AppData images are
