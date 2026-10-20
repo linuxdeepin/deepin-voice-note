@@ -1,3 +1,21 @@
+deepin-voice-note (6.6.3) unstable; urgency=medium
+
+  * fix(tiptap): keep tab indentation scoped to active list item
+  * fix(export): omit list and task markers from TXT output
+  * fix(tiptap): restore list nesting after indent round trips
+  * fix(tiptap): localize editor chrome and stabilize system fonts
+  * fix(client): align rich-text integration and interaction behavior
+  * build(tiptap): rebuild editor and validation bundles
+  * fix(tiptap): stabilize rich-text editing and toolbar behavior
+  * fix(dialog): keep message dialog buttons centered at narrow widths
+  * fix(search): keep clear search in sync with editor highlight
+  * fix(search): bound search index memory for overlong notes
+  * fix(audio): ignore pauseRecording when recording is not active
+  * fix(common): avoid null pointer dereference in Utils::documentToBlock
+  * test(ut): add PMS sev2 bug regression cases
+
+ -- dengzhongyuan <dengzhongyuan@uniontech.com>  Tue, 20 Oct 2026 20:24:15 +0800
+
 deepin-voice-note (6.6.2) unstable; urgency=medium
 
   * chore: Update version to 6.6.2
