@@ -2,212 +2,209 @@
 
 ## Overview
 
-Voice Notes is a note-taking software that integrates voice and text, commonly used to record daily life or work matters.
+Voice Notepad is a note-taking software that integrates both voice and text, commonly used for recording daily life or work tasks.
 
 ## Getting Started
 
-Run, close Voice Notes, or create shortcuts through the following methods.
+You can run or close Voice Notepad using the following methods, and also create shortcuts.
 
-### Run Voice Notes
+### Running Voice Notepad
 
 1. Click the Launcher icon ![deepin_launcher](../common/deepin_launcher.svg) on the taskbar to enter the Launcher interface.
-2. Scroll the mouse wheel or search to find the Voice Notes icon ![deepin_voice_note](../common/deepin_voice_note.svg), then click to run.
+2. Scroll the mouse wheel up and down to browse or search for the Voice Notepad icon ![deepin_voice_note](../common/deepin_voice_note.svg), then click to run it.
 3. Right-click ![deepin_voice_note](../common/deepin_voice_note.svg) to:
-   - Click **Send to Desktop** to create a desktop shortcut.
-   - Click **Pin to Taskbar** to pin the application to the taskbar.
-   - Click **Startup Automatically** to add the application to startup items, automatically running it when the computer boots.
+   - Click **Send to Desktop** to create a shortcut on the desktop.
+   - Click **Send to Taskbar** to pin the application to the taskbar.
+   - Click **Startup Automatically** to add the application to the startup items, so it runs automatically when the computer boots.
 
-### Close Voice Notes
+### Closing Voice Notepad
 
-- Click ![close_icon](../common/close_icon.svg) in the Voice Notes interface to exit.
-- Right-click ![deepin_voice_note](../common/deepin_voice_note.svg) on the taskbar and select **Close All**.
-- Click ![icon_menu](../common/icon_menu.svg) in the Voice Notes interface and select **Exit**.
+- Click ![close_icon](../common/close_icon.svg) in the Voice Notepad interface to exit.
+- Right-click ![deepin_voice_note](../common/deepin_voice_note.svg) on the taskbar and select **Close All** to exit Voice Notepad.
+- Click ![icon_menu](../common/icon_menu.svg) in the Voice Notepad interface, choose **Exit** to close the application.
 
-### View Shortcuts
+### Viewing Shortcuts
 
-Use the shortcut **Ctrl + Shift + ?** to open the shortcut preview. Mastering shortcuts will significantly improve efficiency.
+In the Voice Notepad interface, use the shortcut **Ctrl + Shift + ?** to open the shortcuts preview. Mastering these shortcuts will significantly improve your efficiency.
 
 ![hotkey](fig/hotkey.png)
 
-## Notebook Management
+## Notepad Management
 
-### Create Notebook
+### Creating a New Notepad
 
-- When no notebooks exist, click **New Notebook** to create one.
-- Below the notebook list, click **New Notebook** to create a new notebook.
+- If there are no existing notepads in Voice Notepad, click **New Notepad** to create one.
+- At the bottom of the notepad list, click **New Notepad** to create a new notepad.
 
-> ![tips](../common/tips.svg) Tip: Drag notebooks to reorder; click ![icon](../common/view.svg) to hide/show the notebook list.
+> ![tips](../common/tips.svg) Tip: You can drag and drop notepads in the list to reorder them; click the icon ![icon](../common/view.svg) in the menu bar to hide the notepad list, and click it again to show the list.
 
-### Rename Notebook
+### Renaming a Notepad
 
-1. Double-click a notebook or right-click and select **Rename**.
-2. Enter a new name in the text box.
-3. Click a blank area or press **Enter** to confirm.
+1. In the notepad list, double-click the notepad or right-click and select **Rename**.
+2. Enter the new name in the text box.
+3. Click a blank area of the interface or press **Enter** on the keyboard to confirm the rename.
 
 ![0|rename](fig/rename.png)
 
-### Delete Notebook
+### Deleting a Notepad
 
-1. Select a notebook in the notebook list.
-2. Right-click and select **Delete** or press **Delete**.
-3. Confirm deletion in the dialog.
+1. In the notepad list, select a notepad.
+2. Right-click and choose **Delete** or press the **Delete** key on the keyboard.
+3. A confirmation dialog ("Confirm Delete Notepad") will appear; click **Confirm**.
 
 ## Note Management
 
-### Create Note
+### Creating a New Note
 
-- After creating your first notebook, a default note is created. Click ![add](../common/circlebutton_add2.svg) to add more notes.
-- Right-click a notebook/note and select **New Note**.
+- When you create a new notepad for the first time, the system automatically creates a note. Click the add button ![add](../common/circlebutton_add2.svg) in the note list to continue creating new notes.
+- Right-click a notepad or note and select **New Note** to create one.
 
 ![0|new](fig/new_notes.png)
 
-#### Add Text to Note
+#### Adding Text to a Note
 
-1. Select a note in the note list.
-2. Click the detail area and enter text.
-3. Select text to access formatting tools: font, size, color, bold, etc.
+1. In the note list, select a note.
+2. Move the cursor into the details pane on the right, click the left mouse button, and start typing.
+3. After selecting the text, you can set text styles (e.g., font, size, color, bold) in the top toolbar.
 
 ![0|txtinput](fig/txtinput.png)
 
-#### Add Voice to Note
+#### Adding Voice to a Note
 
-1. Select a note in the note list.
-2. Click the record button ![record_normal](../common/record_normal.svg).
-3. Click ![finish](../common/finish_normal.svg) to finish recording (max 60 minutes).
-   
-   > ![notes](../common/notes.svg) Note: Click ![pause](../common/pause_red_normal.svg) to pause; ![record_normal](../common/continue.svg) to resume.
-4. Click ![play_blue_normal](../common/play_blue_normal.svg) to playback.
+1. In the note list, select a note.
+2. Click the record button ![record_normal](../common/record_normal.svg) in the top toolbar to start recording.
+3. Click the finish button ![finish](../common/finish_normal.svg) to complete the recording.
+
+   > ![notes](../common/notes.svg) Note: During recording, you can click the pause button ![pause](../common/pause_red_normal.svg) to pause and the record button ![record_normal](../common/continue.svg) to resume. The maximum recording duration is 60 minutes.
+4. After recording, click the play button ![play_blue_normal](../common/play_blue_normal.svg) to replay the recording.
 
 ![0|Recorder](fig/recorder.png)
 
-#### Add Image to Note
+#### Adding Images to a Note
 
-Add images via:
-- Click ![icon](../common/pic.svg) > select image.
-- Drag image to detail area.
-- Copy-paste image.
+You can add images to a note in the following ways:
+- Click the picture icon ![icon](../common/pic.svg) in the top toolbar, select an image file from the pop-up window, and import it.
+- Drag and drop an image into the details pane.
+- Copy and paste an image.
 
 ![pic](fig/picture.png)
 
-### Rename Note
+### Renaming a Note
 
-1. Double-click a note or right-click and select **Rename**.
-2. Enter a new name.
-3. Click a blank area or press **Enter**.
+1. In the note list, double-click the note or right-click and select **Rename**.
+2. Enter the new name in the text box.
+3. Click a blank area or press **Enter** to confirm the rename.
 
-### Search Notes
+### Searching Notes
 
-1. Click ![search](../common/search.svg) in the search box.
-2. Enter keywords and press **Enter**.
-3. Click ![0|three_dots](../common/close_icon.svg) to clear/cancel search.
+1. In the search box at the top of Voice Notepad, click ![search](../common/search.svg) and enter a keyword.
+2. Press **Enter** to view the search results.
+3. Click ![0|three_dots](../common/close_icon.svg) in the search box to clear the keyword or cancel the search.
 
-### Move Notes
+### Moving Notes
 
-Select one/multiple notes (Ctrl/Shift), then:
-- Drag to another notebook.
-- Right-click > **Move** > select target notebook.
+In the note list, select one or multiple notes (using **Ctrl/Shift**), then:
+- Drag and drop the note(s) to another notepad.
+- Right-click and choose **Move**, then select the target notepad.
 
 ![0|move](fig/move.png)
 
-### Pin Notes
+### Pinning Notes
 
-1. Right-click a note.
-2. Select **Pin to Top**.
+1. In the note list, right-click a note.
+2. Select **Pin** to move it to the top of the list. For pinned notes, right-click and choose **Unpin**.
 
-   Right-click pinned note > **Unpin**.
+### Saving Notes
 
-### Save Notes
-
-1. Select one/multiple notes.
-2. Right-click > **Save Note** > **Save as HTML** or **Save as TXT**.
+1. In the note list, select one or multiple notes (using **Ctrl/Shift**).
+2. Right-click, and under **Save Note**, choose **Save as HTML** or **Save as TXT** to save the note in the respective format.
 
    >![notes](../common/notes.svg) Note:
-   >- TXT: Saves text/voice metadata (no audio/images).
-   >- HTML: Saves text/images (no audio).
+   >- TXT format saves only text notes and metadata for voice notes (e.g., recording time, duration), excluding audio and images.
+   >- HTML format saves text and images but excludes audio.
 
 ![pic](fig/save_notes.png)
 
-### Save Voice
+### Saving Voice
 
-1. Select one/multiple voice notes.
-2. Right-click > **Save Voice** (saves as MP3).
+1. In the note list, select one or multiple voice notes (using **Ctrl/Shift**).
+2. Right-click and choose **Save Voice** to save the selected voice notes as MP3 files.
 
-> ![tips](../common/tips.svg) Tip: Right-click a single voice file > **Save as MP3**.
+> ![tips](../common/tips.svg) Tip: You can also right-click a specific audio file and select **Save as MP3** to save it to your local storage.
 
-### Voice to Text
+### Voice-to-Text
 
-1. Select a voice file.
-2. Right-click > **Voice to Text** (converts to text).
+1. In the Voice Notepad interface, select a voice file.
+2. Right-click and choose **Voice-to-Text**; the voice content will be transcribed into text in the details pane.
 
 ![0|save](fig/tovoice.png)
 
-### Text to Speech
+### Text-to-Speech
 
-1. Select text > right-click > **Text to Speech**.
-2. Click close button ![close](../common/close_icon.svg) to stop.
+1. Select a piece of text, right-click, and choose **Text-to-Speech** to hear the selected text spoken aloud.
+2. Click the close button on the speech control to stop playback.
 
 >![notes](../common/notes.svg) Note:
->- Grayed out if no text selected.
->- Works only on converted text (not raw audio).
+>- The **Text-to-Speech** option is grayed out if no text is selected.
+>- For voice notes, **Text-to-Speech** is only available if the audio has been transcribed into text.
 
 ![0|speech](fig/speech.png)
 
 ### Voice Dictation
 
-1. Place cursor > right-click > **Voice Dictation** (speech-to-text).
-2. Click close button ![close](../common/close_icon.svg) to stop.
+1. In the text editing area, right-click and select **Voice Dictation** to input speech via the microphone; the transcribed text will appear at the cursor position.
+2. Click the close button on the dictation control to stop.
 
->![tips](../common/tips.svg) Tip: Can be used while recording.
+>![tips](../common/tips.svg) Tip: You can enable voice dictation while recording audio.
 
-### Delete Note
+### Deleting Notes
 
-1. Select one/multiple notes.
-2. Right-click > **Delete** or press **Delete**.
-3. Confirm deletion.
+1. In the note list, select one or multiple notes (using **Ctrl/Shift**).
+2. Right-click and choose **Delete** or press the **Delete** key.
+3. A confirmation dialog ("Confirm Delete Note") will appear; click **Confirm**.
 
-### Delete Voice
+### Deleting Voice
 
-1. Select a voice file.
-2. Right-click > **Delete** or press **Delete**.
+1. In the Voice Notepad interface, select a voice file.
+2. Right-click and choose **Delete** or press the **Delete** key.
 
 ## Main Menu
 
-Set audio source, view privacy policy, switch themes, view help, etc.
+In the main menu, you can configure audio sources, view the privacy policy, switch window themes, access the help manual, and learn more about Voice Notepad.
 
 ### Settings
 
-Set audio source:
-- **System Sound**: Records internal audio only.
-- **Microphone**: Records mic input only.
-
-1. Click ![icon_menu](../common/icon_menu.svg).
-2. Select audio source.
+You can set the audio source, including system audio and microphone audio.
+1. In the Voice Notepad interface, click ![icon_menu](../common/icon_menu.svg).
+2. Configure the audio source:
+   - Select **System Audio** to record only built-in system sounds.
+   - Select **Microphone Audio** to record only microphone input.
 
 ### Privacy Policy
 
-1. Click ![icon_menu](../common/icon_menu.svg).
-2. Select **Privacy Policy** to view.
+1. In the Voice Notepad interface, click ![icon_menu](../common/icon_menu.svg).
+2. Select **Privacy Policy** to open and review the policy.
 
 ### Theme
 
-Switch themes (Light/Dark/System):
-1. Click ![icon_menu](../common/icon_menu.svg).
-2. Select **Theme**.
+Window themes include Light, Dark, and System themes.
+1. In the Voice Notepad interface, click ![icon_menu](../common/icon_menu.svg).
+2. Select **Theme** and choose a theme color.
 
 ### Help
 
-View help manual:
-1. Click ![icon_menu](../common/icon_menu.svg).
+Access the help manual for further guidance on using Voice Notepad.
+1. In the Voice Notepad interface, click ![icon_menu](../common/icon_menu.svg).
 2. Select **Help**.
+3. Review the Voice Notepad manual.
 
 ### About
 
-View version/info:
-1. Click ![icon_menu](../common/icon_menu.svg).
+1. In the Voice Notepad interface, click ![icon_menu](../common/icon_menu.svg).
 2. Select **About**.
+3. View the Voice Notepad version and description.
 
 ### Exit
 
-Quit Voice Notes:
-1. Click ![icon_menu](../common/icon_menu.svg).
-2. Select **Exit**.
+1. In the Voice Notepad interface, click ![icon_menu](../common/icon_menu.svg).
+2. Select **Exit** to close the application.
