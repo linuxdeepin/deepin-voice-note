@@ -2173,6 +2173,29 @@ function sinkSingleActiveListItem(editor, options = {}) {
 
   if (getActiveListNestingDepth(editor) >= MAX_LIST_NESTING_DEPTH) return true
 
+  // Tab 的产品语义是“只修改当前项”，不能把当前项已有的子列表一起结构下沉。
+  // 有前一个同级项时，用 dvnIndentLevel 只移动当前项；子项结构、属性和视觉深度
+  // 全部保持不变。即使当前项还是一级，也有两级的视觉余量，不能套用只针对
+  // 游离子树的 canUseExtraIndent() 限制。
+  if (hasDirectChildList(info.node)) {
+    // 当前项是列表首项时没有 previousSibling，但前面若已有另一个列表块，
+    // 它仍然有合法的视觉父级上下文。跨类型列表尤其不能走 sinkDetachedList，
+    // 否则会把当前项和已有子列表整体挂到前一项下面。
+    const listPos = editor.state.selection.$from.before(info.parentListDepth)
+    const previousBlock = editor.state.doc.resolve(listPos).nodeBefore
+    const hasPreviousList = LIST_TYPES.has(previousBlock?.type?.name)
+    if (info.previousSibling || hasPreviousList) {
+      const maxExtraIndent = maxExtraIndentForStructuralDepth(info.structuralDepth)
+      if (info.indentLevel < maxExtraIndent) {
+        const indented = setActiveListExtraIndent(editor, info.indentLevel + 1)
+        if (indented) restoreAtomicNodeSelection(editor, options.pendingAtomicSelection)
+      }
+    }
+    // 已是视觉三级或没有可挂靠的前项时保持原样，绝不能落入 sinkListItem
+    // 把父项及其整棵子列表一起结构下沉。
+    return true
+  }
+
   if (info.indentLevel === 0
     && !editor.can().sinkListItem(itemType)
     && sinkDetachedListIntoPreviousItem(editor, info)) {

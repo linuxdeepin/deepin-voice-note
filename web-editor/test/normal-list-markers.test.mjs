@@ -322,6 +322,34 @@ test('扁平视觉层级按可见节点分组编号，不按整个 ol 连续编�
   editor.destroy()
 })
 
+test('视觉子级结束返回根级时，相邻 ol 的根序号继续而不是重置', () => {
+  const { editor, element } = createEditorWithMarkers()
+  const item = (text, dvnIndentLevel = 0) => ({
+    type: 'listItem',
+    attrs: { dvnIndentLevel },
+    content: [{ type: 'paragraph', content: [{ type: 'text', text }] }],
+  })
+  const list = (items) => ({ type: 'orderedList', attrs: { start: 1 }, content: items })
+
+  editor.commands.setContent({
+    type: 'doc',
+    content: [
+      list([item('A'), item('B'), item('B1', 1)]),
+      list([item('C'), item('D'), item('E')]),
+    ],
+  })
+
+  const styles = Array.from(element.querySelectorAll('.ProseMirror ol > li'))
+    .map((li) => li.getAttribute('style'))
+  assert.equal(editor.state.doc.childCount, 2, '该用例只校验编号显示，不要求改写文档结构')
+  assert.deepEqual(
+    styles.map((style) => Number(/--dvn-list-number: "(\d+)"/.exec(style)?.[1])),
+    [1, 2, 1, 3, 4, 5],
+    'B1 的子级编号独立，C/D/E 返回根级后必须继续 3/4/5',
+  )
+  editor.destroy()
+})
+
 test('视觉层级编号矩阵：回退层级继续父组，进入子层重新从 1 开始', () => {
   const item = (dvnIndentLevel) => ({ attrs: { dvnIndentLevel } })
   const numbersFor = (depths, start = 1) => orderedListMarkerNumbers({

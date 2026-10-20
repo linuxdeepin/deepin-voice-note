@@ -120,17 +120,37 @@ function hasDirectChildList(node) {
 // 例如截图中的 A(0) B(1) C(2) D(2) E(0) 应显示 1,1,1,2,2；
 // 只有回到根层级后的 E 才继续根组编号。每进入更深一层，更深层计数器清零；
 // 每回到较浅层，只重置它下面的层级，较浅层自己的编号继续递增。
-export function orderedListMarkerNumbers(listNode) {
+function effectiveMarkerDepth(item) {
+  const rawDepth = Number(item?.attrs?.dvnIndentLevel)
+  const visualDepth = Number.isFinite(rawDepth) ? Math.max(0, Math.floor(rawDepth)) : 0
+  // 带真实子列表的项按 Tab 时只给当前行补视觉缩进，它在当前 <ol> 中仍是
+  // 原来的直接兄弟，不能因此重置外层编号。子列表会递归独立编号。
+  return visualDepth > 0 && hasDirectChildList(item) ? 0 : visualDepth
+}
+
+function markerNumberingType(listNode) {
+  const type = listNode?.attrs?.type
+  return !type || type === '1' ? null : type
+}
+
+// 连续的有序列表可能因为视觉缩进被暂时拆成多个 <ol>。编号状态必须能跨
+// 这些块继续：例如 [A(0), B(0), B1(1)] + [C(0), D(0)]，C 返回根层级后
+// 应继续为 3，而不是在新 <ol> 中重新从 1 开始。
+function orderedListMarkerNumbersWithState(listNode, state) {
   const numbers = []
-  const counters = []
   const start = orderedListStart(listNode?.attrs?.start)
+  const firstDepth = listNode?.firstChild ? effectiveMarkerDepth(listNode.firstChild) : null
+  const type = markerNumberingType(listNode)
+  const continuesPrevious = state.counters.length > 0
+    && state.lastDepth != null
+    && firstDepth != null
+    && firstDepth <= state.lastDepth
+    && start === 1
+    && state.numberingType === type
+  const counters = continuesPrevious ? state.counters.slice() : []
 
   listNode?.forEach?.((item) => {
-    const rawDepth = Number(item?.attrs?.dvnIndentLevel)
-    const visualDepth = Number.isFinite(rawDepth) ? Math.max(0, Math.floor(rawDepth)) : 0
-    // 带真实子列表的项按 Tab 时只给当前行补视觉缩进，它在当前 <ol> 中仍是
-    // 原来的直接兄弟，不能因此重置外层编号。子列表会递归独立编号。
-    const depth = visualDepth > 0 && hasDirectChildList(item) ? 0 : visualDepth
+    const depth = effectiveMarkerDepth(item)
     for (let index = depth + 1; index < counters.length; index += 1) {
       counters[index] = null
     }
@@ -141,7 +161,18 @@ export function orderedListMarkerNumbers(listNode) {
     counters[depth] += 1
   })
 
+  state.counters = counters
+  state.lastDepth = listNode?.childCount ? effectiveMarkerDepth(listNode.lastChild) : null
+  state.numberingType = type
   return numbers
+}
+
+export function orderedListMarkerNumbers(listNode) {
+  return orderedListMarkerNumbersWithState(listNode, {
+    counters: [],
+    lastDepth: null,
+    numberingType: null,
+  })
 }
 
 export function normalListMarkerStyleForNumbers(numbers, start = 1) {
@@ -172,10 +203,35 @@ export function listItemMarkerStyle(fontSize, gutterPx, orderedNumber = null) {
 // 自顶向下递归：进有序列表时先算出该列表的编号槽位，再把它作为
 // orderedGutter 传给直接子项，保证同一列表内所有列表项的
 // --dvn-marker-gutter 与列表槽位一致（网格首列 / 折行缩进都依赖它）。
-function collectMarkerDecorations(node, pos, orderedGutter, decorations, orderedNumber = null) {
+//
+// 同级连续的 <ol> 共用一份编号状态。这里只影响 marker 显示，不合并或改写
+// 文档树，避免在取消/重应用列表时破坏真实父子结构。
+function collectChildMarkerDecorations(node, pos, orderedGutter, decorations) {
+  let orderedState = null
+  node?.forEach?.((child, offset) => {
+    const childPos = pos + 1 + offset
+    if (child.type?.name === 'orderedList') {
+      orderedState ||= { counters: [], lastDepth: null, numberingType: null }
+      collectMarkerDecorations(child, childPos, orderedGutter, decorations, null, orderedState)
+    } else {
+      orderedState = null
+      collectMarkerDecorations(child, childPos, orderedGutter, decorations)
+    }
+  })
+}
+
+function collectMarkerDecorations(
+  node,
+  pos,
+  orderedGutter,
+  decorations,
+  orderedNumber = null,
+  orderedState = null,
+) {
   const name = node?.type?.name
   if (name === 'orderedList') {
-    const numbers = orderedListMarkerNumbers(node)
+    const state = orderedState ?? { counters: [], lastDepth: null, numberingType: null }
+    const numbers = orderedListMarkerNumbersWithState(node, state)
     const gutter = orderedListMarkerGutterForLastNumber(numbers.length ? Math.max(...numbers) : 1)
     decorations.push(Decoration.node(pos, pos + node.nodeSize, {
       style: normalListMarkerStyleForNumbers(numbers, node.attrs?.start),
@@ -190,7 +246,7 @@ function collectMarkerDecorations(node, pos, orderedGutter, decorations, ordered
     return
   }
   if (name === 'bulletList' || name === 'taskList') {
-    node.forEach((child, offset) => collectMarkerDecorations(child, pos + 1 + offset, null, decorations))
+    collectChildMarkerDecorations(node, pos, null, decorations)
     return
   }
   if (LIST_ITEM_TYPES.has(name)) {
@@ -198,15 +254,15 @@ function collectMarkerDecorations(node, pos, orderedGutter, decorations, ordered
     decorations.push(Decoration.node(pos, pos + node.nodeSize, {
       style: listItemMarkerStyle(size, orderedGutter ?? undefined, orderedNumber),
     }))
-    node.forEach((child, offset) => collectMarkerDecorations(child, pos + 1 + offset, null, decorations))
+    collectChildMarkerDecorations(node, pos, null, decorations)
     return
   }
-  node?.forEach?.((child, offset) => collectMarkerDecorations(child, pos + 1 + offset, null, decorations))
+  collectChildMarkerDecorations(node, pos, null, decorations)
 }
 
 export function buildNormalListMarkerDecorations(doc) {
   const decorations = []
-  doc?.forEach?.((node, offset) => collectMarkerDecorations(node, offset, null, decorations))
+  collectChildMarkerDecorations(doc, -1, null, decorations)
   return DecorationSet.create(doc, decorations)
 }
 
