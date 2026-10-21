@@ -978,7 +978,7 @@ function setVoiceButColor(color, shdow) {
     .selectColor {
         box-shadow: 0 0 0 1.5px ${color};
     }
-    .active {
+    .btn-default.active {
         background: ${color}80!important;
     }
     `)
@@ -997,24 +997,24 @@ function changeColor(flag, activeColor, disableColor, backgroundColor) {
     global_themeColor = backgroundColor
     setVoiceButColor(global_activeColor, global_disableColor)
 
-    $('.dropdown-fontsize>li>a').hover(function (e) {
+    $('.dropdown-fontsize>li>a').off('mouseenter mouseleave').hover(function (e) {
         $(this).css('background-color', activeColor);
     }, function () {
-        $('.dropdown-fontsize>li>a').css('background-color', 'transparent');
+        $(this).css('background-color', 'transparent');
         if (flag == 1) {
-            $('.dropdown-fontsize>li>a').css('color', "black");
+            $(this).css('color', "black");
         } else {
-            $('.dropdown-fontsize>li>a').css('color', "rgba(197,207,224,1)");
+            $(this).css('color', "rgba(197,207,224,1)");
         }
     })
-    $('.dropdown-fontname>li>a').hover(function (e) {
+    $('.dropdown-fontname>li>a').off('mouseenter mouseleave').hover(function (e) {
         $(this).css('background-color', activeColor);
     }, function () {
-        $('.dropdown-fontname>li>a').css('background-color', 'transparent');
+        $(this).css('background-color', 'transparent');
         if (flag == 1) {
-            $('.dropdown-fontname>li>a').css('color', "black");
+            $(this).css('color', "black");
         } else {
-            $('.dropdown-fontname>li>a').css('color', "rgba(197,207,224,1)");
+            $(this).css('color', "rgba(197,207,224,1)");
         }
     })
     $('body').css('background-color', global_themeColor)
