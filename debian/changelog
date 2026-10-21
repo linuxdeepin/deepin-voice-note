@@ -1,3 +1,11 @@
+deepin-voice-note (6.6.4) unstable; urgency=medium
+
+  * fix(export): preserve foreground color in highlighted HTML
+  * fix(tiptap): support continuous tabs and align list markers
+  * test(tiptap): add GTest cases for search clear signal sync
+
+ -- dengzhongyuan <dengzhongyuan@uniontech.com>  Wed, 21 Oct 2026 13:19:49 +0800
+
 deepin-voice-note (6.6.3) unstable; urgency=medium
 
   * fix(tiptap): keep tab indentation scoped to active list item
