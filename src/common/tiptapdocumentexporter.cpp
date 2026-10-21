@@ -367,7 +367,12 @@ QString markOpenHtml(const QJsonObject &mark)
     }
     if (type == QStringLiteral("highlight")) {
         const QString color = safeCssValue(textValue(attrs, QStringLiteral("color")));
-        return color.isEmpty() ? QStringLiteral("<mark>") : QStringLiteral("<mark style=\"background-color:%1\">").arg(htmlAttr(color));
+        // <mark> 的浏览器默认样式会覆盖祖先节点的文字颜色。编辑器里的
+        // Highlight mark 同样显式设置 color:inherit，导出 HTML 必须保持一致，
+        // 否则“前景色 + 背景色”组合导出后前景色会变成黑色。
+        return color.isEmpty()
+            ? QStringLiteral("<mark style=\"color:inherit\">")
+            : QStringLiteral("<mark style=\"background-color:%1;color:inherit\">").arg(htmlAttr(color));
     }
     if (type == QStringLiteral("fontFamily")) {
         const QString family = safeCssValue(textValue(attrs, QStringLiteral("fontFamily")));

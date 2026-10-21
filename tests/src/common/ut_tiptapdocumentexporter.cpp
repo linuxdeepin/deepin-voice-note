@@ -245,6 +245,42 @@ TEST(UT_TiptapDocumentExporter, htmlExportsImagesTranscriptAndMarks)
     EXPECT_FALSE(html.contains(QStringLiteral("translating")));
 }
 
+TEST(UT_TiptapDocumentExporter, htmlHighlightInheritsForegroundColorInNestedHeadingList)
+{
+    QJsonObject colorAttrs;
+    colorAttrs.insert(QStringLiteral("color"), QStringLiteral("rgb(236, 128, 0)"));
+    QJsonObject highlightAttrs;
+    highlightAttrs.insert(QStringLiteral("color"), QStringLiteral("rgba(192, 192, 192, 0.2)"));
+
+    QJsonObject headingAttrs;
+    headingAttrs.insert(QStringLiteral("level"), 2);
+    QJsonObject headingNode = blockNode(
+        QStringLiteral("heading"),
+        QJsonArray { textNode(QStringLiteral("彩色高亮"), QJsonArray {
+                        mark(QStringLiteral("color"), colorAttrs),
+                        mark(QStringLiteral("highlight"), highlightAttrs),
+                    }) },
+        headingAttrs);
+    QJsonObject doc;
+    doc.insert(QStringLiteral("type"), QStringLiteral("doc"));
+    doc.insert(QStringLiteral("content"), QJsonArray {
+                   blockNode(QStringLiteral("orderedList"), QJsonArray {
+                       listItem(QJsonArray { headingNode }),
+                   }),
+               });
+
+    QJsonObject envelope;
+    envelope.insert(QStringLiteral("format"), QStringLiteral("tiptap"));
+    envelope.insert(QStringLiteral("schemaVersion"), 1);
+    envelope.insert(QStringLiteral("content"), doc);
+
+    const QString html = TiptapDocumentExporter::toHtml(
+        QString::fromUtf8(QJsonDocument(envelope).toJson(QJsonDocument::Compact)));
+
+    EXPECT_TRUE(html.contains(QStringLiteral(
+        "<span style=\"color:rgb(236, 128, 0)\"><mark style=\"background-color:rgba(192, 192, 192, 0.2);color:inherit\">彩色高亮</mark></span>")));
+}
+
 TEST(UT_TiptapDocumentExporter, voiceJsonsExportPersistedFieldsOnly)
 {
     const QStringList voices = TiptapDocumentExporter::voiceJsons(sampleEnvelope());
