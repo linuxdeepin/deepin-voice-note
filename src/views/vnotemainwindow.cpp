@@ -1072,7 +1072,6 @@ void VNoteMainWindow::resizeEvent(QResizeEvent *event)
         m_noteSearchEdit->resize(wsearch, VNOTE_SEARCHBAR_H);
     }
 
-    m_middleView->repaint();
 
     if (m_asrErrMeassage && m_asrErrMeassage->isVisible()) {
         int xPos = (m_centerWidget->width() - m_asrErrMeassage->width()) / 2;
@@ -2024,7 +2023,7 @@ bool VNoteMainWindow::eventFilter(QObject *o, QEvent *e)
         int position = (m_middleViewHolder->width() - m_addNoteBtn->width()) / 2 - 6;
         m_buttonAnchor->setLeftMargin(position);
         m_middleView->resize(m_middleViewHolder->width(), m_middleViewHolder->height());
-        return true;
+        return false;
     }
     if (e->type() == QEvent::KeyPress) {
         QKeyEvent *keyEvent = dynamic_cast<QKeyEvent *>(e);
