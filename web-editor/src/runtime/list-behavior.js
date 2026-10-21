@@ -199,8 +199,16 @@ function canUseExtraIndent(info) {
   // preserveDescendantListVisualDepths 写回的 dvnIndentLevel>0 就能继续
   // Tab；而"列表前面恰好有内容"（例如选中图片后转成列表、列表上面还有正文）
   // 只是普通的一级唯一项，按 B04 不得凭空缩进，否则出现悬空缩进。
-  return (info.structuralDepth > 1 || info.indentLevel > 0)
-    && info.indentLevel < maxExtraIndentForStructuralDepth(info.structuralDepth)
+  //
+  // 例外：刚被 Shift+Tab 从二级回退到一级的项（structuralDepth=1,
+  // indentLevel=0），若前一个兄弟项仍有视觉缩进（dvnIndentLevel>0），
+  // 说明该项原本处于更深的视觉层级，允许恢复视觉缩进以走安全的
+  // setActiveListExtraIndent 路径，避免降级到结构性 sinkListItem
+  // 导致兄弟项被错误拉入嵌套列表。
+  if (info.indentLevel >= maxExtraIndentForStructuralDepth(info.structuralDepth)) return false
+  if (info.structuralDepth > 1 || info.indentLevel > 0) return true
+  if (info.previousSibling && (Number(info.previousSibling.attrs?.dvnIndentLevel) || 0) > 0) return true
+  return false
 }
 
 // ---- 块身份定位 -----------------------------------------------------------
