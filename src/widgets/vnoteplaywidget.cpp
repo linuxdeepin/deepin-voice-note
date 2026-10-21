@@ -67,6 +67,7 @@ void VNotePlayWidget::initUI()
     this->setLayout(mainLayout);
     m_sliderHover->installEventFilter(this);
     m_slider->installEventFilter(this);
+    onChangeTheme();
 }
 
 /**
@@ -101,6 +102,9 @@ void VNotePlayWidget::initConnection()
             this, &VNotePlayWidget::onSliderReleased);
     connect(m_slider, &DSlider::sliderMoved,
             this, &VNotePlayWidget::onSliderMove);
+
+    connect(DApplicationHelper::instance(), &DApplicationHelper::themeTypeChanged,
+            this, &VNotePlayWidget::onChangeTheme);
 }
 
 /**
@@ -262,4 +266,16 @@ void VNotePlayWidget::playVoice(VNVoiceBlock *voiceData, bool bIsSame)
     } else {
         qInfo() << "paly voice param is error";
     }
+}
+
+void VNotePlayWidget::onChangeTheme()
+{
+    DGuiApplicationHelper::ColorType theme =
+        DGuiApplicationHelper::instance()->themeType();
+    DPalette palette = DApplicationHelper::instance()->palette(this);
+    QColor borderColor = theme == DGuiApplicationHelper::DarkType
+        ? QColor(80, 80, 80)
+        : QColor(180, 180, 180);
+    palette.setBrush(DPalette::FrameBorder, borderColor);
+    this->setPalette(palette);
 }
