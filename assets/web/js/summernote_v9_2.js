@@ -7291,6 +7291,15 @@
                 if (winWidth - x < airPopoverWidth) {
                     x = winWidth - airPopoverWidth
                 }
+                // Y方向上边界检查，与update()的if (top < 34)逻辑对齐
+                if (y < 34) {
+                    y = rect.top + rect.height + 14
+                }
+                // Y方向下边界检查，防止工具栏超出可视区域底部
+                let winHeight = $(window).height()
+                if (y + airPopoverHeight > winHeight) {
+                    y = winHeight - airPopoverHeight
+                }
                 this.$popover.css({
                     display: 'block',
                     left: x + $(document).scrollLeft(),
