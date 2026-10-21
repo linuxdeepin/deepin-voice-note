@@ -376,13 +376,13 @@ function injectTaskListStyles() {
     // 把勾选框放在首行中心。li 用 flex-start 让 label 从首行顶部开始，
     // 折行/多段时也不会掉到整个列表项中间。
     'ul[data-type="taskList"] > li { display: flex; align-items: flex-start; gap: 0; }',
-    'ul[data-type="taskList"] > li > label { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 var(--dvn-marker-gutter, 20px); width: var(--dvn-marker-gutter, 20px); height: calc(1lh * max(1, var(--dvn-marker-ratio, 1))); font-size: 14px; line-height: inherit; margin: 0; background: transparent; }',
+    'ul[data-type="taskList"] > li > label { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 var(--dvn-marker-gutter, 20px); width: var(--dvn-marker-gutter, 20px); height: var(--dvn-marker-line-height, calc(1lh * max(1, var(--dvn-marker-ratio, 1)))); font-size: 14px; line-height: inherit; margin: 0; background: transparent; }',
     // 原生 checkbox 是固定 13px 的替换元素，不跟随 font-size；宽高保持默认，
     // 只由 label 的居中布局决定位置。
     'ul[data-type="taskList"] > li > label > input[type="checkbox"] { margin: 0; width: 13px; height: 13px; accent-color: var(--highlightColor, #007AFF); }',
     'ul[data-type="taskList"] > li > div { flex: 1 1 auto; min-width: 0; }',
-    'ul[data-type="taskList"] > li > div > p { margin: 0; }',
-    'ul[data-type="taskList"] > li[data-checked="true"] > div > p:first-child { opacity: 0.55; }',
+    'ul[data-type="taskList"] > li > div > p, ul[data-type="taskList"] > li > div > h1, ul[data-type="taskList"] > li > div > h2, ul[data-type="taskList"] > li > div > h3, ul[data-type="taskList"] > li > div > h4, ul[data-type="taskList"] > li > div > h5, ul[data-type="taskList"] > li > div > h6 { margin: 0; }',
+    'ul[data-type="taskList"] > li[data-checked="true"] > div > p:first-child, ul[data-type="taskList"] > li[data-checked="true"] > div > h1:first-child, ul[data-type="taskList"] > li[data-checked="true"] > div > h2:first-child, ul[data-type="taskList"] > li[data-checked="true"] > div > h3:first-child, ul[data-type="taskList"] > li[data-checked="true"] > div > h4:first-child, ul[data-type="taskList"] > li[data-checked="true"] > div > h5:first-child, ul[data-type="taskList"] > li[data-checked="true"] > div > h6:first-child { opacity: 0.55; }',
   ].join('\n')
   document.head.appendChild(style)
 }

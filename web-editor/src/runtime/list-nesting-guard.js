@@ -34,14 +34,15 @@ function insertPlainTextTab(editor) {
   return insertPlainText(editor, selection.from, selection.to)
 }
 
-// 普通段落行首或空段落中的空光标按 Tab，插入纯文本缩进。
-// 行中仍保留默认 Tab 焦点行为；列表内空光标继续走列表缩进。
+// 普通段落中的空光标按 Tab，在当前光标处插入纯文本缩进。
+// 与旧版 Summernote 一致，不限制光标必须在行首，因此同一位置可以连续 Tab。
+// 列表内空光标仍继续走列表层级缩进，不能插入 NBSP。
 function insertParagraphIndent(editor) {
   const { selection } = editor.state
   if (!selection.empty || !(selection instanceof TextSelection)) return false
 
   const { $from } = selection
-  if ($from.parent.type.name !== 'paragraph' || $from.parentOffset !== 0) return false
+  if ($from.parent.type.name !== 'paragraph') return false
   if (isInListItem(editor)) return false
   return insertPlainText(editor, selection.from)
 }

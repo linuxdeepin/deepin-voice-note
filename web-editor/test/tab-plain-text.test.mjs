@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 // Tab 的纯文本语义：
-// 1. 普通段落行首、空段落：插入 4 个 NBSP；
+// 1. 普通段落任意光标位置：插入 4 个 NBSP，可连续插入；
 // 2. 任意文本选区：删除选区后插入 4 个 NBSP；
 // 3. 列表内空光标：仍执行列表缩进。
 import assert from 'node:assert/strict'
@@ -129,7 +129,7 @@ test('空段落按 Tab 插入 4 个 NBSP，形成纯文本缩进', () => {
   editor.destroy()
 })
 
-test('普通段落行中按 Tab 不插入缩进，保留默认焦点行为', () => {
+test('普通段落行中按 Tab 在当前光标位置插入 4 个 NBSP', () => {
   const window = setupDom()
   const editor = createEditor(window, {
     type: 'doc',
@@ -137,11 +137,31 @@ test('普通段落行中按 Tab 不插入缩进，保留默认焦点行为', () 
   })
   const range = findTextRange(editor, '普通文本')
   editor.chain().focus().setTextSelection(range.from + 2).run()
-  const before = editor.getJSON()
 
   const event = pressTab(editor, window)
-  assert.equal(event.defaultPrevented, false)
-  assert.deepEqual(editor.getJSON(), before)
+  assert.equal(event.defaultPrevented, true, '行中 Tab 必须由编辑器接管')
+  assert.equal(editor.state.doc.textContent, `普通${PLAIN_TAB}文本`)
+  assert.equal(editor.state.doc.firstChild.type.name, 'paragraph')
+  assert.equal(editor.state.selection.empty, true)
+  assert.equal(editor.state.selection.from, range.from + 2 + PLAIN_TAB.length)
+  editor.destroy()
+})
+
+test('普通段落连续按 Tab 每次都插入 4 个 NBSP，焦点不移出编辑器', () => {
+  const window = setupDom()
+  const editor = createEditor(window, {
+    type: 'doc',
+    content: [paragraph('普通文本')],
+  })
+  const range = findTextRange(editor, '普通文本')
+  editor.chain().focus().setTextSelection(range.from + 2).run()
+
+  for (let count = 1; count <= 3; count += 1) {
+    const event = pressTab(editor, window)
+    assert.equal(event.defaultPrevented, true, `第 ${count} 次 Tab 必须被编辑器接管`)
+    assert.equal(editor.state.doc.textContent, `普通${PLAIN_TAB.repeat(count)}文本`)
+    assert.equal(editor.state.selection.from, range.from + 2 + PLAIN_TAB.length * count)
+  }
   editor.destroy()
 })
 
@@ -166,6 +186,40 @@ test('列表内空光标按 Tab 仍执行列表缩进，不插入 NBSP', () => {
   assert.equal(nestedList.content[0].content[0].content[0].text, '第二项')
   editor.destroy()
 })
+
+for (const spec of [
+  { name: '无序列表', listType: 'bulletList', makeItem: listItem },
+  { name: '有序列表', listType: 'orderedList', makeItem: listItem },
+  { name: '待办列表', listType: 'taskList', makeItem: taskItem },
+]) {
+  for (const offset of [0, 2, 4]) {
+    test(`${spec.name}第二项光标偏移 ${offset} 时按 Tab 仍只执行列表缩进`, () => {
+      const window = setupDom()
+      const text = '第二项'
+      const editor = createEditor(window, {
+        type: 'doc',
+        content: [list(spec.listType, [
+          spec.makeItem('第一项'),
+          spec.makeItem(text),
+        ])],
+      })
+      const range = findTextRange(editor, text)
+      editor.chain().focus().setTextSelection(range.from + offset).run()
+
+      const event = pressTab(editor, window)
+      const root = editor.getJSON().content[0]
+      const first = root.content[0]
+      const nested = first.content.find((child) => child.type === spec.listType)
+
+      assert.equal(event.defaultPrevented, true)
+      assert.equal(root.type, spec.listType)
+      assert.ok(nested, '第二项应缩进到第一项下面')
+      assert.equal(nested.content[0].content[0].content[0].text, text)
+      assert.equal(editor.state.doc.textContent.includes(PLAIN_TAB), false)
+      editor.destroy()
+    })
+  }
+}
 
 const LIST_CASES = [
   {

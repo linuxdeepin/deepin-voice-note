@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 // TTP-022: 组装 Schema V1 全部扩展为数组，供 Editor 与 schema 漂移校验复用。
-// 本文件镜像 create-schema.js 的扩展清单与 .configure()，不修改 src/schema/*。
+// 本文件镜像 create-schema.js 的扩展清单与 .configure()。
 
 import Document from '@tiptap/extension-document'
 import Paragraph from '@tiptap/extension-paragraph'
@@ -12,9 +12,7 @@ import Heading from '@tiptap/extension-heading'
 import Blockquote from '@tiptap/extension-blockquote'
 import BulletList from '@tiptap/extension-bullet-list'
 import OrderedList from '@tiptap/extension-ordered-list'
-import ListItem from '@tiptap/extension-list-item'
 import TaskList from '@tiptap/extension-task-list'
-import TaskItem from '@tiptap/extension-task-item'
 import Bold from '@tiptap/extension-bold'
 import Italic from '@tiptap/extension-italic'
 import Underline from '@tiptap/extension-underline'
@@ -27,6 +25,7 @@ import { FontSizeMark } from '../extensions/font-size-mark.js'
 import { FontWeightMark } from '../extensions/font-weight-mark.js'
 import { ImageBlock } from '../extensions/image-block.js'
 import { VoiceBlock } from '../extensions/voice-block.js'
+import { ListItemWithHeading, TaskItemWithHeading } from '../extensions/list-item-with-heading.js'
 import { ListNestingGuard } from './list-nesting-guard.js'
 import { NormalListMarkers } from './normal-list-markers.js'
 import { TaskListCascade } from './task-list-cascade.js'
@@ -49,9 +48,9 @@ export function createTiptapExtensions(uiStrings) {
     Blockquote,
     BulletList,
     OrderedList,
-    ListItem,
+    ListItemWithHeading,
     TaskList,
-    TaskItem.configure({ nested: true }),
+    TaskItemWithHeading.configure({ nested: true }),
     ImageBlock,
     voiceBlock,
     Bold,

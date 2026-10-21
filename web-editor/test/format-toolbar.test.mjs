@@ -14,6 +14,7 @@ import toolbarCss from '../src/runtime/format-toolbar.css?raw'
 import tiptapEditorHtml from '../src/runtime/tiptap-editor.html?raw'
 import { syncEmptyPlaceholderState } from '../src/runtime/empty-placeholder-state.js'
 import { createEmptyDoc, createEnvelope, validateEnvelope } from '../src/schema/document-envelope.js'
+import { listItemMarkerFontSize } from '../src/runtime/normal-list-markers.js'
 
 function defineGlobal(name, value) {
   Object.defineProperty(globalThis, name, {
@@ -725,6 +726,207 @@ test('heading dropdown applies and clears heading levels', () => {
   editor.destroy()
 })
 
+function listDocument(listType, texts = ['A', 'B', 'C']) {
+  return {
+    type: 'doc',
+    content: [{
+      type: listType,
+      attrs: listType === 'orderedList' ? { start: 1 } : {},
+      content: texts.map((text) => listItemForListType(listType, text)),
+    }],
+  }
+}
+
+function firstTextblockType(item) {
+  return item?.content?.[0]?.type || null
+}
+
+for (const listType of ['bulletList', 'orderedList', 'taskList']) {
+  test(`${listType}: heading levels keep all selected items inside the list`, () => {
+    const { editor, host } = createEditorWithToolbar()
+    const content = listDocument(listType)
+    if (listType === 'taskList') content.content[0].content[1].attrs.checked = true
+    editor.commands.setContent({
+      type: 'doc',
+      content: [
+        { type: 'paragraph', content: [{ type: 'text', text: 'before' }] },
+        ...content.content,
+        { type: 'paragraph', content: [{ type: 'text', text: 'after' }] },
+      ],
+    })
+
+    const headingSelect = host.querySelector('select[data-control="heading"]')
+    assert.ok(headingSelect)
+
+    for (const level of ['1', '2', '3', '4', '5']) {
+      selectTextSpan(editor, 'A', 'C')
+      const selection = {
+        from: editor.state.selection.from,
+        to: editor.state.selection.to,
+        text: editor.state.doc.textBetween(editor.state.selection.from, editor.state.selection.to, '|'),
+      }
+
+      headingSelect.value = level
+      headingSelect.dispatchEvent(new Event('change'))
+
+      const json = editor.getJSON()
+      assert.deepEqual(json.content.map((node) => node.type), ['paragraph', listType, 'paragraph'])
+      const list = json.content[1]
+      assert.equal(list.content.length, 3, `${listType} must retain all three items at heading ${level}`)
+      for (const item of list.content) {
+        assert.equal(firstTextblockType(item), 'heading', `${listType} item should keep its wrapper at heading ${level}`)
+        assert.equal(item.content[0].attrs.level, Number(level))
+      }
+      if (listType === 'taskList') {
+        assert.deepEqual(list.content.map((item) => item.attrs.checked), [false, true, false])
+      }
+
+      assert.deepEqual({
+        from: editor.state.selection.from,
+        to: editor.state.selection.to,
+        text: editor.state.doc.textBetween(editor.state.selection.from, editor.state.selection.to, '|'),
+      }, selection, `${listType} selection must remain on the same text after heading ${level}`)
+      assert.equal(validateEnvelope(createEnvelope(json)).ok, true)
+    }
+
+    selectTextSpan(editor, 'A', 'C')
+    headingSelect.value = 'p'
+    headingSelect.dispatchEvent(new Event('change'))
+    const json = editor.getJSON()
+    assert.deepEqual(json.content.map((node) => node.type), ['paragraph', listType, 'paragraph'])
+    assert.equal(json.content[1].content.length, 3, 'switching back to paragraph must not remove the list')
+    assert.ok(json.content[1].content.every((item) => firstTextblockType(item) === 'paragraph'))
+    assert.equal(validateEnvelope(createEnvelope(json)).ok, true)
+
+    const listSelector = listType === 'orderedList'
+      ? 'ol > li'
+      : listType === 'taskList'
+        ? 'ul[data-type="taskList"] > li'
+        : 'ul:not([data-type="taskList"]) > li'
+    const renderedItems = Array.from(editor.view.dom.querySelectorAll(listSelector))
+    assert.ok(renderedItems.length >= 3, `${listType} markers must still have list item DOM wrappers`)
+    editor.destroy()
+  })
+}
+
+test('task list checkbox uses the heading line box instead of the body text line box', () => {
+  const { editor, host } = createEditorWithToolbar()
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{
+      type: 'heading',
+      attrs: { level: 1 },
+      content: [{ type: 'text', text: '标题待办' }],
+    }],
+  })
+
+  const taskButton = host.querySelector('button[data-format="taskList"]')
+  taskButton.click()
+
+  const taskItem = editor.view.dom.querySelector('ul[data-type="taskList"] > li')
+  assert.ok(taskItem, 'heading should be converted into a task item')
+  assert.match(taskItem.getAttribute('style') || '', /--dvn-marker-line-height: 36px/)
+
+  const taskStyle = document.getElementById('dvn-tiptap-tasklist-style')?.textContent || ''
+  assert.match(
+    taskStyle,
+    /height: var\(--dvn-marker-line-height, calc\(1lh \* max\(1, var\(--dvn-marker-ratio, 1\)\)\)\)/,
+    'checkbox label height must prefer the heading line box variable',
+  )
+  editor.destroy()
+})
+
+test('heading conversion preserves nested mixed-list structure and selection', () => {
+  const { editor, host } = createEditorWithToolbar()
+  const paragraph = (text) => ({ type: 'paragraph', content: [{ type: 'text', text }] })
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{
+      type: 'orderedList',
+      attrs: { start: 1 },
+      content: [
+        {
+          type: 'listItem',
+          attrs: { dvnIndentLevel: 0 },
+          content: [
+            paragraph('A'),
+            {
+              type: 'bulletList',
+              content: [{
+                type: 'listItem',
+                attrs: { dvnIndentLevel: 0 },
+                content: [paragraph('B')],
+              }],
+            },
+          ],
+        },
+        {
+          type: 'listItem',
+          attrs: { dvnIndentLevel: 0 },
+          content: [paragraph('C')],
+        },
+      ],
+    }],
+  })
+
+  selectTextSpan(editor, 'A', 'C')
+  const before = {
+    from: editor.state.selection.from,
+    to: editor.state.selection.to,
+    text: editor.state.doc.textBetween(editor.state.selection.from, editor.state.selection.to, '|'),
+  }
+  const headingSelect = host.querySelector('select[data-control="heading"]')
+  headingSelect.value = '2'
+  headingSelect.dispatchEvent(new Event('change'))
+
+  const json = editor.getJSON()
+  assert.equal(json.content.length, 1)
+  assert.equal(json.content[0].type, 'orderedList')
+  assert.equal(json.content[0].content.length, 2)
+  const [parent, sibling] = json.content[0].content
+  assert.equal(parent.content[0].type, 'heading')
+  assert.equal(parent.content[0].attrs.level, 2)
+  assert.equal(parent.content[1].type, 'bulletList')
+  assert.equal(parent.content[1].content[0].content[0].type, 'heading')
+  assert.equal(parent.content[1].content[0].content[0].attrs.level, 2)
+  assert.equal(sibling.content[0].type, 'heading')
+  assert.equal(sibling.content[0].attrs.level, 2)
+  assert.deepEqual({
+    from: editor.state.selection.from,
+    to: editor.state.selection.to,
+    text: editor.state.doc.textBetween(editor.state.selection.from, editor.state.selection.to, '|'),
+  }, before)
+  assert.equal(validateEnvelope(createEnvelope(json)).ok, true)
+  assert.ok(editor.view.dom.querySelector('ol > li > h2'), 'ordered marker host should remain an h2')
+  assert.ok(editor.view.dom.querySelector('ol > li > ul > li > h2'), 'nested bullet marker host should remain an h2')
+  editor.destroy()
+})
+
+test('list marker typography reads heading as the item textblock', () => {
+  const { editor } = createEditorWithToolbar()
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{
+      type: 'orderedList',
+      attrs: { start: 1 },
+      content: [{
+        type: 'listItem',
+        attrs: { dvnIndentLevel: 0 },
+        content: [{
+          type: 'heading',
+          attrs: { level: 1 },
+          content: [{ type: 'text', text: 'H', marks: [{ type: 'fontSize', attrs: { fontSize: '22px' } }] }],
+        }],
+      }],
+    }],
+  })
+  const item = editor.state.doc.firstChild.firstChild
+  assert.equal(listItemMarkerFontSize(item), 22)
+  assert.match(tiptapEditorHtml, /ol > li > h1:first-child::before/)
+  assert.match(tiptapEditorHtml, /ul:not\(\[data-type="taskList"\]\) > li > h6:first-child::before/)
+  editor.destroy()
+})
+
 test('applying a heading clears a uniform paragraph font size so the heading scale is visible', () => {
   const { editor, host } = createEditorWithToolbar()
   insertText(editor, 'title')
@@ -1053,11 +1255,11 @@ test('empty heading keeps the body placeholder on the active heading line', () =
   assert.equal(appElement.dataset.emptyBlock, 'heading')
   assert.equal(appElement.dataset.emptyHeadingLevel, '1')
   assert.match(tiptapEditorHtml, /#app\.is-empty\[data-empty-heading-level="1"\] \.ProseMirror::before/)
-  assert.match(tiptapEditorHtml, /\.ProseMirror h1 \{ font-size: 24px; line-height: 32px; \}/)
-  assert.match(tiptapEditorHtml, /\.ProseMirror h2 \{ font-size: 20px; line-height: 28px; \}/)
-  assert.match(tiptapEditorHtml, /\.ProseMirror h3 \{ font-size: 18px; line-height: 26px; \}/)
-  assert.match(tiptapEditorHtml, /\.ProseMirror h4 \{ font-size: 16px; line-height: 24px; \}/)
-  assert.match(tiptapEditorHtml, /\.ProseMirror h5 \{ font-size: 14px; line-height: 22px; \}/)
+  assert.match(tiptapEditorHtml, /\.ProseMirror h1 \{ font-size: 24px; line-height: 1\.5; \}/)
+  assert.match(tiptapEditorHtml, /\.ProseMirror h2 \{ font-size: 20px; line-height: 1\.5; \}/)
+  assert.match(tiptapEditorHtml, /\.ProseMirror h3 \{ font-size: 18px; line-height: 1\.5; \}/)
+  assert.match(tiptapEditorHtml, /\.ProseMirror h4 \{ font-size: 16px; line-height: 1\.5; \}/)
+  assert.match(tiptapEditorHtml, /\.ProseMirror h5 \{ font-size: 14px; line-height: 1\.5714285714; \}/)
   assert.match(tiptapEditorHtml, /Source Han Sans SC/)
   assert.match(tiptapEditorHtml, /\.ProseMirror h1, \.ProseMirror h2/)
   assert.match(tiptapEditorHtml, /\.ProseMirror::selection, \.ProseMirror ::selection \{ background: var\(--dvn-text-selection-bg/)
@@ -1981,7 +2183,7 @@ test('task list style keeps checkbox and text on the same row', () => {
   assert.equal(/ul\[data-type="taskList"\] > li \{[^}]*align-items: center/.test(style.textContent), false, 'task row must not center the checkbox over the whole item')
   assert.equal(/ul\[data-type="taskList"\] > li \{[^}]*align-items: baseline/.test(style.textContent), false, 'task row must not align the checkbox to the text baseline')
   assert.equal(/ul\[data-type="taskList"\] li \{ display: flex/.test(style.textContent), false, 'task list row style must not hide markers of nested bullet/ordered lists')
-  assert.match(style.textContent, /ul\[data-type="taskList"\] > li > label \{ display: inline-flex; align-items: center; justify-content: center; flex: 0 0 var\(--dvn-marker-gutter, 20px\); width: var\(--dvn-marker-gutter, 20px\); height: calc\(1lh \* max\(1, var\(--dvn-marker-ratio, 1\)\)\); font-size: 14px; line-height: inherit; margin: 0; background: transparent; \}/)
+  assert.match(style.textContent, /ul\[data-type="taskList"\] > li > label \{ display: inline-flex; align-items: center; justify-content: center; flex: 0 0 var\(--dvn-marker-gutter, 20px\); width: var\(--dvn-marker-gutter, 20px\); height: var\(--dvn-marker-line-height, calc\(1lh \* max\(1, var\(--dvn-marker-ratio, 1\)\)\)\); font-size: 14px; line-height: inherit; margin: 0; background: transparent; \}/)
   assert.match(style.textContent, /ul\[data-type="taskList"\] > li > label > input\[type="checkbox"\] \{ margin: 0; width: 13px; height: 13px; accent-color: var\(--highlightColor, #007AFF\); \}/)
   assert.equal(style.textContent.includes('calc(13px * var(--dvn-marker-ratio'), false, 'task checkbox must stay fixed at 13px')
   assert.equal(/input\[type="checkbox"\] \{[^}]*top: \d+px/.test(style.textContent), false, 'task checkbox must not use a hard-coded pixel nudge')
@@ -1991,8 +2193,8 @@ test('task list style keeps checkbox and text on the same row', () => {
   assert.match(tiptapEditorHtml, /\.ProseMirror li\[data-dvn-indent-level="2"\] \{ margin-left: 40px; \}/)
   assert.match(tiptapEditorHtml, /li\[data-dvn-indent-level="1"\] > ul,[\s\S]*margin-left: -20px;/)
   assert.match(tiptapEditorHtml, /li\[data-dvn-indent-level="2"\] > ul,[\s\S]*margin-left: -40px;/)
-  assert.match(style.textContent, /ul\[data-type="taskList"\] > li > div > p \{ margin: 0;/)
-  assert.match(style.textContent, /ul\[data-type="taskList"\] > li\[data-checked="true"\] > div > p:first-child \{ opacity: 0\.55;/)
+  assert.match(style.textContent, /ul\[data-type="taskList"\] > li > div > p, ul\[data-type="taskList"\] > li > div > h1,[\s\S]*\{ margin: 0;/)
+  assert.match(style.textContent, /ul\[data-type="taskList"\] > li\[data-checked="true"\] > div > p:first-child, ul\[data-type="taskList"\] > li\[data-checked="true"\] > div > h1:first-child,[\s\S]*\{ opacity: 0\.55;/)
   assert.equal(style.textContent.includes('text-decoration: line-through'), false, 'checked task text should not render a strikethrough')
   assert.equal(style.textContent.includes('color: var(--color'), false, 'checked task text should not switch to theme color')
   editor.destroy()
@@ -2005,28 +2207,28 @@ test('normal list markers stay on the first line for wrapped items', () => {
   )
   assert.match(
     tiptapEditorHtml,
-    /\.ProseMirror ul:not\(\[data-type="taskList"\]\) > li > p:first-child,[\s\S]*\.ProseMirror ol > li > p:first-child \{[\s\S]*text-indent: calc\(-1 \* var\(--dvn-marker-gutter, 20px\)\);/,
+    /\.ProseMirror ul:not\(\[data-type="taskList"\]\) > li > p:first-child,[\s\S]*\.ProseMirror ol > li > h6:first-child \{[\s\S]*text-indent: calc\(-1 \* var\(--dvn-marker-gutter, 20px\)\);/,
   )
-  // marker 字形固定 14px、槽位固定 20px；垂直位置用 height: calc(1lh * max(1,
-  // ratio)) 跟踪首行有效行盒，再用 vertical-align: top 对齐行盒顶部。字号倍率
-  // 只参与盒高计算，不参与字形放大，也不写按字号/字体逐个补偿的像素值。
+  // marker 字形固定 14px、槽位固定 20px；标题优先使用运行时下发的真实
+  // 标题行高，其他正文继续用 calc(1lh * max(1, ratio)) 跟踪首行有效行盒。
+  // 再用 vertical-align: top 对齐行盒顶部，不写逐字号补偿像素。
   assert.match(
     tiptapEditorHtml,
-    /\.ProseMirror ul:not\(\[data-type="taskList"\]\) > li > p:first-child::before,[\s\S]*\.ProseMirror ol > li > p:first-child::before \{[\s\S]*display: inline-flex;[\s\S]*width: var\(--dvn-marker-gutter, 20px\);[\s\S]*font-size: 14px;[\s\S]*height: calc\(1lh \* max\(1, var\(--dvn-marker-ratio, 1\)\)\);[\s\S]*line-height: inherit;[\s\S]*vertical-align: top;/,
+    /\.ProseMirror ul:not\(\[data-type="taskList"\]\) > li > p:first-child::before,[\s\S]*\.ProseMirror ol > li > h6:first-child::before \{[\s\S]*display: inline-flex;[\s\S]*width: var\(--dvn-marker-gutter, 20px\);[\s\S]*font-size: 14px;[\s\S]*height: var\(--dvn-marker-line-height, calc\(1lh \* max\(1, var\(--dvn-marker-ratio, 1\)\)\)\);[\s\S]*line-height: inherit;[\s\S]*vertical-align: top;/,
     'marker 必须固定字形大小，并用首行有效行盒居中',
   )
   assert.doesNotMatch(
     tiptapEditorHtml,
-    /\.ProseMirror ul:not\(\[data-type="taskList"\]\) > li > p:first-child::before,[\s\S]*?\.ProseMirror ol > li > p:first-child::before \{[^}]*font-size: calc\(14px \* var\(--dvn-marker-ratio, 1\)\);/,
+    /\.ProseMirror ul:not\(\[data-type="taskList"\]\) > li > p:first-child::before,[\s\S]*?\.ProseMirror ol > li > h6:first-child::before \{[^}]*font-size: calc\(14px \* var\(--dvn-marker-ratio, 1\)\);/,
     'marker 字形不得跟随字号放大',
   )
   assert.doesNotMatch(
     tiptapEditorHtml,
-    /\.ProseMirror ol > li > p:first-child::before \{[^}]*vertical-align: baseline\s*;/,
+    /\.ProseMirror ol > li > h6:first-child::before \{[^}]*vertical-align: baseline\s*;/,
     'marker 不得再退回文字基线对齐',
   )
-  assert.match(tiptapEditorHtml, /\.ProseMirror ul:not\(\[data-type="taskList"\]\) > li > p:first-child::before \{[\s\S]*content: "•";/)
-  assert.match(tiptapEditorHtml, /\.ProseMirror ol > li > p:first-child::before \{[\s\S]*content: var\(--dvn-list-number, counter\(dvn-ordered-list\)\) "\.";/)
+  assert.match(tiptapEditorHtml, /\.ProseMirror ul:not\(\[data-type="taskList"\]\) > li > h6:first-child::before \{[\s\S]*content: "•";/)
+  assert.match(tiptapEditorHtml, /\.ProseMirror ol > li > h6:first-child::before \{[\s\S]*content: var\(--dvn-list-number, counter\(dvn-ordered-list\)\) "\.";/)
 })
 
 test('multi-paragraph list items keep each block on its own grid row', () => {
@@ -2037,29 +2239,22 @@ test('multi-paragraph list items keep each block on its own grid row', () => {
   //   1) 通用段落规则不得固定 grid-row，第二段起必须走自动排版落到后续行；
   //   2) 只有首段参与第一行（方案 A：编号始终贴列表项第一行，即使首行为空）；
   //   3) 第二段起保留 marker 槽位的左内边距，正文左边界与首行一致。
-  assert.doesNotMatch(
-    tiptapEditorHtml,
-    /\.ProseMirror ol > li > p \{[^}]*grid-row:/,
-    '有序列表通用段落规则不得固定 grid-row，否则多段列表项会重叠',
-  )
-  assert.doesNotMatch(
-    tiptapEditorHtml,
-    /\.ProseMirror ul:not\(\[data-type="taskList"\]\) > li > p \{[^}]*grid-row:/,
-    '无序列表通用段落规则同样不得固定 grid-row',
-  )
+  const listTextblockRule = tiptapEditorHtml.match(/\.ProseMirror ul:not\(\[data-type="taskList"\]\) > li > p,[\s\S]*?\.ProseMirror ol > li > h6 \{([\s\S]*?)\}/)
+  assert.ok(listTextblockRule)
+  assert.doesNotMatch(listTextblockRule[1], /grid-row:/, '列表通用文本块规则不得固定 grid-row，否则多段列表项会重叠')
   assert.match(
     tiptapEditorHtml,
-    /\.ProseMirror ul:not\(\[data-type="taskList"\]\) > li > p:first-child,[\s\S]*\.ProseMirror ol > li > p:first-child \{[\s\S]*grid-row: 1;/,
+    /\.ProseMirror ul:not\(\[data-type="taskList"\]\) > li > p:first-child,[\s\S]*\.ProseMirror ol > li > h6:first-child \{[\s\S]*grid-row: 1;/,
     '只有首段参与第一行，marker 才始终贴列表项第一行',
   )
   assert.match(
     tiptapEditorHtml,
-    /\.ProseMirror ol > li > p \{ padding-left: var\(--dvn-ordered-marker-gutter, 20px\); \}/,
+    /\.ProseMirror ol > li > h6 \{ padding-left: var\(--dvn-ordered-marker-gutter, 20px\); \}/,
     '第二段起必须保留 marker 槽位左内边距，正文左边界才和首行一致',
   )
   assert.match(
     tiptapEditorHtml,
-    /\.ProseMirror ol > li > p:first-child \{ text-indent: calc\(-1 \* var\(--dvn-ordered-marker-gutter, 20px\)\); \}/,
+    /\.ProseMirror ol > li > h6:first-child \{ text-indent: calc\(-1 \* var\(--dvn-ordered-marker-gutter, 20px\)\); \}/,
   )
 })
 
