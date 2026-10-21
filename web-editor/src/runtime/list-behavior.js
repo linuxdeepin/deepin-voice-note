@@ -3,6 +3,7 @@
 
 import { AllSelection, NodeSelection, Selection, TextSelection } from '@tiptap/pm/state'
 import { canJoin } from '@tiptap/pm/transform'
+import { closeHistory } from '@tiptap/pm/history'
 import { taskListCascadePluginKey } from './task-list-cascade.js'
 
 export const MAX_LIST_NESTING_DEPTH = 3
@@ -697,7 +698,7 @@ function sinkSelectedListItems(editor) {
       const info = activeListItemInfo(editor)
       const detachedHandled = info
         && !editor.can().sinkListItem(itemType)
-        && sinkDetachedListIntoPreviousItem(editor, info)
+        && indentDetachedListFirstItem(editor, info)
       if (!detachedHandled) editor.chain().focus().sinkListItem(itemType).run()
       // 批量下沉后，后续未选中兄弟可能仍靠 dvnIndentLevel 保持视觉二级。
       // 与单光标路径一样并回当前真实子列表，避免它们继续漂到三级。
@@ -1342,7 +1343,7 @@ function cancelListSelection(editor, node, pos, selection, state) {
   return { blocks: changed ? result : [node], changed }
 }
 
-function cancelSelectedListFormatting(editor, selection, cursorContext = null) {
+function cancelSelectedListFormatting(editor, selection, cursorContext = null, rangeContext = null) {
   const { doc } = editor.state
   const state = { changed: false, selectedBlocks: [] }
   const blocks = []
@@ -1380,7 +1381,7 @@ function cancelSelectedListFormatting(editor, selection, cursorContext = null) {
   joinAdjacentSameTypeLists(tr, { preserveOrderedStart: true })
   const nextSelection = nextCursorContext
     ? cursorSelectionAfterTransform(tr.doc, nextCursorContext)
-    : selectionAfterListConversion(
+    : selectionForRangeContext(tr.doc, rangeContext) ?? selectionAfterListConversion(
       tr.doc,
       selection,
       selectedRanges,
@@ -1391,7 +1392,7 @@ function cancelSelectedListFormatting(editor, selection, cursorContext = null) {
   // 工具栏取消列表是结构操作，不是用户点击任务复选框。任务级联插件若在本笔
   // 事务后按新的视觉父子关系重算 checked，会把未选中的祖先项一并改掉。
   tr.setMeta(taskListCascadePluginKey, true)
-  editor.view.dispatch(tr.scrollIntoView())
+  editor.view.dispatch(closeHistory(tr).scrollIntoView())
   return true
 }
 
@@ -1452,9 +1453,52 @@ function cursorSelectionAfterTransform(doc, context) {
   return Selection.near(doc.resolve(nodePos + 1 + offset), 1)
 }
 
+// 范围选区也要以“原来那批文字”为边界恢复，不能拿转换后列表节点的完整文本范围。
+// 后者会把未选中的子列表、祖先项或相邻兄弟一起拉回选区：例如只选中父项文字
+// 时，父项转换后的节点仍包含子列表，按节点范围恢复就会高亮整棵子树。
+function captureRangeSelection(doc, selection) {
+  if (selection.empty || selection instanceof AllSelection || selection instanceof NodeSelection) return null
+  const $from = doc.resolve(selection.from)
+  const $to = doc.resolve(selection.to)
+  if (!$from.parent.isTextblock || !$to.parent.isTextblock) return null
+
+  // selection.to 是开区间终点：当它刚好落在下一个文本块开头时，$to 会指向
+  // 下一块而不是用户实际选中的最后一块。用 to - 1 定位最后一个被选中的字符，
+  // 再把偏移加回一位，才能稳定还原“选到该行末尾”的范围。
+  const $end = doc.resolve(Math.max(selection.from, selection.to - 1))
+  const endParent = $end.parent.isTextblock ? $end.parent : $to.parent
+  const endBlockPos = $end.parent.isTextblock ? $end.before($end.depth) : $to.before($to.depth)
+  const endOffset = $end.parent.isTextblock ? $end.parentOffset + 1 : $to.parentOffset
+
+  const fromPos = $from.before($from.depth)
+  return {
+    fromText: $from.parent.textContent,
+    fromOffset: $from.parentOffset,
+    fromOccurrence: textblockOccurrenceBefore(doc, $from.parent.textContent, fromPos),
+    toText: endParent.textContent,
+    toOffset: endOffset,
+    toOccurrence: textblockOccurrenceBefore(doc, endParent.textContent, endBlockPos),
+  }
+}
+
+function selectionForRangeContext(doc, context) {
+  if (!context) return null
+  const fromPos = findTextblockPosition(doc, context.fromText, context.fromOccurrence)
+  const toPos = findTextblockPosition(doc, context.toText, context.toOccurrence)
+  if (fromPos == null || toPos == null) return null
+
+  const fromNode = doc.nodeAt(fromPos)
+  const toNode = doc.nodeAt(toPos)
+  if (!fromNode?.isTextblock || !toNode?.isTextblock) return null
+  const from = fromPos + 1 + Math.max(0, Math.min(context.fromOffset, fromNode.content.size))
+  const to = toPos + 1 + Math.max(0, Math.min(context.toOffset, toNode.content.size))
+  return TextSelection.between(doc.resolve(Math.min(from, to)), doc.resolve(Math.max(from, to)))
+}
+
 function switchListTypeForSelection(editor, targetListType, selection, cursorContext = null) {
   const { doc } = editor.state
   if (!LIST_TYPES.has(targetListType)) return false
+  const rangeContext = cursorContext ? null : captureRangeSelection(doc, selection)
 
   const state = { changed: false, selectedLists: [], wrappedLists: [] }
   const blocks = []
@@ -1465,7 +1509,14 @@ function switchListTypeForSelection(editor, targetListType, selection, cursorCon
       blocks.push(...transformListForSelection(editor, child, pos, selection, targetListType, state))
     } else if (selectionCoversTextblock(child, pos, selection)) {
       const previousBlock = blocks.at(-1)
+      // 只有和前一个列表的最后一项处于同一视觉层级，重新包成列表时才继承
+      // “start + 项数”。嵌套项取消后会暂时落到顶层并靠 dvnIndentLevel 保持
+      // 视觉缩进；它重应用时仍是子级的新编号组，不能因为左边刚好有一段根列表
+      // 就从 2/3 开始，否则会出现 2、3、4 或 1、2、2。
+      const previousItemIndent = Number(previousBlock?.lastChild?.attrs?.dvnIndentLevel) || 0
+      const textblockIndent = Number(child.attrs?.dvnIndentLevel) || 0
       const previousAttrs = previousBlock?.type.name === targetListType
+        && previousItemIndent === textblockIndent
         ? listAttrsFollowing(previousBlock)
         : {}
       const wrapped = wrapTextblockInList(editor, child, targetListType, previousAttrs)
@@ -1484,7 +1535,7 @@ function switchListTypeForSelection(editor, targetListType, selection, cursorCon
 
   // 选区命中的列表本来就全是目标类型：这是按钮的“取消列表”动作。
   // 不能交回默认 toggleList，它在嵌套列表中会提升子项而不是取消列表格式。
-  if (!state.changed) return cancelSelectedListFormatting(editor, selection, cursorContext)
+  if (!state.changed) return cancelSelectedListFormatting(editor, selection, cursorContext, rangeContext)
 
   const nextDoc = editor.schema.topNodeType.create(doc.attrs, blocks, doc.marks)
   const tr = editor.state.tr.replaceWith(0, doc.content.size, nextDoc.content)
@@ -1516,7 +1567,7 @@ function switchListTypeForSelection(editor, targetListType, selection, cursorCon
   })
   const nextSelection = cursorContext
     ? cursorSelectionAfterTransform(tr.doc, cursorContext)
-    : selectionAfterListConversion(
+    : selectionForRangeContext(tr.doc, rangeContext) ?? selectionAfterListConversion(
       tr.doc,
       selection,
       convertedRanges,
@@ -1525,7 +1576,7 @@ function switchListTypeForSelection(editor, targetListType, selection, cursorCon
   if (!nextSelection) return false
   tr.setSelection(nextSelection)
   tr.setMeta(taskListCascadePluginKey, true)
-  editor.view.dispatch(tr.scrollIntoView())
+  editor.view.dispatch(closeHistory(tr).scrollIntoView())
   return true
 }
 
@@ -2007,62 +2058,26 @@ export function sinkActiveListItem(editor) {
   return sinkSingleActiveListItem(editor, { pendingAtomicSelection })
 }
 
-// 跨类型反缩进后，当前项所在列表会变成前一个列表块之后的独立顶层列表。
-// 例如“无序一级 > 有序 A/B”，Shift+Tab 后变成“无序一级”和“有序 A/B”两个块。
-// 此时再按 Tab，ProseMirror 的 sinkListItem 因 A 是当前列表首项而直接返回 false。
-// 这里把整个独立列表挂回前一个列表的最后一项；列表整体下降一层，所以同步减掉
-// 各子项此前为保持视觉层级补上的 dvnIndentLevel，保证 A/B/C 的视觉位置不漂移。
-function sinkDetachedListIntoPreviousItem(editor, info) {
-  if (!info || info.indentLevel !== 0) return false
-  if (info.childIndex !== 0) return false
-
-  // 把整棵独立列表挂进前一项会让它所有后代的结构层级 +1。若当前子树
-  // 已经达到三级，继续结构下沉必然制造第 4 层；改用当前项的视觉缩进
-  // 表达这次 Tab，子树结构和视觉上限都保持不变。
-  if (maxVisualDepthForListSubtree(info.parentList, info.structuralDepth + 1)
-    > MAX_LIST_NESTING_DEPTH) {
-    const maxExtraIndent = maxExtraIndentForStructuralDepth(info.structuralDepth)
-    if (info.indentLevel >= maxExtraIndent) return true
-    return setActiveListExtraIndent(editor, info.indentLevel + 1)
-  }
+// 反缩进后，当前项所在列表可能成为前一个列表块之后的独立顶层列表。
+// 例如“无序 A/B”和“有序 C/D”是两个块时，C 是当前列表首项，ProseMirror
+// 的 sinkListItem 因没有前一个同级项而直接失败。
+//
+// Tab 的产品语义是“只修改当前项”。旧实现把整个独立列表挂到前一个列表末项下，
+// 会让 C 后所有兄弟和子树一起结构下沉，这是错误路径。这里只用 dvnIndentLevel
+// 推进当前项一级；后续兄弟、子树、勾选状态和列表块边界全部保持不变。
+function indentDetachedListFirstItem(editor, info) {
+  if (!info || info.indentLevel !== 0 || info.childIndex !== 0) return false
 
   const { doc, selection } = editor.state
   const listPos = selection.$from.before(info.parentListDepth)
   const previousList = doc.resolve(listPos).nodeBefore
-  if (!previousList || !LIST_TYPES.has(previousList.type.name)) return false
-  if (previousList.type.name === info.parentList.type.name) return false
-  if (!previousList.childCount) return false
+  if (!previousList || !LIST_TYPES.has(previousList.type.name) || !previousList.childCount) {
+    return false
+  }
 
-  const previousLastItem = previousList.lastChild
-  if (!LIST_ITEM_TYPES.has(previousLastItem.type.name)) return false
-
-  const pendingSelection = captureActiveTextblockSelection(editor)
-
-  const normalizedItems = childNodesOf(info.parentList)
-    .map((item) => adjustListSubtreeVisualDepth(item, -1))
-  const nestedList = info.parentList.type.create(
-    info.parentList.attrs,
-    normalizedItems,
-    info.parentList.marks,
-  )
-  const nextLastItem = previousLastItem.type.create(
-    previousLastItem.attrs,
-    [...childNodesOf(previousLastItem), nestedList],
-    previousLastItem.marks,
-  )
-  const previousItems = childNodesOf(previousList)
-  previousItems[previousItems.length - 1] = nextLastItem
-  const nextPreviousList = previousList.type.create(previousList.attrs, previousItems, previousList.marks)
-  const previousListPos = listPos - previousList.nodeSize
-
-  const tr = editor.state.tr.replaceWith(
-    previousListPos,
-    listPos + info.parentList.nodeSize,
-    nextPreviousList,
-  )
-  editor.view.dispatch(tr.scrollIntoView())
-  restoreTextblockSelection(editor, pendingSelection)
-  return true
+  const maxExtraIndent = maxExtraIndentForStructuralDepth(info.structuralDepth)
+  if (info.indentLevel >= maxExtraIndent) return true
+  return setActiveListExtraIndent(editor, info.indentLevel + 1)
 }
 
 // 同类型列表 Tab 后，当前项已经真实下沉到父项的子列表，但此前为了保持视觉层级
@@ -2184,7 +2199,13 @@ function sinkSingleActiveListItem(editor, options = {}) {
     const listPos = editor.state.selection.$from.before(info.parentListDepth)
     const previousBlock = editor.state.doc.resolve(listPos).nodeBefore
     const hasPreviousList = LIST_TYPES.has(previousBlock?.type?.name)
-    if (info.previousSibling || hasPreviousList) {
+    // 已经处在二级，或本身已经带视觉缩进时，继续缩进只改变当前项自己的
+    // dvnIndentLevel，不依赖同级前项。不能因为它是父项下的首个子项就提前
+    // 返回：这样会让“带子列表的二级项”偶发无法进入三级，而同样位置不带
+    // 子列表的项却可以进入三级。
+    const canContinueFromCurrentDepth = canUseExtraIndent(info)
+
+    if (info.previousSibling || hasPreviousList || canContinueFromCurrentDepth) {
       const maxExtraIndent = maxExtraIndentForStructuralDepth(info.structuralDepth)
       if (info.indentLevel < maxExtraIndent) {
         const indented = setActiveListExtraIndent(editor, info.indentLevel + 1)
@@ -2198,7 +2219,7 @@ function sinkSingleActiveListItem(editor, options = {}) {
 
   if (info.indentLevel === 0
     && !editor.can().sinkListItem(itemType)
-    && sinkDetachedListIntoPreviousItem(editor, info)) {
+    && indentDetachedListFirstItem(editor, info)) {
     restoreAtomicNodeSelection(editor, options.pendingAtomicSelection)
     return true
   }
@@ -2628,7 +2649,10 @@ export function joinParagraphBackwardIntoPreviousList(editor) {
       const target = caretNodePos + 1 + Math.min(caretOffset, maxOffset)
       joinTr.setSelection(TextSelection.create(joinTr.doc, target))
     }
-    editor.view.dispatch(joinTr.setMeta('addToHistory', false).scrollIntoView())
+    // 归一事务必须和上面的删除事务进入同一段历史。若把它排除在历史外，
+    // 撤销删除事务时最终文档已经被归一结构改过，历史步骤无法映射回删除前，
+    // 实测表现为第二次 Backspace 后 Ctrl+Z 完全不生效。
+    editor.view.dispatch(joinTr.scrollIntoView())
   }
   return true
 }

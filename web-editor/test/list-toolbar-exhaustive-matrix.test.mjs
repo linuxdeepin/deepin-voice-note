@@ -306,6 +306,57 @@ test('截图场景：三层混合列表中取消中间无序项，文字保持�
   editor.destroy()
 })
 
+test('嵌套有序子项局部取消再应用：首项/中间项/末项都必须从 1 连续编号', () => {
+  const failures = []
+  for (const withGrandchildren of [false, true]) {
+    for (const target of TARGETS) {
+      const childNodes = TARGETS.map((text) => item(
+        'orderedList',
+        text,
+        withGrandchildren && text === 'C'
+          ? [list('orderedList', [item('orderedList', 'C1'), item('orderedList', 'C2')])]
+          : [],
+      ))
+      const { editor } = createEditor({
+        type: 'doc',
+        content: [list('orderedList', [
+          item('orderedList', 'P', [list('orderedList', childNodes)]),
+          item('orderedList', 'Q'),
+        ])],
+      })
+      const label = `${withGrandchildren ? '带孙项' : '叶子'}/${target}`
+      try {
+        const beforeText = textOrder(editor.state.doc)
+        const beforeDepth = new Map(itemSnapshot(editor.state.doc)
+          .filter((entry) => TARGETS.includes(entry.text))
+          .map((entry) => [entry.text, entry.depth]))
+        setCursor(editor, target, target.length)
+        assert.equal(toggleActiveListFormatting(editor, 'orderedList'), true, `${label}: 取消失败`)
+        assert.equal(toggleActiveListFormatting(editor, 'orderedList'), true, `${label}: 重应用失败`)
+        assert.deepEqual(textOrder(editor.state.doc), beforeText, `${label}: 文本顺序变化`)
+        assert.deepEqual(
+          itemSnapshot(editor.state.doc)
+            .filter((entry) => TARGETS.includes(entry.text))
+            .map((entry) => [entry.text, entry.depth]),
+          TARGETS.map((text) => [text, beforeDepth.get(text)]),
+          `${label}: 视觉层级错误`,
+        )
+        assert.deepEqual(
+          [...editor.view.dom.querySelectorAll('ol > li')]
+            .filter((itemNode) => TARGETS.includes(itemNode.firstChild?.textContent))
+            .map((itemNode) => Number(/--dvn-list-number: "(\d+)"/.exec(itemNode.getAttribute('style'))?.[1])),
+          [1, 2, 3],
+          `${label}: DOM marker 不是 1/2/3`,
+        )
+      } catch (error) {
+        failures.push(error.message)
+      }
+      editor.destroy()
+    }
+  }
+  assert.deepEqual(failures, [], `嵌套子项取消/重应用编号失败 ${failures.length} 例：\n${failures.join('\n')}`)
+})
+
 test('截图场景：扁平视觉层级整体转有序后，序号按可见节点分组重置', () => {
   const { editor } = createEditor({
     type: 'doc',
@@ -598,6 +649,59 @@ test('按钮与 Tab/Shift+Tab 交叉 × 3 种列表：取消、重应用、缩�
     editor.destroy()
   }
   assert.deepEqual(failures, [], `按钮/键盘交叉矩阵失败 ${failures.length} 例：\n${failures.join('\n')}`)
+})
+
+test('真实链路：无序列表局部两项转换后 Tab，只缩进当前项，转换片段其他项不得整体后移', () => {
+  const failures = []
+  const texts = ['A', 'B', 'C', 'D', 'E']
+  const selections = [
+    ['B', 'C'],
+    ['C', 'D'],
+  ]
+
+  for (const targetType of LIST_TYPES.filter((type) => type !== 'bulletList')) {
+    for (const [startText, endText] of selections) {
+      for (const cursorText of [startText, endText]) {
+        const { editor, window } = createEditor({
+          type: 'doc',
+          content: [list('bulletList', texts.map((text) => item('bulletList', text)))],
+        })
+        const label = `${targetType}/${startText}-${endText}/${cursorText}`
+        try {
+          // 用户真实路径：从普通无序列表中只选中相邻两项，先点另一种列表按钮，
+          // 再把光标放到转换后片段的其中一项按 Tab。
+          selectText(editor, startText, 0, endText, 1)
+          assert.equal(switchSelectedListType(editor, targetType), true, `${label}: 局部转换失败`)
+
+          const beforeJSON = editor.getJSON()
+          const before = itemSnapshot(editor.state.doc)
+          const cursorBefore = before.find((entry) => entry.text === cursorText)
+          const othersBefore = withoutNumbers(before.filter((entry) => entry.text !== cursorText))
+          const initialChildCount = editor.state.doc.childCount
+
+          setCursor(editor, cursorText, cursorText.length)
+          const event = pressTab(editor, window)
+          assert.equal(event.defaultPrevented, true, `${label}: Tab 未由列表逻辑处理`)
+
+          const after = itemSnapshot(editor.state.doc)
+          const cursorAfter = after.find((entry) => entry.text === cursorText)
+          const othersAfter = withoutNumbers(after.filter((entry) => entry.text !== cursorText))
+          assert.equal(cursorAfter.depth, Math.min(2, cursorBefore.depth + 1), `${label}: 当前项没有且只缩进一级`)
+          assert.deepEqual(othersAfter, othersBefore, `${label}: 未选中的转换兄弟或前后列表项被整体带动`)
+          assert.equal(editor.state.doc.childCount, initialChildCount, `${label}: Tab 改变了列表块边界`)
+          assert.deepEqual(textOrder(editor.state.doc), texts, `${label}: Tab 后文本顺序变化`)
+
+          const lift = pressTab(editor, window, true)
+          assert.equal(lift.defaultPrevented, true, `${label}: Shift+Tab 未由列表逻辑处理`)
+          assert.deepEqual(editor.getJSON(), beforeJSON, `${label}: Shift+Tab 未精确恢复到 Tab 前`)
+        } catch (error) {
+          failures.push(error.message)
+        }
+        editor.destroy()
+      }
+    }
+  }
+  assert.deepEqual(failures, [], `局部转换后 Tab 交叉失败 ${failures.length} 例：\n${failures.join('\n')}`)
 })
 
 test('按钮转换不能把带深后代的视觉子列表推到第 4 层', () => {

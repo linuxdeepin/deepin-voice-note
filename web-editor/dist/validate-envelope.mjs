@@ -14880,9 +14880,7 @@ Extension.create({
 });
 var index_default$a = BulletList;
 var index_default$9 = OrderedList;
-var index_default$8 = ListItem;
-var index_default$7 = TaskList;
-var index_default$6 = TaskItem;
+var index_default$8 = TaskList;
 var starInputRegex$1 = /(?:^|\s)(\*\*(?!\s+\*\*)((?:[^*]+))\*\*(?!\s+\*\*))$/;
 var starPasteRegex$1 = /(?:^|\s)(\*\*(?!\s+\*\*)((?:[^*]+))\*\*(?!\s+\*\*))/g;
 var underscoreInputRegex$1 = /(?:^|\s)(__(?!\s+__)((?:[^_]+))__(?!\s+__))$/;
@@ -14973,7 +14971,7 @@ var Bold = Mark2.create({
     ];
   }
 });
-var index_default$5 = Bold;
+var index_default$7 = Bold;
 var starInputRegex = /(?:^|\s)(\*(?!\s+\*)((?:[^*]+))\*(?!\s+\*))$/;
 var starPasteRegex = /(?:^|\s)(\*(?!\s+\*)((?:[^*]+))\*(?!\s+\*))/g;
 var underscoreInputRegex = /(?:^|\s)(_(?!\s+_)((?:[^_]+))_(?!\s+_))$/;
@@ -15063,7 +15061,7 @@ var Italic = Mark2.create({
     ];
   }
 });
-var index_default$4 = Italic;
+var index_default$6 = Italic;
 var Underline = Mark2.create({
   name: "underline",
   addOptions() {
@@ -15133,7 +15131,7 @@ var Underline = Mark2.create({
     };
   }
 });
-var index_default$3 = Underline;
+var index_default$5 = Underline;
 var inputRegex$2 = /(?:^|\s)(~~(?!\s+~~)((?:[^~]+))~~(?!\s+~~))$/;
 var pasteRegex$1 = /(?:^|\s)(~~(?!\s+~~)((?:[^~]+))~~(?!\s+~~))/g;
 var Strike = Mark2.create({
@@ -15206,7 +15204,7 @@ var Strike = Mark2.create({
     ];
   }
 });
-var index_default$2 = Strike;
+var index_default$4 = Strike;
 var inputRegex$1 = /(?:^|\s)(==(?!\s+==)((?:[^=]+))==(?!\s+==))$/;
 var pasteRegex = /(?:^|\s)(==(?!\s+==)((?:[^=]+))==(?!\s+==))/g;
 var Highlight = Mark2.create({
@@ -15311,7 +15309,7 @@ var Highlight = Mark2.create({
     ];
   }
 });
-var index_default$1 = Highlight;
+var index_default$3 = Highlight;
 const ColorMark = Mark2.create({
   name: "color",
   addAttributes() {
@@ -15549,7 +15547,7 @@ var Image = Node3.create({
     ];
   }
 });
-var index_default = Image;
+var index_default$2 = Image;
 const IMAGE_ATTRS = ["src", "alt", "title", "width", "height", "data-rel-path"];
 function imageDomAttributes(baseAttributes, nodeAttrs) {
   return {
@@ -15572,7 +15570,7 @@ function applyImageAttributes(img, attributes) {
     img.setAttribute(name, String(value));
   }
 }
-const ImageBlock = index_default.extend({
+const ImageBlock = index_default$2.extend({
   name: "image",
   addOptions() {
     return {
@@ -17680,6 +17678,14 @@ const VoiceBlock = Node3.create({
     ];
   }
 });
+var index_default$1 = ListItem;
+var index_default = TaskItem;
+const ListItemWithHeading = index_default$1.extend({
+  content: "(paragraph|heading) block*"
+});
+const TaskItemWithHeading = index_default.extend({
+  content: "(paragraph|heading) block*"
+});
 function createTiptapSchemaV1() {
   return getSchema([
     index_default$g,
@@ -17690,17 +17696,17 @@ function createTiptapSchemaV1() {
     index_default$b,
     index_default$a,
     index_default$9,
+    ListItemWithHeading,
     index_default$8,
-    index_default$7,
-    index_default$6.configure({ nested: true }),
+    TaskItemWithHeading.configure({ nested: true }),
     ImageBlock,
     VoiceBlock,
+    index_default$7,
+    index_default$6,
     index_default$5,
     index_default$4,
-    index_default$3,
-    index_default$2,
     ColorMark,
-    index_default$1.configure({ multicolor: true }),
+    index_default$3.configure({ multicolor: true }),
     FontFamilyMark,
     FontSizeMark,
     FontWeightMark

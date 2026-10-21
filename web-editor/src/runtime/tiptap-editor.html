@@ -42,11 +42,15 @@
     #app.is-empty[data-empty-heading-level="6"] .ProseMirror::before { font-size: 10px; }
     .ProseMirror p { margin: 0; min-height: 1.72em; }
     .ProseMirror h1, .ProseMirror h2, .ProseMirror h3, .ProseMirror h4, .ProseMirror h5, .ProseMirror h6 { margin: 0; font-weight: 700; }
-    .ProseMirror h1 { font-size: 24px; line-height: 32px; }
-    .ProseMirror h2 { font-size: 20px; line-height: 28px; }
-    .ProseMirror h3 { font-size: 18px; line-height: 26px; }
-    .ProseMirror h4 { font-size: 16px; line-height: 24px; }
-    .ProseMirror h5 { font-size: 14px; line-height: 22px; }
+    /* 标题行高必须使用无单位倍率，不能使用 px 或 em 计算出的固定值。
+       行内字号 mark 会覆盖标题字号；如果行高先被计算成 px，24px 行内字号
+       仍会继承旧标题的 30px/27px/24px 行高，多行选区背景就会上下重叠。
+       无单位倍率会随行内字号重新计算。H5 保留原 22/14 的行高比例。 */
+    .ProseMirror h1 { font-size: 24px; line-height: 1.5; }
+    .ProseMirror h2 { font-size: 20px; line-height: 1.5; }
+    .ProseMirror h3 { font-size: 18px; line-height: 1.5; }
+    .ProseMirror h4 { font-size: 16px; line-height: 1.5; }
+    .ProseMirror h5 { font-size: 14px; line-height: 1.5714285714; }
     .ProseMirror h6 { font-size: 10px; }
     /* Match legacy Summernote list spacing from saved note CSS.
        Browser defaults indent lists too far and can make migrated long lines
@@ -73,13 +77,37 @@
        注意 2：只有 :first-child 参与第一行，marker 才始终贴列表项第一行
        （方案 A：首行为空时编号也留在第一行，不跳到第一个有字的行）。 */
     .ProseMirror ul:not([data-type="taskList"]) > li > p,
-    .ProseMirror ol > li > p {
+    .ProseMirror ul:not([data-type="taskList"]) > li > h1,
+    .ProseMirror ul:not([data-type="taskList"]) > li > h2,
+    .ProseMirror ul:not([data-type="taskList"]) > li > h3,
+    .ProseMirror ul:not([data-type="taskList"]) > li > h4,
+    .ProseMirror ul:not([data-type="taskList"]) > li > h5,
+    .ProseMirror ul:not([data-type="taskList"]) > li > h6,
+    .ProseMirror ol > li > p,
+    .ProseMirror ol > li > h1,
+    .ProseMirror ol > li > h2,
+    .ProseMirror ol > li > h3,
+    .ProseMirror ol > li > h4,
+    .ProseMirror ol > li > h5,
+    .ProseMirror ol > li > h6 {
       /* 所有段落都进正文列；不要在这里写 grid-row，第二段起靠自动排版落行 */
       grid-column: 1 / -1;
       padding-left: var(--dvn-marker-gutter, 20px);
     }
     .ProseMirror ul:not([data-type="taskList"]) > li > p:first-child,
-    .ProseMirror ol > li > p:first-child {
+    .ProseMirror ul:not([data-type="taskList"]) > li > h1:first-child,
+    .ProseMirror ul:not([data-type="taskList"]) > li > h2:first-child,
+    .ProseMirror ul:not([data-type="taskList"]) > li > h3:first-child,
+    .ProseMirror ul:not([data-type="taskList"]) > li > h4:first-child,
+    .ProseMirror ul:not([data-type="taskList"]) > li > h5:first-child,
+    .ProseMirror ul:not([data-type="taskList"]) > li > h6:first-child,
+    .ProseMirror ol > li > p:first-child,
+    .ProseMirror ol > li > h1:first-child,
+    .ProseMirror ol > li > h2:first-child,
+    .ProseMirror ol > li > h3:first-child,
+    .ProseMirror ol > li > h4:first-child,
+    .ProseMirror ol > li > h5:first-child,
+    .ProseMirror ol > li > h6:first-child {
       /* 只有首段可以参与第一行；其余段落必须落到后续行 */
       grid-row: 1;
       text-indent: calc(-1 * var(--dvn-marker-gutter, 20px));
@@ -95,26 +123,50 @@
          - 内层字符用 inline-flex 居中，因此 marker 字形中心落在盒子中心。
        这里没有按字号/字体逐个写补偿像素；字号只参与盒高计算，不参与字形大小。 */
     .ProseMirror ul:not([data-type="taskList"]) > li > p:first-child::before,
-    .ProseMirror ol > li > p:first-child::before {
+    .ProseMirror ul:not([data-type="taskList"]) > li > h1:first-child::before,
+    .ProseMirror ul:not([data-type="taskList"]) > li > h2:first-child::before,
+    .ProseMirror ul:not([data-type="taskList"]) > li > h3:first-child::before,
+    .ProseMirror ul:not([data-type="taskList"]) > li > h4:first-child::before,
+    .ProseMirror ul:not([data-type="taskList"]) > li > h5:first-child::before,
+    .ProseMirror ul:not([data-type="taskList"]) > li > h6:first-child::before,
+    .ProseMirror ol > li > p:first-child::before,
+    .ProseMirror ol > li > h1:first-child::before,
+    .ProseMirror ol > li > h2:first-child::before,
+    .ProseMirror ol > li > h3:first-child::before,
+    .ProseMirror ol > li > h4:first-child::before,
+    .ProseMirror ol > li > h5:first-child::before,
+    .ProseMirror ol > li > h6:first-child::before {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       width: var(--dvn-marker-gutter, 20px);
       box-sizing: border-box;
       font-size: 14px;
-      height: calc(1lh * max(1, var(--dvn-marker-ratio, 1)));
+      height: var(--dvn-marker-line-height, calc(1lh * max(1, var(--dvn-marker-ratio, 1))));
       line-height: inherit;
       color: currentColor;
       text-indent: 0;
       vertical-align: top;
     }
-    .ProseMirror ul:not([data-type="taskList"]) > li > p:first-child::before {
+    .ProseMirror ul:not([data-type="taskList"]) > li > p:first-child::before,
+    .ProseMirror ul:not([data-type="taskList"]) > li > h1:first-child::before,
+    .ProseMirror ul:not([data-type="taskList"]) > li > h2:first-child::before,
+    .ProseMirror ul:not([data-type="taskList"]) > li > h3:first-child::before,
+    .ProseMirror ul:not([data-type="taskList"]) > li > h4:first-child::before,
+    .ProseMirror ul:not([data-type="taskList"]) > li > h5:first-child::before,
+    .ProseMirror ul:not([data-type="taskList"]) > li > h6:first-child::before {
       content: "•";
       justify-content: center;
     }
     .ProseMirror ol { counter-reset: dvn-ordered-list; }
     .ProseMirror ol > li { counter-increment: dvn-ordered-list; }
-    .ProseMirror ol > li > p:first-child::before {
+    .ProseMirror ol > li > p:first-child::before,
+    .ProseMirror ol > li > h1:first-child::before,
+    .ProseMirror ol > li > h2:first-child::before,
+    .ProseMirror ol > li > h3:first-child::before,
+    .ProseMirror ol > li > h4:first-child::before,
+    .ProseMirror ol > li > h5:first-child::before,
+    .ProseMirror ol > li > h6:first-child::before {
       /* 扁平列表可能通过 dvnIndentLevel 表达视觉层级；运行态 decoration
          会给每个列表项下发按可见节点分组后的编号。counter 仅作为极端情况下
          的兜底，不能直接使用，否则会表现为 1,2,3,4,5 而不是 1,1,1,2,2。 */
@@ -128,9 +180,27 @@
     .ProseMirror ol > li {
       grid-template-columns: var(--dvn-ordered-marker-gutter, 20px) minmax(0, 1fr);
     }
-    .ProseMirror ol > li > p { padding-left: var(--dvn-ordered-marker-gutter, 20px); }
-    .ProseMirror ol > li > p:first-child { text-indent: calc(-1 * var(--dvn-ordered-marker-gutter, 20px)); }
-    .ProseMirror ol > li > p:first-child::before { width: var(--dvn-ordered-marker-gutter, 20px); }
+    .ProseMirror ol > li > p,
+    .ProseMirror ol > li > h1,
+    .ProseMirror ol > li > h2,
+    .ProseMirror ol > li > h3,
+    .ProseMirror ol > li > h4,
+    .ProseMirror ol > li > h5,
+    .ProseMirror ol > li > h6 { padding-left: var(--dvn-ordered-marker-gutter, 20px); }
+    .ProseMirror ol > li > p:first-child,
+    .ProseMirror ol > li > h1:first-child,
+    .ProseMirror ol > li > h2:first-child,
+    .ProseMirror ol > li > h3:first-child,
+    .ProseMirror ol > li > h4:first-child,
+    .ProseMirror ol > li > h5:first-child,
+    .ProseMirror ol > li > h6:first-child { text-indent: calc(-1 * var(--dvn-ordered-marker-gutter, 20px)); }
+    .ProseMirror ol > li > p:first-child::before,
+    .ProseMirror ol > li > h1:first-child::before,
+    .ProseMirror ol > li > h2:first-child::before,
+    .ProseMirror ol > li > h3:first-child::before,
+    .ProseMirror ol > li > h4:first-child::before,
+    .ProseMirror ol > li > h5:first-child::before,
+    .ProseMirror ol > li > h6:first-child::before { width: var(--dvn-ordered-marker-gutter, 20px); }
     .ProseMirror ul:not([data-type="taskList"]) > li > ul,
     .ProseMirror ul:not([data-type="taskList"]) > li > ol,
     .ProseMirror ol > li > ul,
@@ -162,7 +232,13 @@
     .ProseMirror li[data-dvn-indent-level="2"] > div > ul,
     .ProseMirror li[data-dvn-indent-level="2"] > div > ol { margin-left: -40px; }
     .ProseMirror li { margin-top: 0; margin-right: 0; margin-bottom: 0; padding-left: 0; }
-    .ProseMirror li > p { margin: 0; min-height: 0; }
+    .ProseMirror li > p,
+    .ProseMirror li > h1,
+    .ProseMirror li > h2,
+    .ProseMirror li > h3,
+    .ProseMirror li > h4,
+    .ProseMirror li > h5,
+    .ProseMirror li > h6 { margin: 0; min-height: 0; }
     /* Match legacy Summernote image geometry while keeping img inline inside its paragraph. */
     .ProseMirror img { box-sizing: border-box; padding: 4px !important; max-width: 100% !important; }
 

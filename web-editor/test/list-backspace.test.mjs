@@ -1641,3 +1641,31 @@ test('Delete at the last item of a nested inner list is a safe no-op for all lis
   }
   assert.deepEqual(failures, [], `nested Delete matrix failed ${failures.length} cases:\n${failures.join('\n')}`)
 })
+
+test('一级父项带子树连续 Backspace 合并后，一次 Undo 精确恢复上一次退出列表状态', async () => {
+  const window = setupDom()
+  const editor = createEditor(window, {
+    type: 'doc',
+    content: [list('orderedList', [
+      listItem('A'),
+      listItem('B', [list('orderedList', [listItem('B1'), listItem('B2')])]),
+      listItem('C'),
+    ])],
+  })
+
+  backspaceAtTextStart(editor, window, 'B')
+  const afterFirst = editor.getJSON()
+  assert.equal(textOccurrenceContext(editor, 'B').listType, null, '第一次 Backspace 后 B 应退出列表并保持一级视觉位置')
+
+  await new Promise((resolve) => setTimeout(resolve, 650))
+
+  backspaceAtTextStart(editor, window, 'B')
+  assert.ok(editor.state.doc.textBetween(0, editor.state.doc.content.size, '\n', '\n').includes('AB'))
+
+  assert.equal(editor.commands.undo(), true, '第二次 Backspace 必须可撤销')
+  assert.deepEqual(editor.getJSON(), afterFirst, '一次 Undo 必须回到第一次 Backspace 后的结构，而不是停留在合并态')
+
+  assert.equal(editor.commands.redo(), true, '合并操作必须可重做')
+  assert.ok(editor.state.doc.textBetween(0, editor.state.doc.content.size, '\n', '\n').includes('AB'))
+  editor.destroy()
+})

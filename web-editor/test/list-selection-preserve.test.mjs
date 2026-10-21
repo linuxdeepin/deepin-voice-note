@@ -174,7 +174,7 @@ function selectListItems(editor, firstIndex, lastIndex) {
   for (let index = 0; index < list.childCount; index += 1) {
     const item = list.child(index)
     if (index === firstIndex) from = pos + 2
-    if (index === lastIndex) to = pos + item.nodeSize - 3
+    if (index === lastIndex) to = pos + item.nodeSize - 2
     pos += item.nodeSize
   }
   editor.commands.setTextSelection({ from, to })
@@ -333,7 +333,7 @@ function listItemRanges(editor, blockIndex) {
   let itemPos = blockPos + 1
   for (let index = 0; index < list.childCount; index += 1) {
     const size = list.child(index).nodeSize
-    ranges.push({ from: itemPos + 2, to: itemPos + size - 3 })
+    ranges.push({ from: itemPos + 2, to: itemPos + size - 2 })
     itemPos += size
   }
   return ranges
@@ -1058,5 +1058,94 @@ test('截图同款混合列表中只拖选第一个嵌套分支：选中项整�
   assert.equal(lists.includes('taskList'), true, '未选中的后续待办分支不能丢类型')
   assert.equal(editor.state.doc.textBetween(editor.state.selection.from, editor.state.selection.to, '|'),
     'dasdsadas|ddsadsad|dasdsa|dasdsa')
+  editor.destroy()
+})
+
+function mixedRangeSelectionDoc() {
+  const item = (type, text, children = []) => ({
+    type,
+    attrs: type === 'taskItem' ? { checked: false } : {},
+    content: [{ type: 'paragraph', content: [{ type: 'text', text }] }, ...children],
+  })
+  return {
+    type: 'doc',
+    content: [
+      { type: 'paragraph', content: [{ type: 'text', text: 'P1' }] },
+      { type: 'paragraph', content: [{ type: 'text', text: 'P2' }] },
+      {
+        type: 'orderedList',
+        attrs: { start: 1 },
+        content: [
+          item('listItem', 'L1', [{
+            type: 'bulletList',
+            attrs: {},
+            content: [item('listItem', 'L1a'), item('listItem', 'L1b')],
+          }]),
+          item('listItem', 'L2'),
+        ],
+      },
+      { type: 'taskList', attrs: {}, content: [item('taskItem', 'T1'), item('taskItem', 'T2')] },
+    ],
+  }
+}
+
+function selectBetweenText(editor, startText, endText = startText) {
+  const ranges = textRanges(editor)
+  const start = ranges.find((range) => editor.state.doc.textBetween(range.from, range.to) === startText)
+  const end = ranges.find((range) => editor.state.doc.textBetween(range.from, range.to) === endText)
+  assert.ok(start, `missing start text: ${startText}`)
+  assert.ok(end, `missing end text: ${endText}`)
+  editor.commands.setTextSelection({ from: start.from, to: end.to })
+}
+
+test('只选中父项文字切换列表：选区不能吞掉未选中的子列表', () => {
+  const editor = createEditor(mixedRangeSelectionDoc())
+  selectBetweenText(editor, 'L1')
+
+  assert.equal(switchSelectedListType(editor, 'bulletList'), true)
+
+  assert.equal(selectedText(editor), 'L1')
+  assert.equal(editor.state.doc.textBetween(editor.state.selection.from, editor.state.selection.to), 'L1')
+  editor.destroy()
+})
+
+test('从正文选到父项末尾切换有序列表：选区不能追加子项或后续兄弟项', () => {
+  const editor = createEditor(mixedRangeSelectionDoc())
+  selectBetweenText(editor, 'P1', 'L1')
+
+  assert.equal(switchSelectedListType(editor, 'orderedList'), true)
+
+  assert.equal(selectedText(editor), 'P1|P2|L1')
+  editor.destroy()
+})
+
+test('从子项选到后续父项切换有序列表：选区不能反向追加祖先或前置兄弟项', () => {
+  const editor = createEditor(mixedRangeSelectionDoc())
+  selectBetweenText(editor, 'L1b', 'L2')
+
+  assert.equal(switchSelectedListType(editor, 'orderedList'), true)
+
+  assert.equal(selectedText(editor), 'L1b|L2')
+  editor.destroy()
+})
+
+test('连续两次列表按钮点击在历史中保持为两个独立操作，Undo 逐次恢复', () => {
+  const editor = createEditor(screenshotMixedNestedDoc())
+  selectWholeDocumentText(editor)
+  const original = editor.getJSON()
+
+  assert.equal(switchSelectedListType(editor, 'taskList'), true)
+  const applied = editor.getJSON()
+  assert.equal(switchSelectedListType(editor, 'taskList'), true)
+  const canceled = editor.getJSON()
+
+  assert.equal(editor.commands.undo(), true)
+  assert.deepEqual(editor.getJSON(), applied, '第一次 Undo 只应撤销第二次按钮点击')
+  assert.equal(editor.commands.undo(), true)
+  assert.deepEqual(editor.getJSON(), original, '第二次 Undo 才应撤销第一次按钮点击')
+  assert.equal(editor.commands.redo(), true)
+  assert.deepEqual(editor.getJSON(), applied)
+  assert.equal(editor.commands.redo(), true)
+  assert.deepEqual(editor.getJSON(), canceled)
   editor.destroy()
 })

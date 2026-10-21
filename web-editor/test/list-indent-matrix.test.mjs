@@ -17,6 +17,7 @@ import { Editor } from '@tiptap/core'
 
 import { createTiptapExtensions } from '../src/runtime/tiptap-extensions.js'
 import { liftActiveListItem, sinkActiveListItem } from '../src/runtime/list-behavior.js'
+import { orderedListMarkerNumbers } from '../src/runtime/normal-list-markers.js'
 
 function defineGlobal(name, value) {
   Object.defineProperty(globalThis, name, { value, writable: true, configurable: true })
@@ -771,8 +772,10 @@ function listItemSnapshots(doc) {
     if (isItem) {
       snapshots.push({
         text: node.firstChild?.textContent ?? '',
+        itemType: node.type.name,
         structuralDepth,
         indentLevel: Number(node.attrs?.dvnIndentLevel) || 0,
+        checked: node.attrs?.checked ?? null,
         hasChildList: itemHasDirectChildList(node),
       })
     }
@@ -868,6 +871,142 @@ test('父项带子列表时 Tab 只改父项，子项结构和视觉层级不动
   assert.equal(failures.length, 0, `带子列表的单父项缩进回归失败：\n${failures.join('\n')}`)
 })
 
+// 二级项是父项下唯一子项，并且自身还带子列表时，Tab 仍必须能进入三级。
+// 旧实现只要看到“有子列表 + 没有同级前项”就提前返回，表现为同一位置的项
+// 因为多了子内容而偶发不能缩进；实际缩进只改当前项的 dvnIndentLevel，完全
+// 不依赖同级前项，也不会带动它的子列表。
+test('二级首项带子列表时仍可进入三级，且只修改当前项', () => {
+  const failures = []
+  for (const outer of LIST_TYPES) {
+    for (const middle of LIST_TYPES) {
+      const window = setupDom()
+      const editor = createEditor(window, {
+        type: 'doc',
+        content: [list(outer.listType, [
+          outer.mkItem('A', [list(middle.listType, [
+            middle.mkItem('B', [list(outer.listType, [outer.mkItem('B1')])]),
+            middle.mkItem('C'),
+          ])]),
+        ])],
+      })
+      const name = `${outer.label}外层/${middle.label}中层`
+      const initial = listItemSnapshots(editor.state.doc)
+      const initialB = initial.find((item) => item.text === 'B')
+      const initialB1 = initial.find((item) => item.text === 'B1')
+
+      editor.chain().focus().setTextSelection(findTextRange(editor, 'B').from).run()
+      const event = dispatchTab(editor, window, false)
+      if (!event.defaultPrevented) failures.push(`[${name}] Tab 未处理`)
+
+      const afterTab = listItemSnapshots(editor.state.doc)
+      const bAfterTab = afterTab.find((item) => item.text === 'B')
+      const b1AfterTab = afterTab.find((item) => item.text === 'B1')
+      if (bAfterTab?.structuralDepth !== initialB?.structuralDepth
+        || bAfterTab?.indentLevel !== initialB?.indentLevel + 1) {
+        failures.push(`[${name}] 二级首项没有只靠视觉属性进入三级: ${JSON.stringify({ initialB, bAfterTab })}`)
+      }
+      if (JSON.stringify(b1AfterTab) !== JSON.stringify(initialB1)) {
+        failures.push(`[${name}] 子项 B1 被带动: ${JSON.stringify({ initialB1, b1AfterTab })}`)
+      }
+      if (afterTab.map((item) => item.text).join('|') !== initial.map((item) => item.text).join('|')) {
+        failures.push(`[${name}] 文本顺序变化`)
+      }
+
+      dispatchTab(editor, window, true)
+      const restored = listItemSnapshots(editor.state.doc)
+      if (JSON.stringify(restored) !== JSON.stringify(initial)) {
+        failures.push(`[${name}] Shift+Tab 未精确恢复: ${JSON.stringify({ initial, restored })}`)
+      }
+      editor.destroy()
+    }
+  }
+  assert.equal(failures.length, 0, `二级首项带子列表缩进回归失败：\n${failures.join('\n')}`)
+})
+
+// 用户实际路径：有序 A / B(B1,B2) / C / D，光标在 B 连续做 Tab/Shift+Tab。
+// B 带真实子列表时仍只能改变 B 自己的视觉层级；B 缩进后必须进入子级编号组，
+// 回到根级后 B/C/D 的根编号必须重新连续，不能出现 1,1,1,2 后突然断号或重号。
+test('带子列表的有序项 Tab/Shift+Tab 往返后编号始终按当前视觉层级连续', () => {
+  const window = setupDom()
+  const editor = createEditor(window, {
+    type: 'doc',
+    content: [list('orderedList', [
+      listItem('A'),
+      listItem('B', [list('orderedList', [listItem('B1'), listItem('B2')])]),
+      listItem('C'),
+      listItem('D'),
+    ])],
+  })
+  const outerList = () => editor.state.doc.firstChild
+  const item = (text) => listItemSnapshots(editor.state.doc).find((entry) => entry.text === text)
+
+  editor.chain().focus().setTextSelection(findTextRange(editor, 'B').from).run()
+
+  for (let round = 1; round <= 3; round += 1) {
+    const beforeB = item('B')
+    const beforeB1 = item('B1')
+    dispatchTab(editor, window, false)
+
+    assert.deepEqual(orderedListMarkerNumbers(outerList()), [1, 1, 2, 3], `第 ${round} 轮 Tab 后断号/重号`)
+    assert.equal(item('B').structuralDepth, beforeB.structuralDepth, `第 ${round} 轮 Tab 把 B 的结构层级改了`)
+    assert.equal(item('B').indentLevel, beforeB.indentLevel + 1, `第 ${round} 轮 Tab 没有只缩进 B`)
+    assert.deepEqual(item('B1'), beforeB1, `第 ${round} 轮 Tab 把未选中的 B1 一起移动了`)
+
+    dispatchTab(editor, window, true)
+
+    assert.deepEqual(orderedListMarkerNumbers(outerList()), [1, 2, 3, 4], `第 ${round} 轮 Shift+Tab 后断号/重号`)
+    assert.equal(item('B').structuralDepth, beforeB.structuralDepth, `第 ${round} 轮 Shift+Tab 把 B 的结构层级改了`)
+    assert.equal(item('B').indentLevel, beforeB.indentLevel, `第 ${round} 轮 Shift+Tab 没有恢复 B`)
+    assert.deepEqual(item('B1'), beforeB1, `第 ${round} 轮 Shift+Tab 把未选中的 B1 一起移动了`)
+  }
+
+  editor.destroy()
+})
+
+// 用户截图同构路径：A / B(B1,B2) / C / D。B 先 Tab 缩进、再 Shift+Tab
+// 回到根级，然后连续 Tab 两次。父项编号必须按当前视觉层级重新计算，但
+// B1/B2 仍在原有序子列表中独立连续编号，不能被子项缩进或往返重置/断号。
+test('有序父项回到根级后连续 Tab，父项重排且子列表独立编号不重置', () => {
+  const window = setupDom()
+  const editor = createEditor(window, {
+    type: 'doc',
+    content: [list('orderedList', [
+      listItem('A'),
+      listItem('B', [list('orderedList', [listItem('B1'), listItem('B2')])]),
+      listItem('C'),
+      listItem('D'),
+    ])],
+  })
+  const outerList = () => editor.state.doc.firstChild
+  const innerList = () => outerList().child(1).lastChild
+  const item = (text) => listItemSnapshots(editor.state.doc).find((entry) => entry.text === text)
+  const initialB1 = item('B1')
+
+  editor.chain().focus().setTextSelection(findTextRange(editor, 'B').from).run()
+
+  dispatchTab(editor, window, false)
+  assert.deepEqual(orderedListMarkerNumbers(outerList()), [1, 1, 2, 3], 'Tab 后父项编号未按视觉层级重算')
+
+  dispatchTab(editor, window, true)
+  assert.deepEqual(orderedListMarkerNumbers(outerList()), [1, 2, 3, 4], 'Shift+Tab 回根级后编号未恢复连续')
+
+  dispatchTab(editor, window, false)
+  dispatchTab(editor, window, false)
+  assert.equal(item('B').indentLevel, 2, '连续两次 Tab 没有只推进父项自身')
+  assert.deepEqual(orderedListMarkerNumbers(outerList()), [1, 1, 2, 3], '连续 Tab 后父项编号断号/重号')
+  assert.deepEqual(orderedListMarkerNumbers(innerList()), [1, 2], '连续 Tab 把子列表编号重置或改乱')
+  assert.deepEqual(item('B1'), initialB1, '连续 Tab 改变了未选中的 B1')
+
+  dispatchTab(editor, window, true)
+  dispatchTab(editor, window, true)
+  assert.equal(item('B').indentLevel, 0, '两次 Shift+Tab 没有恢复父项到根级')
+  assert.deepEqual(orderedListMarkerNumbers(outerList()), [1, 2, 3, 4], '恢复根级后父列表编号不连续')
+  assert.deepEqual(orderedListMarkerNumbers(innerList()), [1, 2], '恢复根级后子列表编号不连续')
+  assert.deepEqual(item('B1'), initialB1, '恢复根级改变了未选中的 B1')
+
+  editor.destroy()
+})
+
 // 跨列表类型时，当前项是独立列表首项但前面已有列表块：Tab 仍然只能缩进
 // 当前项本身，不能调用跨列表挂载把当前项及其已有子列表整体下沉。
 test('跨类型列表首项带子列表时 Tab 不整体下沉', () => {
@@ -921,6 +1060,131 @@ test('跨类型列表首项带子列表时 Tab 不整体下沉', () => {
     }
   }
   assert.equal(failures.length, 0, `跨类型首项缩进失败：\n${failures.join('\n')}`)
+})
+
+
+// 用户真实路径的完整交叉矩阵：前一个列表块、当前独立列表块、后一个列表块。
+// 当前列表首项 C 按 Tab 时，只允许 C 的视觉层级 +1；D、两个子列表、前后列表
+// 以及待办勾选状态都必须原样保留。27 种前后类型组合 × 4 种子树分布全部覆盖。
+test('相邻三个列表共 108 例：Tab 只缩进当前独立列表首项，兄弟与子树不漂移', () => {
+  const failures = []
+  const makeItem = (spec, text, children = [], checked = false) => {
+    const node = spec.mkItem(text, children)
+    if (spec.listType === 'taskList') node.attrs.checked = checked
+    return node
+  }
+  const shapes = [
+    { name: '无子树', currentChildren: false, followingChildren: false },
+    { name: '当前项带子树', currentChildren: true, followingChildren: false },
+    { name: '后续兄弟带子树', currentChildren: false, followingChildren: true },
+    { name: '当前项和后续兄弟都带子树', currentChildren: true, followingChildren: true },
+  ]
+  const visualDepth = (item) => item.structuralDepth + item.indentLevel
+
+  for (const previousSpec of LIST_TYPES) {
+    for (const currentSpec of LIST_TYPES) {
+      for (const nextSpec of LIST_TYPES) {
+        for (const shape of shapes) {
+          const window = setupDom()
+          const cChildren = shape.currentChildren
+            ? [list(currentSpec.listType, [makeItem(currentSpec, 'C1', [], true)])]
+            : []
+          const dChildren = shape.followingChildren
+            ? [list(currentSpec.listType, [makeItem(currentSpec, 'D1', [], true)])]
+            : []
+          const editor = createEditor(window, {
+            type: 'doc',
+            content: [
+              list(previousSpec.listType, [
+                makeItem(previousSpec, 'A', [], true),
+                makeItem(previousSpec, 'B', [], false),
+              ]),
+              list(currentSpec.listType, [
+                makeItem(currentSpec, 'C', cChildren, true),
+                makeItem(currentSpec, 'D', dChildren, shape.followingChildren),
+              ]),
+              list(nextSpec.listType, [
+                makeItem(nextSpec, 'E', [], true),
+                makeItem(nextSpec, 'F', [], false),
+              ]),
+            ],
+          })
+          const label = `${previousSpec.label}/${currentSpec.label}/${nextSpec.label}/${shape.name}`
+          const initialJSON = JSON.stringify(editor.getJSON())
+          const initial = listItemSnapshots(editor.state.doc)
+          const initialC = initial.find((item) => item.text === 'C')
+          const initialOthers = initial.filter((item) => item.text !== 'C')
+          const initialChildCount = editor.state.doc.childCount
+          const initialOrder = initial.map((item) => item.text).join('|')
+          // 相邻同类型列表在第一次结构事务中会被既有归一化合并；这属于独立
+          // 的列表边界规则。当前回归真正要求“三块保持不变”的是类型不同的块。
+          const canChangeBlockBoundary = previousSpec.listType === currentSpec.listType
+            || currentSpec.listType === nextSpec.listType
+
+          editor.chain().focus().setTextSelection(findTextRange(editor, 'C').from).run()
+          const firstEvent = dispatchTab(editor, window, false)
+          const afterFirst = listItemSnapshots(editor.state.doc)
+          const afterFirstC = afterFirst.find((item) => item.text === 'C')
+          const afterFirstOthers = afterFirst.filter((item) => item.text !== 'C')
+
+          if (!firstEvent.defaultPrevented) failures.push(`${label}: 第一次 Tab 未处理`)
+          if (!canChangeBlockBoundary && editor.state.doc.childCount !== initialChildCount) {
+            failures.push(`${label}: 列表块边界变化 ${initialChildCount} -> ${editor.state.doc.childCount}`)
+          }
+          if (afterFirstC && initialC && visualDepth(afterFirstC) !== visualDepth(initialC) + 1) {
+            failures.push(`${label}: C 未只缩进一级 ${JSON.stringify({ initialC, afterFirstC })}`)
+          }
+          if (JSON.stringify(afterFirstOthers) !== JSON.stringify(initialOthers)) {
+            failures.push(`${label}: 未选中的兄弟/前后项或勾选状态被带动 ${JSON.stringify({ initialOthers, afterFirstOthers })}`)
+          }
+          if (afterFirst.map((item) => item.text).join('|') !== initialOrder) {
+            failures.push(`${label}: 文本顺序变化`)
+          }
+
+          const secondEvent = dispatchTab(editor, window, false)
+          const afterSecond = listItemSnapshots(editor.state.doc)
+          const afterSecondC = afterSecond.find((item) => item.text === 'C')
+          if (!secondEvent.defaultPrevented) failures.push(`${label}: 第二次 Tab 未处理`)
+          if (afterSecondC && initialC && visualDepth(afterSecondC) !== Math.min(3, visualDepth(initialC) + 2)) {
+            failures.push(`${label}: 第二次 Tab 后 C 视觉层级错误 ${JSON.stringify({ initialC, afterSecondC })}`)
+          }
+          if (JSON.stringify(afterSecond.filter((item) => item.text !== 'C'))
+            !== JSON.stringify(initialOthers)) {
+            failures.push(`${label}: 第二次 Tab 带动了未选中项`)
+          }
+          if (Math.max(...afterSecond.map(visualDepth)) > 3) {
+            failures.push(`${label}: 出现第 4 层列表`)
+          }
+
+          dispatchTab(editor, window, true)
+          dispatchTab(editor, window, true)
+          if (canChangeBlockBoundary) {
+            const restored = listItemSnapshots(editor.state.doc).map((item) => ({
+              text: item.text,
+              itemType: item.itemType,
+              visualDepth: visualDepth(item),
+              checked: item.checked,
+              hasChildList: item.hasChildList,
+            }))
+            const expected = initial.map((item) => ({
+              text: item.text,
+              itemType: item.itemType,
+              visualDepth: visualDepth(item),
+              checked: item.checked,
+              hasChildList: item.hasChildList,
+            }))
+            if (JSON.stringify(restored) !== JSON.stringify(expected)) {
+              failures.push(`${label}: 两次 Shift+Tab 后语义未恢复`)
+            }
+          } else if (JSON.stringify(editor.getJSON()) !== initialJSON) {
+            failures.push(`${label}: 两次 Shift+Tab 后文档未精确恢复`)
+          }
+          editor.destroy()
+        }
+      }
+    }
+  }
+  assert.deepEqual(failures, [], `相邻独立列表首项缩进失败 ${failures.length} 例：\n${failures.join('\n')}`)
 })
 
 // 图片是 NodeSelection，不是文本范围选区；列表缩进/反缩进后必须保留图片节点

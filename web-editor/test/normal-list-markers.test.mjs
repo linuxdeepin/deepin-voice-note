@@ -13,6 +13,7 @@ import {
   buildNormalListMarkerDecorations,
   listItemMarkerFontSize,
   listItemMarkerGutter,
+  listItemMarkerLineHeight,
   listItemMarkerStyle,
   markerRatio,
   orderedListMarkerGutter,
@@ -75,6 +76,11 @@ function createEditorWithMarkers() {
 function markerStyleAttr(element) {
   const list = element.querySelector('.ProseMirror ol')
   return list ? list.getAttribute('style') : null
+}
+
+function renderedOrderedNumbers(element) {
+  return Array.from(element.querySelectorAll('.ProseMirror ol > li'))
+    .map((item) => Number(/--dvn-list-number: "(\d+)"/.exec(item.getAttribute('style') || '')?.[1]))
 }
 
 test('single digit markers keep the historical 20px gutter', () => {
@@ -231,6 +237,118 @@ test('marker ratio follows the widest inline font size in the first paragraph', 
   editor.destroy()
 })
 
+test('heading list items publish the real heading line box for marker alignment', () => {
+  setupDom()
+  const { editor, element } = createEditorWithMarkers()
+
+  const headingItem = (text, level) => ({
+    type: 'taskItem',
+    attrs: { checked: false },
+    content: [{
+      type: 'heading',
+      attrs: { level },
+      content: [{ type: 'text', text }],
+    }],
+  })
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{
+      type: 'taskList',
+      content: [1, 2, 3, 4, 5, 6].map((level) => headingItem(`H${level}`, level)),
+    }],
+  })
+
+  const items = []
+  editor.state.doc.descendants((node) => {
+    if (node.type.name === 'taskItem') items.push(node)
+  })
+  assert.deepEqual(
+    items.map((item) => listItemMarkerLineHeight(item)),
+    [36, 30, 27, 24, 22, 17.2],
+    'H1-H6 must follow the browser line box, including H6 inheriting the body ratio',
+  )
+  assert.match(
+    listItemMarkerStyle(null, 20, null, 36),
+    /--dvn-marker-line-height: 36px/,
+    'heading line height must be emitted with item marker variables',
+  )
+
+  const itemStyles = Array.from(element.querySelectorAll('ul[data-type="taskList"] > li'))
+    .map((item) => item.getAttribute('style') || '')
+  assert.deepEqual(
+    itemStyles.map((style) => /--dvn-marker-line-height: ([\d.]+)px/.exec(style)?.[1]),
+    ['36', '30', '27', '24', '22', '17.2'],
+  )
+  editor.destroy()
+})
+
+test('heading marker line height grows with an explicit font size', () => {
+  const { editor } = createEditorWithMarkers()
+  const headingItem = (level, fontSize) => ({
+    type: 'taskItem',
+    attrs: { checked: false },
+    content: [{
+      type: 'heading',
+      attrs: { level },
+      content: [{
+        type: 'text',
+        text: `H${level}`,
+        marks: [{ type: 'fontSize', attrs: { fontSize: `${fontSize}px` } }],
+      }],
+    }],
+  })
+
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{
+      type: 'taskList',
+      content: [1, 2, 3, 4, 5].map((level) => headingItem(level, 24)),
+    }],
+  })
+  const items = []
+  editor.state.doc.descendants((node) => {
+    if (node.type.name === 'taskItem') items.push(node)
+  })
+  assert.deepEqual(
+    items.map((item) => listItemMarkerLineHeight(item)),
+    [36, 36, 36, 36, 37.7143],
+    'explicit 24px headings must publish the same scaled line box as CSS',
+  )
+
+  // 显式字号小于标题默认字号时，标题自身行盒仍然决定实际行距。
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{
+      type: 'taskList',
+      content: [1, 2, 3, 4, 5, 6].map((level) => headingItem(level, 8)),
+    }],
+  })
+  const smallItems = []
+  editor.state.doc.descendants((node) => {
+    if (node.type.name === 'taskItem') smallItems.push(node)
+  })
+  assert.deepEqual(
+    smallItems.map((item) => listItemMarkerLineHeight(item)),
+    [36, 30, 27, 24, 22, 17.2],
+    '8px inline text cannot shrink the heading strut',
+  )
+
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{ type: 'taskList', content: [headingItem(4, 36)] }],
+  })
+  const largeHeadingItem = editor.state.doc.firstChild.firstChild
+  assert.equal(listItemMarkerLineHeight(largeHeadingItem), 54, '36px heading must scale the line box to 54px')
+
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{ type: 'taskList', content: [headingItem(6, 36)] }],
+  })
+  const largeH6 = editor.state.doc.firstChild.firstChild
+  assert.equal(listItemMarkerLineHeight(largeH6), 61.92, 'H6 must follow its inherited 1.72 line box')
+  editor.destroy()
+})
+
 test('ordered gutter depends on digit count, not marker font size', () => {
   setupDom()
   const { editor } = createEditorWithMarkers()
@@ -363,7 +481,7 @@ test('视觉层级编号矩阵：回退层级继续父组，进入子层重新�
   assert.deepEqual(numbersFor([1, 1, 0, 2], 5), [1, 2, 5, 1])
 })
 
-test('带直接子列表的项不会被 dvnIndentLevel 重置外层编号', () => {
+test('带直接子列表的项缩进后按视觉层级进入子级编号组', () => {
   setupDom()
   const { editor } = createEditorWithMarkers()
   const item = (text, dvnIndentLevel, children = []) => ({
@@ -397,8 +515,8 @@ test('带直接子列表的项不会被 dvnIndentLevel 重置外层编号', () =
   const outer = editor.state.doc.firstChild
   assert.deepEqual(
     orderedListMarkerNumbers(outer),
-    [1, 2, 3, 4],
-    '带真实子列表的项即使保留视觉缩进，也必须继续外层编号',
+    [1, 1, 2, 3],
+    'B 视觉缩进后属于子级编号组，后续根项必须从父级剩余序号继续',
   )
   assert.deepEqual(
     orderedListMarkerNumbers(outer.child(1).lastChild),
@@ -408,7 +526,256 @@ test('带直接子列表的项不会被 dvnIndentLevel 重置外层编号', () =
   editor.destroy()
 })
 
+test('嵌套列表按真实视觉层级跨结构继续编号', () => {
+  setupDom()
+  const { editor, element } = createEditorWithMarkers()
+  const item = (text, dvnIndentLevel = 0, children = []) => ({
+    type: 'listItem',
+    attrs: { dvnIndentLevel },
+    content: [
+      { type: 'paragraph', content: [{ type: 'text', text }] },
+      ...children,
+    ],
+  })
+  const ordered = (children) => ({ type: 'orderedList', attrs: { start: 1 }, content: children })
+
+  // 用户截图同构：父项通过 dvnIndentLevel 位于视觉三级；其子列表的结构
+  // 层级更深，但视觉上仍是三级，因此四项必须共用 1/2/3/4 的计数器。
+  // 返回到根级的 b/c/d/e 则继续根组 2/3/4/5。
+  editor.commands.setContent({
+    type: 'doc',
+    content: [ordered([
+      item('a', 0, [ordered([
+        item('adsa', 1),
+        item('dsad', 1, [ordered([
+          item('dsad', 0),
+          item('dasd', 0),
+        ])]),
+      ])]),
+      item('b'),
+      item('c'),
+      item('d'),
+      item('e'),
+    ])],
+  })
+
+  assert.deepEqual(renderedOrderedNumbers(element), [1, 1, 2, 3, 4, 2, 3, 4, 5])
+  editor.destroy()
+})
+
+test('普通结构嵌套仍按各自视觉层级重新从 1 编号', () => {
+  setupDom()
+  const { editor, element } = createEditorWithMarkers()
+  const item = (text, children = []) => ({
+    type: 'listItem',
+    attrs: { dvnIndentLevel: 0 },
+    content: [
+      { type: 'paragraph', content: [{ type: 'text', text }] },
+      ...children,
+    ],
+  })
+
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{
+      type: 'orderedList',
+      attrs: { start: 1 },
+      content: [
+        item('A', [{
+          type: 'orderedList',
+          attrs: { start: 1 },
+          content: [item('A1'), item('A2')],
+        }]),
+        item('B'),
+      ],
+    }],
+  })
+
+  assert.deepEqual(renderedOrderedNumbers(element), [1, 1, 2, 2])
+  editor.destroy()
+})
+
+test('视觉层级相同的子列表显式 start 能重设编号，返回父级后恢复父级计数', () => {
+  setupDom()
+  const { editor, element } = createEditorWithMarkers()
+  const item = (text, dvnIndentLevel = 0, children = []) => ({
+    type: 'listItem',
+    attrs: { dvnIndentLevel },
+    content: [
+      { type: 'paragraph', content: [{ type: 'text', text }] },
+      ...children,
+    ],
+  })
+
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{
+      type: 'orderedList',
+      attrs: { start: 1 },
+      content: [
+        item('A', 0, [{
+          type: 'orderedList',
+          attrs: { start: 4 },
+          content: [item('A1'), item('A2')],
+        }]),
+        item('B'),
+      ],
+    }],
+  })
+
+  assert.deepEqual(renderedOrderedNumbers(element), [1, 4, 5, 2])
+  editor.destroy()
+})
+
+test('有序/无序/待办混合嵌套时只有有序项参与编号', () => {
+  setupDom()
+  const { editor, element } = createEditorWithMarkers()
+  const item = (text, children = []) => ({
+    type: 'listItem',
+    attrs: { dvnIndentLevel: 0 },
+    content: [
+      { type: 'paragraph', content: [{ type: 'text', text }] },
+      ...children,
+    ],
+  })
+  const taskItem = (text, children = []) => ({
+    type: 'taskItem',
+    attrs: { checked: false, dvnIndentLevel: 0 },
+    content: [
+      { type: 'paragraph', content: [{ type: 'text', text }] },
+      ...children,
+    ],
+  })
+
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{
+      type: 'orderedList',
+      attrs: { start: 1 },
+      content: [
+        item('A'),
+        item('B', [
+          {
+            type: 'bulletList',
+            content: [item('B1', [{
+              type: 'taskList',
+              content: [taskItem('B1a', [{
+                type: 'orderedList',
+                attrs: { start: 1 },
+                content: [item('B1a1'), item('B1a2')],
+              }])],
+            }])],
+          },
+          {
+            type: 'bulletList',
+            content: [item('B2')],
+          },
+        ]),
+        item('C'),
+      ],
+    }],
+  })
+
+  assert.deepEqual(renderedOrderedNumbers(element), [1, 2, 1, 2, 3])
+  editor.destroy()
+})
+
+test('取消嵌套项留下的缩进普通段落只重置所在视觉层级，根级编号继续', () => {
+  setupDom()
+  const { editor, element } = createEditorWithMarkers()
+  const item = (text, dvnIndentLevel = 0, children = []) => ({
+    type: 'listItem',
+    attrs: { dvnIndentLevel },
+    content: [
+      { type: 'paragraph', content: [{ type: 'text', text }] },
+      ...children,
+    ],
+  })
+  const ordered = (children) => ({ type: 'orderedList', attrs: { start: 1 }, content: children })
+
+  // 取消二级 C2 后，它会变成带 dvnIndentLevel=1 的顶层普通段落。
+  // 该段落应只打断视觉二级的编号组，根级 P/Q 的 1/2 不能跟着重置。
+  editor.commands.setContent({
+    type: 'doc',
+    content: [
+      ordered([item('P', 0, [ordered([item('C1')])])]),
+      {
+        type: 'paragraph',
+        attrs: { dvnIndentLevel: 1 },
+        content: [{ type: 'text', text: 'C2' }],
+      },
+      ordered([item('C3', 1), item('C4', 1)]),
+      ordered([item('Q')]),
+    ],
+  })
+
+  assert.deepEqual(
+    renderedOrderedNumbers(element),
+    [1, 1, 1, 2, 2],
+    'P=1、C1=1、C3/C4 从 1 重新编号、Q 必须继续根级 2',
+  )
+
+  // 根级普通段落仍应重置整个编号序列，不能在根级强行续号。
+  editor.commands.setContent({
+    type: 'doc',
+    content: [
+      ordered([item('A')]),
+      { type: 'paragraph', content: [{ type: 'text', text: '普通段落' }] },
+      ordered([item('B')]),
+    ],
+  })
+  assert.deepEqual(renderedOrderedNumbers(element), [1, 1])
+  editor.destroy()
+})
+
 test('extension exposes the marker plugin', () => {
   assert.equal(NormalListMarkers.name, 'dvnNormalListMarkers')
   assert.equal(typeof NormalListMarkers.config.addProseMirrorPlugins, 'function')
+})
+
+test('顶层非列表块会切断两侧有序列表编号，容器内部编号也不能泄漏到后面', () => {
+  setupDom()
+  const { editor, element } = createEditorWithMarkers()
+  const item = (text) => ({
+    type: 'listItem',
+    attrs: { dvnIndentLevel: 0 },
+    content: [{ type: 'paragraph', content: [{ type: 'text', text }] }],
+  })
+  const ordered = (...texts) => ({
+    type: 'orderedList',
+    attrs: { start: 1 },
+    content: texts.map((text) => item(text)),
+  })
+  const paragraph = (text) => ({
+    type: 'paragraph',
+    content: [{ type: 'text', text }],
+  })
+
+  editor.commands.setContent({
+    type: 'doc',
+    content: [
+      ordered('A', 'B'),
+      {
+        type: 'voiceBlock',
+        attrs: { voiceId: 'marker-separator', voicePath: 'voice/separator.wav', voiceSize: 1 },
+      },
+      ordered('C', 'D'),
+    ],
+  })
+  assert.deepEqual(renderedOrderedNumbers(element), [1, 2, 1, 2])
+
+  editor.commands.setContent({
+    type: 'doc',
+    content: [
+      ordered('A', 'B'),
+      { type: 'blockquote', content: [paragraph('引用'), ordered('X', 'Y')] },
+      ordered('C', 'D'),
+    ],
+  })
+  assert.deepEqual(
+    renderedOrderedNumbers(element),
+    [1, 2, 1, 2, 1, 2],
+    '引用块内部有序列表从 1 开始，离开引用块后的根列表也必须从 1 开始',
+  )
+  editor.destroy()
 })
