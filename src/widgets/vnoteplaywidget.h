@@ -59,6 +59,7 @@ protected:
 private:
     void initUI();
     void initConnection();
+    void onChangeTheme();
     //初始化播放库
     void initPlayer();
     bool m_sliderReleased {true};
