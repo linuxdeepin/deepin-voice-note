@@ -861,31 +861,31 @@ function changeColor(flag, activeColor, disableColor, backgroundColor) {
     global_themeColor = backgroundColor
     setVoiceButColor(global_activeColor, global_disableColor)
 
-    $('.dropdown-fontsize>li>a').hover(function (e) {
+    $('.dropdown-fontsize>li').hover(function (e) {
         $(this).css('background-color', activeColor);
     }, function () {
-        $('.dropdown-fontsize>li>a').css('background-color', 'transparent');
+        $('.dropdown-fontsize>li').css('background-color', 'transparent');
         if (flag == 1) {
-            $('.dropdown-fontsize>li>a').css('color', "black");
+            $('.dropdown-fontsize>li').css('color', "black");
         } else {
-            $('.dropdown-fontsize>li>a').css('color', "rgba(197,207,224,1)");
+            $('.dropdown-fontsize>li').css('color', "rgba(197,207,224,1)");
         }
     })
-    $('.dropdown-fontname>li>a').hover(function (e) {
+    $('.dropdown-fontname>li').hover(function (e) {
         $(this).css('background-color', activeColor);
     }, function () {
-        $('.dropdown-fontname>li>a').css('background-color', 'transparent');
+        $('.dropdown-fontname>li').css('background-color', 'transparent');
         if (flag == 1) {
-            $('.dropdown-fontname>li>a').css('color', "black");
+            $('.dropdown-fontname>li').css('color', "black");
         } else {
-            $('.dropdown-fontname>li>a').css('color', "rgba(197,207,224,1)");
+            $('.dropdown-fontname>li').css('color', "rgba(197,207,224,1)");
         }
     })
     $('body').css('background-color', global_themeColor)
     if (flag == 1) {
         $('#dark').remove()
-        $('.dropdown-fontsize>li>a').css('color', "black");
-        $('.dropdown-fontname>li>a').css('color', "black");
+        $('.dropdown-fontsize>li').css('color', "black");
+        $('.dropdown-fontname>li').css('color', "black");
     } else if (flag == 2 && !$('#dark').length) {
         $("head").append("<link>");
         var css = $("head").children(":last");
