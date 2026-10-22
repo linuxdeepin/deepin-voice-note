@@ -7194,10 +7194,21 @@
                 if (winWidth - x < airPopoverWidth) {
                     x = winWidth - airPopoverWidth
                 }
+                let winHeight = $(document).height()
+                let scrollTop = $(document).scrollTop()
+                let top = y + scrollTop
+                // 上边界保护：工具栏上边距不小于 34（tip 高度，避免遮挡），与 update() 对称
+                if (top < 34) {
+                    top = 34
+                }
+                // 下边界保护：工具栏不超出可视区域下边界
+                if (top + airPopoverHeight > winHeight + scrollTop) {
+                    top = winHeight + scrollTop - airPopoverHeight
+                }
                 this.$popover.css({
                     display: 'block',
                     left: x + $(document).scrollLeft(),
-                    top: y + $(document).scrollTop()
+                    top: top
                 });
                 this.context.invoke('buttons.updateCurrentStyle', this.$popover);
             }
