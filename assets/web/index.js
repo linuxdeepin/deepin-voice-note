@@ -981,6 +981,9 @@ function setVoiceButColor(color, shdow) {
     .active {
         background: ${color}80!important;
     }
+    .translate>div {
+        color: ${color} !important;
+    }
     `)
 }
 
