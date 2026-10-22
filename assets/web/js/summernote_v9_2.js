@@ -7291,6 +7291,10 @@
                 if (winWidth - x < airPopoverWidth) {
                     x = winWidth - airPopoverWidth
                 }
+                // 上边距判断，工具栏上边距不小于34（tip高度，避免遮挡）
+                if (y < 34) {
+                    y = rect.top + rect.height + 14
+                }
                 this.$popover.css({
                     display: 'block',
                     left: x + $(document).scrollLeft(),
