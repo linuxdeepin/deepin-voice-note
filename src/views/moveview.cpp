@@ -159,16 +159,18 @@ void MoveView::paintNormal(QPaintEvent *e)
             QColor color2("#FD5E5E");
             painter.setPen(QPen(color2));
             painter.setBrush(color2);
-            if (m_notesNumber < 10) {
-                painter.drawEllipse(QPointF(220, 18), 10, 10);
-            } else {
-                painter.drawEllipse(QPointF(220, 18), 10 + (widths - 7) / 4, 10 + (widths - 7) / 4);
-            }
+            qreal badgeRadius = (m_notesNumber < 10) ? 10.0 : 10.0 + (widths - 7) / 4.0;
+            QPointF badgeCenter(rect().right() - 20, rect().center().y());
+            painter.drawEllipse(badgeCenter, badgeRadius, badgeRadius);
             QColor color3("#FFFFFF");
             painter.setPen(QPen(color3));
             painter.setBrush(color3);
             //绘制笔记数量
-            QRect numberRect(QPoint(212 - ((widths - 7) / 2), 7), QSize(16 + (widths - 7), 19));
+            int badgeTextWidth = 16 + (widths - 7);
+            int badgeTextHeight = 19;
+            QRect numberRect(QPoint(badgeCenter.x() - badgeTextWidth / 2,
+                                    badgeCenter.y() - badgeTextHeight / 2),
+                             QSize(badgeTextWidth, badgeTextHeight));
             painter.drawText(numberRect, Qt::AlignCenter, numString);
         }
     }
@@ -209,7 +211,10 @@ void MoveView::paintComposite(QPaintEvent *e)
         if (!darkThemeType) {
             painter.setOpacity(0.9);
         }
-        painter.drawPixmap(rect(), m_backGroundPixMap);
+        QSize pixSize = m_backGroundPixMap.size().scaled(rect().size(), Qt::KeepAspectRatio);
+        QRect pixRect(QPoint((rect().width() - pixSize.width()) / 2,
+                             (rect().height() - pixSize.height()) / 2), pixSize);
+        painter.drawPixmap(pixRect, m_backGroundPixMap);
         painter.setOpacity(1);
         //设置背景颜色
         QColor color;
@@ -242,7 +247,10 @@ void MoveView::paintComposite(QPaintEvent *e)
                 painter.setOpacity(0.98);
             }
             //设置透明度
-            painter.drawPixmap(rect(), m_backGroundPixMap);
+            QSize pixSize = m_backGroundPixMap.size().scaled(rect().size(), Qt::KeepAspectRatio);
+        QRect pixRect(QPoint((rect().width() - pixSize.width()) / 2,
+                             (rect().height() - pixSize.height()) / 2), pixSize);
+        painter.drawPixmap(pixRect, m_backGroundPixMap);
             painter.setOpacity(1);
 
             QColor color;
@@ -269,16 +277,18 @@ void MoveView::paintComposite(QPaintEvent *e)
             QColor color2("#FD5E5E");
             painter.setPen(QPen(color2));
             painter.setBrush(color2);
-            if (m_notesNumber < 10) {
-                painter.drawEllipse(QPointF(248, 28), 12.5, 12.5);
-            } else {
-                painter.drawEllipse(QPointF(248, 28), 12.5 + (widths - 7) / 4, 12.5 + (widths - 7) / 4);
-            }
+            qreal badgeRadius = (m_notesNumber < 10) ? 12.5 : 12.5 + (widths - 7) / 4.0;
+            QPointF badgeCenter(rect().right() - 34, 28);
+            painter.drawEllipse(badgeCenter, badgeRadius, badgeRadius);
             QColor color3("#FFFFFF");
             painter.setPen(QPen(color3));
             painter.setBrush(color3);
             //绘制笔记数量
-            QRect numberRect(QPoint(240 - ((widths - 7) / 2), 19), QSize(16 + (widths - 7), 19));
+            int badgeTextWidth = 16 + (widths - 7);
+            int badgeTextHeight = 19;
+            QRect numberRect(QPoint(badgeCenter.x() - badgeTextWidth / 2,
+                                    badgeCenter.y() - badgeTextHeight / 2),
+                             QSize(badgeTextWidth, badgeTextHeight));
             painter.drawText(numberRect, Qt::AlignCenter, numString);
         }
         //单个笔记拖拽
@@ -286,7 +296,10 @@ void MoveView::paintComposite(QPaintEvent *e)
             if (!darkThemeType) {
                 painter.setOpacity(0.9);
             }
-            painter.drawPixmap(rect(), m_backGroundPixMap);
+            QSize pixSize = m_backGroundPixMap.size().scaled(rect().size(), Qt::KeepAspectRatio);
+        QRect pixRect(QPoint((rect().width() - pixSize.width()) / 2,
+                             (rect().height() - pixSize.height()) / 2), pixSize);
+        painter.drawPixmap(pixRect, m_backGroundPixMap);
             painter.setOpacity(1);
             QColor color;
             color = pb.color(DPalette::Normal, DPalette::Window);
