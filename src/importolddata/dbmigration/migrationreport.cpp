@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "migrationreport.h"
+#include "ddlog.h"
 
 #include "migrationhtmlcodes.h"  // warning 码词汇表（只读引用，不改义）
 
@@ -207,12 +208,12 @@ bool MigrationReport::atomicWrite(const QString &path, const QByteArray &payload
     {
         QFile tmp(tmpPath);
         if (!tmp.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-            qWarning("MigrationReport: open tmp failed: %s (%s)",
+            qCWarning(voiceNoteLog, "MigrationReport: open tmp failed: %s (%s)",
                      qPrintable(tmpPath), qPrintable(tmp.errorString()));
             return false;
         }
         if (tmp.write(payload) != payload.size()) {
-            qWarning("MigrationReport: write tmp failed: %s (%s)",
+            qCWarning(voiceNoteLog, "MigrationReport: write tmp failed: %s (%s)",
                      qPrintable(tmpPath), qPrintable(tmp.errorString()));
             tmp.close();
             QFile::remove(tmpPath);
@@ -224,7 +225,7 @@ bool MigrationReport::atomicWrite(const QString &path, const QByteArray &payload
 
     if (std::rename(QFile::encodeName(tmpPath).constData(),
                     QFile::encodeName(path).constData()) != 0) {
-        qWarning("MigrationReport: rename failed: %s -> %s (%s)",
+        qCWarning(voiceNoteLog, "MigrationReport: rename failed: %s -> %s (%s)",
                  qPrintable(tmpPath), qPrintable(path),
                  qPrintable(QString::fromLocal8Bit(strerror(errno))));
         QFile::remove(tmpPath);
@@ -242,7 +243,7 @@ ReportResult MigrationReport::generate(const MigrationReportInput &input)
         result.code = ReportErrorCode::InputInvalid;
         result.message = QStringLiteral("finalState is not terminal: %1")
                              .arg(finalStateName(input.finalState));
-        qWarning("MigrationReport: %s", qPrintable(result.message));
+        qCWarning(voiceNoteLog, "MigrationReport: %s", qPrintable(result.message));
         return result;
     }
 
@@ -257,7 +258,7 @@ ReportResult MigrationReport::generate(const MigrationReportInput &input)
     if (!QDir().exists(dir) && !QDir().mkpath(dir)) {
         result.code = ReportErrorCode::DirCreateFailed;
         result.message = QStringLiteral("Failed to create report directory: %1").arg(dir);
-        qWarning("MigrationReport: %s", qPrintable(result.message));
+        qCWarning(voiceNoteLog, "MigrationReport: %s", qPrintable(result.message));
         return result;
     }
 
@@ -269,7 +270,7 @@ ReportResult MigrationReport::generate(const MigrationReportInput &input)
     if (!atomicWrite(path, payload)) {
         result.code = ReportErrorCode::WriteFailed;
         result.message = QStringLiteral("Failed to write report: %1").arg(path);
-        qWarning("MigrationReport: %s", qPrintable(result.message));
+        qCWarning(voiceNoteLog, "MigrationReport: %s", qPrintable(result.message));
         return result;
     }
 
@@ -277,6 +278,6 @@ ReportResult MigrationReport::generate(const MigrationReportInput &input)
     result.reportPath = path;
     result.code = ReportErrorCode::None;
     result.message = QStringLiteral("Report generated: %1").arg(path);
-    qInfo("MigrationReport: %s", qPrintable(result.message));
+    qCInfo(voiceNoteLog, "MigrationReport: %s", qPrintable(result.message));
     return result;
 }

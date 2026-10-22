@@ -4,6 +4,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "jscontent.h"
+#include "ddlog.h"
 
 #include <QFile>
 #include <QVariant>
@@ -26,9 +27,9 @@
 
 JsContent::JsContent()
 {
-    qInfo() << "JsContent constructor called";
+    qCInfo(voiceNoteLog) << "JsContent constructor called";
     connect(QApplication::clipboard(), &QClipboard::changed, this, &JsContent::onClipChange);
-    qInfo() << "JsContent constructor finished";
+    qCInfo(voiceNoteLog) << "JsContent constructor finished";
 }
 
 JsContent *JsContent::instance()
@@ -46,7 +47,7 @@ JsContent *JsContent::instance()
  */
 bool JsContent::insertImages(QStringList filePaths)
 {
-    qDebug() << "Attempting to insert" << filePaths.size() << "images";
+    qCDebug(voiceNoteLog) << "Attempting to insert" << filePaths.size() << "images";
     int count = 0;
     QStringList paths;
     // 获取文件夹路径
@@ -61,7 +62,7 @@ bool JsContent::insertImages(QStringList filePaths)
         QFileInfo fileInfo(path);
         QString suffix = fileInfo.suffix();
         if (!(suffix == "jpg" || suffix == "png" || suffix == "bmp")) {
-            qWarning() << "Skipping unsupported image format:" << suffix << "from path:" << path;
+            qCWarning(voiceNoteLog) << "Skipping unsupported image format:" << suffix << "from path:" << path;
             continue;
         }
         // 创建文件路径
@@ -69,18 +70,18 @@ bool JsContent::insertImages(QStringList filePaths)
         if (QFile::copy(path, newPath)) {
             QString fileName = QString("%1_%2.%3").arg(date).arg(count).arg(suffix);
             paths.push_back(QString("images/") + fileName);
-            qDebug() << "Successfully copied image to:" << newPath << "sending relative path:" << paths.last();
+            qCDebug(voiceNoteLog) << "Successfully copied image to:" << newPath << "sending relative path:" << paths.last();
         } else {
-            qWarning() << "Failed to copy image from:" << path << "to:" << newPath;
+            qCWarning(voiceNoteLog) << "Failed to copy image from:" << path << "to:" << newPath;
         }
     }
     if (paths.size() == 0) {
-        qWarning() << "No valid images were processed";
+        qCWarning(voiceNoteLog) << "No valid images were processed";
         return false;
     }
-    qDebug() << "Emitting callJsInsertImages with" << paths.size() << "images";
+    qCDebug(voiceNoteLog) << "Emitting callJsInsertImages with" << paths.size() << "images";
     emit callJsInsertImages(paths);
-    qInfo() << "Image insertion finished";
+    qCInfo(voiceNoteLog) << "Image insertion finished";
     return true;
 }
 
@@ -92,7 +93,7 @@ bool JsContent::insertImages(QStringList filePaths)
  */
 bool JsContent::insertImages(const QImage &image)
 {
-    qDebug() << "Attempting to insert single image";
+    qCDebug(voiceNoteLog) << "Attempting to insert single image";
     // 获取文件夹路径
     QString dirPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/images";
     // 创建文件夹
@@ -104,21 +105,21 @@ bool JsContent::insertImages(const QImage &image)
 
     // 保存文件
     if (!image.save(imgPath)) {
-        qWarning() << "Failed to save image to:" << imgPath;
+        qCWarning(voiceNoteLog) << "Failed to save image to:" << imgPath;
         return false;
     }
-    qDebug() << "Successfully saved image to:" << imgPath;
+    qCDebug(voiceNoteLog) << "Successfully saved image to:" << imgPath;
     // 转换为相对路径发送给前端（images/xxx）
     emit callJsInsertImages(QStringList(QString("images/") + fileName));
-    qInfo() << "Single image insertion finished";
+    qCInfo(voiceNoteLog) << "Single image insertion finished";
     return true;
 }
 
 QString JsContent::webPath()
 {
-    qInfo() << "Getting web path";
+    qCInfo(voiceNoteLog) << "Getting web path";
     QString path = "file://" WEB_PATH "/index.html";
-    qInfo() << "Web path retrieved";
+    qCInfo(voiceNoteLog) << "Web path retrieved";
     return path;
 }
 
@@ -126,13 +127,13 @@ QString JsContent::jsCallGetAppDataPath()
 {
     const QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     if (appDataPath.isEmpty()) {
-        qWarning() << "Provide AppData base path to JS failed: empty AppData path";
+        qCWarning(voiceNoteLog) << "Provide AppData base path to JS failed: empty AppData path";
         return QString();
     }
     QDir dir(appDataPath);
     if (!dir.exists()) {
         if (!dir.mkpath(".")) {
-            qWarning() << "Provide AppData base path to JS failed: mkpath failed for" << appDataPath;
+            qCWarning(voiceNoteLog) << "Provide AppData base path to JS failed: mkpath failed for" << appDataPath;
             return QString();
         }
     }
@@ -142,49 +143,49 @@ QString JsContent::jsCallGetAppDataPath()
     }
     QUrl url = QUrl::fromLocalFile(basePath);
     const QString urlStr = url.toString();
-    qInfo() << "Provide AppData base path to JS:" << urlStr;
+    qCInfo(voiceNoteLog) << "Provide AppData base path to JS:" << urlStr;
     return urlStr;
 }
 
 void JsContent::jsCallTxtChange()
 {
-    qInfo() << "Text change called from JavaScript";
+    qCInfo(voiceNoteLog) << "Text change called from JavaScript";
     emit textChange();
-    qInfo() << "Text change handling finished";
+    qCInfo(voiceNoteLog) << "Text change handling finished";
 }
 
 void JsContent::jsCallChannleFinish()
 {
-    qInfo() << "Channel finish called from JavaScript";
+    qCInfo(voiceNoteLog) << "Channel finish called from JavaScript";
     emit getfontinfo();
-    qInfo() << "Channel finish handling finished";
+    qCInfo(voiceNoteLog) << "Channel finish handling finished";
 }
 
 void JsContent::jsCallSummernoteInitFinish()
 {
-    qInfo() << "Summernote init finish called from JavaScript";
+    qCInfo(voiceNoteLog) << "Summernote init finish called from JavaScript";
     emit loadFinsh();
-    qInfo() << "Summernote init finish handling finished";
+    qCInfo(voiceNoteLog) << "Summernote init finish handling finished";
 }
 
 void JsContent::jsCallPopupMenu(int type, const QVariant &json)
 {
-    qInfo() << "Popup menu called from JavaScript, type:" << type;
+    qCInfo(voiceNoteLog) << "Popup menu called from JavaScript, type:" << type;
     emit popupMenu(type, json);
-    qInfo() << "Popup menu handling finished";
+    qCInfo(voiceNoteLog) << "Popup menu handling finished";
 }
 
 void JsContent::jsCallPlayVoice(const QVariant &json, bool bIsSame)
 {
-    qInfo() << "Play voice called from JavaScript, isSame:" << bIsSame;
+    qCInfo(voiceNoteLog) << "Play voice called from JavaScript, isSame:" << bIsSame;
     emit playVoice(json, bIsSame);
-    qInfo() << "Play voice handling finished";
+    qCInfo(voiceNoteLog) << "Play voice handling finished";
 }
 
 QString JsContent::jsCallGetTranslation()
 {
-    qInfo() << "Translation data requested from JavaScript";
-    qDebug() << "Translation data requested from JavaScript";
+    qCInfo(voiceNoteLog) << "Translation data requested from JavaScript";
+    qCDebug(voiceNoteLog) << "Translation data requested from JavaScript";
     static QJsonDocument doc;
     if (doc.isEmpty()) {
         QJsonObject object;
@@ -201,10 +202,10 @@ QString JsContent::jsCallGetTranslation()
         object.insert("more", QApplication::translate("web", "More colors"));
         object.insert("recentlyUsed", QApplication::translate("web", "Recent"));
         doc.setObject(object);
-        qDebug() << "Translation data initialized";
+        qCDebug(voiceNoteLog) << "Translation data initialized";
     }
     QString result = doc.toJson(QJsonDocument::Compact);
-    qInfo() << "Translation data retrieval finished";
+    qCInfo(voiceNoteLog) << "Translation data retrieval finished";
     return result;
 }
 
@@ -213,23 +214,23 @@ QString JsContent::jsCallGetTranslation()
  */
 QString JsContent::jsCallDivTextTranslation()
 {
-    qDebug() << "Div text translation requested from JavaScript";
+    qCDebug(voiceNoteLog) << "Div text translation requested from JavaScript";
     static QJsonDocument doc;
     if (doc.isEmpty()) {
         QJsonObject object;
         object.insert("translateLabel", QApplication::translate("web", "Voice To Text"));
         object.insert("translatingLabel", QApplication::translate("web", "Converting voice to text"));
         doc.setObject(object);
-        qDebug() << "Div text translation data initialized";
+        qCDebug(voiceNoteLog) << "Div text translation data initialized";
     }
     return doc.toJson(QJsonDocument::Compact);
 }
 
 void JsContent::jsCallScrollChange(int scrollTop)
 {
-    qInfo() << "Scroll change called from JavaScript, scrollTop:" << scrollTop;
+    qCInfo(voiceNoteLog) << "Scroll change called from JavaScript, scrollTop:" << scrollTop;
     emit scrollTopChange(scrollTop == 0);
-    qInfo() << "Scroll change handling finished";
+    qCInfo(voiceNoteLog) << "Scroll change handling finished";
 }
 
 /**
@@ -237,9 +238,9 @@ void JsContent::jsCallScrollChange(int scrollTop)
  */
 void JsContent::jsCallPlayVoiceStop()
 {
-    qInfo() << "Play voice stop called from JavaScript";
+    qCInfo(voiceNoteLog) << "Play voice stop called from JavaScript";
     Q_EMIT playVoiceStop();
-    qInfo() << "Play voice stop handling finished";
+    qCInfo(voiceNoteLog) << "Play voice stop handling finished";
 }
 
 /**
@@ -248,14 +249,14 @@ void JsContent::jsCallPlayVoiceStop()
  */
 void JsContent::jsCallVoiceProgressChange(qint64 progressMs)
 {
-    qInfo() << "Voice progress change called from JavaScript, progressMs:" << progressMs;
+    qCInfo(voiceNoteLog) << "Voice progress change called from JavaScript, progressMs:" << progressMs;
     Q_EMIT playVoiceProgressChange(progressMs);
-    qInfo() << "Voice progress change handling finished";
+    qCInfo(voiceNoteLog) << "Voice progress change handling finished";
 }
 
 QVariant JsContent::callJsSynchronous(QWebEnginePage *page, const QString &funtion)
 {
-    qDebug() << "Executing synchronous JavaScript function";
+    qCDebug(voiceNoteLog) << "Executing synchronous JavaScript function";
     QVariant synResult;
     QEventLoop synLoop;
     if (page) {
@@ -274,52 +275,52 @@ QVariant JsContent::callJsSynchronous(QWebEnginePage *page, const QString &funti
         });
 #endif
         synLoop.exec();
-        qDebug() << "Synchronous JavaScript execution completed";
+        qCDebug(voiceNoteLog) << "Synchronous JavaScript execution completed";
     } else {
-        qWarning() << "Attempted to execute JavaScript on null page";
+        qCWarning(voiceNoteLog) << "Attempted to execute JavaScript on null page";
     }
-    qInfo() << "Synchronous JavaScript execution finished";
+    qCInfo(voiceNoteLog) << "Synchronous JavaScript execution finished";
     return synResult;
 }
 
 void JsContent::jsCallSetDataFinsh()
 {
-    qInfo() << "Set data finish called from JavaScript";
+    qCInfo(voiceNoteLog) << "Set data finish called from JavaScript";
     emit setDataFinsh();
-    qInfo() << "Set data finish handling finished";
+    qCInfo(voiceNoteLog) << "Set data finish handling finished";
 }
 
 void JsContent::jsCallPaste(bool isVoicePaste)
 {
-    qInfo() << "Paste called from JavaScript, isVoicePaste:" << isVoicePaste;
+    qCInfo(voiceNoteLog) << "Paste called from JavaScript, isVoicePaste:" << isVoicePaste;
     emit textPaste(isVoicePaste);
-    qInfo() << "Paste handling finished";
+    qCInfo(voiceNoteLog) << "Paste handling finished";
 }
 
 void JsContent::jsCallViewPicture(const QString &imagePath)
 {
-    qInfo() << "View picture called from JavaScript, imagePath:" << imagePath;
+    qCInfo(voiceNoteLog) << "View picture called from JavaScript, imagePath:" << imagePath;
     emit viewPictrue(imagePath);
-    qInfo() << "View picture handling finished";
+    qCInfo(voiceNoteLog) << "View picture handling finished";
 }
 
 void JsContent::jsCallCreateNote()
 {
-    qInfo() << "Create note called from JavaScript";
+    qCInfo(voiceNoteLog) << "Create note called from JavaScript";
     emit createNote();
-    qInfo() << "Create note handling finished";
+    qCInfo(voiceNoteLog) << "Create note handling finished";
 }
 
 void JsContent::jsCallSaveAudio()
 {
-    qInfo() << "Save audio called from JavaScript";
+    qCInfo(voiceNoteLog) << "Save audio called from JavaScript";
     emit saveAudio();
-    qInfo() << "Save audio handling finished";
+    qCInfo(voiceNoteLog) << "Save audio handling finished";
 }
 
 void JsContent::jsCallSetClipData(const QString &text, const QString &html)
 {
-    qDebug() << "Setting clipboard data from JavaScript";
+    qCDebug(voiceNoteLog) << "Setting clipboard data from JavaScript";
     QClipboard *clip = QApplication::clipboard();
     if (nullptr != clip) {
         // 剪切板先断开与前端的通信
@@ -334,19 +335,19 @@ void JsContent::jsCallSetClipData(const QString &text, const QString &html)
         m_clipData = data;
         // 剪切板重新建立与前端的通信
         connect(QApplication::clipboard(), &QClipboard::changed, this, &JsContent::onClipChange);
-        qDebug() << "Clipboard data updated successfully";
+        qCDebug(voiceNoteLog) << "Clipboard data updated successfully";
     } else {
-        qWarning() << "Failed to access clipboard";
+        qCWarning(voiceNoteLog) << "Failed to access clipboard";
     }
-    qInfo() << "Clipboard data setting finished";
+    qCInfo(voiceNoteLog) << "Clipboard data setting finished";
 }
 
 void JsContent::onClipChange(QClipboard::Mode mode)
 {
-    qDebug() << "Clipboard change detected, mode:" << mode;
+    qCDebug(voiceNoteLog) << "Clipboard change detected, mode:" << mode;
     if (QClipboard::Clipboard == mode && QApplication::clipboard()->mimeData() != m_clipData) {
-        qDebug() << "Clipboard content changed externally";
+        qCDebug(voiceNoteLog) << "Clipboard content changed externally";
         emit callJsClipboardDataChanged();
     }
-    qDebug() << "Clipboard change handling finished";
+    qCDebug(voiceNoteLog) << "Clipboard change handling finished";
 }

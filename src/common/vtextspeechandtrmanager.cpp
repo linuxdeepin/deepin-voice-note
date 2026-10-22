@@ -4,6 +4,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "vtextspeechandtrmanager.h"
+#include "ddlog.h"
 #include "uosaicapabilitymanager.h"
 #include "../handler/voice_recoder_handler.h"
 
@@ -42,7 +43,7 @@ void VTextSpeechAndTrManager::checkUosAiExists()
     static std::once_flag kAiFlag;
     std::call_once(kAiFlag, [this]() {
         auto initFunc = []() {
-            qDebug() << "Checking UOS AI backend status";
+            qCDebug(voiceNoteLog) << "Checking UOS AI backend status";
             // If call dbus interface success, the uos-ai backend process started.
             auto copilot = QSharedPointer<QDBusInterface>::create(kCopilotService, kCopilotPath, kCopilotInterface);
             Status status = copilotInstalled(copilot);
@@ -50,7 +51,7 @@ void VTextSpeechAndTrManager::checkUosAiExists()
                 status = isCopilotEnabled(copilot);
             }
 
-            qInfo() << QString("UOS AI backend status: %1(%2)").arg(Enable == status).arg(status);
+            qCInfo(voiceNoteLog) << QString("UOS AI backend status: %1(%2)").arg(Enable == status).arg(status);
 
             // call on non-gui thread, so queued connection.
             auto ins = VTextSpeechAndTrManager::instance();
@@ -70,16 +71,16 @@ void VTextSpeechAndTrManager::checkUosAiExists()
 bool VTextSpeechAndTrManager::isTextToSpeechInWorking()
 {
     if (m_isSpeeching) {
-        qDebug() << "Checking text-to-speech working status";
+        qCDebug(voiceNoteLog) << "Checking text-to-speech working status";
         QDBusMessage stopReadingMsg =
             QDBusMessage::createMethodCall(kCopilotService, "/aiassistant/tts", "com.iflytek.aiassistant.tts", "isTTSInWorking");
 
         QDBusReply<bool> stopReadingStateRet = QDBusConnection::sessionBus().call(stopReadingMsg, QDBus::BlockWithGui);
         if (stopReadingStateRet.isValid()) {
             m_isSpeeching = stopReadingStateRet.value();
-            qDebug() << "Text-to-speech status:" << m_isSpeeching;
+            qCDebug(voiceNoteLog) << "Text-to-speech status:" << m_isSpeeching;
         } else {
-            qWarning() << "Failed to get text-to-speech status:" << stopReadingStateRet.error().message();
+            qCWarning(voiceNoteLog) << "Failed to get text-to-speech status:" << stopReadingStateRet.error().message();
             m_isSpeeching = false;
         }
     }
@@ -93,12 +94,12 @@ bool VTextSpeechAndTrManager::isTextToSpeechInWorking()
  */
 bool VTextSpeechAndTrManager::getTextToSpeechEnable()
 {
-    qDebug() << "Checking text-to-speech enable status";
+    qCDebug(voiceNoteLog) << "Checking text-to-speech enable status";
     
     // 首先检查音频输出设备是否存在
     VoiceRecoderHandler *voiceHandler = VoiceRecoderHandler::instance();
     if (voiceHandler && !voiceHandler->hasAudioOutputDevice()) {
-        qWarning() << "Text-to-speech disabled: No audio output device available";
+        qCWarning(voiceNoteLog) << "Text-to-speech disabled: No audio output device available";
         return false;
     }
     
@@ -107,10 +108,10 @@ bool VTextSpeechAndTrManager::getTextToSpeechEnable()
 
     QDBusReply<bool> voiceReadingStateRet = QDBusConnection::sessionBus().call(voiceReadingMsg, QDBus::BlockWithGui);
     if (voiceReadingStateRet.isValid()) {
-        qDebug() << "Text-to-speech enabled:" << voiceReadingStateRet.value();
+        qCDebug(voiceNoteLog) << "Text-to-speech enabled:" << voiceReadingStateRet.value();
         return voiceReadingStateRet.value();
     } else {
-        qWarning() << "Failed to get text-to-speech enable status:" << voiceReadingStateRet.error().message();
+        qCWarning(voiceNoteLog) << "Failed to get text-to-speech enable status:" << voiceReadingStateRet.error().message();
         return false;
     }
 }
@@ -121,12 +122,12 @@ bool VTextSpeechAndTrManager::getTextToSpeechEnable()
  */
 bool VTextSpeechAndTrManager::getSpeechToTextEnable()
 {
-    qDebug() << "Checking speech-to-text enable status";
+    qCDebug(voiceNoteLog) << "Checking speech-to-text enable status";
     
     // 首先检查音频输入设备是否存在
     VoiceRecoderHandler *voiceHandler = VoiceRecoderHandler::instance();
     if (voiceHandler && !voiceHandler->hasAudioInputDevice()) {
-        qWarning() << "Speech-to-text disabled: No audio input device available";
+        qCWarning(voiceNoteLog) << "Speech-to-text disabled: No audio input device available";
         return false;
     }
     
@@ -135,10 +136,10 @@ bool VTextSpeechAndTrManager::getSpeechToTextEnable()
 
     QDBusReply<bool> dictationStateRet = QDBusConnection::sessionBus().call(dictationMsg, QDBus::BlockWithGui);
     if (dictationStateRet.isValid()) {
-        qDebug() << "Speech-to-text enabled:" << dictationStateRet.value();
+        qCDebug(voiceNoteLog) << "Speech-to-text enabled:" << dictationStateRet.value();
         return dictationStateRet.value();
     } else {
-        qWarning() << "Failed to get speech-to-text enable status:" << dictationStateRet.error().message();
+        qCWarning(voiceNoteLog) << "Failed to get speech-to-text enable status:" << dictationStateRet.error().message();
         return false;
     }
 }
@@ -149,16 +150,16 @@ bool VTextSpeechAndTrManager::getSpeechToTextEnable()
  */
 bool VTextSpeechAndTrManager::getTransEnable()
 {
-    qDebug() << "Checking translation enable status";
+    qCDebug(voiceNoteLog) << "Checking translation enable status";
     QDBusMessage translateReadingMsg =
         QDBusMessage::createMethodCall(kCopilotService, "/aiassistant/trans", "com.iflytek.aiassistant.trans", "getTransEnable");
 
     QDBusReply<bool> translateStateRet = QDBusConnection::sessionBus().call(translateReadingMsg, QDBus::BlockWithGui);
     if (translateStateRet.isValid()) {
-        qDebug() << "Translation enabled:" << translateStateRet.value();
+        qCDebug(voiceNoteLog) << "Translation enabled:" << translateStateRet.value();
         return translateStateRet.value();
     } else {
-        qWarning() << "Failed to get translation enable status:" << translateStateRet.error().message();
+        qCWarning(voiceNoteLog) << "Failed to get translation enable status:" << translateStateRet.error().message();
         return false;
     }
 }
@@ -168,32 +169,32 @@ bool VTextSpeechAndTrManager::getTransEnable()
  */
 VTextSpeechAndTrManager::Status VTextSpeechAndTrManager::onTextToSpeech()
 {
-    qDebug() << "Starting text-to-speech operation";
+    qCDebug(voiceNoteLog) << "Starting text-to-speech operation";
     if (Enable != checkValid()) {
-        qWarning() << "Text-to-speech operation failed: Invalid status" << status();
+        qCWarning(voiceNoteLog) << "Text-to-speech operation failed: Invalid status" << status();
         return status();
     }
 
     if (!getTextToSpeechEnable()) {
-        qWarning() << "Text-to-speech operation failed: No output device";
+        qCWarning(voiceNoteLog) << "Text-to-speech operation failed: No output device";
         return NoOutputDevice;
     }
 
     QDBusInterface interface(kCopilotService, "/aiassistant/deepinmain", "com.iflytek.aiassistant.mainWindow");
     if (!interface.isValid()) {
-        qWarning() << "Text-to-speech operation failed: Invalid interface";
+        qCWarning(voiceNoteLog) << "Text-to-speech operation failed: Invalid interface";
         return Failed;
     }
 
     // check if speech now
     if (isTextToSpeechInWorking()) {
-        qDebug() << "Stopping current text-to-speech before starting new one";
+        qCDebug(voiceNoteLog) << "Stopping current text-to-speech before starting new one";
         onStopTextToSpeech();
     }
 
     interface.asyncCall("TextToSpeech");
     m_isSpeeching = true;
-    qDebug() << "Text-to-speech operation started successfully";
+    qCDebug(voiceNoteLog) << "Text-to-speech operation started successfully";
     return Success;
 }
 
@@ -202,22 +203,22 @@ VTextSpeechAndTrManager::Status VTextSpeechAndTrManager::onTextToSpeech()
  */
 VTextSpeechAndTrManager::Status VTextSpeechAndTrManager::onStopTextToSpeech()
 {
-    qDebug() << "Stopping text-to-speech operation";
+    qCDebug(voiceNoteLog) << "Stopping text-to-speech operation";
     if (Enable != status()) {
-        qWarning() << "Stop text-to-speech failed: Invalid status" << status();
+        qCWarning(voiceNoteLog) << "Stop text-to-speech failed: Invalid status" << status();
         return status();
     }
 
     if (m_isSpeeching) {
         QDBusInterface interface(kCopilotService, "/aiassistant/tts", "com.iflytek.aiassistant.tts");
         if (!interface.isValid()) {
-            qWarning() << "Stop text-to-speech failed: Invalid interface";
+            qCWarning(voiceNoteLog) << "Stop text-to-speech failed: Invalid interface";
             return Failed;
         }
 
         interface.asyncCall("stopTTSDirectly");
         m_isSpeeching = false;
-        qDebug() << "Text-to-speech stopped successfully";
+        qCDebug(voiceNoteLog) << "Text-to-speech stopped successfully";
     }
 
     return Success;
@@ -228,31 +229,31 @@ VTextSpeechAndTrManager::Status VTextSpeechAndTrManager::onStopTextToSpeech()
  */
 VTextSpeechAndTrManager::Status VTextSpeechAndTrManager::onSpeechToText()
 {
-    qDebug() << "Starting speech-to-text operation";
+    qCDebug(voiceNoteLog) << "Starting speech-to-text operation";
     if (Enable != checkValid()) {
-        qWarning() << "Speech-to-text operation failed: Invalid status" << status();
+        qCWarning(voiceNoteLog) << "Speech-to-text operation failed: Invalid status" << status();
         return status();
     }
 
     auto capability = UosAiCapabilityManager::instance()->checkCapability(UosAiCapabilityManager::SpeechToText);
     if (UosAiCapabilityManager::Available != capability) {
-        qWarning() << "Speech-to-text operation failed: UOS AI capability unavailable" << capability;
+        qCWarning(voiceNoteLog) << "Speech-to-text operation failed: UOS AI capability unavailable" << capability;
         return UosAiUnsupported;
     }
 
     if (!getSpeechToTextEnable()) {
-        qWarning() << "Speech-to-text operation failed: No input device";
+        qCWarning(voiceNoteLog) << "Speech-to-text operation failed: No input device";
         return NoInputDevice;
     }
 
     QDBusInterface interface(kCopilotService, "/aiassistant/deepinmain", "com.iflytek.aiassistant.mainWindow");
     if (!interface.isValid()) {
-        qWarning() << "Speech-to-text operation failed: Invalid interface";
+        qCWarning(voiceNoteLog) << "Speech-to-text operation failed: Invalid interface";
         return Failed;
     }
 
     interface.asyncCall("SpeechToText");
-    qDebug() << "Speech-to-text operation started successfully";
+    qCDebug(voiceNoteLog) << "Speech-to-text operation started successfully";
     return Success;
 }
 
@@ -261,20 +262,20 @@ VTextSpeechAndTrManager::Status VTextSpeechAndTrManager::onSpeechToText()
  */
 VTextSpeechAndTrManager::Status VTextSpeechAndTrManager::onTextTranslate()
 {
-    qDebug() << "Starting text translation operation";
+    qCDebug(voiceNoteLog) << "Starting text translation operation";
     if (Enable != checkValid()) {
-        qWarning() << "Text translation failed: Invalid status" << status();
+        qCWarning(voiceNoteLog) << "Text translation failed: Invalid status" << status();
         return status();
     }
 
     if (!getTransEnable()) {
-        qWarning() << "Text translation failed: Translation not enabled";
+        qCWarning(voiceNoteLog) << "Text translation failed: Translation not enabled";
         return Failed;
     }
 
     QProcess::startDetached("dbus-send  --print-reply --dest=com.iflytek.aiassistant /aiassistant/deepinmain "
                             "com.iflytek.aiassistant.mainWindow.TextToTranslate");
-    qDebug() << "Text translation operation started successfully";
+    qCDebug(voiceNoteLog) << "Text translation operation started successfully";
     return Success;
 }
 
@@ -302,12 +303,12 @@ bool VTextSpeechAndTrManager::isUosAiUpdateRequired(Status status) const
 
 VTextSpeechAndTrManager::Status VTextSpeechAndTrManager::checkValid()
 {
-    qDebug() << "Checking UOS AI validity, current status:" << m_status;
+    qCDebug(voiceNoteLog) << "Checking UOS AI validity, current status:" << m_status;
     switch (m_status) {
         case NotInstalled:
             m_status = copilotInstalled(m_copilot);
             if (Enable != m_status) {
-                qWarning() << "UOS AI not installed";
+                qCWarning(voiceNoteLog) << "UOS AI not installed";
                 break;
             }
             // If uos-ai is installed, it detects whether the user agrees to the user agreement.
@@ -316,7 +317,7 @@ VTextSpeechAndTrManager::Status VTextSpeechAndTrManager::checkValid()
             // Detect current state every call
             m_status = isCopilotEnabled(m_copilot);
             if (NoUserAgreement == m_status) {
-                qInfo() << "Launching UOS AI chat page for user agreement";
+                qCInfo(voiceNoteLog) << "Launching UOS AI chat page for user agreement";
                 launchCopilotChat(m_copilot);
             }
         } break;
@@ -329,40 +330,40 @@ VTextSpeechAndTrManager::Status VTextSpeechAndTrManager::checkValid()
 
 VTextSpeechAndTrManager::Status VTextSpeechAndTrManager::copilotInstalled(const QSharedPointer<QDBusInterface> &copilot)
 {
-    qDebug() << "Checking if UOS AI is installed";
+    qCDebug(voiceNoteLog) << "Checking if UOS AI is installed";
     QDBusReply<QString> version = copilot->call("version");
     if (version.isValid()) {
-        qInfo() << "UOS AI installed, version:" << version.value();
+        qCInfo(voiceNoteLog) << "UOS AI installed, version:" << version.value();
         return Enable;
     }
 
-    qWarning() << "UOS AI installation check failed:" << version.error().message();
+    qCWarning(voiceNoteLog) << "UOS AI installation check failed:" << version.error().message();
     return NotInstalled;
 }
 
 VTextSpeechAndTrManager::Status VTextSpeechAndTrManager::isCopilotEnabled(const QSharedPointer<QDBusInterface> &copilot)
 {
-    qDebug() << "Checking if UOS AI is enabled";
+    qCDebug(voiceNoteLog) << "Checking if UOS AI is enabled";
     QDBusReply<bool> state = copilot->call("isCopilotEnabled");
     if (state.isValid()) {
-        qInfo() << "UOS AI enabled status:" << state.value();
+        qCInfo(voiceNoteLog) << "UOS AI enabled status:" << state.value();
         return state.value() ? Enable : NoUserAgreement;
     }
 
     // NOTE: Adapt old version, if dbus interface not valid, assume the user agreement agreed.
-    qWarning() << "Failed to get UOS AI enabled status:" << state.error().message();
+    qCWarning(voiceNoteLog) << "Failed to get UOS AI enabled status:" << state.error().message();
     return Enable;
 }
 
 VTextSpeechAndTrManager::Status VTextSpeechAndTrManager::launchCopilotChat(const QSharedPointer<QDBusInterface> &copilot)
 {
-    qDebug() << "Launching UOS AI chat page";
+    qCDebug(voiceNoteLog) << "Launching UOS AI chat page";
     QDBusMessage message = copilot->call("launchChatPage");
     if (!message.errorMessage().isEmpty()) {
-        qWarning() << "Failed to launch UOS AI chat page:" << message.errorMessage();
+        qCWarning(voiceNoteLog) << "Failed to launch UOS AI chat page:" << message.errorMessage();
         return Disable;
     }
 
-    qInfo() << "UOS AI chat page launched successfully";
+    qCInfo(voiceNoteLog) << "UOS AI chat page launched successfully";
     return Enable;
 }

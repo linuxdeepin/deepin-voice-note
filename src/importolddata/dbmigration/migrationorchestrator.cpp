@@ -16,7 +16,7 @@
 #include <QThread>
 
 namespace {
-Q_LOGGING_CATEGORY(lcMigrationOrchestrator, "voice_note_migration_orchestrator")
+Q_LOGGING_CATEGORY(lcMigrationOrchestrator, "org.deepin.voice-note.migration.orchestrator")
 }
 
 MigrationOrchestrator::MigrationOrchestrator(QObject *parent)

@@ -4,6 +4,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "opsstateinterface.h"
+#include "ddlog.h"
 #include <QDBusConnectionInterface>
 #include <QDBusInterface>
 // #include <DSysInfo>
@@ -40,7 +41,7 @@ void OpsStateInterface::operState(int type, bool isSet)
             // qDebug() << "Setting state" << type << "to false";
         }
     } else {
-        qCritical() << "Operation error: Invalid opsType =" << type 
+        qCCritical(voiceNoteLog) << "Operation error: Invalid opsType =" << type 
                    << " (must be between" << StateNone << "and" << StateMax << ")";
     }
     // qInfo() << "State operation finished";

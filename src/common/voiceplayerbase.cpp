@@ -1,13 +1,14 @@
 #include "voiceplayerbase.h"
+#include "ddlog.h"
 #include <QDebug>
 
 VoicePlayerBase::VoicePlayerBase(QObject *parent)
 {
-    qInfo() << "VoicePlayerBase constructor called";
+    qCInfo(voiceNoteLog) << "VoicePlayerBase constructor called";
 }
 
 void VoicePlayerBase::setChangePlayFile(bool flag)
 {
-    qInfo() << "Setting change play file flag to:" << flag;
+    qCInfo(voiceNoteLog) << "Setting change play file flag to:" << flag;
     Q_UNUSED(flag)
 }

@@ -1,4 +1,5 @@
 #include "imageprovider.h"
+#include "ddlog.h"
 #include "vnotefolderoper.h"
 #include <QDebug>
 #include <qlogging.h>
@@ -22,16 +23,16 @@ QImage ImageProvider::requestImage(const QString &id, QSize *size, const QSize &
 
 QPixmap ImageProvider::requestPixmap(const QString &id, QSize *size, const QSize &requestedSize)
 {
-    qInfo() << "Requesting pixmap for ID:" << id;
+    qCInfo(voiceNoteLog) << "Requesting pixmap for ID:" << id;
     VNoteFolderOper folderOper;
     int iconIndex = id.toInt();
     QPixmap pix = folderOper.getDefaultIcon(iconIndex, IconsType::DefaultIcon);
-    qInfo() << "Pixmap request finished";
+    qCInfo(voiceNoteLog) << "Pixmap request finished";
     return pix;
 }
 
 ImageProvider::ImageProvider(ImageType type)
     :QQuickImageProvider(type)
 {
-    qInfo() << "ImageProvider constructor called with type:" << static_cast<int>(type);
+    qCInfo(voiceNoteLog) << "ImageProvider constructor called with type:" << static_cast<int>(type);
 }

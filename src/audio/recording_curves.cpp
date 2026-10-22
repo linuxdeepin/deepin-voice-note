@@ -1,4 +1,5 @@
 #include "recording_curves.h"
+#include "ddlog.h"
 
 #include <QPainter>
 #include <cmath>
@@ -10,10 +11,10 @@ RecordingCurves::RecordingCurves(QQuickItem *parent)
     : QQuickPaintedItem(parent)
     , m_timer(new QTimer(this))
 {
-    qInfo() << "RecordingCurves constructor called";
+    qCInfo(voiceNoteLog) << "RecordingCurves constructor called";
     m_timer->setInterval(1000 / 45);
     connect(m_timer, &QTimer::timeout, this, &RecordingCurves::updateCurves);
-    qInfo() << "RecordingCurves constructor finished";
+    qCInfo(voiceNoteLog) << "RecordingCurves constructor finished";
 }
 
 RecordingCurves::~RecordingCurves()
@@ -31,33 +32,33 @@ void RecordingCurves::updateVolume(const double &gain)
 
 void RecordingCurves::startRecording()
 {
-    qInfo() << "startRecording called";
+    qCInfo(voiceNoteLog) << "startRecording called";
     m_timer->start();
-    qInfo() << "startRecording finished";
+    qCInfo(voiceNoteLog) << "startRecording finished";
 }
 
 void RecordingCurves::stopRecording()
 {
-    qInfo() << "stopRecording called";
+    qCInfo(voiceNoteLog) << "stopRecording called";
     m_timer->stop();
     m_phase = 0.0;
     m_gain = 0.0;  // 添加这一行，重置增益为0
     update();
-    qInfo() << "stopRecording finished";
+    qCInfo(voiceNoteLog) << "stopRecording finished";
 }
 
 void RecordingCurves::pauseRecording()
 {
-    qInfo() << "pauseRecording called, timer active:" << m_timer->isActive();
+    qCInfo(voiceNoteLog) << "pauseRecording called, timer active:" << m_timer->isActive();
     if (m_timer->isActive()) {
         m_gain = 0.0;
         m_timer->stop();
-        qInfo() << "Recording paused";
+        qCInfo(voiceNoteLog) << "Recording paused";
     } else {
         m_timer->start();
-        qInfo() << "Recording resumed";
+        qCInfo(voiceNoteLog) << "Recording resumed";
     }
-    qInfo() << "pauseRecording finished";
+    qCInfo(voiceNoteLog) << "pauseRecording finished";
 }
 
 bool RecordingCurves::isRecordingActive() const

@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "uosaicapabilitymanager.h"
+#include "ddlog.h"
 
 #include <QDBusConnection>
 #include <QDBusInterface>
@@ -34,7 +35,7 @@ UosAiCapabilityManager *UosAiCapabilityManager::instance()
 UosAiCapabilityManager::Status UosAiCapabilityManager::checkCapability(Capability capability) const
 {
     if (!isUosAiInstalled()) {
-        qWarning() << "UOS AI is not installed or cannot be reached";
+        qCWarning(voiceNoteLog) << "UOS AI is not installed or cannot be reached";
         return NotInstalled;
     }
 
@@ -52,7 +53,7 @@ UosAiCapabilityManager::Status UosAiCapabilityManager::checkCapability(Capabilit
         break;
     }
 
-    qWarning() << "UOS AI does not support requested capability:" << capability;
+    qCWarning(voiceNoteLog) << "UOS AI does not support requested capability:" << capability;
     return UnsupportedVersion;
 }
 
@@ -69,17 +70,17 @@ bool UosAiCapabilityManager::openUosAiInAppStore() const
                             QDBusConnection::sessionBus());
     appStore.setTimeout(kDbusTimeoutMs);
     if (!appStore.isValid()) {
-        qWarning() << "App Store D-Bus interface is invalid:" << appStore.lastError().message();
+        qCWarning(voiceNoteLog) << "App Store D-Bus interface is invalid:" << appStore.lastError().message();
         return false;
     }
 
     QDBusMessage reply = appStore.call(QStringLiteral("openBusinessUri"), kUosAiAppStoreUri);
     if (reply.type() == QDBusMessage::ErrorMessage) {
-        qWarning() << "Failed to open UOS AI detail in App Store:" << reply.errorMessage();
+        qCWarning(voiceNoteLog) << "Failed to open UOS AI detail in App Store:" << reply.errorMessage();
         return false;
     }
 
-    qInfo() << "Opened UOS AI detail in App Store with uri:" << kUosAiAppStoreUri;
+    qCInfo(voiceNoteLog) << "Opened UOS AI detail in App Store with uri:" << kUosAiAppStoreUri;
     return true;
 }
 
@@ -93,11 +94,11 @@ bool UosAiCapabilityManager::isUosAiInstalled() const
 
     QDBusReply<QString> version = copilot.call(QStringLiteral("version"));
     if (!version.isValid()) {
-        qWarning() << "Failed to query UOS AI version:" << version.error().message();
+        qCWarning(voiceNoteLog) << "Failed to query UOS AI version:" << version.error().message();
         return false;
     }
 
-    qDebug() << "Detected UOS AI version:" << version.value();
+    qCDebug(voiceNoteLog) << "Detected UOS AI version:" << version.value();
     return true;
 }
 
@@ -112,7 +113,7 @@ bool UosAiCapabilityManager::hasDbusMethod(const QString &service,
                                                           QStringLiteral("Introspect"));
     QDBusMessage reply = QDBusConnection::sessionBus().call(message, QDBus::Block, kDbusTimeoutMs);
     if (reply.type() == QDBusMessage::ErrorMessage || reply.arguments().isEmpty()) {
-        qWarning() << "Failed to introspect UOS AI D-Bus object:" << service << path << reply.errorMessage();
+        qCWarning(voiceNoteLog) << "Failed to introspect UOS AI D-Bus object:" << service << path << reply.errorMessage();
         return false;
     }
 
@@ -120,7 +121,7 @@ bool UosAiCapabilityManager::hasDbusMethod(const QString &service,
     const bool interfaceFound = xml.contains(QStringLiteral("interface name=\"") + interface + QLatin1Char('"'));
     const bool methodFound = xml.contains(QStringLiteral("method name=\"") + method + QLatin1Char('"'));
     if (!interfaceFound || !methodFound) {
-        qWarning() << "UOS AI D-Bus method not found:" << interface << method << "at" << path;
+        qCWarning(voiceNoteLog) << "UOS AI D-Bus method not found:" << interface << method << "at" << path;
         return false;
     }
 

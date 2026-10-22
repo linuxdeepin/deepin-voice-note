@@ -107,3 +107,14 @@ target_link_libraries(${BIN_NAME} PRIVATE ${LIBXML2_LIBRARIES})
 
 # Add install rule
 install(TARGETS ${BIN_NAME} DESTINATION ${APP_BIN_INSTALL_DIR})
+
+# 安装 DConfig 配置文件（调试模式动态日志规则），参考 deepin-reader
+set(DCONFIG_APPID org.deepin.voice-note)
+file(GLOB DCONFIG_FILES "${CMAKE_SOURCE_DIR}/assets/configs/*.json")
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "mips.*")
+    # MIPS/Qt5(DTK5) 环境：dtk_add_config_meta_files 由 Dtk6DConfig 提供，这里直接 install
+    install(FILES ${DCONFIG_FILES}
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/share/dsg/configs/${DCONFIG_APPID})
+else()
+    dtk_add_config_meta_files(APPID ${DCONFIG_APPID} FILES ${DCONFIG_FILES})
+endif()

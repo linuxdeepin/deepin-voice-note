@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "migrationstatepersistent.h"
+#include "ddlog.h"
 
 #include <QDir>
 #include <QFile>
@@ -73,7 +74,7 @@ bool MigrationStatePersistent::save(MigrationState state, MigrationSubstage subs
     const QFileInfo info(m_filePath);
     const QDir dir = info.absoluteDir();
     if (!dir.exists() && !dir.mkpath(dir.absolutePath())) {
-        qWarning("MigrationStatePersistent: mkpath failed for %s",
+        qCWarning(voiceNoteLog, "MigrationStatePersistent: mkpath failed for %s",
                  qPrintable(dir.absolutePath()));
         return false;
     }
@@ -83,13 +84,13 @@ bool MigrationStatePersistent::save(MigrationState state, MigrationSubstage subs
     {
         QFile tmp(tmpPath);
         if (!tmp.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-            qWarning("MigrationStatePersistent: open tmp failed: %s",
+            qCWarning(voiceNoteLog, "MigrationStatePersistent: open tmp failed: %s",
                      qPrintable(tmp.errorString()));
             return false;
         }
         const QByteArray payload = doc.toJson(QJsonDocument::Compact);
         if (tmp.write(payload) != payload.size()) {
-            qWarning("MigrationStatePersistent: write tmp failed: %s",
+            qCWarning(voiceNoteLog, "MigrationStatePersistent: write tmp failed: %s",
                      qPrintable(tmp.errorString()));
             tmp.close();
             return false;
@@ -103,7 +104,7 @@ bool MigrationStatePersistent::save(MigrationState state, MigrationSubstage subs
     // 的原子替换语义不同，故此处必须用 std::rename 以保证原子写（缓解 R2）。
     if (std::rename(QFile::encodeName(tmpPath).constData(),
                     QFile::encodeName(m_filePath).constData()) != 0) {
-        qWarning("MigrationStatePersistent: rename failed: %s -> %s (%s)",
+        qCWarning(voiceNoteLog, "MigrationStatePersistent: rename failed: %s -> %s (%s)",
                  qPrintable(tmpPath), qPrintable(m_filePath),
                  qPrintable(QString::fromLocal8Bit(strerror(errno))));
         return false;
@@ -132,7 +133,7 @@ bool MigrationStatePersistent::load(MigrationState &state, MigrationSubstage &su
         return true;
     }
     if (!file.open(QIODevice::ReadOnly)) {
-        qWarning("MigrationStatePersistent: open failed: %s",
+        qCWarning(voiceNoteLog, "MigrationStatePersistent: open failed: %s",
                  qPrintable(file.errorString()));
         resetInitial();
         return false;
@@ -143,7 +144,7 @@ bool MigrationStatePersistent::load(MigrationState &state, MigrationSubstage &su
     QJsonParseError parseError;
     const QJsonDocument doc = QJsonDocument::fromJson(data, &parseError);
     if (parseError.error != QJsonParseError::NoError || !doc.isObject()) {
-        qWarning("MigrationStatePersistent: parse failed: %s",
+        qCWarning(voiceNoteLog, "MigrationStatePersistent: parse failed: %s",
                  qPrintable(parseError.errorString()));
         resetInitial();
         return false;
@@ -154,7 +155,7 @@ bool MigrationStatePersistent::load(MigrationState &state, MigrationSubstage &su
     const MigrationState parsedState = migrationStateFromString(stateName);
     // 回检：未知状态字符串经转换后会与原名不一致，视为损坏回退初始态
     if (stateName.isEmpty() || migrationStateToString(parsedState) != stateName) {
-        qWarning("MigrationStatePersistent: unknown state %s",
+        qCWarning(voiceNoteLog, "MigrationStatePersistent: unknown state %s",
                  qPrintable(stateName));
         resetInitial();
         return false;
@@ -164,7 +165,7 @@ bool MigrationStatePersistent::load(MigrationState &state, MigrationSubstage &su
     const QString substageName = root.value("substage").toString();
     const MigrationSubstage parsedSubstage = migrationSubstageFromString(substageName);
     if (!substageName.isEmpty() && migrationSubstageToString(parsedSubstage) != substageName) {
-        qWarning("MigrationStatePersistent: unknown substage %s",
+        qCWarning(voiceNoteLog, "MigrationStatePersistent: unknown substage %s",
                  qPrintable(substageName));
         resetInitial();
         return false;

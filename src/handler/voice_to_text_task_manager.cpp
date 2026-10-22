@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "voice_to_text_task_manager.h"
+#include "ddlog.h"
 
 #include <QDebug>
 
@@ -20,7 +21,7 @@ VoiceToTextTaskManager* VoiceToTextTaskManager::instance()
 void VoiceToTextTaskManager::addTask(int noteId, const QString &voiceId)
 {
     if (voiceId.isEmpty()) {
-        qWarning() << "Cannot add task with empty voiceId";
+        qCWarning(voiceNoteLog) << "Cannot add task with empty voiceId";
         return;
     }
 
@@ -32,7 +33,7 @@ void VoiceToTextTaskManager::addTask(int noteId, const QString &voiceId)
 
     m_tasks[voiceId] = task;
 
-    qInfo() << "Added voice-to-text task, voiceId:" << voiceId << "noteId:" << noteId;
+    qCInfo(voiceNoteLog) << "Added voice-to-text task, voiceId:" << voiceId << "noteId:" << noteId;
     emit taskStatusChanged(voiceId, VoiceToTextTask::Converting);
 }
 
@@ -47,7 +48,7 @@ VoiceToTextTask* VoiceToTextTaskManager::getTask(const QString &voiceId)
 void VoiceToTextTaskManager::setTaskResult(const QString &voiceId, const QString &text, bool success)
 {
     if (!m_tasks.contains(voiceId)) {
-        qWarning() << "Task not found for voiceId:" << voiceId;
+        qCWarning(voiceNoteLog) << "Task not found for voiceId:" << voiceId;
         return;
     }
 
@@ -55,7 +56,7 @@ void VoiceToTextTaskManager::setTaskResult(const QString &voiceId, const QString
     task.status = success ? VoiceToTextTask::Completed : VoiceToTextTask::Failed;
     task.resultText = text;
 
-    qInfo() << "Task result set, voiceId:" << voiceId 
+    qCInfo(voiceNoteLog) << "Task result set, voiceId:" << voiceId 
             << "success:" << success 
             << "text length:" << text.length();
 
@@ -87,7 +88,7 @@ bool VoiceToTextTaskManager::hasActiveTask() const
 void VoiceToTextTaskManager::removeTask(const QString &voiceId)
 {
     if (m_tasks.remove(voiceId) > 0) {
-        qDebug() << "Removed task for voiceId:" << voiceId;
+        qCDebug(voiceNoteLog) << "Removed task for voiceId:" << voiceId;
     }
 }
 

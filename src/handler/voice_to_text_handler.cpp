@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "voice_to_text_handler.h"
+#include "ddlog.h"
 #include "voice_to_text_task_manager.h"
 
 #include <QTimer>
@@ -25,36 +26,36 @@ VoiceToTextHandler::VoiceToTextHandler(QObject *parent)
     : QObject { parent }
     , m_a2tManager(new VNoteA2TManager(this))
 {
-    qInfo() << "VoiceToTextHandler constructor called";
+    qCInfo(voiceNoteLog) << "VoiceToTextHandler constructor called";
     connect(m_a2tManager, &VNoteA2TManager::asrError, this, &VoiceToTextHandler::onA2TError);
     connect(m_a2tManager, &VNoteA2TManager::asrSuccess, this, &VoiceToTextHandler::onA2TSuccess);
 }
 
 void VoiceToTextHandler::setAudioToText(const QSharedPointer<VNVoiceBlock> &voiceBlock)
 {
-    qDebug() << "Setting audio for text conversion";
+    qCDebug(voiceNoteLog) << "Setting audio for text conversion";
     m_voiceBlock = voiceBlock;
     if (!m_voiceBlock) {
-        qWarning() << "Voice block is null";
+        qCWarning(voiceNoteLog) << "Voice block is null";
         return;
     }
 
     auto capability = UosAiCapabilityManager::instance()->checkCapability(UosAiCapabilityManager::AudioToText);
     if (UosAiCapabilityManager::instance()->isUpdateRequired(capability)) {
-        qWarning() << "Audio-to-text operation failed: UOS AI capability unavailable" << capability;
+        qCWarning(voiceNoteLog) << "Audio-to-text operation failed: UOS AI capability unavailable" << capability;
         Q_EMIT uosAiUpdateRequired();
         return;
     }
 
     if (!checkNetworkState()) {
-        qWarning() << "No network connection available";
+        qCWarning(voiceNoteLog) << "No network connection available";
         Q_EMIT noNetworkConnection();
         return;
     }
 
     // 超过20分钟的语音不支持转文字
     if (m_voiceBlock->voiceSize > MAX_A2T_AUDIO_LEN_MS) {
-        qWarning() << "Audio length exceeds limit:" << m_voiceBlock->voiceSize << "ms (max:" << MAX_A2T_AUDIO_LEN_MS << "ms)";
+        qCWarning(voiceNoteLog) << "Audio length exceeds limit:" << m_voiceBlock->voiceSize << "ms (max:" << MAX_A2T_AUDIO_LEN_MS << "ms)";
         // 弹窗提示
         Q_EMIT audioLengthLimit();
         return;
@@ -67,7 +68,7 @@ void VoiceToTextHandler::setAudioToText(const QSharedPointer<VNVoiceBlock> &voic
         // 注册到任务管理器（使用 voiceId 作为唯一标识）
         VoiceToTextTaskManager::instance()->addTask(m_originalNoteId, m_originalVoiceId);
 
-        qDebug() << "Starting audio to text conversion, voiceId:" << m_originalVoiceId
+        qCDebug(voiceNoteLog) << "Starting audio to text conversion, voiceId:" << m_originalVoiceId
                  << "voicePath:" << m_originalVoicePath
                  << "noteId:" << m_originalNoteId;
         onA2TStart();
@@ -76,7 +77,7 @@ void VoiceToTextHandler::setAudioToText(const QSharedPointer<VNVoiceBlock> &voic
 
 void VoiceToTextHandler::onA2TStart()
 {
-    qInfo() << "VoiceToTextHandler onA2TStart called, voiceId:" << m_originalVoiceId;
+    qCInfo(voiceNoteLog) << "VoiceToTextHandler onA2TStart called, voiceId:" << m_originalVoiceId;
     OpsStateInterface::instance()->operState(OpsStateInterface::StateVoice2Text, true);
     emit VNoteMainManager::instance()->voiceToTextStateChanged(true);
     // 使用 voiceId 精确定位语音块，显示转换中状态
@@ -86,26 +87,26 @@ void VoiceToTextHandler::onA2TStart()
 
 bool VoiceToTextHandler::checkNetworkState()
 {
-    qDebug() << "Checking network state";
+    qCDebug(voiceNoteLog) << "Checking network state";
     QDBusInterface network("org.freedesktop.NetworkManager",
                            "/org/freedesktop/NetworkManager",
                            "org.freedesktop.NetworkManager",
                            QDBusConnection::systemBus());
 
     if (!network.isValid()) {
-        qWarning() << "Failed to obtain the network status from NetworkManager D-Bus";
+        qCWarning(voiceNoteLog) << "Failed to obtain the network status from NetworkManager D-Bus";
         return false;
     }
 
     QVariant ret = network.property("State");
     bool isConnected = (ret.toInt() == 70);
-    qDebug() << "Network state:" << ret.toInt() << (isConnected ? "Connected" : "Disconnected");
+    qCDebug(voiceNoteLog) << "Network state:" << ret.toInt() << (isConnected ? "Connected" : "Disconnected");
     return isConnected;
 }
 
 void VoiceToTextHandler::onA2TError(int error)
 {
-    qInfo() << "VoiceToTextHandler onA2TError called, error:" << error;
+    qCInfo(voiceNoteLog) << "VoiceToTextHandler onA2TError called, error:" << error;
 
     // 更新任务管理器状态（使用 voiceId）
     VoiceToTextTaskManager::instance()->setTaskResult(m_originalVoiceId, QString(), false);
@@ -126,7 +127,7 @@ void VoiceToTextHandler::onA2TError(int error)
 
 void VoiceToTextHandler::onA2TSuccess(const QString &text)
 {
-    qInfo() << "VoiceToTextHandler onA2TSuccess called, text length:" << text.length();
+    qCInfo(voiceNoteLog) << "VoiceToTextHandler onA2TSuccess called, text length:" << text.length();
 
     // 更新任务管理器状态（使用 voiceId）
     VoiceToTextTaskManager::instance()->setTaskResult(m_originalVoiceId, text, true);
@@ -145,13 +146,13 @@ void VoiceToTextHandler::onA2TSuccess(const QString &text)
         }
     } else if (isTiptapEnabled) {
         // Tiptap 路径：已切换笔记，写回 Tiptap JSON 信封并通知前端
-        qInfo() << "Note switched during conversion, saving result to original note:"
+        qCInfo(voiceNoteLog) << "Note switched during conversion, saving result to original note:"
                 << m_originalNoteId << "current note:" << currentNoteId;
         VNoteMainManager::instance()->insertVoiceTextToTiptapNote(m_originalNoteId, m_originalVoiceId, text);
         TiptapChannelBridge::instance()->emitVoiceToTextCompleted(m_originalVoiceId, text);
     } else {
         // Summernote 路径：已切换笔记，在 C++ 层直接修改原始笔记的 HTML
-        qInfo() << "Note switched during conversion, saving result to original note:"
+        qCInfo(voiceNoteLog) << "Note switched during conversion, saving result to original note:"
                 << m_originalNoteId << "current note:" << currentNoteId;
         VNoteMainManager::instance()->insertVoiceTextToNote(m_originalNoteId, m_originalVoiceId, text);
     }

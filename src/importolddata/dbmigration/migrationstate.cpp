@@ -9,7 +9,7 @@
 #include <QStandardPaths>
 
 namespace {
-Q_LOGGING_CATEGORY(lcMigrationState, "voice_note_migration_state")
+Q_LOGGING_CATEGORY(lcMigrationState, "org.deepin.voice-note.migration.state")
 }
 
 // --- 枚举字符串转换 ---
