@@ -17,6 +17,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QDebug>
+#include <QRegularExpression>
 
 /**
  * @brief ExportNoteWorker::ExportNoteWorker
@@ -146,8 +147,10 @@ ExportNoteWorker::ExportError ExportNoteWorker::exportText()
             //富文本数据需要转换为纯文本
             if (!noteData->htmlCode.isEmpty()) {
                 qDebug() << "Converting HTML content to plain text";
+                QString html = noteData->htmlCode;
+                html.remove(QRegularExpression("<div\\s+class=\"voiceToTextLabel\">[\\s\\S]*?</div>\\s*</div>"));
                 QTextDocument doc;
-                doc.setHtml(noteData->htmlCode);
+                doc.setHtml(html);
                 out.write(doc.toPlainText().toUtf8());
             } else {
                 qDebug() << "Writing plain text content";
