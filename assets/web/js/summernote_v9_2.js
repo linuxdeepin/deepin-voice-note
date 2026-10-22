@@ -6190,6 +6190,10 @@
                             if (backColor) {
                                 $recentColor.css('background-color', _this.options.colorButton.backColor);
                                 $button.attr('data-backColor', _this.options.colorButton.backColor);
+                                if (_this.options.colorButton.backColor == 'transparent') {
+                                    $('.icon-backcolor .path5').addClass('transparentColor');
+                                    $('.icon-backcolor').append('<div class="slopingside"></div>');
+                                }
                             }
                             if (foreColor) {
                                 $recentColor.css('color', _this.options.colorButton.foreColor);
@@ -6310,8 +6314,12 @@
                                     $('.icon-backcolor .path6').css('color', value)
                                     if (value == 'transparent') {
                                         $('.icon-backcolor .path5').addClass('transparentColor')
+                                        if ($('.icon-backcolor .slopingside').length === 0) {
+                                            $('.icon-backcolor').append('<div class="slopingside"></div>')
+                                        }
                                     } else {
                                         $('.icon-backcolor .path5').removeClass('transparentColor')
+                                        $('.icon-backcolor .slopingside').remove()
                                     }
                                 } else if (eventName == 'foreColor') {
                                     $('.icon-forecolor .path1').css('color', value)
