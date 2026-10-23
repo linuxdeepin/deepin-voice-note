@@ -141,14 +141,19 @@ void AudioWatcher::updateDeviceEnabled(const QString cardsStr, bool isEmitSig)
             }
         }
     }
+    const bool oldInIsEnable = m_inIsEnable;
+    const bool oldOutIsEnable = m_outIsEnable;
+
     m_inAudioPort = currentAuidoPort(m_inAuidoPorts,Micphone);
-    m_inIsEnable = (m_inAudioPort.availability == 2 || m_inAudioPort.availability == 0)? true : false;
-    if (isEmitSig)
+    // m_inAuidoPorts 只保存 CardsWithoutUnavailable 中 Enabled=true 的输入端口，
+    // 设备是否可用应直接以该列表为准，避免 ActivePort.availability 的 D-Bus 解析异常影响判断。
+    m_inIsEnable = !m_inAuidoPorts.isEmpty();
+    if (isEmitSig && oldInIsEnable != m_inIsEnable)
         sigDeviceEnableChanged(Micphone, m_inIsEnable);
     m_outAudioPort = currentAuidoPort(m_outAuidoPorts,Internal);
-    // 此时应该使用 m_outAudioPort.availability 来判断是否启用
-    m_outIsEnable = (m_outAudioPort.availability == 2 || m_outAudioPort.availability == 0)? true : false;
-    if (isEmitSig)
+    // m_outAuidoPorts 只保存 CardsWithoutUnavailable 中 Enabled=true 的输出端口。
+    m_outIsEnable = !m_outAuidoPorts.isEmpty();
+    if (isEmitSig && oldOutIsEnable != m_outIsEnable)
         sigDeviceEnableChanged(Internal, m_outIsEnable);
 
     qInfo() << "Audio device status updated:"
@@ -166,18 +171,16 @@ AudioPort AudioWatcher::currentAuidoPort(const QList<AudioPort> &auidoPorts,Audi
     AudioPort currentAudioPort;
     if(auidoPorts.count()){
         qInfo() << "auidoPorts is not empty";
-        foreach (AudioPort audioPort, auidoPorts) {
-            AudioPort defaultAudioPort;
-            if(audioMode == AudioMode::Internal){
-                defaultAudioPort = defaultSinkActivePort();
-            }else{
-                defaultAudioPort = defaultSourceActivePort();
-            }
+        AudioPort defaultAudioPort;
+        if(audioMode == AudioMode::Internal){
+            defaultAudioPort = defaultSinkActivePort();
+        }else{
+            defaultAudioPort = defaultSourceActivePort();
+        }
+        foreach (const AudioPort &audioPort, auidoPorts) {
+            currentAudioPort = audioPort;
             if(audioPort.name ==  defaultAudioPort.name){
-                currentAudioPort = defaultAudioPort;
                 break;
-            }else{
-                currentAudioPort = audioPort;
             }
         }
     }else{
