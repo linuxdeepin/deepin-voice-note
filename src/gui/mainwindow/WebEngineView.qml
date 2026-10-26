@@ -888,7 +888,13 @@ Item {
                             + "if(vb&&vb.getAttribute('data-type')==='voice-block'){if(window.__dvnTiptapSelectVoiceBlockFromElement)window.__dvnTiptapSelectVoiceBlockFromElement(vb);return JSON.stringify({type:1,json:vb.getAttribute('data-voice-meta')||''});}"
                             + "var img=el.closest?el.closest('img[data-rel-path]'):null;"
                             + "if(img){if(window.__dvnTiptapSelectImageFromElement)window.__dvnTiptapSelectImageFromElement(img);return JSON.stringify({type:0,json:img.getAttribute('src')||img.getAttribute('data-rel-path')||''});}"
-                            + "var sel=window.getSelection();var hasSelection=!!(sel&&sel.rangeCount>0&&!sel.isCollapsed&&sel.toString());var inEditor=!!(el.closest&&el.closest('.ProseMirror'));"
+                            // The body canvas can be taller than ProseMirror (short notes / zoom).
+                            // Only its blank containers belong to the editor, not title/toolbar children.
+                            + "var editor=window.__dvnTiptapEditor;var blankBody=el===document.getElementById('app')||el===document.getElementById('content-scroll');"
+                            + "var inEditor=!!(editor&&editor.isEditable&&(blankBody||(el.closest&&el.closest('.ProseMirror'))));"
+                            // Restore the saved selection synchronously, without moving it to the end.
+                            + "if(blankBody&&inEditor)editor.view.focus();"
+                            + "var sel=window.getSelection();var hasSelection=!!(sel&&sel.rangeCount>0&&!sel.isCollapsed&&sel.toString());"
                             + "return JSON.stringify({type:2,json:'',transcript:false,inEditor:inEditor,flags:flags(inEditor,hasSelection,hasSelection&&inEditor,inEditor,hasSelection&&inEditor)});"
                             + "})()",
                             function(result) {

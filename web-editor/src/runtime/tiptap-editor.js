@@ -346,7 +346,7 @@ window._dvnTiptapFocus = function () {
 }
 
 document.addEventListener('mousedown', function (event) {
-  if (shouldFocusEditorOnDocumentMouseDown(event.target)) {
+  if (shouldFocusEditorOnDocumentMouseDown(event.target, event.button)) {
     editor.commands.focus('end')
   }
 })
