@@ -29,6 +29,14 @@ TitleBar {
 
     background: Rectangle {
         color: DTK.themeType === ApplicationHelper.LightType ? "white" : "#242424"
+
+        MouseArea {
+            anchors.fill: parent
+            onPressed: function(mouse) {
+                if (mouse.button === Qt.LeftButton && titleBar.Window.window)
+                    titleBar.Window.window.startSystemMove();
+            }
+        }
     }
     content: Item {
         Component.onCompleted: {

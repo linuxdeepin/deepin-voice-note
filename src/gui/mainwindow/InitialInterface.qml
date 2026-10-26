@@ -1,4 +1,5 @@
 import QtQuick 2.15
+import QtQuick.Window 2.15
 import QtQuick.Layouts 1.15
 import VNote 1.0
 import org.deepin.dtk 1.0
@@ -28,6 +29,13 @@ Item {
         Layout.fillWidth: true
         anchors.top: rootWindow.top
         height: 40
+
+        background: MouseArea {
+            onPressed: function(mouse) {
+                if (mouse.button === Qt.LeftButton && title.Window.window)
+                    title.Window.window.startSystemMove();
+            }
+        }
 
         menu: TitleBarMenu {
             Accessible.name: "InitialInterfaceTitleBarMenu"

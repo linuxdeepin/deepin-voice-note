@@ -18,8 +18,14 @@ ApplicationWindow {
     property bool workspaceActive: workspaceLoader.active
     property bool createFirstNotebook: false
     property bool isRecording: workspaceLoader.item ? workspaceLoader.item.isRecording : false
+    property bool listPointerDown: false
+    // The Treeland platform helper reads this property when the window is created.
+    // DWindow.enableSystemMove alone does not disable its automatic window drag.
+    property bool _d_enableSystemMove: false
 
     DWindow.enabled: true
+    // Keep pointer drags in the notebook/note lists from becoming a window move.
+    DWindow.enableSystemMove: !listPointerDown
     // StyledBehindWindowBlur 只有在窗口启用 DTK 背景模糊并且窗口本身
     // 允许透明合成时才会真正采集窗口背后的内容；否则只会显示兜底纯色。
     DWindow.enableBlurWindow: true
