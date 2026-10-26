@@ -25,3 +25,14 @@ test('document mousedown focus helper ignores editor and toolbar clicks', () => 
   assert.equal(shouldFocusEditorOnDocumentMouseDown(document.getElementById('outside')), true)
   assert.equal(shouldFocusEditorOnDocumentMouseDown(document.body), true)
 })
+
+
+test('right-clicking blank body does not reset the editor selection', () => {
+  const window = new Window()
+  const document = window.document
+  document.body.innerHTML = '<div id="content-scroll"><div id="app"></div></div>'
+  for (const target of [document.body, document.getElementById('content-scroll'), document.getElementById('app')]) {
+    assert.equal(shouldFocusEditorOnDocumentMouseDown(target, 2), false)
+    assert.equal(shouldFocusEditorOnDocumentMouseDown(target, 0), true)
+  }
+})
