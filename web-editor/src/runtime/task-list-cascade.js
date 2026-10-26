@@ -123,21 +123,28 @@ function taskItemDescendants(doc, node, basePos) {
   const descendants = []
   if (!isTaskItem(node)) return descendants
 
+  const parentVisualDepth = taskItemVisualDepthAt(doc, basePos, node)
+
   node.descendants((child, relativePos) => {
     if (!isTaskItem(child)) return true
-    descendants.push({ node: child, pos: basePos + 1 + relativePos })
+    const childPos = basePos + 1 + relativePos
+    const childVisualDepth = taskItemVisualDepthAt(doc, childPos, child)
+    if (childVisualDepth <= parentVisualDepth) return true
+    descendants.push({ node: child, pos: childPos })
     return true
   })
 
   // dvnIndentLevel 会把同一层 taskList 中的后续兄弟项显示成当前项的
   // 子项；这些“视觉子项”不是 ProseMirror 结构 descendants，手动勾选
   // 父项时也必须一起级联。
-  const parentVisualDepth = taskItemVisualDepthAt(doc, basePos, node)
   for (const sibling of collectTaskItemsFromFollowingVisualSiblings(doc, basePos, parentVisualDepth, 'descendants')) {
     descendants.push(sibling)
     sibling.node.descendants((child, relativePos) => {
       if (!isTaskItem(child)) return true
-      descendants.push({ node: child, pos: sibling.pos + 1 + relativePos })
+      const childPos = sibling.pos + 1 + relativePos
+      const childVisualDepth = taskItemVisualDepthAt(doc, childPos, child)
+      if (childVisualDepth <= parentVisualDepth) return true
+      descendants.push({ node: child, pos: childPos })
       return true
     })
   }
