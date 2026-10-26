@@ -615,6 +615,8 @@ Item {
                             if (!rootItem.cancelRename && text.length !== 0 && text !== model.name) {
                                 model.name = text;
                                 VNoteMainManager.renameFolderById(model.folderId, text);
+                                if (index === folderListView.currentIndex)
+                                    updateFolderName(text);
                             } else {
                                 renameLine.text = model.name;
                             }
