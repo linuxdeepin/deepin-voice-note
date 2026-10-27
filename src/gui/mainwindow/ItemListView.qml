@@ -1256,19 +1256,19 @@ Item {
                     visible: section == "top" && !isSearch
                     
                     // 置顶图标
-                    Image {
+                    DciIcon {
                         id: sectionPinIcon
                         
                         Layout.preferredWidth: 12
                         Layout.preferredHeight: 12
-                        source: "qrc:/dsg/icons/pin_top.dci"
-                        fillMode: Image.PreserveAspectFit
-                        smooth: true
-                        antialiasing: true
+                        name: "pin_top"
+                        sourceSize: Qt.size(12, 12)
+                        theme: DTK.themeType
+                        palette: DTK.makeIconPalette(parent.palette)
                     }
                     
                     Text {
-                        color: "#b3000000"
+                        color: DTK.themeType === ApplicationHelper.LightType ? "#b3000000" : "#b3ffffff"
                         font.pixelSize: 12
                         verticalAlignment: Text.AlignVCenter
                         text: qsTr("Sticky Notes")
