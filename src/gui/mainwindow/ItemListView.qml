@@ -945,7 +945,7 @@ Item {
                     topPadding: 4
                     bottomPadding: 4
                     implicitHeight: Math.max(30, Math.ceil(font.pixelSize * 1.6))
-                    maximumLength: 64
+                    maximumLength: 24
                     Layout.preferredHeight: (function() {
                         var itemH = rootItemDelegate.height;
                         var outerTop = 8, outerBottom = 8;
