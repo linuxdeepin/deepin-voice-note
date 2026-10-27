@@ -7,6 +7,8 @@ import QtQuick.Window 2.15
 import QtQuick.Layouts 1.15
 import VNote 1.0
 import org.deepin.dtk 1.0
+import org.deepin.dtk.style 1.0 as DS
+import org.deepin.dtk.private 1.0 as DPrivate
 
 Loader {
     id: loader
@@ -42,7 +44,11 @@ Loader {
         readonly property int btnHeight: 30
         readonly property bool isUpdateUosAiDialog: loader.messageType === VNoteMessageDialogHandler.UpdateUosAi
         readonly property int btnWidth: Math.floor((width - 20 - 6) / 2)
-        readonly property int dialogContentHeight: isUpdateUosAiDialog ? 164 : 158
+        readonly property int dialogContentHeight: isUpdateUosAiDialog
+                                                   ? DS.Style.dialogWindow.titleBarHeight
+                                                     + DS.Style.dialogWindow.footerMargin
+                                                     + messageColumn.implicitHeight + contentLayout.spacing + btnHeight
+                                                   : 158
 
         flags: Qt.Window | Qt.WindowCloseButtonHint
         height: dialogContentHeight
@@ -80,8 +86,10 @@ Loader {
         }
 
         ColumnLayout {
+            id: contentLayout
+
             height: parent.height
-            spacing: 10
+            spacing: dialog.isUpdateUosAiDialog ? 20 : 10
             width: parent.width
 
             VNoteMessageDialogHandler {
@@ -92,11 +100,13 @@ Loader {
             }
 
             ColumnLayout {
+                id: messageColumn
+
                 Layout.alignment: Qt.AlignCenter
                 Layout.fillWidth: true
-                Layout.maximumHeight: dialog.isUpdateUosAiDialog ? 64 : 58
-                Layout.minimumHeight: dialog.isUpdateUosAiDialog ? 64 : 58
-                Layout.preferredHeight: dialog.isUpdateUosAiDialog ? 64 : 58
+                Layout.maximumHeight: dialog.isUpdateUosAiDialog ? implicitHeight : 58
+                Layout.minimumHeight: dialog.isUpdateUosAiDialog ? implicitHeight : 58
+                Layout.preferredHeight: dialog.isUpdateUosAiDialog ? implicitHeight : 58
                 spacing: dialog.isUpdateUosAiDialog ? 8 : 0
 
                 Label {
@@ -132,13 +142,13 @@ Loader {
 
                     Layout.alignment: Qt.AlignHCenter
                     Layout.fillHeight: visible && !dialog.isUpdateUosAiDialog
-                    Layout.preferredHeight: dialog.isUpdateUosAiDialog ? 34 : implicitHeight
+                    Layout.preferredHeight: implicitHeight
                     Layout.preferredWidth: dialog.isUpdateUosAiDialog ? 302 : dialog.width
                     color: dialog.isUpdateUosAiDialog ? ColorSelector.textColor : DTK.palette.windowText
                     elide: Text.ElideNone
                     font: DTK.fontManager.t7
                     horizontalAlignment: Text.AlignHCenter
-                    maximumLineCount: dialog.isUpdateUosAiDialog ? 2 : 3
+                    maximumLineCount: 3
                     text: handler.detailMessage
                     verticalAlignment: Text.AlignVCenter
                     visible: handler.detailMessage.length
@@ -149,7 +159,7 @@ Loader {
 
             Row {
                 Layout.alignment: Qt.AlignLeft | Qt.AlignBottom
-                Layout.fillHeight: true
+                Layout.fillHeight: !dialog.isUpdateUosAiDialog
                 Layout.leftMargin: handler.singleButton
                                     ? Math.max(0, (parent.width - btnWidth) / 2)
                                     : 0
@@ -165,6 +175,14 @@ Loader {
                         anchors.fill: parent
                         font: DTK.fontManager.t6
                         text: handler.cancelText
+
+                        background: DPrivate.ButtonPanel {
+                            implicitWidth: DS.Style.button.width
+                            implicitHeight: DS.Style.button.height
+                            button: parent
+                            // Match the recommended button's outline in the update dialog.
+                            outsideBorderColor: dialog.isUpdateUosAiDialog ? null : DS.Style.button.outsideBorder
+                        }
 
                         onClicked: {
                             dialog.close();
