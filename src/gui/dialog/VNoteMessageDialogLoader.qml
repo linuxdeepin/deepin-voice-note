@@ -34,7 +34,6 @@ Loader {
     }
 
     active: false
-    asynchronous: true
 
     sourceComponent: DialogWindow {
         id: dialog
