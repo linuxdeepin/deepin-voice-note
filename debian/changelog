@@ -1,3 +1,9 @@
+deepin-voice-note (6.5.69) unstable; urgency=medium
+
+  * docs: add Portuguese (pt_BR) help manual
+
+ -- re2zero <yangwu@uniontech.com>  Tue, 27 Oct 2026 19:38:54 +0800
+
 deepin-voice-note (6.5.68) unstable; urgency=medium
 
   * refactor(packaging): migrate dependencies to buildext
