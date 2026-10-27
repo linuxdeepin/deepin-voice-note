@@ -199,4 +199,5 @@ strike[style="text-decoration-line: underline;"] {
    注意：此规则仅限编辑器内容区域，零模糊不产生额外合成层，无性能影响。 */
 .note-editable b, .note-editable strong {
     text-shadow: 0.5px 0 0 currentColor;
+    -webkit-text-stroke: 0.3px currentColor;
 }
