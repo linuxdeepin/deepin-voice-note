@@ -41,6 +41,13 @@
     #app.is-empty[data-empty-heading-level="5"] .ProseMirror::before { font-size: 14px; line-height: 22px; }
     #app.is-empty[data-empty-heading-level="6"] .ProseMirror::before { font-size: 10px; }
     .ProseMirror p { margin: 0; min-height: 1.72em; }
+    /* 位图字体（如文泉驿点阵正黑、Unifont）无粗体变体，font-weight:bold 不产生视觉变化。
+       使用零模糊 text-shadow 偏移和 -webkit-text-stroke 合成加粗效果，不影响矢量字体的正常粗体渲染。
+       注意：此规则仅限编辑器内容区域，零模糊不产生额外合成层，无性能影响。 */
+    .ProseMirror b, .ProseMirror strong {
+      text-shadow: 0.5px 0 0 currentColor;
+      -webkit-text-stroke: 0.4px currentColor;
+    }
     .ProseMirror h1, .ProseMirror h2, .ProseMirror h3, .ProseMirror h4, .ProseMirror h5, .ProseMirror h6 { margin: 0; font-weight: 700; }
     /* 标题行高必须使用无单位倍率，不能使用 px 或 em 计算出的固定值。
        行内字号 mark 会覆盖标题字号；如果行高先被计算成 px，24px 行内字号
