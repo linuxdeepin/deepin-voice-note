@@ -936,6 +936,7 @@ Item {
                         Layout.fillWidth: true
                         Layout.preferredHeight: 18
                         color: DTK.themeType === ApplicationHelper.LightType ? "#BB000000" : "#BBFFFFFF"
+                        elide: Text.ElideRight
                         font.pixelSize: 16
                         text: ""
                     }
