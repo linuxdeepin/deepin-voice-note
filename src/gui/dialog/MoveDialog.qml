@@ -17,8 +17,12 @@ DialogWindow {
 
     signal moveToFolder(int index)
 
-    height: 365
+    height: 400
     width: 370
+    minimumHeight: 400
+    maximumHeight: 400
+    minimumWidth: 370
+    maximumWidth: 370
 
     onVisibleChanged: if (visible) folderList.currentIndex = 0
 
@@ -34,8 +38,13 @@ DialogWindow {
             id: description
 
             Layout.alignment: Qt.AlignHCenter
+            Layout.fillWidth: true
+            Layout.maximumWidth: 340
+            elide: Text.ElideRight
             font: DTK.fontManager.t5
+            maximumLineCount: 2
             text: name
+            wrapMode: Text.Wrap
         }
 
         ListView {
