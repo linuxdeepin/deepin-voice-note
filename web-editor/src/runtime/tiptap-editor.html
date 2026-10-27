@@ -279,8 +279,8 @@
     }
     /* 位图字体（如文泉驿点阵正黑、Unifont）无粗体变体，font-weight:bold
        无法合成粗体。-webkit-text-stroke 沿字形轮廓描边产生均匀加粗，
-       不依赖亚像素偏移量化，对点阵字体同样有效。
-       与 text-shadow 叠加使用，描边为主、偏移为辅。 */
+       不依赖亚像素偏移量化，描边为唯一合成手段。
+       对点阵字体和矢量字体均有效。 */
     .ProseMirror b, .ProseMirror strong {
       -webkit-text-stroke: 0.3px currentColor;
     }
