@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "webrichetextmanager.h"
+#include "ddlog.h"
 #include "jscontent.h"
 #include "db/vnoteitemoper.h"
 #include "metadataparser.h"
@@ -58,7 +59,7 @@ QString envelopeForNote(const VNoteItem &data)
         if (converted.ok()) {
             return MigrationJsonBuilder::toCompactJson(converted.envelope);
         }
-        qWarning() << "Failed to convert legacy HTML note to Tiptap envelope:" << converted.errors.size();
+        qCWarning(voiceNoteLog) << "Failed to convert legacy HTML note to Tiptap envelope:" << converted.errors.size();
         break;
     }
     case LegacyFormat::LegacyNoteDatas: {
@@ -67,7 +68,7 @@ QString envelopeForNote(const VNoteItem &data)
         if (converted.ok()) {
             return MigrationJsonBuilder::toCompactJson(converted.envelope);
         }
-        qWarning() << "Failed to convert legacy note data to Tiptap envelope:" << converted.errors.size();
+        qCWarning(voiceNoteLog) << "Failed to convert legacy note data to Tiptap envelope:" << converted.errors.size();
         break;
     }
     case LegacyFormat::ProseMirrorDoc: {
@@ -102,21 +103,21 @@ QString envelopeForNote(const VNoteItem &data)
 WebRichTextManager::WebRichTextManager(QObject *parent)
 : QObject(parent)
 {
-    qInfo() << "WebRichTextManager constructor called";
+    qCInfo(voiceNoteLog) << "WebRichTextManager constructor called";
     initUpdateTimer();
     initConnect();
-    qInfo() << "WebRichTextManager constructor finished";
+    qCInfo(voiceNoteLog) << "WebRichTextManager constructor finished";
 }
 
 void WebRichTextManager::initData(VNoteItem *data, const QString reg, bool focus)
 {
-    qInfo() << "Initializing data for note ID:" << (data ? data->noteId : -1);
+    qCInfo(voiceNoteLog) << "Initializing data for note ID:" << (data ? data->noteId : -1);
     //重置鼠标点击位置
     m_mouseClickPos = QPoint(-1, -1);
     m_setFocus = focus;
     // 若数据为空，清空页面并返回，避免后续异步回调空指针
     if (!data) {
-        qWarning() << "initData called with null data, clearing JS content";
+        qCWarning(voiceNoteLog) << "initData called with null data, clearing JS content";
         m_noteData = nullptr;
         m_textChange = false;
         m_textChangeNoteId = -1;
@@ -133,17 +134,17 @@ void WebRichTextManager::initData(VNoteItem *data, const QString reg, bool focus
     QTimer::singleShot(50, this, [this, reg] {
         // 使用成员 m_noteData 避免捕获过期指针
         if (!m_noteData) {
-            qWarning() << "Deferred setData skipped due to null m_noteData";
+            qCWarning(voiceNoteLog) << "Deferred setData skipped due to null m_noteData";
             return;
         }
         setData(m_noteData, reg);
     });
-    qInfo() << "Data initialization finished";
+    qCInfo(voiceNoteLog) << "Data initialization finished";
 }
 
 void WebRichTextManager::initConnect()
 {
-    qInfo() << "Initializing connections";
+    qCInfo(voiceNoteLog) << "Initializing connections";
     connect(JsContent::instance(), &JsContent::textChange, this, [=](){
         m_textChange = true;
         m_textChangeNoteId = m_noteData ? m_noteData->noteId : -1;
@@ -165,14 +166,14 @@ void WebRichTextManager::initConnect()
     connect(TiptapChannelBridge::instance(), &TiptapChannelBridge::contentSaved,
             this, &WebRichTextManager::onTiptapContentSaved);
 
-    qInfo() << "Connections initialized";
+    qCInfo(voiceNoteLog) << "Connections initialized";
 }
 
 void WebRichTextManager::setData(VNoteItem *data, const QString reg)
 {
-    qDebug() << "Setting rich text data";
+    qCDebug(voiceNoteLog) << "Setting rich text data";
     if (!data) {
-        qWarning() << "setData called with null data, skip";
+        qCWarning(voiceNoteLog) << "setData called with null data, skip";
         return;
     }
     m_noteData = data;
@@ -187,10 +188,10 @@ void WebRichTextManager::setData(VNoteItem *data, const QString reg)
 
     //设置富文本内容
     if (data->htmlCode.isEmpty()) {
-        qDebug() << "Initializing with metadata";
+        qCDebug(voiceNoteLog) << "Initializing with metadata";
         emit JsContent::instance()->callJsInitData(data->metaDataRef().toString());
     } else {
-        qDebug() << "Setting HTML content";
+        qCDebug(voiceNoteLog) << "Setting HTML content";
         emit JsContent::instance()->callJsSetHtml(data->htmlCode);
     }
     m_updateTimer->start();
@@ -203,19 +204,19 @@ void WebRichTextManager::setData(VNoteItem *data, const QString reg)
         for (const auto &task : tasks) {
             if (task.status == VoiceToTextTask::Converting) {
                 // 任务还在进行中，显示转换中状态（使用 voiceId 定位）
-                qInfo() << "Restoring voice-to-text converting status for voiceId:" << task.voiceId;
+                qCInfo(voiceNoteLog) << "Restoring voice-to-text converting status for voiceId:" << task.voiceId;
                 emit JsContent::instance()->callJsSetVoiceTextByPath(
                     task.voiceId, QString(), JsContent::AsrFlag::Start);
             } else if (task.status == VoiceToTextTask::Completed && !task.resultText.isEmpty()) {
                 // 任务已完成且有结果，确保结果显示
-                qInfo() << "Task completed, ensuring result is displayed for voiceId:" << task.voiceId;
+                qCInfo(voiceNoteLog) << "Task completed, ensuring result is displayed for voiceId:" << task.voiceId;
                 emit JsContent::instance()->callJsSetVoiceTextByPath(
                     task.voiceId, task.resultText, JsContent::AsrFlag::End);
                 // 移除已处理的任务
                 VoiceToTextTaskManager::instance()->removeTask(task.voiceId);
             } else if (task.status == VoiceToTextTask::Failed) {
                 // 任务失败，移除转换中状态
-                qInfo() << "Task failed, removing converting status for voiceId:" << task.voiceId;
+                qCInfo(voiceNoteLog) << "Task failed, removing converting status for voiceId:" << task.voiceId;
                 emit JsContent::instance()->callJsSetVoiceTextByPath(
                     task.voiceId, QString(), JsContent::AsrFlag::End);
                 // 移除已处理的任务
@@ -224,21 +225,21 @@ void WebRichTextManager::setData(VNoteItem *data, const QString reg)
         }
     });
 
-    qInfo() << "Rich text data setting finished";
+    qCInfo(voiceNoteLog) << "Rich text data setting finished";
 }
 
 void WebRichTextManager::initUpdateTimer()
 {
-    qInfo() << "Initializing update timer";
+    qCInfo(voiceNoteLog) << "Initializing update timer";
     m_updateTimer = new QTimer(this);
     m_updateTimer->setInterval(1000);
     connect(m_updateTimer, &QTimer::timeout, this, &WebRichTextManager::updateNote);
-    qInfo() << "Update timer initialized";
+    qCInfo(voiceNoteLog) << "Update timer initialized";
 }
 
 void WebRichTextManager::updateNote()
 {
-    // qInfo() << "Updating note, text change flag:" << m_textChange;
+    // qCInfo(voiceNoteLog) << "Updating note, text change flag:" << m_textChange;
     if (m_textChange) {
         if (m_updateInProgress) {
             return;
@@ -248,7 +249,7 @@ void WebRichTextManager::updateNote()
         m_updateRequestSerial = m_textChangeSerial;
         emit needUpdateNote(m_updateRequestNoteId);
     }
-    // qInfo() << "Note update finished";
+    // qCInfo(voiceNoteLog) << "Note update finished";
 }
 
 bool WebRichTextManager::hasPendingTextChange() const
@@ -273,9 +274,9 @@ void WebRichTextManager::requestUpdateNoteNow()
 
 void WebRichTextManager::onUpdateNoteWithResult(VNoteItem *data, const QString &result)
 {
-    qDebug() << "Updating note with result";
+    qCDebug(voiceNoteLog) << "Updating note with result";
     if (!data) {
-        qWarning() << "onUpdateNoteWithResult called with null data, skip";
+        qCWarning(voiceNoteLog) << "onUpdateNoteWithResult called with null data, skip";
         m_updateInProgress = false;
         m_updateRequestNoteId = -1;
         m_updateRequestSerial = 0;
@@ -286,9 +287,9 @@ void WebRichTextManager::onUpdateNoteWithResult(VNoteItem *data, const QString &
     VNoteItemOper noteOps(data);
     const bool updateOk = noteOps.updateNote();
     if (!updateOk) {
-        qWarning() << "Failed to save note";
+        qCWarning(voiceNoteLog) << "Failed to save note";
     } else {
-        qDebug() << "Note saved successfully";
+        qCDebug(voiceNoteLog) << "Note saved successfully";
     }
     if (updateOk && data->noteId == m_textChangeNoteId && m_updateRequestSerial == m_textChangeSerial) {
         m_textChange = false;
@@ -298,14 +299,14 @@ void WebRichTextManager::onUpdateNoteWithResult(VNoteItem *data, const QString &
     m_updateRequestNoteId = -1;
     m_updateRequestSerial = 0;
     emit finishedUpdateNote();
-    qInfo() << "Note update with result finished";
+    qCInfo(voiceNoteLog) << "Note update with result finished";
 }
 
 void WebRichTextManager::onTiptapContentSaved(const QString &envelopeJson)
 {
-    qDebug() << "Saving Tiptap envelope content";
+    qCDebug(voiceNoteLog) << "Saving Tiptap envelope content";
     if (!m_noteData) {
-        qWarning() << "onTiptapContentSaved: null note data, skip";
+        qCWarning(voiceNoteLog) << "onTiptapContentSaved: null note data, skip";
         m_updateInProgress = false;
         m_updateRequestNoteId = -1;
         m_updateRequestSerial = 0;
@@ -314,9 +315,9 @@ void WebRichTextManager::onTiptapContentSaved(const QString &envelopeJson)
     }
     bool updateOk = VNoteItemOper(m_noteData).updateNoteTiptapEnvelope(envelopeJson);
     if (!updateOk) {
-        qWarning() << "Failed to save Tiptap note";
+        qCWarning(voiceNoteLog) << "Failed to save Tiptap note";
     } else {
-        qDebug() << "Tiptap note saved successfully";
+        qCDebug(voiceNoteLog) << "Tiptap note saved successfully";
     }
     if (updateOk && m_noteData->noteId == m_textChangeNoteId && m_updateRequestSerial == m_textChangeSerial) {
         m_textChange = false;
@@ -326,12 +327,12 @@ void WebRichTextManager::onTiptapContentSaved(const QString &envelopeJson)
     m_updateRequestNoteId = -1;
     m_updateRequestSerial = 0;
     emit finishedUpdateNote();
-    qInfo() << "Tiptap content saved finished";
+    qCInfo(voiceNoteLog) << "Tiptap content saved finished";
 }
 
 void WebRichTextManager::insertVoiceItem(const QString &voicePath, qint64 voiceSize)
 {
-    qDebug() << "Inserting voice item, path:" << voicePath << "size:" << voiceSize;
+    qCDebug(voiceNoteLog) << "Inserting voice item, path:" << voicePath << "size:" << voiceSize;
     VNVoiceBlock data;
     data.ptrVoice->voiceSize = voiceSize;
     // 存储相对路径：AppData/voicenote/ -> voicenote/...
@@ -348,12 +349,12 @@ void WebRichTextManager::insertVoiceItem(const QString &voicePath, qint64 voiceS
     const QString voiceInfoJson = value.toString();
     if (TiptapChannelBridge::instance()->tiptapEnabled()) {
         TiptapChannelBridge::instance()->sendInsertVoiceBlock(voiceInfoJson);
-        qDebug() << "Tiptap voice block insert requested successfully, voiceId:" << data.ptrVoice->voiceId;
+        qCDebug(voiceNoteLog) << "Tiptap voice block insert requested successfully, voiceId:" << data.ptrVoice->voiceId;
         return;
     }
 
     emit JsContent::instance()->callJsInsertVoice(voiceInfoJson);
-    qDebug() << "Voice item inserted successfully, voiceId:" << data.ptrVoice->voiceId;
+    qCDebug(voiceNoteLog) << "Voice item inserted successfully, voiceId:" << data.ptrVoice->voiceId;
 }
 
 /**
@@ -362,27 +363,27 @@ void WebRichTextManager::insertVoiceItem(const QString &voicePath, qint64 voiceS
  */
 void WebRichTextManager::onLoadFinsh()
 {
-    qDebug() << "Web communication established";
+    qCDebug(voiceNoteLog) << "Web communication established";
     //再次设置笔记内容
     if (m_noteData && !m_loadFinshSign) {
         if (TiptapChannelBridge::instance()->tiptapEnabled()) {
-            qDebug() << "Reloading Tiptap envelope after load";
+            qCDebug(voiceNoteLog) << "Reloading Tiptap envelope after load";
             TiptapChannelBridge::instance()->loadEnvelope(envelopeForNote(*m_noteData));
         } else if (m_noteData->htmlCode.isEmpty()) {
-            qDebug() << "Initializing with metadata after load";
+            qCDebug(voiceNoteLog) << "Initializing with metadata after load";
             emit JsContent::instance()->callJsInitData(m_noteData->metaDataRef().toString());
         } else {
-            qDebug() << "Setting HTML content after load";
+            qCDebug(voiceNoteLog) << "Setting HTML content after load";
             emit JsContent::instance()->callJsSetHtml(m_noteData->htmlCode);
         }
     }
     m_loadFinshSign = true;
-    qInfo() << "Web communication establishment handling finished";
+    qCInfo(voiceNoteLog) << "Web communication establishment handling finished";
 }
 
 void WebRichTextManager::clearJSContent()
 {
-    qDebug() << "Clearing JS content";
+    qCDebug(voiceNoteLog) << "Clearing JS content";
     if (TiptapChannelBridge::instance()->tiptapEnabled()) {
         TiptapChannelBridge::instance()->loadEnvelope(emptyTiptapEnvelopeJson());
     }
@@ -392,12 +393,12 @@ void WebRichTextManager::clearJSContent()
     QEventLoop eveLoop;
     QTimer::singleShot(100, &eveLoop, SLOT(quit()));
     eveLoop.exec();
-    qDebug() << "JS content cleared";
+    qCDebug(voiceNoteLog) << "JS content cleared";
 }
 
 void WebRichTextManager::onSetDataFinsh()
 {
-    qInfo() << "Set data finished";
+    qCInfo(voiceNoteLog) << "Set data finished";
     if (!m_setFocus) {
         return;
     }

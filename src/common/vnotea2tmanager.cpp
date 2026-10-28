@@ -1,8 +1,9 @@
-// SPDX-FileCopyrightText: 2019 - 2024 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2019 - 2026 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "vnotea2tmanager.h"
+#include "ddlog.h"
 #include "opsstateinterface.h"
 
 #include <DSysInfo>
@@ -25,7 +26,7 @@ QTimer *timer;
 VNoteA2TManager::VNoteA2TManager(QObject *parent)
     : QObject(parent)
 {
-    qDebug() << "Initializing VNoteA2TManager";
+    qCDebug(voiceNoteLog) << "Initializing VNoteA2TManager";
     initSession();
 }
 
@@ -35,7 +36,7 @@ VNoteA2TManager::VNoteA2TManager(QObject *parent)
  */
 int VNoteA2TManager::initSession()
 {
-    qDebug() << "Initializing ASR session";
+    qCDebug(voiceNoteLog) << "Initializing ASR session";
     int errorCode = 0;
 
     timer = new QTimer;
@@ -49,10 +50,10 @@ int VNoteA2TManager::initSession()
     bool ret = QDBusConnection::sessionBus().connect("com.iflytek.aiassistant", "/aiassistant/deepinmain",
                                           "com.iflytek.aiassistant.mainWindow", "onNotify", this, SLOT(onNotify(QString)));
     if (!ret) {
-        qWarning() << "Failed to connect to D-Bus signal:" << QDBusConnection::sessionBus().lastError().message();
+        qCWarning(voiceNoteLog) << "Failed to connect to D-Bus signal:" << QDBusConnection::sessionBus().lastError().message();
         errorCode = -1;
     } else {
-        qDebug() << "Successfully connected to D-Bus signal";
+        qCDebug(voiceNoteLog) << "Successfully connected to D-Bus signal";
     }
 
     return errorCode;
@@ -67,14 +68,14 @@ int VNoteA2TManager::initSession()
  */
 void VNoteA2TManager::startAsr(QString filePath, qint64 fileDuration, QString srcLanguage, QString targetLanguage)
 {
-    qInfo() << "Starting ASR for file:" << filePath << "duration:" << fileDuration 
+    qCInfo(voiceNoteLog) << "Starting ASR for file:" << filePath << "duration:" << fileDuration 
             << "source language:" << srcLanguage << "target language:" << targetLanguage;
 
     QDBusInterface asrInterface("com.iflytek.aiassistant", "/aiassistant/deepinmain",
                                 "com.iflytek.aiassistant.mainWindow");
     if (!asrInterface.isValid())
     {
-        qWarning() << "Invalid D-Bus interface:" << QDBusConnection::sessionBus().lastError().message();
+        qCWarning(voiceNoteLog) << "Invalid D-Bus interface:" << QDBusConnection::sessionBus().lastError().message();
         emit asrError(AudioOther);
         return;
     }
@@ -93,17 +94,17 @@ void VNoteA2TManager::startAsr(QString filePath, qint64 fileDuration, QString sr
         param.insert("targetLanguage", targetLanguage);
     }
 
-    qDebug() << "Calling D-Bus startAsr with parameters:" << param;
+    qCDebug(voiceNoteLog) << "Calling D-Bus startAsr with parameters:" << param;
     QDBusMessage retMessage = asrInterface.call(QLatin1String("startAsr"), param);
     QString retStr = retMessage.arguments().at(0).value<QString>();
 
     if (retStr != CODE_SUCCESS) {
-        qWarning() << "ASR start failed with code:" << retStr;
+        qCWarning(voiceNoteLog) << "ASR start failed with code:" << retStr;
         asrMsg error;
         error.code = retStr;
         emit asrError(getErrorCode(error));
     } else {
-        qDebug() << "ASR started successfully";
+        qCDebug(voiceNoteLog) << "ASR started successfully";
         OpsStateInterface::instance()->operState(OpsStateInterface::StateVoice2Text, true);
         timer->start();
     }
@@ -114,7 +115,7 @@ void VNoteA2TManager::startAsr(QString filePath, qint64 fileDuration, QString sr
  */
 void VNoteA2TManager::stopAsr()
 {
-    qInfo() << "Stopping ASR";
+    qCInfo(voiceNoteLog) << "Stopping ASR";
     // m_asrInterface->stopAsr();
 }
 
@@ -124,41 +125,41 @@ void VNoteA2TManager::stopAsr()
  */
 void VNoteA2TManager::onNotify(const QString &msg)
 {
-    qDebug() << "Received ASR notification";
+    qCDebug(voiceNoteLog) << "Received ASR notification";
     asrMsg asrData;
     asrJsonParser(msg, asrData);
 
     if (timer->isActive()) {
-        qDebug() << "Stopping ASR timeout timer";
+        qCDebug(voiceNoteLog) << "Stopping ASR timeout timer";
         timer->stop();
     }
     OpsStateInterface::instance()->operState(OpsStateInterface::StateVoice2Text, false);
 
     if (CODE_SUCCESS == asrData.code)
     {
-        qInfo() << "ASR success";
+        qCInfo(voiceNoteLog) << "ASR success";
         if (XF_finish == asrData.status)
         {
-            qInfo() << "ASR finish";
+            qCInfo(voiceNoteLog) << "ASR finish";
             // Finish convertion
             emit asrSuccess(asrData.text);
         }
         else if (XF_fail == asrData.status)
         {
-            qInfo() << "ASR failed";
+            qCInfo(voiceNoteLog) << "ASR failed";
             // Failed convertion
             emit asrError(getErrorCode(asrData));
         }
         else
         {
-            qInfo() << "ASR other";
+            qCInfo(voiceNoteLog) << "ASR other";
             // We ingore other state BCS we don't
             //  care about it
         }
     }
     else
     {
-        qInfo() << "ASR error";
+        qCInfo(voiceNoteLog) << "ASR error";
         emit asrError(getErrorCode(asrData));
     }
 }
@@ -170,47 +171,47 @@ void VNoteA2TManager::onNotify(const QString &msg)
  */
 void VNoteA2TManager::asrJsonParser(const QString &msg, asrMsg &asrData)
 {
-    qDebug() << "Parsing ASR JSON message";
+    qCDebug(voiceNoteLog) << "Parsing ASR JSON message";
     QJsonParseError error;
     QJsonDocument doc = QJsonDocument::fromJson(msg.toUtf8(), &error);
 
     if (QJsonParseError::NoError == error.error)
     {
-        qInfo() << "ASR JSON message is valid";
+        qCInfo(voiceNoteLog) << "ASR JSON message is valid";
         QVariantMap map = doc.toVariant().toMap();
 
         if (map.contains("code"))
         {
-            qInfo() << "ASR code is valid";
+            qCInfo(voiceNoteLog) << "ASR code is valid";
             asrData.code = map["code"].toString();
         }
 
         if (map.contains("descInfo"))
         {
-            qInfo() << "ASR descInfo is valid";
+            qCInfo(voiceNoteLog) << "ASR descInfo is valid";
             asrData.descInfo = map["descInfo"].toString();
         }
 
         if (map.contains("failType"))
         {
-            qInfo() << "ASR failType is valid";
+            qCInfo(voiceNoteLog) << "ASR failType is valid";
             asrData.failType = map["failType"].toInt();
         }
 
         if (map.contains("status"))
         {
-            qInfo() << "ASR status is valid";
+            qCInfo(voiceNoteLog) << "ASR status is valid";
             asrData.status = map["status"].toInt();
         }
 
         if (map.contains("text"))
         {
-            qInfo() << "ASR text is valid";
+            qCInfo(voiceNoteLog) << "ASR text is valid";
             asrData.text = map["text"].toString();
         }
-        qDebug() << "JSON parsed successfully, code:" << asrData.code << "status:" << asrData.status;
+        qCDebug(voiceNoteLog) << "JSON parsed successfully, code:" << asrData.code << "status:" << asrData.status;
     } else {
-        qWarning() << "JSON parse error:" << error.errorString();
+        qCWarning(voiceNoteLog) << "JSON parse error:" << error.errorString();
     }
 }
 
@@ -221,53 +222,53 @@ void VNoteA2TManager::asrJsonParser(const QString &msg, asrMsg &asrData)
  */
 VNoteA2TManager::ErrorCode VNoteA2TManager::getErrorCode(const asrMsg &asrData)
 {
-    qDebug() << "Getting error code for ASR message, code:" << asrData.code << "status:" << asrData.status;
+    qCDebug(voiceNoteLog) << "Getting error code for ASR message, code:" << asrData.code << "status:" << asrData.status;
     ErrorCode error = Success;
 
     if (CODE_SUCCESS == asrData.code && XF_fail == asrData.status)
     {
-        qWarning() << "ASR failed";
+        qCWarning(voiceNoteLog) << "ASR failed";
         switch (asrData.failType)
         {
         case XF_upload:
         {
-            qWarning() << "Audio file upload failed";
+            qCWarning(voiceNoteLog) << "Audio file upload failed";
             error = UploadAudioFileFail;
         }
         break;
         case XF_decode:
         {
-            qWarning() << "Audio decode failed";
+            qCWarning(voiceNoteLog) << "Audio decode failed";
             error = AudioDecodeFail;
         }
         break;
         case XF_recognize:
         {
-            qWarning() << "Audio recognition failed";
+            qCWarning(voiceNoteLog) << "Audio recognition failed";
             error = AudioRecognizeFail;
         }
         break;
         case XF_limit:
         {
-            qWarning() << "Audio exceeds size limit";
+            qCWarning(voiceNoteLog) << "Audio exceeds size limit";
             error = AudioExceedeLimit;
         }
         break;
         case XF_verify:
         {
-            qWarning() << "Audio verification failed";
+            qCWarning(voiceNoteLog) << "Audio verification failed";
             error = AudioVerifyFailed;
         }
         break;
         case XF_mute:
         {
-            qWarning() << "Audio file is mute";
+            qCWarning(voiceNoteLog) << "Audio file is mute";
             error = AudioMuteFile;
         }
         break;
         case XF_other:
         {
-            qWarning() << "Other audio error occurred";
+            qCWarning(voiceNoteLog) << "Other audio error occurred";
             error = AudioOther;
         }
         break;
@@ -276,7 +277,7 @@ VNoteA2TManager::ErrorCode VNoteA2TManager::getErrorCode(const asrMsg &asrData)
     }
     else if (CODE_NETWORK == asrData.code)
     {
-        qWarning() << "Network error occurred";
+        qCWarning(voiceNoteLog) << "Network error occurred";
         error = NetworkError;
     }
     else
@@ -284,7 +285,7 @@ VNoteA2TManager::ErrorCode VNoteA2TManager::getErrorCode(const asrMsg &asrData)
         // TODO:
         //     Now we don't care this error,may be handle
         // it in furture if needed
-        qDebug() << "Ignoring non-critical error";
+        qCDebug(voiceNoteLog) << "Ignoring non-critical error";
         error = DontCareError;
     }
     return error;

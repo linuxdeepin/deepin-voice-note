@@ -4,6 +4,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "datatypedef.h"
+#include "ddlog.h"
 #include "vnoteitemoper.h"
 #include "vnotefolderoper.h"
 #include "VNoteMainManager.h"
@@ -113,13 +114,13 @@ QHash<int, VNoteItem *> buildAllNotesLookup(VNOTE_ALL_NOTES_MAP *noteAll)
 
 VNoteMainManager::VNoteMainManager()
 {
-    qInfo() << "VNoteMainManager constructor called";
+    qCInfo(voiceNoteLog) << "VNoteMainManager constructor called";
 }
 
 // 写一个单例模式的类
 VNoteMainManager *VNoteMainManager::instance()
 {
-    qInfo() << "VNoteMainManager instance requested";
+    qCInfo(voiceNoteLog) << "VNoteMainManager instance requested";
     static VNoteMainManager instance;
     return &instance;
 }
@@ -129,7 +130,7 @@ bool VNoteMainManager::hasExistingFolders()
     QSqlQuery query(VNoteDbManager::instance()->getVNoteDb());
     if (!query.exec(QStringLiteral("SELECT 1 FROM %1 LIMIT 1")
                     .arg(VNoteDbManager::FOLDER_TABLE_NAME))) {
-        qWarning() << "Failed to check existing folders:" << query.lastError().text();
+        qCWarning(voiceNoteLog) << "Failed to check existing folders:" << query.lastError().text();
         return false;
     }
 
@@ -161,34 +162,34 @@ void VNoteMainManager::start()
 
 void VNoteMainManager::initNote()
 {
-    qInfo() << "Initializing note manager";
+    qCInfo(voiceNoteLog) << "Initializing note manager";
     m_richTextManager = new WebRichTextManager();
     initConnections();
     initData();
 
     int savedAudioSource = loadAudioSource();
-    qInfo() << "Loading saved audio source setting:" << savedAudioSource;
+    qCInfo(voiceNoteLog) << "Loading saved audio source setting:" << savedAudioSource;
     VoiceRecoderHandler::instance()->changeMode(savedAudioSource);
 
     m_dbusService = new VoiceNoteDBusService(this);
     m_dbusService->initDBusService();
     
-    qInfo() << "Note manager initialization finished";
+    qCInfo(voiceNoteLog) << "Note manager initialization finished";
 }
 
 void VNoteMainManager::initData()
 {
-    qInfo() << "Initializing data";
+    qCInfo(voiceNoteLog) << "Initializing data";
     VNoteDataManager::instance()->reqNoteDefIcons();
     VNoteDataManager::instance()->reqNoteFolders();
     QThread::msleep(200);
     VNoteDataManager::instance()->reqNoteItems();
-    qInfo() << "Data initialization finished";
+    qCInfo(voiceNoteLog) << "Data initialization finished";
 }
 
 void VNoteMainManager::reloadAfterMigration()
 {
-    qInfo() << "Reloading UI data after migration";
+    qCInfo(voiceNoteLog) << "Reloading UI data after migration";
     m_currentFolderIndex = -1;
     m_currentNoteId = -1;
     m_currentHasTop = 0;
@@ -206,7 +207,7 @@ bool VNoteMainManager::openUosAiInAppStore()
 
 void VNoteMainManager::initConnections()
 {
-    qInfo() << "Initializing connections";
+    qCInfo(voiceNoteLog) << "Initializing connections";
     connect(VNoteDataManager::instance(), &VNoteDataManager::onAllDatasReady,
             this, &VNoteMainManager::onVNoteFoldersLoaded);
     connect(m_richTextManager, &WebRichTextManager::needUpdateNote, this, &VNoteMainManager::needUpdateNote);
@@ -218,12 +219,12 @@ void VNoteMainManager::initConnections()
             TiptapChannelBridge::instance(), &TiptapChannelBridge::currentNoteChanged);
     connect(m_richTextManager, &WebRichTextManager::finishedUpdateNote, this, &VNoteMainManager::onRichTextSaveFinished);
     connect(VoiceRecoderHandler::instance(), &VoiceRecoderHandler::finishedRecod, this, &VNoteMainManager::insertVoice);
-    qInfo() << "Connections initialized";
+    qCInfo(voiceNoteLog) << "Connections initialized";
 }
 
 QObject *jsContent_provider(QQmlEngine *engine, QJSEngine *scriptEngine)
 {
-    qInfo() << "jsContent_provider called";
+    qCInfo(voiceNoteLog) << "jsContent_provider called";
     Q_UNUSED(engine)
     Q_UNUSED(scriptEngine)
 
@@ -232,7 +233,7 @@ QObject *jsContent_provider(QQmlEngine *engine, QJSEngine *scriptEngine)
 
 QObject *mainManager_provider(QQmlEngine *engine, QJSEngine *scriptEngine)
 {
-    qInfo() << "mainManager_provider called";
+    qCInfo(voiceNoteLog) << "mainManager_provider called";
     Q_UNUSED(engine)
     Q_UNUSED(scriptEngine)
 
@@ -241,7 +242,7 @@ QObject *mainManager_provider(QQmlEngine *engine, QJSEngine *scriptEngine)
 
 QObject *actionManager_provider(QQmlEngine *engine, QJSEngine *scriptEngine)
 {
-    qInfo() << "actionManager_provider called";
+    qCInfo(voiceNoteLog) << "actionManager_provider called";
     Q_UNUSED(engine)
     Q_UNUSED(scriptEngine)
 
@@ -250,7 +251,7 @@ QObject *actionManager_provider(QQmlEngine *engine, QJSEngine *scriptEngine)
 
 QObject *voiceRecoder_provider(QQmlEngine *engine, QJSEngine *scriptEngine)
 {
-    qInfo() << "voiceRecoder_provider called";
+    qCInfo(voiceNoteLog) << "voiceRecoder_provider called";
     Q_UNUSED(engine)
     Q_UNUSED(scriptEngine)
 
@@ -259,7 +260,7 @@ QObject *voiceRecoder_provider(QQmlEngine *engine, QJSEngine *scriptEngine)
 
 QObject *migrationViewController_provider(QQmlEngine *engine, QJSEngine *scriptEngine)
 {
-    qInfo() << "migrationViewController_provider called";
+    qCInfo(voiceNoteLog) << "migrationViewController_provider called";
     Q_UNUSED(engine)
     Q_UNUSED(scriptEngine)
 
@@ -276,7 +277,7 @@ QObject *tiptapChannelBridge_provider(QQmlEngine *engine, QJSEngine *scriptEngin
 
 void VNoteMainManager::initQMLRegister()
 {
-    qInfo() << "Initializing QML registration";
+    qCInfo(voiceNoteLog) << "Initializing QML registration";
     qmlRegisterSingletonType<VNoteMainManager>("VNote", 1, 0, "VNoteMainManager", mainManager_provider);
     // 升级进度界面控制器单例
     qmlRegisterSingletonType<MigrationViewController>("VNote", 1, 0, "MigrationViewController", migrationViewController_provider);
@@ -292,12 +293,12 @@ void VNoteMainManager::initQMLRegister()
     qmlRegisterSingletonType<VoiceRecoderHandler>("VNote", 1, 0, "VoiceRecoderHandler", voiceRecoder_provider);
 
     qmlRegisterType<RecordingCurves>("VNote", 1, 0, "RecordingCurves");
-    qInfo() << "QML registration finished";
+    qCInfo(voiceNoteLog) << "QML registration finished";
 }
 
 void VNoteMainManager::onVNoteFoldersLoaded()
 {
-    qInfo() << "VNote folders loaded";
+    qCInfo(voiceNoteLog) << "VNote folders loaded";
     // #ifdef IMPORT_OLD_VERSION_DATA
     //     if (m_fNeedUpgradeOldDb) {
     //         //Start upgrade if all components are ready.
@@ -323,7 +324,7 @@ void VNoteMainManager::onVNoteFoldersLoaded()
     //     pFileCleanupWorker->setObjectName("FileCleanupWorker");
     //     QThreadPool::globalInstance()->start(pFileCleanupWorker);
     emit initialDataReady();
-    qInfo() << "VNote folders loaded handling finished";
+    qCInfo(voiceNoteLog) << "VNote folders loaded handling finished";
 }
 
 /**
@@ -332,23 +333,23 @@ void VNoteMainManager::onVNoteFoldersLoaded()
  */
 int VNoteMainManager::loadNotepads()
 {
-    qDebug() << "Loading notepads";
+    qCDebug(voiceNoteLog) << "Loading notepads";
     VNOTE_FOLDERS_MAP *folders = VNoteDataManager::instance()->getNoteFolders();
     QStringList persistedSort;
     QString value = setting::instance()->getOption(VNOTE_FOLDER_SORT).toString();
     if (!value.isEmpty()) {
         persistedSort = value.split(",", Qt::SkipEmptyParts);
-        qDebug() << "Loaded folder sort order:" << persistedSort;
+        qCDebug(voiceNoteLog) << "Loaded folder sort order:" << persistedSort;
     }
 
     int folderCount = 0;
     QList<QVariantMap> foldersDataList;
 
     if (folders) {
-        qInfo() << "folders is not nullptr";
+        qCInfo(voiceNoteLog) << "folders is not nullptr";
         folders->lock.lockForRead();
         folderCount = folders->folders.size();
-        qDebug() << "Found" << folderCount << "folders";
+        qCDebug(voiceNoteLog) << "Found" << folderCount << "folders";
 
         QSet<QString> realFolderIds;
         QSet<QString> seenFolderIds;
@@ -363,7 +364,7 @@ int VNoteMainManager::loadNotepads()
             const qint64 folderId = rawId.toLongLong(&ok);
             const QString normalizedId = folderIdKey(folderId);
             if (!ok || !realFolderIds.contains(normalizedId) || seenFolderIds.contains(normalizedId)) {
-                qWarning() << "Ignoring invalid folder sort entry:" << rawId;
+                qCWarning(voiceNoteLog) << "Ignoring invalid folder sort entry:" << rawId;
                 continue;
             }
             sanitizedSort.append(normalizedId);
@@ -383,7 +384,7 @@ int VNoteMainManager::loadNotepads()
         m_folderSort = sanitizedSort;
         if (value != m_folderSort.join(",")) {
             setting::instance()->setOption(VNOTE_FOLDER_SORT, m_folderSort.join(","));
-            qDebug() << "Sanitized folder sort order:" << m_folderSort;
+            qCDebug(voiceNoteLog) << "Sanitized folder sort order:" << m_folderSort;
         }
 
         for (VNoteFolder *folder : folders->folders) {
@@ -407,62 +408,62 @@ int VNoteMainManager::loadNotepads()
                   [](const QVariantMap &a, const QVariantMap &b) {
                       return a[FOLDER_SORT_KEY].toInt() < b[FOLDER_SORT_KEY].toInt();
                   });
-        qDebug() << "Folder data sorted";
+        qCDebug(voiceNoteLog) << "Folder data sorted";
     } else {
-        qWarning() << "Cannot load notepads: folders map is null";
+        qCWarning(voiceNoteLog) << "Cannot load notepads: folders map is null";
     }
 
     emit finishedFolderLoad(foldersDataList);
-    qDebug() << "Folder data emitted, count:" << foldersDataList.size();
-    qInfo() << "Notepads loading finished, count:" << folderCount;
+    qCDebug(voiceNoteLog) << "Folder data emitted, count:" << foldersDataList.size();
+    qCInfo(voiceNoteLog) << "Notepads loading finished, count:" << folderCount;
     return folderCount;
 }
 
 void VNoteMainManager::vNoteFloderChanged(const int &index)
 {
-    qDebug() << "Changing to folder index:" << index;
+    qCDebug(voiceNoteLog) << "Changing to folder index:" << index;
     VNoteFolder *folder = getFloderByIndex(index);
     if (folder) {
-        qInfo() << "folder is not nullptr";
+        qCInfo(voiceNoteLog) << "folder is not nullptr";
         m_currentFolderIndex = folder->id;
-        qDebug() << "Loading notes for folder ID:" << folder->id;
+        qCDebug(voiceNoteLog) << "Loading notes for folder ID:" << folder->id;
         if (!loadNotes(folder)) {
-            qWarning() << "Failed to load notes for folder ID:" << folder->id;
+            qCWarning(voiceNoteLog) << "Failed to load notes for folder ID:" << folder->id;
         }
     } else {
-        qWarning() << "Invalid folder index:" << index;
+        qCWarning(voiceNoteLog) << "Invalid folder index:" << index;
     }
-    qInfo() << "Folder change finished";
+    qCInfo(voiceNoteLog) << "Folder change finished";
 }
 
 void VNoteMainManager::vNoteFloderChangedById(const int &folderId)
 {
-    qDebug() << "Changing to folder ID:" << folderId;
+    qCDebug(voiceNoteLog) << "Changing to folder ID:" << folderId;
     VNoteFolder *folder = getFloderById(folderId);
     if (folder) {
-        qInfo() << "folder is not nullptr";
+        qCInfo(voiceNoteLog) << "folder is not nullptr";
         m_currentFolderIndex = folder->id;
-        qDebug() << "Loading notes for folder ID:" << folder->id;
+        qCDebug(voiceNoteLog) << "Loading notes for folder ID:" << folder->id;
         if (!loadNotes(folder)) {
-            qWarning() << "Failed to load notes for folder ID:" << folder->id;
+            qCWarning(voiceNoteLog) << "Failed to load notes for folder ID:" << folder->id;
         }
     } else {
-        qWarning() << "Invalid folder ID:" << folderId;
+        qCWarning(voiceNoteLog) << "Invalid folder ID:" << folderId;
     }
-    qInfo() << "Folder change by ID finished";
+    qCInfo(voiceNoteLog) << "Folder change by ID finished";
 }
 
 void VNoteMainManager::vNoteCreateFolder()
 {
-    qDebug() << "Creating new folder";
+    qCDebug(voiceNoteLog) << "Creating new folder";
     // 录音中禁止创建记事本
     if (VoiceRecoderHandler::instance()->getRecoderType() == VoiceRecoderHandler::Recording) {
-        qWarning() << "Cannot create notebook while recording";
+        qCWarning(voiceNoteLog) << "Cannot create notebook while recording";
         return;
     }
     // 播放中禁止创建记事本
     if (OpsStateInterface::instance()->isPlaying()) {
-        qWarning() << "Cannot create notebook while playing";
+        qCWarning(voiceNoteLog) << "Cannot create notebook while playing";
         return;
     }
     VNoteFolder itemData;
@@ -472,7 +473,7 @@ void VNoteMainManager::vNoteCreateFolder()
     VNoteFolder *newFolder = folderOper.addFolder(itemData);
 
     if (newFolder) {
-        qDebug() << "New folder created with ID:" << newFolder->id;
+        qCDebug(voiceNoteLog) << "New folder created with ID:" << newFolder->id;
         m_folderSort.insert(0, QString::number(newFolder->id));
 
         QString folderSortData = m_folderSort.join(",");
@@ -488,17 +489,17 @@ void VNoteMainManager::vNoteCreateFolder()
         data.insert(FOLDER_ID_KEY, newFolder->id);
         addFolderFinished(data);
     } else {
-        qWarning() << "Failed to create new folder";
+        qCWarning(voiceNoteLog) << "Failed to create new folder";
     }
-    qInfo() << "Folder creation finished";
+    qCInfo(voiceNoteLog) << "Folder creation finished";
 }
 
 bool VNoteMainManager::vNoteDeleteFolder(const int &index)
 {
-    qDebug() << "Deleting folder at index:" << index;
+    qCDebug(voiceNoteLog) << "Deleting folder at index:" << index;
     VNoteFolder *folder = getFloderByIndex(index);
     if (!folder) {
-        qWarning() << "Invalid folder index for deletion:" << index;
+        qCWarning(voiceNoteLog) << "Invalid folder index for deletion:" << index;
         return false;
     }
     return vNoteDeleteFolderById(folder->id);
@@ -506,17 +507,17 @@ bool VNoteMainManager::vNoteDeleteFolder(const int &index)
 
 bool VNoteMainManager::vNoteDeleteFolderById(const int &folderId)
 {
-    qDebug() << "Deleting folder with ID:" << folderId;
+    qCDebug(voiceNoteLog) << "Deleting folder with ID:" << folderId;
     // 录音或播放中禁止删除
     if (VoiceRecoderHandler::instance()->getRecoderType() == VoiceRecoderHandler::Recording
         || OpsStateInterface::instance()->isPlaying()) {
-        qWarning() << "Cannot delete folder while recording or playing";
+        qCWarning(voiceNoteLog) << "Cannot delete folder while recording or playing";
         return false;
     }
     VNoteFolder *folder = getFloderById(folderId);
     const bool deletingCurrentFolder = (folderId == m_currentFolderIndex);
     if (!folder) {
-        qWarning() << "Folder ID for deletion is already absent, treating as stale UI cleanup:" << folderId;
+        qCWarning(voiceNoteLog) << "Folder ID for deletion is already absent, treating as stale UI cleanup:" << folderId;
         if (m_folderSort.removeAll(folderIdKey(folderId)) > 0)
             setting::instance()->setOption(VNOTE_FOLDER_SORT, m_folderSort.join(","));
         if (deletingCurrentFolder) {
@@ -532,7 +533,7 @@ bool VNoteMainManager::vNoteDeleteFolderById(const int &folderId)
     }
 
     if (hasActiveVoiceToTextTaskInFolder(folder->id)) {
-        qWarning() << "Cannot delete folder while voice-to-text is converting, folder ID:" << folder->id;
+        qCWarning(voiceNoteLog) << "Cannot delete folder while voice-to-text is converting, folder ID:" << folder->id;
         return false;
     }
 
@@ -540,12 +541,12 @@ bool VNoteMainManager::vNoteDeleteFolderById(const int &folderId)
     VNoteFolderOper folderOper(folder);
     const bool deleted = folderOper.deleteVNoteFolder(folder);
     if (!deleted) {
-        qWarning() << "Failed to delete folder with ID:" << folderId;
+        qCWarning(voiceNoteLog) << "Failed to delete folder with ID:" << folderId;
         return false;
     }
 
     if (m_folderSort.removeAll(folderIdString) > 0) {
-        qDebug() << "Removed folder from sort list";
+        qCDebug(voiceNoteLog) << "Removed folder from sort list";
     }
     m_pendingCreateFolderIds.removeAll(folderId);
     if (deletingCurrentFolder) {
@@ -557,16 +558,16 @@ bool VNoteMainManager::vNoteDeleteFolderById(const int &folderId)
             m_richTextManager->initData(nullptr, "");
     }
     setting::instance()->setOption(VNOTE_FOLDER_SORT, m_folderSort.join(","));
-    qDebug() << "Folder deleted successfully";
-    qInfo() << "Folder deletion finished";
+    qCDebug(voiceNoteLog) << "Folder deleted successfully";
+    qCInfo(voiceNoteLog) << "Folder deletion finished";
     return true;
 }
 
 void VNoteMainManager::vNoteChanged(const int &index)
 {
-    qInfo() << "Changing to note index:" << index;
+    qCInfo(voiceNoteLog) << "Changing to note index:" << index;
     if (index < 0) {
-        qWarning() << "Invalid note index:" << index;
+        qCWarning(voiceNoteLog) << "Invalid note index:" << index;
         return;
     }
     if (index != m_currentNoteId && !saveCurrentNoteBeforeAction(PendingAction::SwitchNote, index)) {
@@ -577,11 +578,11 @@ void VNoteMainManager::vNoteChanged(const int &index)
 
 void VNoteMainManager::doSwitchNote(int noteId)
 {
-    qDebug() << "Changing to note index:" << noteId;
+    qCDebug(voiceNoteLog) << "Changing to note index:" << noteId;
     m_currentNoteId = noteId;
     VNoteItem *data = getNoteById(m_currentNoteId);
     if (!data) {
-        qWarning() << "vNoteChanged resolved to null note, skipping initData";
+        qCWarning(voiceNoteLog) << "vNoteChanged resolved to null note, skipping initData";
         // 清空编辑区避免残留
         m_richTextManager->initData(nullptr, "");
         emit currentNoteChanged(-1, QString());
@@ -589,7 +590,7 @@ void VNoteMainManager::doSwitchNote(int noteId)
     }
     m_richTextManager->initData(data, "");
     emit currentNoteChanged(m_currentNoteId, data->noteTitle);
-    qDebug() << "Note change completed";
+    qCDebug(voiceNoteLog) << "Note change completed";
 }
 
 void VNoteMainManager::vNoteChangedWithUIUpdate(const int &noteId)
@@ -634,19 +635,19 @@ struct NoteCompare {
  */
 int VNoteMainManager::loadNotes(VNoteFolder *folder)
 {
-    qInfo() << "Loading notes for folder";
+    qCInfo(voiceNoteLog) << "Loading notes for folder";
     m_currentHasTop = 0;
     m_noteItems.clear();
     int notesCount = -1;
     if (folder) {
-        qInfo() << "folder is not nullptr";
+        qCInfo(voiceNoteLog) << "folder is not nullptr";
         notesCount = 0;
         VNoteItemOper noteOper;
         VNOTE_ITEMS_MAP *notes = noteOper.getFolderNotes(folder->id);
         QList<QVariantMap> notesDataList;
         const int preferredNoteId = m_currentNoteId;
         if (notes) {
-            qInfo() << "notes is not nullptr";
+            qCInfo(voiceNoteLog) << "notes is not nullptr";
             notes->lock.lockForRead();
             for (auto it : notes->folderNotes) {
                 QVariantMap data;
@@ -670,7 +671,7 @@ int VNoteMainManager::loadNotes(VNoteFolder *folder)
         }
         int selectIndex = -1;
         if (!notesDataList.isEmpty()) {
-            qInfo() << "notesDataList is not empty";
+            qCInfo(voiceNoteLog) << "notesDataList is not empty";
             bool foundPreferredNote = false;
             if (preferredNoteId > 0) {
                 for (int i = 0; i < notesDataList.size(); ++i) {
@@ -685,7 +686,7 @@ int VNoteMainManager::loadNotes(VNoteFolder *folder)
                 selectIndex = 0;
                 m_currentNoteId = notesDataList[selectIndex].value("noteId").toInt();
                 vNoteChanged(m_currentNoteId);
-                qDebug() << "Switched to note ID:" << m_currentNoteId << "at index:" << selectIndex;
+                qCDebug(voiceNoteLog) << "Switched to note ID:" << m_currentNoteId << "at index:" << selectIndex;
             }
         } else {
             m_currentNoteId = -1;
@@ -695,15 +696,15 @@ int VNoteMainManager::loadNotes(VNoteFolder *folder)
         }
         emit updateNotes(notesDataList, selectIndex);
     }
-    qInfo() << "Notes loading finished, count:" << notesCount;
+    qCInfo(voiceNoteLog) << "Notes loading finished, count:" << notesCount;
     return notesCount;
 }
 
 void VNoteMainManager::insertVoice(const QString &path, qint64 size)
 {
-    qInfo() << "Inserting voice, path:" << path << "size:" << size;
+    qCInfo(voiceNoteLog) << "Inserting voice, path:" << path << "size:" << size;
     m_richTextManager->insertVoiceItem(path, size);
-    qInfo() << "Voice insertion finished";
+    qCInfo(voiceNoteLog) << "Voice insertion finished";
 }
 
 void VNoteMainManager::createNote()
@@ -713,31 +714,31 @@ void VNoteMainManager::createNote()
 
 void VNoteMainManager::createNoteInFolderId(const int &folderId)
 {
-    qInfo() << "Creating new note in requested folder ID:" << folderId;
+    qCInfo(voiceNoteLog) << "Creating new note in requested folder ID:" << folderId;
     if (!m_searchText.isEmpty()) {
-        qDebug() << "Cannot create note while in search mode";
+        qCDebug(voiceNoteLog) << "Cannot create note while in search mode";
         return;
     }
     
     // 录音中禁止创建笔记
     if (VoiceRecoderHandler::instance()->getRecoderType() == VoiceRecoderHandler::Recording) {
-        qWarning() << "Cannot create note while recording";
+        qCWarning(voiceNoteLog) << "Cannot create note while recording";
         return;
     }
 
     // 播放中禁止创建笔记
     if (OpsStateInterface::instance()->isPlaying()) {
-        qWarning() << "Cannot create note while playing";
+        qCWarning(voiceNoteLog) << "Cannot create note while playing";
         return;
     }
 
     if (folderId == -1) {
-        qWarning() << "Cannot create note: No target folder selected";
+        qCWarning(voiceNoteLog) << "Cannot create note: No target folder selected";
         return;
     }
 
     if (!getFloderById(folderId)) {
-        qWarning() << "Cannot create note: target folder not found for ID:" << folderId;
+        qCWarning(voiceNoteLog) << "Cannot create note: target folder not found for ID:" << folderId;
         return;
     }
 
@@ -745,7 +746,7 @@ void VNoteMainManager::createNoteInFolderId(const int &folderId)
         const int pendingNoteId = m_richTextManager->pendingTextChangeNoteId();
         const int richTextNoteId = m_richTextManager->currentNoteId();
         if (pendingNoteId < 0 || pendingNoteId != richTextNoteId) {
-            qWarning() << "Cannot create note: pending rich text change is not ready to save";
+            qCWarning(voiceNoteLog) << "Cannot create note: pending rich text change is not ready to save";
             return;
         }
 
@@ -761,14 +762,14 @@ void VNoteMainManager::createNoteInFolderId(const int &folderId)
         if (m_pendingAction == PendingAction::CreateNote) {
             if (!m_pendingCreateFolderIds.contains(folderId)) {
                 m_pendingCreateFolderIds.append(folderId);
-                qDebug() << "Queued note creation for folder ID while save is pending:" << folderId;
+                qCDebug(voiceNoteLog) << "Queued note creation for folder ID while save is pending:" << folderId;
             } else {
-                qWarning() << "Skipping duplicate pending note creation for folder ID:" << folderId;
+                qCWarning(voiceNoteLog) << "Skipping duplicate pending note creation for folder ID:" << folderId;
             }
             return;
         }
 
-        qWarning() << "Cannot create note: another pending action is in progress";
+        qCWarning(voiceNoteLog) << "Cannot create note: another pending action is in progress";
         return;
     }
 
@@ -779,10 +780,10 @@ void VNoteMainManager::doCreateNote(int folderId)
 {
     VNoteFolder *currentFolder = getFloderById(folderId);
     if (currentFolder == nullptr) {
-        qWarning() << "Cannot create note: target folder not found for ID:" << folderId;
+        qCWarning(voiceNoteLog) << "Cannot create note: target folder not found for ID:" << folderId;
         return;
     }
-    qDebug() << "Creating new note in folder ID:" << folderId;
+    qCDebug(voiceNoteLog) << "Creating new note in folder ID:" << folderId;
     VNoteItem tmpNote;
     tmpNote.folderId = folderId;
     tmpNote.noteType = VNoteItem::VNT_Text;
@@ -798,7 +799,7 @@ void VNoteMainManager::doCreateNote(int folderId)
 
     VNoteItem *newNote = noteOper.addNote(tmpNote);
     if (newNote == nullptr) {
-        qWarning() << "Create note failed: addNote returned null";
+        qCWarning(voiceNoteLog) << "Create note failed: addNote returned null";
         return;
     }
 
@@ -822,12 +823,12 @@ void VNoteMainManager::doCreateNote(int folderId)
     emit addNoteAtHead(data);
     if (isCurrentFolder && m_richTextManager)
         m_richTextManager->initData(newNote, "", true);
-    qInfo() << "Note creation finished";
+    qCInfo(voiceNoteLog) << "Note creation finished";
 }
 
 void VNoteMainManager::saveAs(const QVariantList &index, const QString &path, SaveAsType type)
 {
-    qDebug() << "Saving notes as" << (type == Html ? "HTML" : type == Text ? "Text" : "Voice") << "to:" << path;
+    qCDebug(voiceNoteLog) << "Saving notes as" << (type == Html ? "HTML" : type == Text ? "Text" : "Voice") << "to:" << path;
     QList<VNoteItem *> noteDataList;
     ExportNoteWorker::ExportType exportType = ExportNoteWorker::ExportNothing;
     for (auto i : index) {
@@ -835,13 +836,13 @@ void VNoteMainManager::saveAs(const QVariantList &index, const QString &path, Sa
             continue;
         VNoteItem *noteData = getNoteById(i.toInt());
         if (noteData == nullptr) {
-            qWarning() << "Failed to get note by ID:" << i.toInt() << ", skipping";
+            qCWarning(voiceNoteLog) << "Failed to get note by ID:" << i.toInt() << ", skipping";
             continue;
         }
         noteDataList.append(noteData);
     }
     if (noteDataList.size() == 0) {
-        qWarning() << "No valid notes to export";
+        qCWarning(voiceNoteLog) << "No valid notes to export";
         return;
     }
 
@@ -850,25 +851,25 @@ void VNoteMainManager::saveAs(const QVariantList &index, const QString &path, Sa
     QFileInfo pathInfo(urlPath);
     
     bool isDirectory = pathInfo.isDir() || urlPath.endsWith('/') || QUrl(path).fileName().isEmpty();
-    qDebug() << "Path analysis - isDirectory:" << isDirectory << "pathInfo.isDir():" << pathInfo.isDir();
+    qCDebug(voiceNoteLog) << "Path analysis - isDirectory:" << isDirectory << "pathInfo.isDir():" << pathInfo.isDir();
     
     switch (type) {
     case Html:
-        qInfo() << "Exporting as HTML";
+        qCInfo(voiceNoteLog) << "Exporting as HTML";
         exportType = ExportNoteWorker::ExportHtml;
         if (!isDirectory && noteDataList.size() == 1) {
             defaultName = QUrl(path).fileName();
         }
         break;
     case Text:
-        qInfo() << "Exporting as Text";
+        qCInfo(voiceNoteLog) << "Exporting as Text";
         exportType = ExportNoteWorker::ExportText;
         if (!isDirectory && noteDataList.size() == 1) {
             defaultName = QUrl(path).fileName();
         }
         break;
     case Voice:
-        qInfo() << "Exporting as Voice";
+        qCInfo(voiceNoteLog) << "Exporting as Voice";
         exportType = ExportNoteWorker::ExportVoice;
         QDateTime now = QDateTime::currentDateTime();
         QString timeStr = now.toString("yyyyMMddhhmmss");
@@ -876,27 +877,27 @@ void VNoteMainManager::saveAs(const QVariantList &index, const QString &path, Sa
         break;
     }
 
-    qDebug() << "Starting export with default name:" << defaultName;
+    qCDebug(voiceNoteLog) << "Starting export with default name:" << defaultName;
     ExportNoteWorker *exportWorker = new ExportNoteWorker(
             QUrl(path).path(), exportType, noteDataList, defaultName);
     exportWorker->setAutoDelete(true);
     connect(exportWorker, &ExportNoteWorker::exportFinished, this, &VNoteMainManager::onExportFinished);
     QThreadPool::globalInstance()->start(exportWorker);
-    qInfo() << "SaveAs operation started";
+    qCInfo(voiceNoteLog) << "SaveAs operation started";
 }
 
 VNoteFolder *VNoteMainManager::getFloderByIndex(const int &index)
 {
-    qInfo() << "Getting folder by index:" << index;
+    qCInfo(voiceNoteLog) << "Getting folder by index:" << index;
     if (index < 0 || index >= m_folderSort.size()) {
-        qWarning() << "Invalid folder index:" << index;
+        qCWarning(voiceNoteLog) << "Invalid folder index:" << index;
         return nullptr;
     }
 
     VNOTE_FOLDERS_MAP *folders = VNoteDataManager::instance()->getNoteFolders();
     int tmpIndex = m_folderSort.at(index).toInt();
     if (folders) {
-        qInfo() << "folders is not nullptr";
+        qCInfo(voiceNoteLog) << "folders is not nullptr";
         folders->lock.lockForRead();
 
         VNoteFolder *folder = folders->folders.value(tmpIndex);
@@ -908,10 +909,10 @@ VNoteFolder *VNoteMainManager::getFloderByIndex(const int &index)
 
 VNoteFolder *VNoteMainManager::getFloderById(const int &id)
 {
-    qInfo() << "Getting folder by ID:" << id;
+    qCInfo(voiceNoteLog) << "Getting folder by ID:" << id;
     VNOTE_FOLDERS_MAP *folders = VNoteDataManager::instance()->getNoteFolders();
     if (folders) {
-        qInfo() << "folders is not nullptr";
+        qCInfo(voiceNoteLog) << "folders is not nullptr";
         folders->lock.lockForRead();
 
         QMap<qint64, VNoteFolder *>::iterator itor;
@@ -930,10 +931,10 @@ VNoteFolder *VNoteMainManager::getFloderById(const int &id)
 
 int VNoteMainManager::getFloderIndexById(const int &id)
 {
-    qInfo() << "Getting folder index by ID:" << id;
+    qCInfo(voiceNoteLog) << "Getting folder index by ID:" << id;
     VNOTE_FOLDERS_MAP *folders = VNoteDataManager::instance()->getNoteFolders();
     if (!folders) {
-        qWarning() << "Cannot get folder index, folders map is null";
+        qCWarning(voiceNoteLog) << "Cannot get folder index, folders map is null";
         return -1;
     }
 
@@ -952,7 +953,7 @@ int VNoteMainManager::getFloderIndexById(const int &id)
 
 VNoteItem *VNoteMainManager::getNoteById(const int &id)
 {
-    qInfo() << "Getting note by ID:" << id;
+    qCInfo(voiceNoteLog) << "Getting note by ID:" << id;
     foreach (auto item, m_noteItems) {
         if (item && item->noteId == id)
             return item;
@@ -983,7 +984,7 @@ VNoteItem *VNoteMainManager::getNoteById(const int &id)
 
 VNoteItem *VNoteMainManager::deleteNoteById(const int &id)
 {
-    qInfo() << "Deleting note by ID:" << id;
+    qCInfo(voiceNoteLog) << "Deleting note by ID:" << id;
     foreach (auto item, m_noteItems) {
         if (item->noteId == id) {
             m_noteItems.removeOne(item);
@@ -995,16 +996,16 @@ VNoteItem *VNoteMainManager::deleteNoteById(const int &id)
 
 bool VNoteMainManager::deleteNote(const QList<int> &index)
 {
-    qDebug() << "Deleting" << index.size() << "notes";
+    qCDebug(voiceNoteLog) << "Deleting" << index.size() << "notes";
     // 录音或播放中禁止删除
     if (VoiceRecoderHandler::instance()->getRecoderType() == VoiceRecoderHandler::Recording
         || OpsStateInterface::instance()->isPlaying()) {
-        qWarning() << "Cannot delete note while recording or playing";
+        qCWarning(voiceNoteLog) << "Cannot delete note while recording or playing";
         return false;
     }
     for (int noteId : index) {
         if (hasActiveVoiceToTextTaskForNote(noteId)) {
-            qWarning() << "Cannot delete note while voice-to-text is converting, note ID:" << noteId;
+            qCWarning(voiceNoteLog) << "Cannot delete note while voice-to-text is converting, note ID:" << noteId;
             return false;
         }
     }
@@ -1020,27 +1021,27 @@ bool VNoteMainManager::deleteNote(const QList<int> &index)
     for (int i = 0; i < index.size(); i++) {
         VNoteItem *note = getNoteById(index.at(i));
         if (!note) {
-            qWarning() << "Failed to get note by ID for deletion:" << index.at(i);
+            qCWarning(voiceNoteLog) << "Failed to get note by ID for deletion:" << index.at(i);
             continue;
         }
         deleteTargets.append(DeleteTarget{note, note->noteId, static_cast<int>(note->folderId), note->isTop != 0});
     }
 
     if (deleteTargets.isEmpty()) {
-        qWarning() << "No notes to delete";
+        qCWarning(voiceNoteLog) << "No notes to delete";
         return false;
     }
 
-    qWarning() << "Processing deletion of" << deleteTargets.size() << "notes";
+    qCWarning(voiceNoteLog) << "Processing deletion of" << deleteTargets.size() << "notes";
     // track deleted count per folder id for UI sync (e.g. search mode)
     QMap<int, int> folderIdToDeletedCount;
     bool deletedCurrentNote = false;
     int deletedCount = 0;
     for (const DeleteTarget &target : std::as_const(deleteTargets)) {
-        qWarning() << "Deleting note from folder ID:" << target.folderId;
+        qCWarning(voiceNoteLog) << "Deleting note from folder ID:" << target.folderId;
         VNoteItemOper noteOper(target.note);
         if (!noteOper.deleteNote()) {
-            qWarning() << "Failed to delete note from storage, note ID:" << target.noteId;
+            qCWarning(voiceNoteLog) << "Failed to delete note from storage, note ID:" << target.noteId;
             continue;
         }
 
@@ -1054,7 +1055,7 @@ bool VNoteMainManager::deleteNote(const QList<int> &index)
     }
 
     if (deletedCount == 0) {
-        qWarning() << "No notes were deleted successfully";
+        qCWarning(voiceNoteLog) << "No notes were deleted successfully";
         return false;
     }
 
@@ -1072,12 +1073,12 @@ bool VNoteMainManager::deleteNote(const QList<int> &index)
     QVariantMap variantMap;
     for (auto it = folderIdToDeletedCount.begin(); it != folderIdToDeletedCount.end(); ++it) {
         variantMap[QString::number(it.key())] = it.value();
-        qWarning() << "Folder ID" << it.key() << "deleted count:" << it.value();
+        qCWarning(voiceNoteLog) << "Folder ID" << it.key() << "deleted count:" << it.value();
     }
-    qWarning() << "Emitting notesDeleted signal with" << variantMap.size() << "folders";
+    qCWarning(voiceNoteLog) << "Emitting notesDeleted signal with" << variantMap.size() << "folders";
     emit notesDeleted(variantMap);
 
-    qInfo() << "Note deletion finished";
+    qCInfo(voiceNoteLog) << "Note deletion finished";
     return true;
 }
 
@@ -1123,10 +1124,10 @@ bool VNoteMainManager::hasActiveVoiceToTextTaskInFolder(qint64 folderId) const
 
 void VNoteMainManager::moveNotes(const QVariantList &index, const int &folderIndex)
 {
-    qDebug() << "Moving" << index.size() << "notes to folder index:" << folderIndex;
+    qCDebug(voiceNoteLog) << "Moving" << index.size() << "notes to folder index:" << folderIndex;
     VNoteFolder *folder = getFloderByIndex(folderIndex);
     if (!folder) {
-        qWarning() << "Invalid destination folder index for move:" << folderIndex;
+        qCWarning(voiceNoteLog) << "Invalid destination folder index for move:" << folderIndex;
         return;
     }
     moveNotesToFolderId(index, folder->id);
@@ -1134,29 +1135,29 @@ void VNoteMainManager::moveNotes(const QVariantList &index, const int &folderInd
 
 void VNoteMainManager::moveNotesToFolderId(const QVariantList &noteIds, const int &folderId)
 {
-    qDebug() << "Moving" << noteIds.size() << "notes to folder ID:" << folderId;
+    qCDebug(voiceNoteLog) << "Moving" << noteIds.size() << "notes to folder ID:" << folderId;
     if (noteIds.isEmpty()) {
-        qWarning() << "Invalid move parameters: empty note list";
+        qCWarning(voiceNoteLog) << "Invalid move parameters: empty note list";
         return;
     }
 
     for (const QVariant &noteId : noteIds) {
         if (hasActiveVoiceToTextTaskForNote(noteId.toInt())) {
-            qWarning() << "Cannot move note while voice-to-text is converting, note ID:" << noteId.toInt();
+            qCWarning(voiceNoteLog) << "Cannot move note while voice-to-text is converting, note ID:" << noteId.toInt();
             return;
         }
     }
 
     VNoteFolder *folder = getFloderById(folderId);
     if (!folder) {
-        qWarning() << "Invalid destination folder ID for move:" << folderId;
+        qCWarning(voiceNoteLog) << "Invalid destination folder ID for move:" << folderId;
         return;
     }
 
     VNoteItemOper noteOper;
     VNOTE_ITEMS_MAP *destNotes = noteOper.getFolderNotes(folder->id);
     if (!destNotes) {
-        qWarning() << "Invalid move operation, destination notes map is null";
+        qCWarning(voiceNoteLog) << "Invalid move operation, destination notes map is null";
         return;
     }
 
@@ -1168,20 +1169,20 @@ void VNoteMainManager::moveNotesToFolderId(const QVariantList &noteIds, const in
     for (const QVariant &noteId : noteIds) {
         VNoteItem *note = getNoteById(noteId.toInt());
         if (!note) {
-            qWarning() << "Skipping invalid note during move, note ID:" << noteId.toInt();
+            qCWarning(voiceNoteLog) << "Skipping invalid note during move, note ID:" << noteId.toInt();
             continue;
         }
 
         const int srcFolderId = note->folderId;
 
         if (srcFolderId == folder->id) {
-            qWarning() << "Skipping move to same folder, note ID:" << note->noteId << "folder ID:" << folder->id;
+            qCWarning(voiceNoteLog) << "Skipping move to same folder, note ID:" << note->noteId << "folder ID:" << folder->id;
             continue;
         }
 
         VNOTE_ITEMS_MAP *srcNotes = noteOper.getFolderNotes(srcFolderId);
         if (!srcNotes) {
-            qWarning() << "Skipping note with null source notes map, note ID:" << note->noteId << "source folder ID:" << srcFolderId;
+            qCWarning(voiceNoteLog) << "Skipping note with null source notes map, note ID:" << note->noteId << "source folder ID:" << srcFolderId;
             continue;
         }
 
@@ -1208,23 +1209,23 @@ void VNoteMainManager::moveNotesToFolderId(const QVariantList &noteIds, const in
     }
 
     if (movedCount <= 0) {
-        qWarning() << "No notes moved";
+        qCWarning(voiceNoteLog) << "No notes moved";
         return;
     }
 
     folder->maxNoteIdRef() += movedCount;
     const QVariantMap folderIdToCount = folderCountsForIds(affectedFolderIds);
-    qDebug() << "Notes moved successfully";
+    qCDebug(voiceNoteLog) << "Notes moved successfully";
     emit moveFinishedByFolderId(noteIds, firstSrcFolderId, folder->id, folderIdToCount);
-    qInfo() << "Notes move finished";
+    qCInfo(voiceNoteLog) << "Notes move finished";
 }
 
 void VNoteMainManager::updateTop(const int &id, const bool &top)
 {
-    qInfo() << "Updating top status for note ID:" << id << "to:" << top;
+    qCInfo(voiceNoteLog) << "Updating top status for note ID:" << id << "to:" << top;
     VNoteItem *note = getNoteById(id);
     if (note == nullptr || note->isTop == top) {
-        qWarning() << "Invalid top update operation";
+        qCWarning(voiceNoteLog) << "Invalid top update operation";
         return;
     }
     VNoteItemOper noteOper(note);
@@ -1251,45 +1252,45 @@ void VNoteMainManager::updateTop(const int &id, const bool &top)
         return item.value("noteId").toInt() == id;
     });
     emit updateNotes(notesDataList, std::distance(notesDataList.begin(), it));
-    qInfo() << "Top status update finished";
+    qCInfo(voiceNoteLog) << "Top status update finished";
 }
 
 void VNoteMainManager::onExportFinished(int err)
 {
-    qInfo() << "Export finished with error code:" << err;
+    qCInfo(voiceNoteLog) << "Export finished with error code:" << err;
     Q_UNUSED(err)
     // TODO:提示保存成功
-    qInfo() << "Export finished handling completed";
+    qCInfo(voiceNoteLog) << "Export finished handling completed";
 }
 
 void VNoteMainManager::onNoteChanged()
 {
-    qInfo() << "Note changed, updating modification time";
+    qCInfo(voiceNoteLog) << "Note changed, updating modification time";
     int changedNoteId = m_richTextManager ? m_richTextManager->pendingTextChangeNoteId() : -1;
     if (changedNoteId < 0) {
         changedNoteId = m_currentNoteId;
     }
     VNoteItem *note = getNoteById(changedNoteId);
     if (!note) {
-        qWarning() << "onNoteChanged: changed note not found, id=" << changedNoteId << ", current=" << m_currentNoteId << ", skip";
+        qCWarning(voiceNoteLog) << "onNoteChanged: changed note not found, id=" << changedNoteId << ", current=" << m_currentNoteId << ", skip";
         return;
     }
     note->modifyTime = QDateTime::currentDateTime();
     emit updateEditNote(changedNoteId, Utils::convertDateTime(note->modifyTime));
-    qInfo() << "Note change handling finished";
+    qCInfo(voiceNoteLog) << "Note change handling finished";
 }
 
 void VNoteMainManager::updateSearch()
 {
-    qInfo() << "Updating search";
+    qCInfo(voiceNoteLog) << "Updating search";
     if (m_searchText.isEmpty()) {
-        qDebug() << "Search text is empty, skipping update";
+        qCDebug(voiceNoteLog) << "Search text is empty, skipping update";
         return;
     }
-    qDebug() << "Updating search with text:" << m_searchText;
+    qCDebug(voiceNoteLog) << "Updating search with text:" << m_searchText;
     TiptapChannelBridge::instance()->setSearchQuery(m_searchText);
     emit updateRichTextSearch(m_searchText);
-    qInfo() << "Search update finished";
+    qCInfo(voiceNoteLog) << "Search update finished";
 }
 
 void VNoteMainManager::onRichTextSaveFinished()
@@ -1299,7 +1300,7 @@ void VNoteMainManager::onRichTextSaveFinished()
     }
 
     if (m_richTextManager && m_richTextManager->hasPendingTextChange()) {
-        qWarning() << "Pending note action canceled because rich text save did not finish successfully";
+        qCWarning(voiceNoteLog) << "Pending note action canceled because rich text save did not finish successfully";
         m_pendingAction = PendingAction::None;
         m_pendingNoteId = -1;
         m_pendingCreateFolderIds.clear();
@@ -1345,30 +1346,30 @@ bool VNoteMainManager::saveCurrentNoteBeforeAction(PendingAction action, int not
 
 bool VNoteMainManager::getTop()
 {
-    qInfo() << "Getting top status:" << m_currentHasTop;
+    qCInfo(voiceNoteLog) << "Getting top status:" << m_currentHasTop;
     return m_currentHasTop;
 }
 
 void VNoteMainManager::updateSort(const int &src, const int &dst)
 {
-    qInfo() << "Updating sort, src:" << src << "dst:" << dst;
+    qCInfo(voiceNoteLog) << "Updating sort, src:" << src << "dst:" << dst;
     if (src < 0 || src >= m_folderSort.size() || dst < 0 || dst >= m_folderSort.size()) {
-        qWarning() << "Invalid folder sort indexes, src:" << src << "dst:" << dst << "size:" << m_folderSort.size();
+        qCWarning(voiceNoteLog) << "Invalid folder sort indexes, src:" << src << "dst:" << dst << "size:" << m_folderSort.size();
         return;
     }
     QString tmp = m_folderSort.at(src);
     m_folderSort.removeAt(src);
     m_folderSort.insert(dst, tmp);
     setting::instance()->setOption(VNOTE_FOLDER_SORT, m_folderSort.join(","));
-    qInfo() << "Sort update finished";
+    qCInfo(voiceNoteLog) << "Sort update finished";
 }
 
 void VNoteMainManager::updateSortByFolderIds(const QVariantList &folderIds)
 {
-    qInfo() << "Updating sort by folder IDs, count:" << folderIds.size();
+    qCInfo(voiceNoteLog) << "Updating sort by folder IDs, count:" << folderIds.size();
     VNOTE_FOLDERS_MAP *folders = VNoteDataManager::instance()->getNoteFolders();
     if (!folders) {
-        qWarning() << "Cannot update folder sort, folders map is null";
+        qCWarning(voiceNoteLog) << "Cannot update folder sort, folders map is null";
         return;
     }
 
@@ -1387,7 +1388,7 @@ void VNoteMainManager::updateSortByFolderIds(const QVariantList &folderIds)
         const qint64 folderId = folderIdValue.toLongLong(&ok);
         const QString id = folderIdKey(folderId);
         if (!ok || !realFolderIds.contains(id) || seenFolderIds.contains(id)) {
-            qWarning() << "Ignoring invalid folder ID in sort update:" << folderIdValue;
+            qCWarning(voiceNoteLog) << "Ignoring invalid folder ID in sort update:" << folderIdValue;
             continue;
         }
         normalizedSort.append(id);
@@ -1415,16 +1416,16 @@ void VNoteMainManager::updateSortByFolderIds(const QVariantList &folderIds)
 
     m_folderSort = normalizedSort;
     setting::instance()->setOption(VNOTE_FOLDER_SORT, m_folderSort.join(","));
-    qInfo() << "Sort by folder IDs update finished";
+    qCInfo(voiceNoteLog) << "Sort by folder IDs update finished";
 }
 
 void VNoteMainManager::renameFolder(const int &index, const QString &name)
 {
-    qDebug() << "Renaming folder at index" << index << "to:" << name;
+    qCDebug(voiceNoteLog) << "Renaming folder at index" << index << "to:" << name;
     VNoteFolder *folder = getFloderByIndex(index);
     if (!folder) {
-        qWarning() << "Invalid folder rename operation";
-        qInfo() << "Folder rename finished";
+        qCWarning(voiceNoteLog) << "Invalid folder rename operation";
+        qCInfo(voiceNoteLog) << "Folder rename finished";
         return;
     }
     renameFolderById(folder->id, name);
@@ -1432,36 +1433,36 @@ void VNoteMainManager::renameFolder(const int &index, const QString &name)
 
 void VNoteMainManager::renameFolderById(const int &folderId, const QString &name)
 {
-    qDebug() << "Renaming folder with ID" << folderId << "to:" << name;
+    qCDebug(voiceNoteLog) << "Renaming folder with ID" << folderId << "to:" << name;
     VNoteFolder *folder = getFloderById(folderId);
     if (folder && name != folder->name) {
         VNoteFolderOper folderOper(folder);
         folderOper.renameVNoteFolder(name);
-        qDebug() << "Folder renamed successfully";
+        qCDebug(voiceNoteLog) << "Folder renamed successfully";
     } else {
-        qWarning() << "Invalid folder rename operation";
+        qCWarning(voiceNoteLog) << "Invalid folder rename operation";
     }
-    qInfo() << "Folder rename by ID finished";
+    qCInfo(voiceNoteLog) << "Folder rename by ID finished";
 }
 
 void VNoteMainManager::renameNote(const int &index, const QString &newName)
 {
-    qDebug() << "Renaming note at index" << index << "to:" << newName;
+    qCDebug(voiceNoteLog) << "Renaming note at index" << index << "to:" << newName;
     VNoteItem *item = getNoteById(index);
     if (item && !newName.isEmpty() && newName != item->noteTitle) {
-        qInfo() << "rename note!";
+        qCInfo(voiceNoteLog) << "rename note!";
         VNoteItemOper noteOps(item);
         if (noteOps.modifyNoteTitle(newName)) {
-            qDebug() << "Note renamed successfully";
+            qCDebug(voiceNoteLog) << "Note renamed successfully";
             // 播放中不重新加载列表，避免中断播放状态
             if (!OpsStateInterface::instance()->isPlaying() && !isInSearchMode()) {
-                qDebug() << "Not playing, reloading current folder";
+                qCDebug(voiceNoteLog) << "Not playing, reloading current folder";
                 VNoteFolder *currentFolder = getFloderById(m_currentFolderIndex);
                 if (currentFolder) {
                     loadNotes(currentFolder);
                 }
             } else {
-                qDebug() << "Playing audio, skip reloading to preserve play state";
+                qCDebug(voiceNoteLog) << "Playing audio, skip reloading to preserve play state";
                 item->noteTitle = newName;
             }
             // 标题变更统一通知列表和工作区，避免工作区标题只在播放状态下刷新。
@@ -1470,49 +1471,49 @@ void VNoteMainManager::renameNote(const int &index, const QString &newName)
                 emit currentNoteChanged(index, newName);
             }
         } else {
-            qWarning() << "Failed to rename note";
+            qCWarning(voiceNoteLog) << "Failed to rename note";
         }
     } else {
-        qWarning() << "Invalid note rename operation";
+        qCWarning(voiceNoteLog) << "Invalid note rename operation";
     }
     onNoteChanged();
-    qInfo() << "Note rename finished";
+    qCInfo(voiceNoteLog) << "Note rename finished";
 }
 
 QString VNoteMainManager::getNotePlainTitle(const int &noteId)
 {
-    qDebug() << "Getting plain title for note ID:" << noteId;
+    qCDebug(voiceNoteLog) << "Getting plain title for note ID:" << noteId;
     VNoteItem *item = getNoteById(noteId);
     if (item) {
         QString plainTitle = Utils::stripHtmlTags(item->noteTitle);
-        qDebug() << "Plain title for note ID" << noteId << ":" << plainTitle;
+        qCDebug(voiceNoteLog) << "Plain title for note ID" << noteId << ":" << plainTitle;
         return plainTitle;
     } else {
-        qWarning() << "Note not found for ID:" << noteId;
+        qCWarning(voiceNoteLog) << "Note not found for ID:" << noteId;
         return QString();
     }
 }
 
 void VNoteMainManager::vNoteSearch(const QString &text)
 {
-    qInfo() << "Starting search with text:" << text;
+    qCInfo(voiceNoteLog) << "Starting search with text:" << text;
     if (!text.isEmpty()) {
         // 当当前的输入文本和前一次相同的时候，回车也需要触发操作，否则笔记有变更无法及时更新搜索结果
-        qDebug() << "Starting search with text:" << text;
+        qCDebug(voiceNoteLog) << "Starting search with text:" << text;
         m_searchText = text;
         loadSearchNotes(text);
         updateSearch();
     } else {
-        qDebug() << "Search text is empty";
+        qCDebug(voiceNoteLog) << "Search text is empty";
     }
-    qInfo() << "Search operation finished";
+    qCInfo(voiceNoteLog) << "Search operation finished";
 }
 
 void VNoteMainManager::updateNoteWithResult(const QString &result)
 {
-    qInfo() << "Updating note with result";
+    qCInfo(voiceNoteLog) << "Updating note with result";
     updateNoteWithResultForNote(m_currentNoteId, result);
-    qInfo() << "Note update with result finished";
+    qCInfo(voiceNoteLog) << "Note update with result finished";
 }
 
 void VNoteMainManager::updateNoteWithResultForNote(int noteId, const QString &result)
@@ -1523,9 +1524,9 @@ void VNoteMainManager::updateNoteWithResultForNote(int noteId, const QString &re
 
 int VNoteMainManager::loadSearchNotes(const QString &key)
 {
-    qInfo() << "Loading search notes for key:" << key;
+    qCInfo(voiceNoteLog) << "Loading search notes for key:" << key;
     if (key.trimmed().isEmpty()) {
-        qWarning() << "Empty search key";
+        qCWarning(voiceNoteLog) << "Empty search key";
         return -1;
     }
 
@@ -1564,25 +1565,25 @@ int VNoteMainManager::loadSearchNotes(const QString &key)
     }
 
     if (notesDataList.isEmpty()) {
-        qDebug() << "No search results found";
+        qCDebug(voiceNoteLog) << "No search results found";
         emit noSearchResult();
     } else {
         emit searchFinished(notesDataList, key);
     }
 
-    qInfo() << "Search notes loading finished, count:" << notesDataList.size();
+    qCInfo(voiceNoteLog) << "Search notes loading finished, count:" << notesDataList.size();
     return notesDataList.size();
 }
 
 int VNoteMainManager::loadAudioSource()
 {
-    qInfo() << "Loading audio source";
+    qCInfo(voiceNoteLog) << "Loading audio source";
     return setting::instance()->getOption(VNOTE_AUDIO_SELECT).toInt();
 }
 
 void VNoteMainManager::changeAudioSource(const int &source)
 {
-    qInfo() << "Changing audio source to:" << source;
+    qCInfo(voiceNoteLog) << "Changing audio source to:" << source;
     setting::instance()->setOption(VNOTE_AUDIO_SELECT, QVariant(source));
     VoiceRecoderHandler::instance()->changeMode(source);
 }
@@ -1611,7 +1612,7 @@ bool VNoteMainManager::canInsertImages(const QList<QUrl> &filePaths) const
 
 void VNoteMainManager::insertImages(const QList<QUrl> &filePaths)
 {
-    qDebug() << "Inserting" << filePaths.size() << "images";
+    qCDebug(voiceNoteLog) << "Inserting" << filePaths.size() << "images";
     int count = 0;
     QStringList paths;
     //获取文件夹路径
@@ -1624,18 +1625,18 @@ void VNoteMainManager::insertImages(const QList<QUrl> &filePaths)
 
     for (auto path : filePaths) {
         if (!path.isLocalFile()) {
-            qWarning() << "Unsupported non-local image URL:" << path;
+            qCWarning(voiceNoteLog) << "Unsupported non-local image URL:" << path;
             continue;
         }
         QString localPath = QDir::cleanPath(path.toLocalFile());
         QFileInfo fileInfo(localPath);
         if (!fileInfo.exists() || !fileInfo.isFile()) {
-            qWarning() << "Image file does not exist or is not a file:" << localPath;
+            qCWarning(voiceNoteLog) << "Image file does not exist or is not a file:" << localPath;
             continue;
         }
         QImageReader imageReader(localPath);
         if (!imageReader.canRead()) {
-            qWarning() << "Invalid image file:" << localPath;
+            qCWarning(voiceNoteLog) << "Invalid image file:" << localPath;
             continue;
         }
         QString suffix = fileInfo.suffix().toLower();
@@ -1646,7 +1647,7 @@ void VNoteMainManager::insertImages(const QList<QUrl> &filePaths)
             suffix = QStringLiteral("jpg");
         }
         if (suffix.isEmpty()) {
-            qWarning() << "Unsupported image format:" << localPath;
+            qCWarning(voiceNoteLog) << "Unsupported image format:" << localPath;
             continue;
         }
         //创建文件路径
@@ -1657,7 +1658,7 @@ void VNoteMainManager::insertImages(const QList<QUrl> &filePaths)
         }
     }
     if (!paths.isEmpty()) {
-        qDebug() << "Inserting" << paths.size() << "images into note";
+        qCDebug(voiceNoteLog) << "Inserting" << paths.size() << "images into note";
         if (TiptapChannelBridge::instance()->tiptapEnabled()) {
             for (const QString &relPath : paths) {
                 QJsonObject imageInfo;
@@ -1669,14 +1670,14 @@ void VNoteMainManager::insertImages(const QList<QUrl> &filePaths)
             JsContent::instance()->callJsInsertImages(paths);
         }
     } else {
-        qWarning() << "No valid images to insert";
+        qCWarning(voiceNoteLog) << "No valid images to insert";
     }
-    qInfo() << "Image insertion finished";
+    qCInfo(voiceNoteLog) << "Image insertion finished";
 }
 
 void VNoteMainManager::checkNoteVoice(const QVariantList &index)
 {
-    qInfo() << "Checking note voice for" << index.size() << "notes";
+    qCInfo(voiceNoteLog) << "Checking note voice for" << index.size() << "notes";
     bool hasVoice = false;
     foreach (auto id, index) {
         int noteIndex = id.toInt();
@@ -1688,12 +1689,12 @@ void VNoteMainManager::checkNoteVoice(const QVariantList &index)
     }
     ActionManager::instance()->enableAction(ActionManager::NoteSaveVoice, hasVoice);
     emit saveVoiceStateChanged(hasVoice);
-    qInfo() << "Note voice check finished, hasVoice:" << hasVoice;
+    qCInfo(voiceNoteLog) << "Note voice check finished, hasVoice:" << hasVoice;
 }
 
 void VNoteMainManager::checkNoteText(const QVariantList &index)
 {
-    qInfo() << "Checking note text for" << index.size() << "notes";
+    qCInfo(voiceNoteLog) << "Checking note text for" << index.size() << "notes";
     foreach (auto id, index) {
         int noteIndex = id.toInt();
         VNoteItem *item = getNoteById(noteIndex);
@@ -1707,24 +1708,24 @@ void VNoteMainManager::checkNoteText(const QVariantList &index)
     ActionManager::instance()->enableAction(ActionManager::NoteSave, false);
     ActionManager::instance()->enableAction(ActionManager::SaveNoteAsText, false);
     ActionManager::instance()->enableAction(ActionManager::SaveNoteAsHtml, false);
-    qInfo() << "Note text check finished";
+    qCInfo(voiceNoteLog) << "Note text check finished";
 }
 
 void VNoteMainManager::clearSearch()
 {
-    qInfo() << "Clearing search";
+    qCInfo(voiceNoteLog) << "Clearing search";
     m_searchText = "";
     // 搜索索引只在搜索会话期间保留，退出搜索后释放长文本索引占用的内存。
     NoteSearchService::instance()->clearIndex();
     TiptapChannelBridge::instance()->clearSearchQuery();
     // 发出信号清除搜索高亮
     emit updateRichTextSearch("");
-    qInfo() << "Search cleared";
+    qCInfo(voiceNoteLog) << "Search cleared";
 }
 
 bool VNoteMainManager::isInSearchMode() const
 {
-    qInfo() << "Checking search mode:" << !m_searchText.isEmpty();
+    qCInfo(voiceNoteLog) << "Checking search mode:" << !m_searchText.isEmpty();
     return !m_searchText.isEmpty();
 }
 
@@ -1864,7 +1865,7 @@ void VNoteMainManager::preViewShortcut(const QPointF &point)
 
 void VNoteMainManager::showPrivacy()
 {
-    qDebug() << "Showing privacy policy";
+    qCDebug(voiceNoteLog) << "Showing privacy policy";
     QString url = "";
     QLocale locale;
     QLocale::Country country = locale.country();
@@ -1882,21 +1883,21 @@ void VNoteMainManager::showPrivacy()
             url = "https://www.uniontech.com/agreement/privacy-en";
         }
     }
-    qDebug() << "Opening privacy URL:" << url;
+    qCDebug(voiceNoteLog) << "Opening privacy URL:" << url;
     QDesktopServices::openUrl(url);
-    qInfo() << "Privacy policy shown";
+    qCInfo(voiceNoteLog) << "Privacy policy shown";
 }
 
 void VNoteMainManager::resumeVoicePlayer()
 {
-    qInfo() << "Resuming voice player";
+    qCInfo(voiceNoteLog) << "Resuming voice player";
     JsContent::instance()->jsCallPlayVoice("", true);
-    qInfo() << "Voice player resumed";
+    qCInfo(voiceNoteLog) << "Voice player resumed";
 }
 
 void VNoteMainManager::forceExit(bool needWait)
 {
-    qDebug() << "Force exiting application, needWait:" << needWait;
+    qCDebug(voiceNoteLog) << "Force exiting application, needWait:" << needWait;
     if (needWait) {
         QTimer::singleShot(2000, this, [=]{
             m_eventloop.quit();
@@ -1906,46 +1907,46 @@ void VNoteMainManager::forceExit(bool needWait)
     VTextSpeechAndTrManager::instance()->onStopTextToSpeech();
     QApplication::exit(0);
     _Exit(0);
-    qInfo() << "Force exit completed";
+    qCInfo(voiceNoteLog) << "Force exit completed";
 }
 
 bool VNoteMainManager::isVoiceToText()
 {
-    qInfo() << "Checking voice to text status";
+    qCInfo(voiceNoteLog) << "Checking voice to text status";
     bool result = OpsStateInterface::instance()->isVoice2Text();
-    qDebug() << "Voice to text status:" << result;
+    qCDebug(voiceNoteLog) << "Voice to text status:" << result;
     return result;
 }
 
 QString VNoteMainManager::getSavedTextPath()
 {
-    qInfo() << "Getting saved text path";
+    qCInfo(voiceNoteLog) << "Getting saved text path";
     QString savedPath = setting::instance()->getOption(VNOTE_EXPORT_TEXT_PATH_KEY).toString();
-    qDebug() << "Retrieved saved path (unified):" << savedPath;
+    qCDebug(voiceNoteLog) << "Retrieved saved path (unified):" << savedPath;
     return savedPath;
 }
 
 QString VNoteMainManager::getSavedVoicePath()
 {
-    qInfo() << "Getting saved voice path";
+    qCInfo(voiceNoteLog) << "Getting saved voice path";
     QString savedPath = setting::instance()->getOption(VNOTE_EXPORT_TEXT_PATH_KEY).toString();
-    qDebug() << "Retrieved saved path (unified):" << savedPath;
+    qCDebug(voiceNoteLog) << "Retrieved saved path (unified):" << savedPath;
     return savedPath;
 }
 
 void VNoteMainManager::saveUserSelectedPath(const QString &path, const SaveAsType type)
 {
-    qDebug() << "Saving user selected path:" << path << "for type:" << type;
+    qCDebug(voiceNoteLog) << "Saving user selected path:" << path << "for type:" << type;
     
     QString dirPath = path;
     QFileInfo pathInfo(path);
     if (pathInfo.isFile() || (!pathInfo.exists() && !path.endsWith('/') && path.contains('.'))) {
         dirPath = pathInfo.absolutePath();
-        qDebug() << "Extracted directory path:" << dirPath << "from file path:" << path;
+        qCDebug(voiceNoteLog) << "Extracted directory path:" << dirPath << "from file path:" << path;
     }
     
     setting::instance()->setOption(VNOTE_EXPORT_TEXT_PATH_KEY, dirPath);
-    qDebug() << "Saved unified export directory to settings:" << dirPath;
+    qCDebug(voiceNoteLog) << "Saved unified export directory to settings:" << dirPath;
 }
 
 int VNoteMainManager::currentNoteId() const
@@ -1955,18 +1956,18 @@ int VNoteMainManager::currentNoteId() const
 
 void VNoteMainManager::insertVoiceTextToNote(int noteId, const QString &voiceId, const QString &text)
 {
-    qInfo() << "insertVoiceTextToNote called, noteId:" << noteId 
+    qCInfo(voiceNoteLog) << "insertVoiceTextToNote called, noteId:" << noteId 
             << "voiceId:" << voiceId << "text length:" << text.length();
 
     VNoteItem *note = getNoteById(noteId);
     if (!note) {
-        qWarning() << "Note not found:" << noteId;
+        qCWarning(voiceNoteLog) << "Note not found:" << noteId;
         return;
     }
 
     QString html = note->htmlCode;
     if (html.isEmpty()) {
-        qWarning() << "Note htmlCode is empty:" << noteId;
+        qCWarning(voiceNoteLog) << "Note htmlCode is empty:" << noteId;
         return;
     }
 
@@ -2017,7 +2018,7 @@ void VNoteMainManager::insertVoiceTextToNote(int noteId, const QString &voiceId,
                     // 替换原来的 jsonKey 值
                     html.replace(valueStart + 1, valueEnd - valueStart - 1, properJson);
 
-                    qInfo() << "Updated jsonKey with voice text for note:" << noteId << "voiceId:" << voiceId;
+                    qCInfo(voiceNoteLog) << "Updated jsonKey with voice text for note:" << noteId << "voiceId:" << voiceId;
                     found = true;
                     break;
                 }
@@ -2027,7 +2028,7 @@ void VNoteMainManager::insertVoiceTextToNote(int noteId, const QString &voiceId,
     }
 
     if (!found) {
-        qWarning() << "Voice element not found in note HTML, voiceId:" << voiceId;
+        qCWarning(voiceNoteLog) << "Voice element not found in note HTML, voiceId:" << voiceId;
         return;
     }
 
@@ -2037,46 +2038,46 @@ void VNoteMainManager::insertVoiceTextToNote(int noteId, const QString &voiceId,
 
     VNoteItemOper noteOper(note);
     if (noteOper.updateNote()) {
-        qInfo() << "Voice text saved to note:" << noteId;
+        qCInfo(voiceNoteLog) << "Voice text saved to note:" << noteId;
         emit noteDataUpdated(noteId);
     } else {
-        qWarning() << "Failed to save voice text to note:" << noteId;
+        qCWarning(voiceNoteLog) << "Failed to save voice text to note:" << noteId;
     }
 }
 
 void VNoteMainManager::insertVoiceTextToTiptapNote(int noteId, const QString &voiceId, const QString &text)
 {
-    qInfo() << "insertVoiceTextToTiptapNote called, noteId:" << noteId
+    qCInfo(voiceNoteLog) << "insertVoiceTextToTiptapNote called, noteId:" << noteId
             << "voiceId:" << voiceId << "text length:" << text.length();
 
     VNoteItem *note = getNoteById(noteId);
     if (!note) {
-        qWarning() << "Note not found:" << noteId;
+        qCWarning(voiceNoteLog) << "Note not found:" << noteId;
         return;
     }
 
     QString envelopeJson = note->htmlCode;
     if (envelopeJson.isEmpty()) {
-        qWarning() << "Note content is empty:" << noteId;
+        qCWarning(voiceNoteLog) << "Note content is empty:" << noteId;
         return;
     }
 
     QJsonDocument doc = QJsonDocument::fromJson(envelopeJson.toUtf8());
     if (!doc.isObject()) {
-        qWarning() << "Note content is not a Tiptap envelope, skip:" << noteId;
+        qCWarning(voiceNoteLog) << "Note content is not a Tiptap envelope, skip:" << noteId;
         return;
     }
 
     QJsonObject envelope = doc.object();
     if (envelope.value(QStringLiteral("format")).toString() != QStringLiteral("tiptap")) {
-        qWarning() << "Note content is not Tiptap format, skip:" << noteId;
+        qCWarning(voiceNoteLog) << "Note content is not Tiptap format, skip:" << noteId;
         return;
     }
 
     QJsonObject content = envelope.value(QStringLiteral("content")).toObject();
     bool found = updateVoiceBlockText(content, voiceId, text);
     if (!found) {
-        qWarning() << "Voice block not found in Tiptap envelope, voiceId:" << voiceId;
+        qCWarning(voiceNoteLog) << "Voice block not found in Tiptap envelope, voiceId:" << voiceId;
         return;
     }
 
@@ -2086,10 +2087,10 @@ void VNoteMainManager::insertVoiceTextToTiptapNote(int noteId, const QString &vo
 
     VNoteItemOper noteOper(note);
     if (noteOper.updateNote()) {
-        qInfo() << "Voice text saved to Tiptap note:" << noteId;
+        qCInfo(voiceNoteLog) << "Voice text saved to Tiptap note:" << noteId;
         emit noteDataUpdated(noteId);
     } else {
-        qWarning() << "Failed to save voice text to Tiptap note:" << noteId;
+        qCWarning(voiceNoteLog) << "Failed to save voice text to Tiptap note:" << noteId;
     }
 }
 

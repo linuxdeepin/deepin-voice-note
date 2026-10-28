@@ -4,6 +4,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "utils.h"
+#include "ddlog.h"
 #include "globaldef.h"
 #include "vnoteitem.h"
 // #include "vnoteapplication.h"
@@ -32,7 +33,7 @@
 
 Utils::Utils()
 {
-    qInfo() << "Utils constructor called";
+    qCInfo(voiceNoteLog) << "Utils constructor called";
 }
 
 QString Utils::makeVoiceAbsolute(const QString &voicePath)
@@ -56,41 +57,41 @@ QString Utils::makeVoiceAbsolute(const QString &voicePath)
  */
 QString Utils::convertDateTime(const QDateTime &dateTime)
 {
-    qInfo() << "Converting date time:" << dateTime.toString();
+    qCInfo(voiceNoteLog) << "Converting date time:" << dateTime.toString();
     QDate currDateTime = QDate::currentDate();
     QDate folerDate = dateTime.date();
     QString disptime;
     qint64 offset = folerDate.daysTo(currDateTime);
     
-    qDebug() << "Converting date time:" << dateTime.toString() << "offset days:" << offset;
+    qCDebug(voiceNoteLog) << "Converting date time:" << dateTime.toString() << "offset days:" << offset;
     
     if (0 == offset) {
-        qInfo() << "Offset is 0";
+        qCInfo(voiceNoteLog) << "Offset is 0";
         qint64 offsetSec = dateTime.secsTo(QDateTime::currentDateTime());
         if (offsetSec < 3600) {
             offsetSec /= 60;
             if (offsetSec <= 1) {
                 disptime = DApplication::translate("Utils", "1 min ago");
             } else {
-                qInfo() << "Offset is greater than 1 minute";
+                qCInfo(voiceNoteLog) << "Offset is greater than 1 minute";
                 disptime = DApplication::translate("Utils", "%1 mins ago").arg(offsetSec);
             }
-            qDebug() << "Time is" << offsetSec << "minutes ago";
+            qCDebug(voiceNoteLog) << "Time is" << offsetSec << "minutes ago";
         } else {
             disptime = dateTime.toString("hh:mm");
-            qDebug() << "Time is today at" << disptime;
+            qCDebug(voiceNoteLog) << "Time is today at" << disptime;
         }
     } else if (1 == offset) {
         disptime = DApplication::translate("Utils", "Yesterday") + " " + dateTime.toString("hh:mm");
-        qDebug() << "Time is yesterday at" << dateTime.toString("hh:mm");
+        qCDebug(voiceNoteLog) << "Time is yesterday at" << dateTime.toString("hh:mm");
     } else if (folerDate.year() == currDateTime.year()) {
         //不跨年 其他时间：MM-DD（例如：9-27）；
         disptime = dateTime.toString("MM-dd");
-        qDebug() << "Time is this year on" << disptime;
+        qCDebug(voiceNoteLog) << "Time is this year on" << disptime;
     } else {
         //跨年:YYYY-MM-DD（例如2018-9-26）；
         disptime = dateTime.toString("yyyy-MM-dd");
-        qDebug() << "Time is on" << disptime;
+        qCDebug(voiceNoteLog) << "Time is on" << disptime;
     }
 
     return disptime;
@@ -105,7 +106,7 @@ QString Utils::convertDateTime(const QDateTime &dateTime)
  */
 QPixmap Utils::renderSVG(const QString &filePath, const QSize &size, DApplication *pApp)
 {
-    qDebug() << "Rendering SVG:" << filePath << "with size:" << size;
+    qCDebug(voiceNoteLog) << "Rendering SVG:" << filePath << "with size:" << size;
     
     QImageReader reader;
     QPixmap pixmap;
@@ -113,15 +114,15 @@ QPixmap Utils::renderSVG(const QString &filePath, const QSize &size, DApplicatio
     reader.setFileName(filePath);
 
     if (reader.canRead()) {
-        qInfo() << "SVG can read";
+        qCInfo(voiceNoteLog) << "SVG can read";
         // const qreal ratio = qApp->devicePixelRatio();
         const qreal ratio = pApp->devicePixelRatio();
         reader.setScaledSize(size * ratio);
         pixmap = QPixmap::fromImage(reader.read());
         pixmap.setDevicePixelRatio(ratio);
-        qDebug() << "SVG rendered successfully with ratio:" << ratio;
+        qCDebug(voiceNoteLog) << "SVG rendered successfully with ratio:" << ratio;
     } else {
-        qWarning() << "Failed to read SVG file:" << filePath;
+        qCWarning(voiceNoteLog) << "Failed to read SVG file:" << filePath;
         pixmap.load(filePath);
     }
 
@@ -136,7 +137,7 @@ QPixmap Utils::renderSVG(const QString &filePath, const QSize &size, DApplicatio
  */
 QPixmap Utils::loadSVG(const QString &fileName, bool fCommon)
 {
-    qDebug() << "Loading SVG:" << fileName << "common:" << fCommon;
+    qCDebug(voiceNoteLog) << "Loading SVG:" << fileName << "common:" << fCommon;
     
     DGuiApplicationHelper::ColorType theme =
         DGuiApplicationHelper::instance()->themeType();
@@ -152,7 +153,7 @@ QPixmap Utils::loadSVG(const QString &fileName, bool fCommon)
     }
 
     iconPath += fileName;
-    qDebug() << "Full icon path:" << iconPath;
+    qCDebug(voiceNoteLog) << "Full icon path:" << iconPath;
 
     qreal ratio = 1.0;
 
@@ -161,22 +162,22 @@ QPixmap Utils::loadSVG(const QString &fileName, bool fCommon)
     QPixmap pixmap;
 
     if (!qFuzzyCompare(ratio, devicePixelRatio)) {
-        qInfo() << "Device pixel ratio is not the same";
+        qCInfo(voiceNoteLog) << "Device pixel ratio is not the same";
         QImageReader reader;
         reader.setFileName(qt_findAtNxFile(iconPath, devicePixelRatio, &ratio));
         if (reader.canRead()) {
-            qInfo() << "SVG can read";
+            qCInfo(voiceNoteLog) << "SVG can read";
             reader.setScaledSize(reader.size() * (devicePixelRatio / ratio));
             pixmap = QPixmap::fromImage(reader.read());
             pixmap.setDevicePixelRatio(devicePixelRatio);
-            qDebug() << "SVG loaded with device pixel ratio:" << devicePixelRatio;
+            qCDebug(voiceNoteLog) << "SVG loaded with device pixel ratio:" << devicePixelRatio;
         } else {
-            qWarning() << "Failed to read SVG file:" << iconPath;
+            qCWarning(voiceNoteLog) << "Failed to read SVG file:" << iconPath;
         }
     } else {
-        qInfo() << "Device pixel ratio is the same";
+        qCInfo(voiceNoteLog) << "Device pixel ratio is the same";
         pixmap.load(iconPath);
-        qDebug() << "SVG loaded with default ratio";
+        qCDebug(voiceNoteLog) << "SVG loaded with default ratio";
     }
 
     return pixmap;
@@ -193,16 +194,16 @@ QPixmap Utils::loadSVG(const QString &fileName, bool fCommon)
 int Utils::highTextEdit(QTextDocument *textDoc, const QString &searchKey,
                         const QColor &highColor, bool undo)
 {
-    qDebug() << "Highlighting text with key:" << searchKey << "color:" << highColor.name() << "undo:" << undo;
+    qCDebug(voiceNoteLog) << "Highlighting text with key:" << searchKey << "color:" << highColor.name() << "undo:" << undo;
     
     int findCount = 0;
     int len = searchKey.length();
     if (undo == true) {
-        qInfo() << "Undoing previous operation";
+        qCInfo(voiceNoteLog) << "Undoing previous operation";
         textDoc->undo();
     }
     if (len != 0) {
-        qInfo() << "Searching for text";
+        qCInfo(voiceNoteLog) << "Searching for text";
         QTextCursor highlightCursor(textDoc);
         QTextCursor cursor(textDoc);
 
@@ -224,7 +225,7 @@ int Utils::highTextEdit(QTextDocument *textDoc, const QString &searchKey,
             }
         }
         cursor.endEditBlock();
-        qDebug() << "Found" << findCount << "matches";
+        qCDebug(voiceNoteLog) << "Found" << findCount << "matches";
     }
 
     return findCount;
@@ -238,18 +239,18 @@ int Utils::highTextEdit(QTextDocument *textDoc, const QString &searchKey,
  */
 QString Utils::formatMillisecond(qint64 millisecond, qint64 minValue)
 {
-    qDebug() << "Formatting millisecond:" << millisecond << "min value:" << minValue;
+    qCDebug(voiceNoteLog) << "Formatting millisecond:" << millisecond << "min value:" << minValue;
     
     qint64 curSecond = millisecond / 1000;
     if (curSecond < minValue) {
         curSecond = minValue;
-        qDebug() << "Adjusted to minimum value:" << minValue;
+        qCDebug(voiceNoteLog) << "Adjusted to minimum value:" << minValue;
     }
     if (curSecond < 3600) {
         return QDateTime::fromSecsSinceEpoch(static_cast<qint64>(curSecond)).toUTC().toString("hh:mm:ss");
     }
 
-    qDebug() << "Time exceeds 1 hour, returning maximum value";
+    qCDebug(voiceNoteLog) << "Time exceeds 1 hour, returning maximum value";
     return QString("60:00:00");
 }
 
@@ -260,16 +261,16 @@ QString Utils::formatMillisecond(qint64 millisecond, qint64 minValue)
  */
 void Utils::documentToBlock(VNoteBlock *block, const QTextDocument *doc)
 {
-    qDebug() << "Converting document to block";
+    qCDebug(voiceNoteLog) << "Converting document to block";
     
     if (block != nullptr) {
-        qInfo() << "Block is not nullptr";
+        qCInfo(voiceNoteLog) << "Block is not nullptr";
         block->blockText = "";
     }
 
     // block 为空时后续无法写入 blockText，直接跳过，避免空指针崩溃
     if (block != nullptr && doc != nullptr) {
-        qInfo() << "Doc is not nullptr";
+        qCInfo(voiceNoteLog) << "Doc is not nullptr";
         QTextBlock currentBlock = doc->begin();
         QTextBlock::iterator it;
         while (true) {
@@ -278,7 +279,7 @@ void Utils::documentToBlock(VNoteBlock *block, const QTextDocument *doc)
                                QTextImageFormat newImageFormat = currentFragment.charFormat().toImageFormat();
                                if (newImageFormat.isValid()) {
                                    int pos = currentFragment.position();
-                                   qDebug() << "Found image at position:" << pos << "url:" << newImageFormat.name();
+                                   qCDebug(voiceNoteLog) << "Found image at position:" << pos << "url:" << newImageFormat.name();
                                    ++it;
                                    continue;
                                }
@@ -294,7 +295,7 @@ void Utils::documentToBlock(VNoteBlock *block, const QTextDocument *doc)
 
             block->blockText.append('\n');
         }
-        qDebug() << "Document converted to block, text length:" << block->blockText.length();
+        qCDebug(voiceNoteLog) << "Document converted to block, text length:" << block->blockText.length();
     }
 }
 
@@ -305,11 +306,11 @@ void Utils::documentToBlock(VNoteBlock *block, const QTextDocument *doc)
  */
 void Utils::blockToDocument(const VNoteBlock *block, QTextDocument *doc)
 {
-    qDebug() << "Converting block to document";
+    qCDebug(voiceNoteLog) << "Converting block to document";
     
     if (block && doc) {
         doc->setPlainText(block->blockText);
-        qDebug() << "Block converted to document, text length:" << block->blockText.length();
+        qCDebug(voiceNoteLog) << "Block converted to document, text length:" << block->blockText.length();
     }
 }
 
@@ -320,7 +321,7 @@ void Utils::blockToDocument(const VNoteBlock *block, QTextDocument *doc)
  */
 void Utils::setDefaultColor(QTextDocument *srcDoc, const QColor &color)
 {
-    qDebug() << "Setting default color:" << color.name();
+    qCDebug(voiceNoteLog) << "Setting default color:" << color.name();
     
     QTextCursor cursor(srcDoc);
     cursor.movePosition(QTextCursor::Start);
@@ -336,7 +337,7 @@ void Utils::setDefaultColor(QTextDocument *srcDoc, const QColor &color)
  */
 void Utils::setTitleBarTabFocus(QKeyEvent *event)
 {
-    // qInfo() << "Setting title bar tab focus";
+    // qCInfo(voiceNoteLog) << "Setting title bar tab focus";
     // VNoteApplication *app = dynamic_cast<VNoteApplication *>(qGuiApp);
     // if (app) {
     //     VNoteMainWindow *wnd = app->mainWindow();
@@ -355,13 +356,13 @@ void Utils::setTitleBarTabFocus(QKeyEvent *event)
  */
 bool Utils::pictureToBase64(QString imgPath, QString &base64)
 {
-    qDebug() << "Converting picture to base64:" << imgPath;
+    qCDebug(voiceNoteLog) << "Converting picture to base64:" << imgPath;
     
     //加载图片，目前的参考格式为（bmp, jpg, png, jpeg, gif, ico）
     QImage img(imgPath, "bmp, jpg, png, jpeg, gif, ico");
     //非本地文件返回空字符串
     if (img.isNull()) {
-        qWarning() << "Failed to load image:" << imgPath;
+        qCWarning(voiceNoteLog) << "Failed to load image:" << imgPath;
         return false;
     }
 
@@ -372,19 +373,19 @@ bool Utils::pictureToBase64(QString imgPath, QString &base64)
     //设置图片最大宽度
     int width = qMin(img.width(), 712);
     int height = img.height();
-    qDebug() << "Image dimensions:" << width << "x" << height;
+    qCDebug(voiceNoteLog) << "Image dimensions:" << width << "x" << height;
 
     //等比例缩放图片
     img.scaled(width, height, Qt::KeepAspectRatio, Qt::SmoothTransformation).save(&buf, qPrintable(fileInfo.suffix()));
     //图片转base64
     base64 = QString("data:image/%1;base64," + ba.toBase64()).arg(fileInfo.suffix());
-    qDebug() << "Image converted to base64, size:" << base64.length();
+    qCDebug(voiceNoteLog) << "Image converted to base64, size:" << base64.length();
     return true;
 }
 
 bool Utils::isLoongsonPlatform()
 {
-    qDebug() << "Checking if platform is Loongson";
+    qCDebug(voiceNoteLog) << "Checking if platform is Loongson";
     
     static QString cpuModeName = "";
     if (cpuModeName.isEmpty()) {
@@ -395,11 +396,11 @@ bool Utils::isLoongsonPlatform()
             QString result = process.readAllStandardOutput();
             if (result.contains("Loongson")) {
                 cpuModeName = "Loongson";
-                qDebug() << "Platform is Loongson";
+                qCDebug(voiceNoteLog) << "Platform is Loongson";
                 return true;
             }
             cpuModeName = "other";
-            qDebug() << "Platform is not Loongson";
+            qCDebug(voiceNoteLog) << "Platform is not Loongson";
         }
     }
     return cpuModeName.contains("Loongson");
@@ -413,7 +414,7 @@ bool Utils::isLoongsonPlatform()
  */
 QString Utils::filteredFileName(QString fileName, const QString &defaultName)
 {
-    qDebug() << "Filtering file name:" << fileName << "default:" << defaultName;
+    qCDebug(voiceNoteLog) << "Filtering file name:" << fileName << "default:" << defaultName;
     //使用正则表达式除去不符合规范的字符并清理文件名两端的空白字符，中间的空白字符不做处理
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
     QString name = fileName.replace(QRegularExpression("[\"\'\\[\\]\\\\/:|<>+=;,?*]"), "").trimmed();
@@ -428,7 +429,7 @@ QString Utils::filteredFileName(QString fileName, const QString &defaultName)
 
 bool Utils::isWayland()
 {
-    // qInfo() << "Checking if platform is Wayland";
+    // qCInfo(voiceNoteLog) << "Checking if platform is Wayland";
     return false;
     // return qApp->platformName() == "dwayland" || qApp->property("_d_isDwayland").toBool();
 }
@@ -460,17 +461,17 @@ QString Utils::createRichText(const QString &title, const QString &key)
 
 QString Utils::stripHtmlTags(const QString &htmlText)
 {
-    qDebug() << "Stripping HTML tags from text:" << htmlText;
+    qCDebug(voiceNoteLog) << "Stripping HTML tags from text:" << htmlText;
     QTextDocument doc;
     doc.setHtml(htmlText);
     QString plainText = doc.toPlainText();
-    qDebug() << "Converted to plain text:" << plainText;
+    qCDebug(voiceNoteLog) << "Converted to plain text:" << plainText;
     return plainText;
 }
 
 bool Utils::inLinglongEnv()
 {
-    // qInfo() << "Checking if in Linglong environment";
+    // qCInfo(voiceNoteLog) << "Checking if in Linglong environment";
     return !qgetenv("LINGLONG_APPID").isEmpty();
 }
 
