@@ -325,10 +325,24 @@
      color: inherit;
  }
 
- .dropdown-fontsize>li>a:hover,
- .dropdown-fontname>li>a:hover {
+ .dropdown-fontsize>li:hover,
+ .dropdown-fontname>li:hover {
      background-color: rgba(0, 0, 0, 0.05);
+ }
+
+ .dropdown-fontsize>li:hover>a,
+ .dropdown-fontname>li:hover>a {
      color: #fff !important;
+ }
+
+ .dropdown-fontsize>li:first-child,
+ .dropdown-fontname>li:first-child {
+     border-radius: 13px 13px 0 0;
+ }
+
+ .dropdown-fontsize>li:nth-last-child(1),
+ .dropdown-fontname>li:nth-last-child(1) {
+     border-radius: 0 0 13px 13px;
  }
 
  .btn-group.open .dropdown-toggle {
