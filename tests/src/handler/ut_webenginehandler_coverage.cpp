@@ -14,9 +14,8 @@
 //   * Lambdas wired via QObject::connect are exercised by emitting the source
 //     signal (signals are protected, but -fno-access-control is set in
 //     tests/CMakeLists.txt so direct emission compiles and runs).
-//   * process{Text,Picture}MenuRequest dereference a QWebEngineContextMenuRequest;
-//     its accessors are out-of-line in libQt6WebEngineCore so the deepin Stub
-//     intercepts them cross-translation-unit, allowing a fake pointer.
+//   * process{Text,Picture}MenuRequest take the engine-agnostic QVariantMap
+//     payload (WebKitWebView::contextMenuRequested), no engine object needed.
 //   * saveAsFile opens a QFileDialog; ADDR(QFileDialog, getSaveFileName) is
 //     stubbed to avoid modal blocking (established project pattern).
 //   * VoiceToTextHandler::checkNetworkState is stubbed so the
@@ -40,7 +39,6 @@
 #include <QPoint>
 #include <QSignalSpy>
 #include <QTimer>
-#include <QWebEngineContextMenuRequest>
 
 // ---------------------------------------------------------------------------
 // Stub functions
@@ -59,16 +57,15 @@ static QString stub_getSaveFileName_dst()
     return QStringLiteral("/tmp/ut_webenginehandler_dst.txt");
 }
 
-// QWebEngineContextMenuRequest accessors: real implementations deref a null
-// d-pointer when the request is faked, so redirect to no-op returns.
-static QWebEngineContextMenuRequest::EditFlags stub_editFlags_all()
+// contextMenuRequested payload：editFlags 全位置位（与
+// QWebEngineContextMenuRequest::EditFlags 及 webkitbridge ctx 掩码约定一致）
+static QVariantMap stub_ctx_request_all()
 {
-    using F = QWebEngineContextMenuRequest::EditFlag;
-    return QWebEngineContextMenuRequest::EditFlags(
-        F::CanCopy | F::CanCut | F::CanDelete | F::CanPaste | F::CanSelectAll);
+    return QVariantMap{
+        { "editFlags", 31 },
+        { "position", QPointF(12, 34) },
+    };
 }
-
-static QPoint stub_position_value() { return QPoint(12, 34); }
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -350,8 +347,7 @@ TEST(WebEngineHandlerCoverageUT, ConnectWebContent_CallJsSetVoiceTextByPath)
 // ===========================================================================
 
 // Valid voice metadata but file does not exist -> the L780 singleShot lambda
-// fires requestMessageDialog(VoicePathNoAvail). request is never dereferenced
-// (early return at L787), so nullptr is safe.
+// fires requestMessageDialog(VoicePathNoAvail).
 TEST(WebEngineHandlerCoverageUT, ProcessVoiceMenuRequest_MissingFileLambda)
 {
     WebEngineHandler h;
@@ -361,7 +357,7 @@ TEST(WebEngineHandlerCoverageUT, ProcessVoiceMenuRequest_MissingFileLambda)
     QSignalSpy spy(&h, &WebEngineHandler::requestMessageDialog);
     ASSERT_TRUE(spy.isValid());
 
-    h.processVoiceMenuRequest(nullptr);
+    h.processVoiceMenuRequest(stub_ctx_request_all());
     pumpEvents(120);  // drain the deferred singleShot(0) lambda
 
     EXPECT_EQ(spy.count(), 1);
@@ -371,22 +367,15 @@ TEST(WebEngineHandlerCoverageUT, ProcessVoiceMenuRequest_MissingFileLambda)
 // 4. processTextMenuRequest (L842)
 // ===========================================================================
 
-// All editFlags set so every enableAction branch executes. Request accessors
-// are stubbed; the fake pointer is never dereferenced.
+// All editFlags set so every enableAction branch executes.
 TEST(WebEngineHandlerCoverageUT, ProcessTextMenuRequest_AllEditFlags)
 {
-    Stub stub;
-    stub.set(ADDR(QWebEngineContextMenuRequest, editFlags), stub_editFlags_all);
-    stub.set(ADDR(QWebEngineContextMenuRequest, position), stub_position_value);
-
     WebEngineHandler h;
-    QObject dummy;
-    auto *request = reinterpret_cast<QWebEngineContextMenuRequest *>(&dummy);
 
     QSignalSpy spy(&h, &WebEngineHandler::requestShowMenu);
     ASSERT_TRUE(spy.isValid());
 
-    h.processTextMenuRequest(request);
+    h.processTextMenuRequest(stub_ctx_request_all());
     ASSERT_EQ(spy.count(), 1);
     EXPECT_EQ(spy.takeFirst().at(0).toInt(),
               static_cast<int>(WebEngineHandler::TxtMenu));
@@ -398,18 +387,12 @@ TEST(WebEngineHandlerCoverageUT, ProcessTextMenuRequest_AllEditFlags)
 
 TEST(WebEngineHandlerCoverageUT, ProcessPictureMenuRequest_AllEditFlags)
 {
-    Stub stub;
-    stub.set(ADDR(QWebEngineContextMenuRequest, editFlags), stub_editFlags_all);
-    stub.set(ADDR(QWebEngineContextMenuRequest, position), stub_position_value);
-
     WebEngineHandler h;
-    QObject dummy;
-    auto *request = reinterpret_cast<QWebEngineContextMenuRequest *>(&dummy);
 
     QSignalSpy spy(&h, &WebEngineHandler::requestShowMenu);
     ASSERT_TRUE(spy.isValid());
 
-    h.processPictureMenuRequest(request);
+    h.processPictureMenuRequest(stub_ctx_request_all());
     ASSERT_EQ(spy.count(), 1);
     EXPECT_EQ(spy.takeFirst().at(0).toInt(),
               static_cast<int>(WebEngineHandler::PictureMenu));

@@ -253,35 +253,6 @@ void JsContent::jsCallVoiceProgressChange(qint64 progressMs)
     qInfo() << "Voice progress change handling finished";
 }
 
-QVariant JsContent::callJsSynchronous(QWebEnginePage *page, const QString &funtion)
-{
-    qDebug() << "Executing synchronous JavaScript function";
-    QVariant synResult;
-    QEventLoop synLoop;
-    if (page) {
-#ifdef USE_QT5
-        // Qt5 中使用 std::function 作为回调
-        std::function<void(const QVariant&)> callback = [&synResult, &synLoop](const QVariant &result) {
-            synResult = result;
-            synLoop.quit();
-        };
-        page->runJavaScript(funtion, callback);
-#else
-        // Qt6 中使用 QWebEngineCallback
-        page->runJavaScript(funtion, [&](const QVariant &result) {
-            synResult = result;
-            synLoop.quit();
-        });
-#endif
-        synLoop.exec();
-        qDebug() << "Synchronous JavaScript execution completed";
-    } else {
-        qWarning() << "Attempted to execute JavaScript on null page";
-    }
-    qInfo() << "Synchronous JavaScript execution finished";
-    return synResult;
-}
-
 void JsContent::jsCallSetDataFinsh()
 {
     qInfo() << "Set data finish called from JavaScript";

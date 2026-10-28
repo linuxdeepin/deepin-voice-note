@@ -16,7 +16,7 @@ command:
   - deepin-voice-note
 
 base: org.deepin.base/25.2.2
-runtime: org.deepin.runtime.webengine/6.7.0
+runtime: org.deepin.runtime.dtk/6.7.0.51
 
 build: |
   # 修正lrelease路径
@@ -40,8 +40,14 @@ buildext:
       - libxml2-dev
       - libvlc-dev
       - libgstreamer1.0-dev
+      - libgtk-3-dev
+      - libwebkit2gtk-4.1-dev
+      - qt6-webchannel-dev
     depends:
       - libvlc5
       - vlc-plugin-base
       - gstreamer1.0-plugins-good
       - gstreamer1.0-pulseaudio
+      - libwebkit2gtk-4.1-0
+      - libqt6webchannel6
+      - qml6-module-qtwebchannel

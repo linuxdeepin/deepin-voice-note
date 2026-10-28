@@ -7,9 +7,8 @@ import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 import QtWebChannel 1.15
-// Use Qt5 version 1.10 for compatibility with both Qt5 and Qt6
-// Qt6 is backward compatible with Qt5 import syntax
-import QtWebEngine 1.10
+// 富文本页面改用 WebKitGTK 桥（webhelper 独立进程 + 浮层真窗嵌入），
+// QtWebEngine 依赖已移除；WebKitWebView 在 VNote 1.0 模块注册。
 import Qt.labs.platform 1.1
 import VNote 1.0
 import "../dialog"
@@ -139,7 +138,7 @@ Item {
         }
         tiptapView.visible = true;
         if (tiptapSurfaceHadFocus) {
-            tiptapView.forceActiveFocus();
+            tiptapView.focusWeb();
         }
         tiptapSurfaceHadFocus = false;
     }
@@ -314,12 +313,12 @@ Item {
         }
         if (TiptapChannel.tiptapEnabled && tiptapLoader.item) {
             var tiptapView = tiptapLoader.item.editor;
-            tiptapView.forceActiveFocus();
+            tiptapView.focusWeb();
             tiptapView.runJavaScript(
                 "if(window.__dvnTiptapEditor){window.__dvnTiptapEditor.commands.focus();"
                 + "window.__dvnTiptapEditor.chain().selectAll().run();}");
         } else {
-            webView.forceActiveFocus();
+            webView.focusWeb();
             webView.triggerWebAction(9);
         }
     }
@@ -384,11 +383,11 @@ Item {
         // 否则保持原有 Summernote webView 聚焦逻辑。
         if (TiptapChannel.tiptapEnabled) {
             if (tiptapLoader.item) {
-                tiptapLoader.item.editor.forceActiveFocus();
+                tiptapLoader.item.editor.focusWeb();
                 tiptapLoader.item.editor.runJavaScript("window._dvnTiptapFocus && window._dvnTiptapFocus()");
             }
         } else {
-            webView.forceActiveFocus();
+            webView.focusWeb();
         }
     }
 
@@ -643,7 +642,7 @@ Item {
             visible: summernoteVisible && !TiptapChannel.tiptapEnabled
             color: DTK.themeType === ApplicationHelper.LightType ? "#FFFFFF" : "#242424"
 
-            WebEngineView {
+            WebKitWebView {
                 Accessible.ignored: true
 
                 id: webView
@@ -667,7 +666,6 @@ Item {
                 onContextMenuRequested: req => {
                     // 初始页可见或编辑器不可见时，屏蔽右键菜单
                     if (initialVisible || !webVisible) {
-                        req.accepted = true;
                         return;
                     }
                     // 仅当菜单是文本类型时，我们才在QML层根据上下文标记(editFlags)更新状态
@@ -689,38 +687,17 @@ Item {
                     // 对于所有菜单类型，都调用C++的处理器
                     // C++将处理特殊逻辑(如解析语音路径)并最终弹出菜单
                     handler.onContextMenuRequested(req)
-
-                    // 阻止默认菜单弹出
-                    req.accepted = true;
-                }
-                onJavaScriptConsoleMessage: {
-                    // 调试使用，打印控制台输出
-                    console.debug("--- from web: ", message, sourceID, lineNumber);
                 }
 
-                DropArea {
-                    anchors.fill: parent
+                // WebKit 拖放目标由 webhelper 接管，文件拖放经
+                // filesDropped 信号回传（替代原 DropArea）。
+                Connections {
+                    target: webView
 
-                    property bool currentDragCanDropImages: false
-
-                    onEntered: function(drag) {
-                        currentDragCanDropImages = drag.hasUrls && VNoteMainManager.canInsertImages(drag.urls);
-                        drag.accepted = currentDragCanDropImages;
-                    }
-                    onExited: {
-                        currentDragCanDropImages = false;
-                    }
-                    onPositionChanged: function(drag) {
-                        drag.accepted = currentDragCanDropImages;
-                    }
-                    onDropped: function(drop) {
-                        if (currentDragCanDropImages) {
-                            drop.accepted = true;
-                            VNoteMainManager.insertImages(drop.urls);
-                        } else {
-                            drop.accepted = false;
+                    function onFilesDropped(urls, x, y) {
+                        if (VNoteMainManager.canInsertImages(urls)) {
+                            VNoteMainManager.insertImages(urls);
                         }
-                        currentDragCanDropImages = false;
                     }
                 }
 
@@ -807,10 +784,10 @@ Item {
             sourceComponent: Item {
                 Accessible.name: "TiptapWebView"
                 Accessible.role: Accessible.Pane
-                property WebEngineView editor: tiptapWebView
+                property var editor: tiptapWebView
                 anchors.fill: parent
 
-                WebEngineView {
+                WebKitWebView {
                     Accessible.ignored: true
 
                     id: tiptapWebView
@@ -821,23 +798,20 @@ Item {
                     backgroundColor: DTK.themeType === ApplicationHelper.LightType ? "white" : "black"
                     visible: rootItem.webVisible
 
-                    settings.localContentCanAccessFileUrls: true
-
                     Component.onCompleted: {
                         tiptapWebChannel.registerObject("tiptapChannel", TiptapChannel);
                         tiptapWebView.webChannel = tiptapWebChannel;
                         tiptapWebView.url = Qt.resolvedUrl(TiptapChannel.tiptapHtmlPath());
                     }
 
-                    onLoadingChanged: function(loadRequest) {
-                        if (loadRequest.status === WebEngineView.LoadSucceededStatus) {
+                    onLoadFinished: function(url, ok, error) {
+                        if (ok) {
                             if (Math.abs(tiptapWebView.zoomFactor - 1.0) >= 0.001) {
                                 tiptapWebView.dvnResettingNativeZoom = true;
                                 tiptapWebView.zoomFactor = 1.0;
                                 Qt.callLater(function() { tiptapWebView.dvnResettingNativeZoom = false; });
                             }
-                            tiptapWebView.forceActiveFocus();
-                            tiptapWebView.runJavaScript("window._dvnTiptapFocus && window._dvnTiptapFocus()");
+                            tiptapWebView.focusWeb();
                             handler.onThemeChanged();
                             rootItem.scheduleTiptapResourceButtonsSync();
                         }
@@ -851,7 +825,6 @@ Item {
                     }
 
                     onContextMenuRequested: req => {
-                        req.accepted = true;
                         var rawX = Number(req.position.x);
                         var rawY = Number(req.position.y);
                         if (isNaN(rawX) || isNaN(rawY)) return;
@@ -937,29 +910,15 @@ Item {
                     }
                 }
 
-                DropArea {
-                    anchors.fill: parent
+                // WebKit 拖放目标由 webhelper 接管，文件拖放携带落点
+                // （页面客户端坐标）以便恢复插入光标位置。
+                Connections {
+                    target: tiptapWebView
 
-                    property bool currentDragCanDropImages: false
-
-                    onEntered: function(drag) {
-                        currentDragCanDropImages = drag.hasUrls && VNoteMainManager.canInsertImages(drag.urls);
-                        drag.accepted = currentDragCanDropImages;
-                    }
-                    onExited: {
-                        currentDragCanDropImages = false;
-                    }
-                    onPositionChanged: function(drag) {
-                        drag.accepted = currentDragCanDropImages;
-                    }
-                    onDropped: function(drop) {
-                        if (currentDragCanDropImages) {
-                            drop.accepted = true;
-                            rootItem.insertImagesAtTiptapClientPoint(drop.urls, drop.x, drop.y);
-                        } else {
-                            drop.accepted = false;
+                    function onFilesDropped(urls, x, y) {
+                        if (VNoteMainManager.canInsertImages(urls)) {
+                            rootItem.insertImagesAtTiptapClientPoint(urls, x, y);
                         }
-                        currentDragCanDropImages = false;
                     }
                 }
 
@@ -1345,7 +1304,7 @@ Item {
         onCallJsSelectAll: {
             if (TiptapChannel.tiptapEnabled && tiptapLoader.item && tiptapLoader.item.editor) {
                 var tiptapView = tiptapLoader.item.editor;
-                tiptapView.forceActiveFocus();
+                tiptapView.focusWeb();
                 tiptapView.runJavaScript(
                     "if(window.__dvnTiptapSelectContextAll)window.__dvnTiptapSelectContextAll();" +
                     "else if(window.__dvnTiptapEditor)window.__dvnTiptapEditor.chain().selectAll().run();");

@@ -51,6 +51,7 @@ export default defineConfig({
         chunkFileNames: 'tiptap-editor.js',
         assetFileNames: (assetInfo) => {
           const originalFileName = assetInfo.originalFileNames?.[0] || ''
+          if (originalFileName.endsWith('/qwebchannel.js')) return 'qwebchannel.js'
           if (originalFileName.endsWith('/audio_file_play/Normal/Light.svg')) return 'icons/audio-file-play-normal-light.svg'
           if (originalFileName.endsWith('/audio_file_play/Hover/Light.svg')) return 'icons/audio-file-play-hover-light.svg'
           if (originalFileName.endsWith('/audio_file_play/Pressed/Light.svg')) return 'icons/audio-file-play-pressed-light.svg'

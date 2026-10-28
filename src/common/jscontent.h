@@ -8,13 +8,6 @@
 #include <QObject>
 #include <QClipboard>
 
-// 条件编译：根据 Qt 版本包含不同的 WebEngine 头文件
-#ifdef USE_QT5
-#include <QtWebEngineWidgets/QWebEnginePage>
-#else
-#include <QWebEnginePage>
-#endif
-
 class JsContent : public QObject
 {
     Q_OBJECT
@@ -31,7 +24,6 @@ public:
     };
     Q_ENUM(AsrFlag)
 
-    QVariant callJsSynchronous(QWebEnginePage *page, const QString &funtion);
     /**
      * @brief 插入图片
      * @param filePaths 图片路径

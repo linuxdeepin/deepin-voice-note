@@ -9,6 +9,7 @@
 
 #include "imageprovider.h"
 #include "jscontent.h"
+#include "web_engine_handler.h"
 
 #include <gtest/gtest.h>
 
@@ -19,7 +20,6 @@
 #include <QTest>
 #include <QTimer>
 #include <QVariant>
-#include <QWebEnginePage>
 
 #include <functional>
 
@@ -202,49 +202,33 @@ TEST(JsContentCoverage, onClipChange_clipboardModeBranches)
     js->m_clipData = oldClipData;
 }
 
-// --- callJsSynchronous inner lambda coverage ---
+// --- callJsSynchronous result round-trip ---
 //
-// The lambda at jscontent.cpp:271 only runs when runJavaScript actually
-// invokes its callback. We stub the 2-arg runJavaScript overload so the stub
-// synchronously dispatches the callback, which executes the lambda body
-// (synResult = result; synLoop.quit()) inside callJsSynchronous. In this
-// Qt6 build the callback type is std::function<void(const QVariant&)>.
+// QtWebEngine 退役后，jscontent.cpp 中的 QWebEnginePage 版 callJsSynchronous
+// 已删除；同步调用链路收敛到 WebEngineHandler::callJsSynchronous()：
+// 发出 requesetCallJsSynchronous → QML (WebEngineView.qml:724) 执行
+// runJavaScript 并回调 onCallJsResult → 事件循环退出并返回结果。
+// 这里用定时器模拟 QML 的异步回包。
 
-static int g_stubCallbackInvocations = 0;
-// First positional arg corresponds to the `this` pointer at the ABI level
-// (member function call), so it is declared as void* and ignored. The other
-// two args match runJavaScript's (script, callback) signature.
-static void stub_runJavaScript_invokeCallback(void * /*thisPtr*/,
-                                              const QString & /*script*/,
-                                              const std::function<void(const QVariant &)> &callback)
+TEST(JsContentCoverage, callJsSynchronousViaWebEngineHandler_roundTrip)
 {
-    ++g_stubCallbackInvocations;
-    // Defer the callback via QTimer::singleShot so it fires AFTER the
-    // QEventLoop::exec() inside callJsSynchronous starts. A synchronous
-    // call here would invoke quit() before exec(), which resets the exit
-    // flag and causes the event loop to hang forever (Qt6.8+).
-    QTimer::singleShot(0, [callback]() {
-        callback(QVariant(QStringLiteral("stub-result")));
-    });
-}
+    WebEngineHandler h;
+    QObject target;
+    h.setTarget(&target);
 
-TEST(JsContentCoverage, callJsSynchronous_innerLambdaExecuted)
-{
-    Stub stub;
-    g_stubCallbackInvocations = 0;
-    stub.set((void (QWebEnginePage::*)(const QString &,
-                                       const std::function<void(const QVariant &)> &))
-                 ADDR(QWebEnginePage, runJavaScript),
-             stub_runJavaScript_invokeCallback);
+    // 模拟 QML onRequesetCallJsSynchronous：异步回调 onCallJsResult。
+    auto conn = QObject::connect(
+        &h, &WebEngineHandler::requesetCallJsSynchronous, &h,
+        [&h](const QString &) {
+            QTimer::singleShot(0, [&h]() {
+                h.onCallJsResult(QVariant(QStringLiteral("stub-result")));
+            });
+        },
+        Qt::QueuedConnection);
+    ASSERT_TRUE(conn);
 
-    QWebEnginePage page;
-    const QVariant result = JsContent::instance()->callJsSynchronous(
-        &page, QStringLiteral("1+1"));
-    // Pump the event loop so the deferred singleShot callback fires.
-    QTest::qWait(50);
-    // The stub deferred the lambda via QTimer::singleShot(0) so it fired
-    // after synLoop.exec() started → synResult was set, then synLoop.quit().
-    EXPECT_GT(g_stubCallbackInvocations, 0);
-    // Result returned from callJsSynchronous equals what the stub passed.
+    const QVariant result = h.callJsSynchronous(QStringLiteral("1+1"));
     EXPECT_EQ(QVariant(QStringLiteral("stub-result")), result);
+
+    QObject::disconnect(conn);
 }

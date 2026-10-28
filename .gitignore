@@ -1,5 +1,8 @@
 # complie
 build/
+build-debug/
+build-release/
+obj-*/
 CMakeLists.txt.user
 
 # cache
@@ -7,6 +10,13 @@ CMakeLists.txt.user
 .cache
 
 translations/*.qm
+
+# debian packaging artifacts
+debian/.debhelper/
+debian/files
+debian/debhelper-build-stamp
+debian/*.substvars
+debian/deepin-voice-note/
 
 #linglong building dir
 linglong

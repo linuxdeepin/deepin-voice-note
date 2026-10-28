@@ -29,7 +29,6 @@
 #include <QJsonObject>
 #include <QCollator>
 #include <QDir>
-#include <QDropEvent>
 #include <QFile>
 #include <QFileInfo>
 #include <QFontDatabase>
@@ -39,10 +38,6 @@
 #include <QUuid>
 #include <QUrl>
 #include <QRegularExpression>
-// 条件编译：QWebEngineContextMenuRequest 只在 Qt6 中存在
-#ifndef USE_QT5
-#include <QWebEngineContextMenuRequest>
-#endif
 #include <QFileDialog>
 #include <QStandardPaths>
 #include <cstring>
@@ -303,72 +298,12 @@ void WebEngineHandler::setTarget(QObject *targetWebEngine)
     qInfo() << "Setting target web engine";
     if (targetWebEngine != m_targetWebEngine) {
         qInfo() << "targetWebEngine is not equal to m_targetWebEngine";
-        if (m_targetWebEngine)
-            m_targetWebEngine->removeEventFilter(this);
+        // 拖放由 WebKitGTK webhelper 接管并转发（filesDropped），
+        // 宿主侧不再需要事件过滤器拦截非图片拖放。
         m_targetWebEngine = targetWebEngine;
-        if (m_targetWebEngine)
-            m_targetWebEngine->installEventFilter(this);
         Q_EMIT targetChanged();
     }
     qInfo() << "Target web engine setting finished";
-}
-
-bool WebEngineHandler::eventFilter(QObject *watched, QEvent *event)
-{
-    if (watched == m_targetWebEngine) {
-        switch (event->type()) {
-        case QEvent::DragEnter: {
-            auto *dropEvent = static_cast<QDropEvent *>(event);
-            const QMimeData *mimeData = dropEvent->mimeData();
-            m_dragImageCheckUrls = mimeData && mimeData->hasUrls() ? mimeData->urls() : QList<QUrl>();
-            m_dragCanInsertImages = !m_dragImageCheckUrls.isEmpty() && VNoteMainManager::instance()->canInsertImages(m_dragImageCheckUrls);
-            if (!m_dragImageCheckUrls.isEmpty() && !m_dragCanInsertImages) {
-                dropEvent->setDropAction(Qt::IgnoreAction);
-                dropEvent->ignore();
-                return true;
-            }
-            break;
-        }
-        case QEvent::DragMove: {
-            auto *dropEvent = static_cast<QDropEvent *>(event);
-            const QMimeData *mimeData = dropEvent->mimeData();
-            if (mimeData && mimeData->hasUrls()) {
-                const QList<QUrl> urls = mimeData->urls();
-                if (urls != m_dragImageCheckUrls) {
-                    m_dragImageCheckUrls = urls;
-                    m_dragCanInsertImages = VNoteMainManager::instance()->canInsertImages(m_dragImageCheckUrls);
-                }
-                if (!m_dragCanInsertImages) {
-                    dropEvent->setDropAction(Qt::IgnoreAction);
-                    dropEvent->ignore();
-                    return true;
-                }
-            }
-            break;
-        }
-        case QEvent::Drop: {
-            auto *dropEvent = static_cast<QDropEvent *>(event);
-            const QMimeData *mimeData = dropEvent->mimeData();
-            const bool canInsertImages = mimeData && mimeData->hasUrls() && VNoteMainManager::instance()->canInsertImages(mimeData->urls());
-            m_dragImageCheckUrls.clear();
-            m_dragCanInsertImages = false;
-            if (mimeData && mimeData->hasUrls() && !canInsertImages) {
-                dropEvent->setDropAction(Qt::IgnoreAction);
-                dropEvent->ignore();
-                return true;
-            }
-            break;
-        }
-        case QEvent::DragLeave:
-            m_dragImageCheckUrls.clear();
-            m_dragCanInsertImages = false;
-            break;
-        default:
-            break;
-        }
-    }
-
-    return QObject::eventFilter(watched, event);
 }
 
 /**
@@ -584,13 +519,15 @@ void WebEngineHandler::connectWebContent()
 
 /*!
  * \brief 处理右键菜单请求 \a request , 完成后抛出 requestShowMenu() 信号
+ *
+ * 引擎无关实现：request 为 WebKitWebView::contextMenuRequested 的 payload：
+ *   position(QPointF) / editFlags(int) / x / y(int)
  */
-#ifdef USE_QT5
-void WebEngineHandler::onContextMenuRequested(QObject *request)
+void WebEngineHandler::onContextMenuRequested(const QVariantMap &request)
 {
     qInfo() << "Context menu requested";
-    // 从 QObject* 中安全地获取属性
-    const QPoint pos = request->property("position").toPoint();
+    // 从 payload 中安全地获取属性
+    const QPoint pos = request.value(QStringLiteral("position")).toPoint();
 
     switch (menuType) {
     case VoiceMenu: {
@@ -612,26 +549,6 @@ void WebEngineHandler::onContextMenuRequested(QObject *request)
     }
     qInfo() << "Context menu request handling finished";
 }
-#else
-void WebEngineHandler::onContextMenuRequested(QWebEngineContextMenuRequest *request)
-{
-    qInfo() << "Context menu requested";
-    switch (menuType) {
-    case VoiceMenu: {
-        processVoiceMenuRequest(request);
-    } break;
-    case PictureMenu: {
-        Q_EMIT requestShowMenu(menuType, request->position());
-    } break;
-    case TxtMenu: {
-        processTextMenuRequest(request);
-    } break;
-    default:
-        break;
-    }
-    qInfo() << "Context menu request handling finished";
-}
-#endif
 
 /**
    @brief 插入音频文件， \a voicePath 为音频文件路径， \a voiceSize 为音频的长度，单位 ms
@@ -699,7 +616,11 @@ void WebEngineHandler::onThemeChanged()
 void WebEngineHandler::onSaveMenuParam(int type, const QVariant &json)
 {
     qInfo() << "Saving menu parameter, type:" << type;
-    menuType = static_cast<Menu>(type);
+    const auto newType = static_cast<Menu>(type);
+    if (newType != menuType) {
+        menuType = newType;
+        Q_EMIT menuTypeChanged();
+    }
     menuJson = json;
     qInfo() << "Menu parameter saving finished";
 }
@@ -738,11 +659,7 @@ void WebEngineHandler::onMenuClicked(ActionManager::ActionKind kind)
                 break;
             }
             // 非 Tiptap 模式或复制失败时继续调用 web 端原生复制事件
-#ifdef USE_QT5
-            Q_EMIT triggerWebAction((int)QWebEnginePage::Copy);
-#else
-            Q_EMIT triggerWebAction(QWebEnginePage::Copy);
-#endif
+            Q_EMIT triggerWebAction(5);   // QWebEnginePage::Copy
             break;
         case ActionManager::PictureCopy:
         case ActionManager::TxtCopy:
@@ -752,21 +669,13 @@ void WebEngineHandler::onMenuClicked(ActionManager::ActionKind kind)
                 break;
             }
             // 直接调用web端的复制事件
-#ifdef USE_QT5
-            Q_EMIT triggerWebAction((int)QWebEnginePage::Copy);
-#else
-            Q_EMIT triggerWebAction(QWebEnginePage::Copy);
-#endif
+            Q_EMIT triggerWebAction(5);   // QWebEnginePage::Copy
             break;
         case ActionManager::VoiceCut:
         case ActionManager::PictureCut:
         case ActionManager::TxtCut:
             // 直接调用web端的剪切事件
-#ifdef USE_QT5
-            Q_EMIT triggerWebAction((int)QWebEnginePage::Cut);
-#else
-            Q_EMIT triggerWebAction(QWebEnginePage::Cut);
-#endif
+            Q_EMIT triggerWebAction(4);   // QWebEnginePage::Cut
             break;
         case ActionManager::VoicePaste:
         case ActionManager::PicturePaste:
@@ -867,11 +776,7 @@ void WebEngineHandler::onPaste(bool isVoice)
 
     if (isVoice) {
         qInfo() << "Paste operation requested, isVoice is true";
-#ifdef USE_QT5
-        Q_EMIT triggerWebAction((int)QWebEnginePage::Paste);
-#else
-        Q_EMIT triggerWebAction(QWebEnginePage::Paste);
-#endif
+        Q_EMIT triggerWebAction(6);   // QWebEnginePage::Paste
         return;
     }
 
@@ -921,11 +826,7 @@ void WebEngineHandler::onPaste(bool isVoice)
     } else {
         // 无图片文件，直接调用web端的粘贴事件
         qDebug() << "Pasting text content";
-#ifdef USE_QT5
-        Q_EMIT triggerWebAction((int)QWebEnginePage::Paste);
-#else
-        Q_EMIT triggerWebAction(QWebEnginePage::Paste);
-#endif
+        Q_EMIT triggerWebAction(6);   // QWebEnginePage::Paste
     }
     qInfo() << "Paste operation finished";
 }
@@ -933,45 +834,12 @@ void WebEngineHandler::onPaste(bool isVoice)
 /*!
  * \brief 处理语音菜单请求 \a request
  */
-#ifdef USE_QT5
-void WebEngineHandler::processVoiceMenuRequest(QObject *request)
+/*!
+ * \brief 处理语音菜单请求 \a request
+ */
+void WebEngineHandler::processVoiceMenuRequest(const QVariantMap &request)
 {
-    qInfo() << "Processing voice menu request";
-    m_voiceBlock.reset(new VNVoiceBlock);
-    MetaDataParser dataParser;
-    // 解析json数据
-    if (!dataParser.parse(menuJson, m_voiceBlock.get())) {
-        return;
-    }
-
-    // 展开相对路径为绝对路径，避免误判
-    if (m_voiceBlock && !m_voiceBlock->voicePath.isEmpty()) {
-        m_voiceBlock->voicePath = Utils::makeVoiceAbsolute(m_voiceBlock->voicePath);
-    }
-
-    // 语音文件不存在使用弹出提示
-    if (!QFile::exists(m_voiceBlock->voicePath)) {
-        // 异步操作，防止阻塞前端事件
-        QTimer::singleShot(0, this, [this] {
-            Q_EMIT requestMessageDialog(VNoteMessageDialogHandler::VoicePathNoAvail);
-            // Tiptap 模式下不走 Summernote JS 删除路径
-            if (!TiptapChannelBridge::instance()->tiptapEnabled()) {
-                Q_EMIT JsContent::instance()->callJsDeleteSelection();
-            }
-        });
-        return;
-    }
-
-    // 如果当前有语音处于转换状态就将语音转文字选项置灰 (此逻辑已移至QML onAboutToShow，此处为兜底)
-    ActionManager::instance()->enableAction(ActionManager::VoiceToText, !OpsStateInterface::instance()->isVoice2Text());
-    // 请求界面弹出右键菜单
-    const QPoint pos = request->property("position").toPoint();
-    Q_EMIT requestShowMenu(VoiceMenu, pos);
-    qInfo() << "Voice menu request processing finished";
-}
-#else
-void WebEngineHandler::processVoiceMenuRequest(QWebEngineContextMenuRequest *request)
-{
+    Q_UNUSED(request);
     qInfo() << "Processing voice menu request";
     m_voiceBlock.reset(new VNVoiceBlock);
     MetaDataParser dataParser;
@@ -1000,59 +868,21 @@ void WebEngineHandler::processVoiceMenuRequest(QWebEngineContextMenuRequest *req
         return;
     }
 
-    // 如果当前有语音处于转换状态就将语音转文字选项置灰
+    // 如果当前有语音处于转换状态就将语音转文字选项置灰 (此逻辑已移至QML onAboutToShow，此处为兜底)
     ActionManager::instance()->enableAction(ActionManager::VoiceToText, !OpsStateInterface::instance()->isVoice2Text());
     // 请求界面弹出右键菜单
-    Q_EMIT requestShowMenu(VoiceMenu, request->position());
+    const QPoint pos = request.value(QStringLiteral("position")).toPoint();
+    Q_EMIT requestShowMenu(VoiceMenu, pos);
     qInfo() << "Voice menu request processing finished";
 }
-#endif
 
 /*!
  * \brief 处理文本菜单请求 \a request
  */
-#ifdef USE_QT5
-void WebEngineHandler::processTextMenuRequest(QObject *request)
-{
-    qInfo() << "Processing text menu request";
-    // 此处的逻辑是"兜底"，主要逻辑已由QML实现，以确保在所有情况下状态正确
-    const int intFlags = request->property("editFlags").toInt();
-    auto flags = static_cast<QWebEngineContextMenuData::EditFlags>(intFlags);
-
-    ActionManager::instance()->resetCtxMenu(ActionManager::MenuType::TxtCtxMenu, false); // 重置菜单选项
-
-    ActionManager::instance()->visibleAction(ActionManager::TxtStopreading, false);
-
-    // 设置普通菜单项状态
-    if (flags.testFlag(QWebEngineContextMenuData::CanSelectAll)) {
-        qInfo() << "flags has CanSelectAll";
-        ActionManager::instance()->enableAction(ActionManager::TxtSelectAll, true);
-    }
-    if (flags.testFlag(QWebEngineContextMenuData::CanCopy)) {
-        qInfo() << "flags has CanCopy";
-        ActionManager::instance()->enableAction(ActionManager::TxtCopy, true);
-        ActionManager::instance()->enableAction(ActionManager::TxtSpeech, true);
-    }
-    if (flags.testFlag(QWebEngineContextMenuData::CanCut)) {
-        qInfo() << "flags has CanCut";
-        ActionManager::instance()->enableAction(ActionManager::TxtCut, true);
-    }
-    if (flags.testFlag(QWebEngineContextMenuData::CanDelete)) {
-        qInfo() << "flags has CanDelete";
-        ActionManager::instance()->enableAction(ActionManager::TxtDelete, true);
-    }
-    if (flags.testFlag(QWebEngineContextMenuData::CanPaste)) {
-        qInfo() << "flags has CanPaste";
-        ActionManager::instance()->enableAction(ActionManager::TxtPaste, true);
-        ActionManager::instance()->enableAction(ActionManager::TxtDictation, true);
-    }
-
-    const QPoint pos = request->property("position").toPoint();
-    Q_EMIT requestShowMenu(TxtMenu, pos);
-    qInfo() << "Text menu request processing finished";
-}
-#else
-void WebEngineHandler::processTextMenuRequest(QWebEngineContextMenuRequest *request)
+/*!
+ * \brief 处理文本菜单请求 \a request
+ */
+void WebEngineHandler::processTextMenuRequest(const QVariantMap &request)
 {
     qInfo() << "Processing text menu request";
     ActionManager::instance()->resetCtxMenu(ActionManager::MenuType::TxtCtxMenu, false); // 重置菜单选项
@@ -1060,87 +890,90 @@ void WebEngineHandler::processTextMenuRequest(QWebEngineContextMenuRequest *requ
     // TASK-37707: Disable now
     ActionManager::instance()->visibleAction(ActionManager::TxtStopreading, false);
 
-    auto flags = request->editFlags();
+    // 标记位定义（与 QWebEngineContextMenuRequest::EditFlags 及
+    // webkitbridge ctx 掩码约定一致）：
+    //   CanSelectAll=1 CanCopy=2 CanCut=4 CanPaste=8 CanDelete=16
+    const int intFlags = request.value(QStringLiteral("editFlags")).toInt();
 
     // 设置普通菜单项状态
     // 可全选
-    if (flags.testFlag(QWebEngineContextMenuRequest::CanSelectAll)) {
+    if (intFlags & 1) {
         qInfo() << "flags has CanSelectAll";
         ActionManager::instance()->enableAction(ActionManager::TxtSelectAll, true);
     }
     // 可复制
-    if (flags.testFlag(QWebEngineContextMenuRequest::CanCopy)) {
+    if (intFlags & 2) {
         qInfo() << "flags has CanCopy";
         ActionManager::instance()->enableAction(ActionManager::TxtCopy, true);
         ActionManager::instance()->enableAction(ActionManager::TxtSpeech, true);
     }
     // 可剪切
-    if (flags.testFlag(QWebEngineContextMenuRequest::CanCut)) {
+    if (intFlags & 4) {
         qInfo() << "flags has CanCut";
         ActionManager::instance()->enableAction(ActionManager::TxtCut, true);
     }
     // 可删除
-    if (flags.testFlag(QWebEngineContextMenuRequest::CanDelete)) {
+    if (intFlags & 16) {
         qInfo() << "flags has CanDelete";
         ActionManager::instance()->enableAction(ActionManager::TxtDelete, true);
     }
     // 可粘贴
-    if (flags.testFlag(QWebEngineContextMenuRequest::CanPaste)) {
+    if (intFlags & 8) {
         qInfo() << "flags has CanPaste";
         ActionManager::instance()->enableAction(ActionManager::TxtPaste, true);
         ActionManager::instance()->enableAction(ActionManager::TxtDictation, true);
     }
 
     // 请求界面弹出右键菜单
-    Q_EMIT requestShowMenu(TxtMenu, request->position());
+    const QPoint pos = request.value(QStringLiteral("position")).toPoint();
+    Q_EMIT requestShowMenu(TxtMenu, pos);
     qInfo() << "Text menu request processing finished";
 }
-#endif
 
 /*!
  * \brief 处理图片菜单请求
  */
-#ifdef USE_QT5
-// Qt5 下图片菜单直接由 onContextMenuRequested 发出信号，无需单独的 process 函数
-#else
-void WebEngineHandler::processPictureMenuRequest(QWebEngineContextMenuRequest *request)
+/*!
+ * \brief 处理图片菜单请求
+ */
+void WebEngineHandler::processPictureMenuRequest(const QVariantMap &request)
 {
     qInfo() << "Processing picture menu request";
     ActionManager::instance()->resetCtxMenu(ActionManager::MenuType::PictureCtxMenu, true);
 
-    auto flags = request->editFlags();
+    // 标记位定义同 processTextMenuRequest
+    const int intFlags = request.value(QStringLiteral("editFlags")).toInt();
 
     // 设置普通菜单项状态
     // 可全选
-    if (flags.testFlag(QWebEngineContextMenuRequest::CanSelectAll)) {
+    if (intFlags & 1) {
         qInfo() << "flags has CanSelectAll";
         ActionManager::instance()->enableAction(ActionManager::PictureSelectAll, true);
     }
     // 可复制
-    if (flags.testFlag(QWebEngineContextMenuRequest::CanCopy)) {
+    if (intFlags & 2) {
         qInfo() << "flags has CanCopy";
         ActionManager::instance()->enableAction(ActionManager::PictureCopy, true);
     }
     // 可剪切
-    if (flags.testFlag(QWebEngineContextMenuRequest::CanCut)) {
+    if (intFlags & 4) {
         qInfo() << "flags has CanCut";
         ActionManager::instance()->enableAction(ActionManager::PictureCut, true);
     }
     // 可删除
-    if (flags.testFlag(QWebEngineContextMenuRequest::CanDelete)) {
+    if (intFlags & 16) {
         qInfo() << "flags has CanDelete";
         ActionManager::instance()->enableAction(ActionManager::PictureDelete, true);
     }
     // 可粘贴
-    if (flags.testFlag(QWebEngineContextMenuRequest::CanPaste)) {
+    if (intFlags & 8) {
         qInfo() << "flags has CanPaste";
         ActionManager::instance()->enableAction(ActionManager::PicturePaste, true);
     }
 
-    Q_EMIT requestShowMenu(PictureMenu, request->position());
+    Q_EMIT requestShowMenu(PictureMenu, request.value(QStringLiteral("position")).toPoint());
     qInfo() << "Picture menu request processing finished";
 }
-#endif
 
 /**
    @return 返回当前拷贝数据是否包含录音

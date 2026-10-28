@@ -71,6 +71,8 @@ set(SCREENRECORDERCORE_QML_PATH "qrc:/com/deepin/voicenote/private")
 configure_file(${PROJECT_SOURCE_DIR}/config.h.in ${PROJECT_BINARY_DIR}/config.h @ONLY)
 
 # Application
+# WebKitGTK 桥公共库（webhelper 独立进程 + 宿主侧封装），替代 QtWebEngine
+add_subdirectory(3rdparty/webkitbridge)
 add_subdirectory(src)
 
 file(GLOB APP_QM_FILES "translations/*.qm")

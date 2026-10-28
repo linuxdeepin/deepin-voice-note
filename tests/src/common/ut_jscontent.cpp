@@ -5,6 +5,7 @@
 
 #include "ut_jscontent.h"
 #include "jscontent.h"
+#include "web_engine_handler.h"
 #include <QSignalSpy>
 
 UT_JsContent::UT_JsContent()
@@ -59,7 +60,10 @@ TEST_F(UT_JsContent, UT_JsContent_jsCallGetTranslation_001)
 
 TEST_F(UT_JsContent, UT_JsContent_callJsSynchronous_001)
 {
-    EXPECT_TRUE(JsContent::instance()->callJsSynchronous(nullptr, "").isNull());
+    // QtWebEngine 退役后同步调用已收敛到 WebEngineHandler::callJsSynchronous，
+    // 无 target 时不发信号直接返回空 QVariant（null）。
+    WebEngineHandler h;
+    EXPECT_TRUE(h.callJsSynchronous("").isNull());
 }
 
 TEST_F(UT_JsContent, UT_JsContent_jsCallSetDataFinsh_001)

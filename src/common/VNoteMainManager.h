@@ -30,7 +30,6 @@ public:
 
     static VNoteMainManager* instance();
     static bool hasExistingFolders();
-    Q_INVOKABLE void prepareWorkspace();
     Q_INVOKABLE void start();
     void initNote();
     void initQMLRegister();
@@ -170,7 +169,6 @@ private:
     WebRichTextManager *m_richTextManager {nullptr};
     VoiceNoteDBusService *m_dbusService {nullptr};
     bool m_initialized {false};
-    bool m_webEngineInitialized {false};
     QString m_searchText;
     QEventLoop m_eventloop;
     PendingAction m_pendingAction {PendingAction::None};

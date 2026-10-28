@@ -52,11 +52,11 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -fstack-protector-all")
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "mips.*")
     message(STATUS "Testing for MIPS architecture, using Qt5")
     add_definitions(-DUSE_QT5)
-    find_package(Qt5 5.15 REQUIRED COMPONENTS Core Gui Widgets DBus Sql Multimedia Test Xml Svg WebChannel WebEngine WebEngineWidgets)
+    find_package(Qt5 5.15 REQUIRED COMPONENTS Core Gui Widgets DBus Sql Multimedia Test Xml Svg WebChannel)
     find_package(Dtk COMPONENTS Core Widget Gui REQUIRED)
 else()
     message(STATUS "Testing for Non-MIPS architecture, using Qt6")
-    find_package(Qt6 6.6 REQUIRED COMPONENTS Core Gui Widgets DBus Sql Multimedia Test Xml Svg WebChannel WebEngineQuick WebEngineWidgets)
+    find_package(Qt6 6.6 REQUIRED COMPONENTS Core Gui Widgets DBus Sql Multimedia Test Xml Svg WebChannel)
     find_package(Dtk6 COMPONENTS Core Widget Gui REQUIRED)
 endif()
 
@@ -121,6 +121,9 @@ list(REMOVE_ITEM VNOTE_SRC_TEST "${CMAKE_CURRENT_LIST_DIR}/../src/main.cpp")
 # access to anonymous-namespace functions (inlineContentFrom,
 # downgradedParagraphFromBlock) for unit testing.
 list(REMOVE_ITEM VNOTE_SRC_TEST "${CMAKE_CURRENT_LIST_DIR}/../src/importolddata/tiptapmigration/migrationhtmlconverter.cpp")
+# Header-only Q_OBJECT 类（webchanneltransport.h）必须显式列入 target 源，
+# 否则 AUTOMOC 不会为其生成 moc → 链接时 vtable 未定义（与 src/CMakeLists.txt 同理）
+list(APPEND VNOTE_SRC_TEST "${CMAKE_CURRENT_LIST_DIR}/../src/webbridge/webchanneltransport.h")
 
 # 生成测试可执行程序
 add_executable(${PROJECT_NAME_TEST}
@@ -159,10 +162,9 @@ if(CMAKE_SYSTEM_PROCESSOR MATCHES "mips.*")
         Qt5::Multimedia
         Qt5::Test
         Qt5::WebChannel
-        Qt5::WebEngine
-        Qt5::WebEngineWidgets
         Qt5::Svg
         Qt5::Xml
+        webkitbridge
         ${LIBXML2_LIBRARIES}
     )
 else()
@@ -182,10 +184,9 @@ else()
         Qt6::Multimedia
         Qt6::Test
         Qt6::WebChannel
-        Qt6::WebEngineQuick
-        Qt6::WebEngineWidgets
         Qt6::Svg
         Qt6::Xml
+        webkitbridge
         ${LIBXML2_LIBRARIES}
     )
 endif()

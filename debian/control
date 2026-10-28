@@ -10,7 +10,8 @@ Build-Depends:
  qt6-tools-dev-tools [!mipsel !mips64el] | qttools5-dev-tools [mipsel mips64el],
  qt6-declarative-dev [!mipsel !mips64el] | qtdeclarative5-dev [mipsel mips64el],
  qt6-webchannel-dev [!mipsel !mips64el] | libqt5webchannel5-dev [mipsel mips64el],
- qt6-webengine-dev [!mipsel !mips64el] | qtwebengine5-dev [mipsel mips64el],
+ libwebkit2gtk-4.1-dev [!mipsel !mips64el] | libwebkit2gtk-4.0-dev [mipsel mips64el],
+ libgtk-3-dev,
  qt6-multimedia-dev [!mipsel !mips64el] | qtmultimedia5-dev [mipsel mips64el],
  qt6-l10n-tools [!mipsel !mips64el],
  pkg-config,
@@ -35,8 +36,7 @@ Build-Depends:
  qml6-module-qtqml-models [!mipsel !mips64el] | qml-module-qtqml-models2 [mipsel mips64el],
  qml6-module-qt-labs-platform [!mipsel !mips64el] | qml-module-qt-labs-platform [mipsel mips64el],
 # qml6-module-qtgraphicaleffects [!mipsel !mips64el] | qml-module-qtgraphicaleffects [mipsel mips64el],
- qml6-module-qtwebchannel [!mipsel !mips64el] | qml-module-qtwebchannel [mipsel mips64el],
- qml6-module-qtwebengine [!mipsel !mips64el] | qml-module-qtwebengine [mipsel mips64el]
+ qml6-module-qtwebchannel [!mipsel !mips64el] | qml-module-qtwebchannel [mipsel mips64el]
 Standards-Version: 4.1.3
 Homepage: <insert the upstream URL, if relevant>
 #Vcs-Browser: https://salsa.debian.org/debian/voice-note
@@ -48,7 +48,7 @@ Depends: ${shlibs:Depends}, ${misc:Depends},
  gstreamer1.0-plugins-good,
  gstreamer1.0-pulseaudio,
  vlc-plugin-base,
- libqt6webenginecore6-bin [!mipsel !mips64el] | libqt5sql5-sqlite [mipsel mips64el],
+ libqt5sql5-sqlite [mipsel mips64el],
  qml6-module-qtquick-dialogs [!mipsel !mips64el] | qml-module-qtquick-dialogs [mipsel mips64el],
  qml6-module-qtquick-layouts [!mipsel !mips64el] | qml-module-qtquick-layouts [mipsel mips64el],
  qml-module-qtquick-controls2 [mipsel mips64el],
@@ -57,7 +57,6 @@ Depends: ${shlibs:Depends}, ${misc:Depends},
  qml6-module-qt-labs-platform [!mipsel !mips64el] | qml-module-qt-labs-platform [mipsel mips64el],
 # qml6-module-qtgraphicaleffects [!mipsel !mips64el] | qml-module-qtgraphicaleffects [mipsel mips64el],
  qml6-module-qtwebchannel [!mipsel !mips64el] | qml-module-qtwebchannel [mipsel mips64el],
- qml6-module-qtwebengine [!mipsel !mips64el] | qml-module-qtwebengine [mipsel mips64el],
  libdtkdeclarative5 [mipsel mips64el],
  qml-module-qtgraphicaleffects [mipsel mips64el]
 Recommends: uos-reporter, deepin-event-log, libvlc5 [!mipsel !mips64el]

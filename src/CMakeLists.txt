@@ -20,11 +20,11 @@ list(APPEND RESOURCES ${CMAKE_PROJECT_NAME}.qrc deepin-voice-note-web.qrc deepin
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "mips.*")
     message(STATUS "Building for MIPS architecture, using Qt5")
     add_definitions(-DUSE_QT5)
-    find_package(Qt5 5.15 REQUIRED COMPONENTS Core Widgets Quick DBus Sql WebEngine WebEngineWidgets Multimedia)
+    find_package(Qt5 5.15 REQUIRED COMPONENTS Core Widgets Quick DBus Sql WebChannel Multimedia)
     find_package(Dtk COMPONENTS Core Widget Gui REQUIRED)
 else()
     message(STATUS "Building for Non-MIPS architecture, using Qt6")
-    find_package(Qt6 6.6 REQUIRED COMPONENTS Core Widgets Quick DBus Sql WebEngineQuick Multimedia)
+    find_package(Qt6 6.6 REQUIRED COMPONENTS Core Widgets Quick DBus Sql WebChannel Multimedia)
     find_package(Dtk6 COMPONENTS Core Widget Gui REQUIRED)
 endif()
 
@@ -48,6 +48,7 @@ aux_source_directory(./ ALLSOURCE)
 aux_source_directory(./dbusservice ALLSOURCE)
 aux_source_directory(./dbus ALLSOURCE)
 aux_source_directory(./common ALLSOURCE)
+aux_source_directory(./webbridge ALLSOURCE)
 aux_source_directory(./importolddata/tiptapmigration ALLSOURCE)
 aux_source_directory(./importolddata/dbmigration ALLSOURCE)
 aux_source_directory(./db ALLSOURCE)
@@ -56,6 +57,8 @@ aux_source_directory(./task ALLSOURCE)
 aux_source_directory(./handler ALLSOURCE)
 aux_source_directory(./search ALLSOURCE)
 aux_source_directory(./audio ALLSOURCE)
+# 仅头文件的 Q_OBJECT 类（无同名 .cpp）：显式列入 target 源，否则 AUTOMOC 不会为其生成 moc
+list(APPEND ALLSOURCE ./webbridge/webchanneltransport.h)
 
 add_executable(${BIN_NAME} ${ALLSOURCE} ${RESOURCES})
 
@@ -67,9 +70,9 @@ if(CMAKE_SYSTEM_PROCESSOR MATCHES "mips.*")
         Qt5::Quick
         Qt5::DBus
         Qt5::Sql
-        Qt5::WebEngine
-        Qt5::WebEngineWidgets
+        Qt5::WebChannel
         Qt5::Multimedia
+        webkitbridge
         Dtk::Core
         Dtk::Gui
         Dtk::Widget
@@ -81,8 +84,9 @@ else()
         Qt6::Quick
         Qt6::DBus
         Qt6::Sql
-        Qt6::WebEngineQuick
+        Qt6::WebChannel
         Qt6::Multimedia
+        webkitbridge
         Dtk6::Core
         Dtk6::Gui
         Dtk6::Widget

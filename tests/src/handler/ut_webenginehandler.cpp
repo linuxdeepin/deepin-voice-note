@@ -9,17 +9,18 @@
 #include "web_engine_handler.h"
 #include "actionmanager.h"
 #include "vnoteitem.h"
+#include "VNoteMainManager.h"
 
 #include <gtest/gtest.h>
-#include <QObject>
-#include <QDropEvent>
-#include <QMimeData>
 #include <QEvent>
+#include <QObject>
 #include <QPointF>
 #include <QTemporaryDir>
 #include <QImage>
 #include <QFile>
 #include <QDir>
+#include <QUrl>
+#include <QVariantMap>
 
 TEST(WebEngineHandlerUT, lifecycleAndTarget)
 {
@@ -40,12 +41,12 @@ TEST(WebEngineHandlerUT, lifecycleAndTarget)
 TEST(WebEngineHandlerUT, contextMenuAndVoiceInsert)
 {
     WebEngineHandler h;
-    // MaxMenu -> default branch (no request deref)
+    // MaxMenu -> default branch (no request use)
     h.onSaveMenuParam(WebEngineHandler::MaxMenu, QVariant());
-    h.onContextMenuRequested(nullptr);
-    // VoiceMenu with empty json -> parse fails -> early return (no request deref)
+    h.onContextMenuRequested(QVariantMap());
+    // VoiceMenu with empty json -> parse fails -> early return (no request use)
     h.onSaveMenuParam(WebEngineHandler::VoiceMenu, QVariant());
-    h.onContextMenuRequested(nullptr);
+    h.onContextMenuRequested(QVariantMap());
     h.onInsertVoiceItem("/tmp/voice-ut.wav", 1000);
     SUCCEED();
 }
@@ -89,18 +90,17 @@ TEST(WebEngineHandlerUT, pasteBranches)
     SUCCEED();
 }
 
-TEST(WebEngineHandlerUT, eventFilterDrag)
+// QtWebEngine 时代存在 WebEngineHandler::eventFilter 拦截 DragLeave 等事件的
+// 逻辑；WebKitGTK 方案下拖放由 webhelper 独立窗接管（filesDropped/textDropped），
+// eventFilter override 已随架构移除，事件过滤回归 QObject 基类行为。
+TEST(WebEngineHandlerUT, eventFilterRemoved_fallsBackToBase)
 {
     WebEngineHandler h;
     QObject target;
-    h.setTarget(&target);
-    QEvent leave(QEvent::DragLeave);
-    EXPECT_FALSE(h.eventFilter(&target, &leave));
-    QMimeData md;   // no urls
-    QDropEvent enter(QPointF(0, 0), Qt::CopyAction, &md, Qt::NoButton, Qt::NoModifier);
-    EXPECT_FALSE(h.eventFilter(&target, &enter));
-    // event for a non-target object -> passes through
     QObject other;
+    QEvent leave(QEvent::DragLeave);
+    // 无重写：任意对象均走 QObject::eventFilter，返回 false 不拦截
+    EXPECT_FALSE(h.eventFilter(&target, &leave));
     EXPECT_FALSE(h.eventFilter(&other, &leave));
     SUCCEED();
 }
@@ -109,52 +109,40 @@ TEST(WebEngineHandlerUT, eventFilterDrag)
 // PMS 补强回归用例（qt-autotest-generator Mode 7 → Mode 2 补强）
 // ============================================================================
 
-// BUG 300535: 已接入输入/输出设备情况下拖拽操作异常。修复：eventFilter 对
-// DragEnter/DragMove/Drop 携带不可插入（非图片/不存在）URL 时置 IgnoreAction
-// 并拦截（src/handler/web_engine_handler.cpp:312-368）。
-// PMS: https://pms.uniontech.com/bug-view-300535.html  commit: 1c05a9e4, 4ebe6e2f
-TEST(WebEngineHandlerUT, BUG300535_eventFilterRejectsNonImageDrop)
+// BUG 300535: 已接入输入/输出设备情况下拖拽操作异常。
+// 修复随架构演进迁移：QtWebEngine 时代由 WebEngineHandler::eventFilter 在宿主
+// 侧拦截非图片拖放（commit 1c05a9e4, 4ebe6e2f）；WebKitGTK 方案下拖放由
+// webhelper 独立窗转发（WebKitWebView::filesDropped → WebEngineView.qml
+// onFilesDropped），非图片过滤收敛到 VNoteMainManager::canInsertImages。
+// 此处验证过滤语义不变：txt 拒绝、png 放行、混合列表整体拒绝。
+// PMS: https://pms.uniontech.com/bug-view-300535.html
+TEST(WebEngineHandlerUT, BUG300535_nonImageDropStillFiltered)
 {
-    WebEngineHandler h;
-    QObject target;
-    h.setTarget(&target);
+    VNoteMainManager *m = VNoteMainManager::instance();
+    ASSERT_NE(nullptr, m);
 
     QTemporaryDir dir;
     ASSERT_TRUE(dir.isValid());
     const QString imgPath = dir.filePath("a.png");
     ASSERT_TRUE(QImage(2, 2, QImage::Format_RGB32).save(imgPath, "PNG"));
-    QTemporaryDir dir2;
-    ASSERT_TRUE(dir2.isValid());
-    const QString txtPath = dir2.filePath("a.txt");
+    const QString txtPath = dir.filePath("a.txt");
     {
         QFile f(txtPath);
         ASSERT_TRUE(f.open(QIODevice::WriteOnly));
         f.write("x", 1);
     }
 
-    QMimeData mdImg;
-    mdImg.setUrls({QUrl::fromLocalFile(imgPath)});
-    QMimeData mdTxt;
-    mdTxt.setUrls({QUrl::fromLocalFile(txtPath)});
+    const QUrl img = QUrl::fromLocalFile(imgPath);
+    const QUrl txt = QUrl::fromLocalFile(txtPath);
 
     // 合法图片拖入：放行
-    QDropEvent enterImg(QPointF(0, 0), Qt::CopyAction, &mdImg,
-                        Qt::NoButton, Qt::NoModifier, QEvent::DragEnter);
-    EXPECT_FALSE(h.eventFilter(&target, &enterImg));
-
-    // 非图片文件：DragEnter / DragMove / Drop 三阶段均拦截
-    QDropEvent enterTxt(QPointF(0, 0), Qt::CopyAction, &mdTxt,
-                        Qt::NoButton, Qt::NoModifier, QEvent::DragEnter);
-    EXPECT_TRUE(h.eventFilter(&target, &enterTxt));
-    QDropEvent moveTxt(QPointF(0, 0), Qt::CopyAction, &mdTxt,
-                       Qt::NoButton, Qt::NoModifier, QEvent::DragMove);
-    EXPECT_TRUE(h.eventFilter(&target, &moveTxt));
-    QDropEvent dropTxt(QPointF(0, 0), Qt::CopyAction, &mdTxt,
-                       Qt::NoButton, Qt::NoModifier);
-    EXPECT_TRUE(h.eventFilter(&target, &dropTxt));
-
-    // 合法图片 Drop：不拦截
-    QDropEvent dropImg(QPointF(0, 0), Qt::CopyAction, &mdImg,
-                       Qt::NoButton, Qt::NoModifier);
-    EXPECT_FALSE(h.eventFilter(&target, &dropImg));
+    EXPECT_TRUE(m->canInsertImages({img}));
+    // 非图片文件：过滤
+    EXPECT_FALSE(m->canInsertImages({txt}));
+    // 图片+非图片混合列表：整体拒绝
+    EXPECT_FALSE(m->canInsertImages({img, txt}));
+    // 空列表：拒绝
+    EXPECT_FALSE(m->canInsertImages({}));
+    // 非本地 URL：拒绝
+    EXPECT_FALSE(m->canInsertImages({QUrl(QStringLiteral("https://example.com/a.png"))}));
 }

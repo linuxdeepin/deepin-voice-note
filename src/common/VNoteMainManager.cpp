@@ -20,6 +20,7 @@
 #include "vtextspeechandtrmanager.h"
 #include "uosaicapabilitymanager.h"
 #include "handler/web_engine_handler.h"
+#include "webbridge/webkitwebview.h"
 #include "handler/vnote_message_dialog_handler.h"
 #include "handler/voice_recoder_handler.h"
 #include "handler/voice_to_text_task_manager.h"
@@ -31,12 +32,6 @@
 
 #include <QThreadPool>
 #include <QQmlApplicationEngine>
-// 条件编译：根据 Qt 版本包含不同的 WebEngine 头文件
-#ifdef USE_QT5
-#include <QtWebEngine/QtWebEngine>
-#else
-#include <QtWebEngineQuick/qtwebenginequickglobal.h>
-#endif
 #include <QStringList>
 #include <QStandardPaths>
 #include <QFileInfo>
@@ -134,19 +129,6 @@ bool VNoteMainManager::hasExistingFolders()
     }
 
     return query.next();
-}
-
-void VNoteMainManager::prepareWorkspace()
-{
-    if (m_webEngineInitialized)
-        return;
-
-#ifdef USE_QT5
-    QtWebEngine::initialize();
-#else
-    QtWebEngineQuick::initialize();
-#endif
-    m_webEngineInitialized = true;
 }
 
 void VNoteMainManager::start()
@@ -288,6 +270,7 @@ void VNoteMainManager::initQMLRegister()
 
     // QML组件访问后端调用
     qmlRegisterType<WebEngineHandler>("VNote", 1, 0, "WebEngineHandler");
+    qmlRegisterType<webnote::WebKitWebView>("VNote", 1, 0, "WebKitWebView");
     qmlRegisterType<VNoteMessageDialogHandler>("VNote", 1, 0, "VNoteMessageDialogHandler");
     qmlRegisterSingletonType<VoiceRecoderHandler>("VNote", 1, 0, "VoiceRecoderHandler", voiceRecoder_provider);
 
