@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "tiptapchannelbridge.h"
+#include "ddlog.h"
 #include "VNoteMainManager.h"
 
 #include <QResource>
@@ -294,7 +295,7 @@ void TiptapChannelBridge::sendInsertImage(const QString &imageInfoJson)
 {
     if (!m_editorReady) {
         m_pendingInsertImages.append(imageInfoJson);
-        qInfo() << "Queueing image insertion until Tiptap editor is ready";
+        qCInfo(voiceNoteLog) << "Queueing image insertion until Tiptap editor is ready";
         return;
     }
     emit insertImage(imageInfoJson);
@@ -311,7 +312,7 @@ void TiptapChannelBridge::sendInsertVoiceBlock(const QString &voiceInfoJson)
 
 void TiptapChannelBridge::jsEditorReady()
 {
-    qInfo() << "Tiptap editor ready (TiptapChannelBridge)";
+    qCInfo(voiceNoteLog) << "Tiptap editor ready (TiptapChannelBridge)";
     notifyEditorReady();
 }
 
@@ -322,19 +323,19 @@ void TiptapChannelBridge::jsContentChanged()
 
 void TiptapChannelBridge::jsContentSaved(const QString &envelopeJson)
 {
-    qInfo() << "Tiptap content saved, envelope length:" << envelopeJson.length();
+    qCInfo(voiceNoteLog) << "Tiptap content saved, envelope length:" << envelopeJson.length();
     emit contentSaved(envelopeJson);
 }
 
 void TiptapChannelBridge::jsInsertImageFailed(const QString &reason)
 {
-    qWarning() << "Tiptap insert image failed:" << reason;
+    qCWarning(voiceNoteLog) << "Tiptap insert image failed:" << reason;
     emit insertImageFailed(reason);
 }
 
 void TiptapChannelBridge::jsInsertVoiceBlockFailed(const QString &reason)
 {
-    qWarning() << "Tiptap insert voice block failed:" << reason;
+    qCWarning(voiceNoteLog) << "Tiptap insert voice block failed:" << reason;
     emit insertVoiceBlockFailed(reason);
 }
 
@@ -413,7 +414,7 @@ void TiptapChannelBridge::jsRequestViewPicture(const QString &url)
 {
     const QString localPath = normalizePicturePath(url);
     if (localPath.isEmpty()) {
-        qWarning() << "jsRequestViewPicture: refused unsafe image path:" << url;
+        qCWarning(voiceNoteLog) << "jsRequestViewPicture: refused unsafe image path:" << url;
         return;
     }
     emit viewPictureRequested(localPath);
@@ -427,25 +428,25 @@ void TiptapChannelBridge::jsCopyPlainTextToClipboard(const QString &text)
 
     QClipboard *clipboard = QApplication::clipboard();
     if (!clipboard) {
-        qWarning() << "Tiptap copy plain text: clipboard is unavailable";
+        qCWarning(voiceNoteLog) << "Tiptap copy plain text: clipboard is unavailable";
         return;
     }
 
     auto *mimeData = new QMimeData;
     mimeData->setText(text);
     clipboard->setMimeData(mimeData);
-    qInfo() << "Tiptap copied plain text to clipboard, length:" << text.length();
+    qCInfo(voiceNoteLog) << "Tiptap copied plain text to clipboard, length:" << text.length();
 }
 
 void TiptapChannelBridge::jsClearClipboard()
 {
     QClipboard *clipboard = QApplication::clipboard();
     if (!clipboard) {
-        qWarning() << "Tiptap clear clipboard: clipboard is unavailable";
+        qCWarning(voiceNoteLog) << "Tiptap clear clipboard: clipboard is unavailable";
         return;
     }
     clipboard->clear();
-    qInfo() << "Tiptap cleared clipboard";
+    qCInfo(voiceNoteLog) << "Tiptap cleared clipboard";
 }
 
 bool TiptapChannelBridge::clipboardHasPasteContent() const
@@ -471,7 +472,7 @@ void TiptapChannelBridge::jsPasteImage(const QString &dataUrl)
     // data URL 形如 data:image/png;base64,XXXX
     const int comma = dataUrl.indexOf(QLatin1Char(','));
     if (comma < 0) {
-        qWarning() << "jsPasteImage: invalid data url";
+        qCWarning(voiceNoteLog) << "jsPasteImage: invalid data url";
         emit insertImageFailed("invalid pasted image data");
         return;
     }
@@ -497,7 +498,7 @@ void TiptapChannelBridge::jsPasteImage(const QString &dataUrl)
     } else if (mime == QStringLiteral("image/bmp")) {
         suffix = QStringLiteral("bmp");
     } else {
-        qWarning() << "jsPasteImage: unsupported image format" << mime;
+        qCWarning(voiceNoteLog) << "jsPasteImage: unsupported image format" << mime;
         emit insertImageFailed("unsupported pasted image format");
         return;
     }
@@ -505,7 +506,7 @@ void TiptapChannelBridge::jsPasteImage(const QString &dataUrl)
     const QByteArray bytes = QByteArray::fromBase64(base64);
     QImage image;
     if (!image.loadFromData(bytes)) {
-        qWarning() << "jsPasteImage: failed to decode image";
+        qCWarning(voiceNoteLog) << "jsPasteImage: failed to decode image";
         emit insertImageFailed("failed to decode pasted image");
         return;
     }
@@ -524,7 +525,7 @@ void TiptapChannelBridge::jsPasteImage(const QString &dataUrl)
     };
     const QByteArray format = formatBySuffix.value(suffix);
     if (!image.save(imgPath, format.constData())) {
-        qWarning() << "jsPasteImage: failed to save image to" << imgPath;
+        qCWarning(voiceNoteLog) << "jsPasteImage: failed to save image to" << imgPath;
         emit insertImageFailed("failed to save pasted image");
         return;
     }

@@ -9,7 +9,7 @@
 #include <QTimer>
 
 namespace {
-Q_LOGGING_CATEGORY(lcMigrationView, "voice_note_migration_view")
+Q_LOGGING_CATEGORY(lcMigrationView, "org.deepin.voice-note.migration")
 }
 
 MigrationViewController *MigrationViewController::instance()
