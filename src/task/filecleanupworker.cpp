@@ -1,9 +1,10 @@
-// Copyright (C) 2019 ~ 2019 UnionTech Software Technology Co.,Ltd.
-// SPDX-FileCopyrightText: 2023 UnionTech Software Technology Co., Ltd.
+// Copyright (C) 2019-2026 UnionTech Software Technology Co.,Ltd.
+// SPDX-FileCopyrightText: 2023-2026 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "filecleanupworker.h"
+#include "ddlog.h"
 #include "common/vnoteitem.h"
 
 #include <QDir>
@@ -14,14 +15,14 @@ FileCleanupWorker::FileCleanupWorker(VNOTE_ALL_NOTES_MAP *qspAllNotesMap, QObjec
     : VNTask(parent)
     , m_qspAllNotesMap(qspAllNotesMap)
 {
-    qInfo() << "FileCleanupWorker constructor called with notes map:" << (qspAllNotesMap ? "valid" : "null");
+    qCInfo(voiceNoteLog) << "FileCleanupWorker constructor called with notes map:" << (qspAllNotesMap ? "valid" : "null");
 }
 
 void FileCleanupWorker::run()
 {
-    qInfo() << "Starting file cleanup operation";
+    qCInfo(voiceNoteLog) << "Starting file cleanup operation";
     if (nullptr == m_qspAllNotesMap) {
-        qWarning() << "Notes map is null, cleanup operation aborted";
+        qCWarning(voiceNoteLog) << "Notes map is null, cleanup operation aborted";
         return;
     }
 
@@ -31,13 +32,13 @@ void FileCleanupWorker::run()
     fillPictureSet();
     //遍历笔记
     if (scanAllNotes()) {
-        qInfo() << "Starting cleanup of unused files";
+        qCInfo(voiceNoteLog) << "Starting cleanup of unused files";
         //清空数据
         cleanVoice();
         cleanPicture();
-        qInfo() << "File cleanup operation completed";
+        qCInfo(voiceNoteLog) << "File cleanup operation completed";
     } else {
-        qWarning() << "Failed to scan notes, cleanup operation aborted";
+        qCWarning(voiceNoteLog) << "Failed to scan notes, cleanup operation aborted";
     }
 }
 
@@ -47,13 +48,13 @@ void FileCleanupWorker::run()
  */
 void FileCleanupWorker::cleanVoice()
 {
-    qInfo() << "Cleaning voice files, count:" << m_voiceSet.size();
+    qCInfo(voiceNoteLog) << "Cleaning voice files, count:" << m_voiceSet.size();
     for (QString path : m_voiceSet) {
         if (!QFile::remove(path)) {
-            qWarning() << "Failed to remove voice file:" << path;
+            qCWarning(voiceNoteLog) << "Failed to remove voice file:" << path;
         }
     }
-    qInfo() << "Voice files cleanup finished";
+    qCInfo(voiceNoteLog) << "Voice files cleanup finished";
 }
 
 /**
@@ -62,13 +63,13 @@ void FileCleanupWorker::cleanVoice()
  */
 void FileCleanupWorker::cleanPicture()
 {
-    qInfo() << "Cleaning picture files, count:" << m_pictureSet.size();
+    qCInfo(voiceNoteLog) << "Cleaning picture files, count:" << m_pictureSet.size();
     for (QString path : m_pictureSet) {
         if (!QFile::remove(path)) {
-            qWarning() << "Failed to remove picture file:" << path;
+            qCWarning(voiceNoteLog) << "Failed to remove picture file:" << path;
         }
     }
-    qInfo() << "Picture files cleanup finished";
+    qCInfo(voiceNoteLog) << "Picture files cleanup finished";
 }
 
 /**
@@ -77,12 +78,12 @@ void FileCleanupWorker::cleanPicture()
  */
 void FileCleanupWorker::fillVoiceSet()
 {
-    qDebug() << "Scanning for voice files";
+    qCDebug(voiceNoteLog) << "Scanning for voice files";
     //文件夹路径
     QString dirPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/voicenote";
     QDir dir(dirPath);
     if (!dir.exists()) {
-        qDebug() << "Voice directory does not exist:" << dirPath;
+        qCDebug(voiceNoteLog) << "Voice directory does not exist:" << dirPath;
         return;
     }
 
@@ -90,7 +91,7 @@ void FileCleanupWorker::fillVoiceSet()
     for (auto fileName : dir.entryList(QStringList("*.mp3"), QDir::Files | QDir::NoSymLinks)) {
         m_voiceSet.insert(dirPath + "/" + fileName);
     }
-    qDebug() << "Found" << m_voiceSet.size() << "voice files in directory:" << dirPath;
+    qCDebug(voiceNoteLog) << "Found" << m_voiceSet.size() << "voice files in directory:" << dirPath;
 }
 
 /**
@@ -99,12 +100,12 @@ void FileCleanupWorker::fillVoiceSet()
  */
 void FileCleanupWorker::fillPictureSet()
 {
-    qDebug() << "Scanning for picture files";
+    qCDebug(voiceNoteLog) << "Scanning for picture files";
     //文件夹路径
     QString dirPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/images";
     QDir dir(dirPath);
     if (!dir.exists()) {
-        qDebug() << "Picture directory does not exist:" << dirPath;
+        qCDebug(voiceNoteLog) << "Picture directory does not exist:" << dirPath;
         return;
     }
 
@@ -112,7 +113,7 @@ void FileCleanupWorker::fillPictureSet()
     for (auto fileName : dir.entryList(filters, QDir::Files | QDir::NoSymLinks)) {
         m_pictureSet.insert(dirPath + "/" + fileName);
     }
-    qDebug() << "Found" << m_pictureSet.size() << "picture files in directory:" << dirPath;
+    qCDebug(voiceNoteLog) << "Found" << m_pictureSet.size() << "picture files in directory:" << dirPath;
 }
 
 /**
@@ -122,7 +123,7 @@ void FileCleanupWorker::fillPictureSet()
  */
 bool FileCleanupWorker::scanAllNotes()
 {
-    qDebug() << "Starting scan of all notes";
+    qCDebug(voiceNoteLog) << "Starting scan of all notes";
     //遍历笔记
     QList<VNOTE_ITEMS_MAP *> voiceItems = m_qspAllNotesMap->notes.values();
     for (VNOTE_ITEMS_MAP *voiceItem : voiceItems) {
@@ -139,7 +140,7 @@ bool FileCleanupWorker::scanAllNotes()
             }
         }
     }
-    qInfo() << "Notes scan finished";
+    qCInfo(voiceNoteLog) << "Notes scan finished";
     return true;
 }
 
@@ -150,16 +151,16 @@ bool FileCleanupWorker::scanAllNotes()
  */
 void FileCleanupWorker::removeVoicePathBySet(const QString &path)
 {
-    qInfo() << "Removing voice path from cleanup set:" << path;
+    qCInfo(voiceNoteLog) << "Removing voice path from cleanup set:" << path;
     if (path.isEmpty()) {
-        qInfo() << "Voice path is empty";
+        qCInfo(voiceNoteLog) << "Voice path is empty";
         return;
     }
     //移除笔记内存在的路径
     if (m_voiceSet.remove(path)) {
-        qDebug() << "Removed voice path from cleanup set:" << path;
+        qCDebug(voiceNoteLog) << "Removed voice path from cleanup set:" << path;
     }
-    qInfo() << "Voice path removal finished";
+    qCInfo(voiceNoteLog) << "Voice path removal finished";
 }
 
 /**
@@ -169,16 +170,16 @@ void FileCleanupWorker::removeVoicePathBySet(const QString &path)
  */
 void FileCleanupWorker::removePicturePathBySet(const QString &path)
 {
-    qInfo() << "Removing picture path from cleanup set:" << path;
+    qCInfo(voiceNoteLog) << "Removing picture path from cleanup set:" << path;
     if (path.isEmpty()) {
-        qInfo() << "Picture path is empty";
+        qCInfo(voiceNoteLog) << "Picture path is empty";
         return;
     }
     //移除笔记内存在的路径
     if (m_pictureSet.remove(path)) {
-        qDebug() << "Removed picture path from cleanup set:" << path;
+        qCDebug(voiceNoteLog) << "Removed picture path from cleanup set:" << path;
     }
-    qInfo() << "Picture path removal finished";
+    qCInfo(voiceNoteLog) << "Picture path removal finished";
 }
 
 /**
@@ -188,7 +189,7 @@ void FileCleanupWorker::removePicturePathBySet(const QString &path)
  */
 void FileCleanupWorker::scanVoiceByHtml(const QString &htmlCode)
 {
-    qInfo() << "Scanning voice by HTML";
+    qCInfo(voiceNoteLog) << "Scanning voice by HTML";
     //匹配语音块标签的正则表达式
     // QRegExp rx("<div.+jsonkey.+>");
     // rx.setMinimal(true); //最小匹配
@@ -205,7 +206,7 @@ void FileCleanupWorker::scanVoiceByHtml(const QString &htmlCode)
     //     }
     //     pos += rx.matchedLength();
     // }
-    qInfo() << "Voice HTML scan finished";
+    qCInfo(voiceNoteLog) << "Voice HTML scan finished";
 }
 
 /**
@@ -215,7 +216,7 @@ void FileCleanupWorker::scanVoiceByHtml(const QString &htmlCode)
  */
 void FileCleanupWorker::scanPictureByHtml(const QString &htmlCode)
 {
-    qInfo() << "Scanning picture by HTML";
+    qCInfo(voiceNoteLog) << "Scanning picture by HTML";
     //匹配图片块标签的正则表达式
     // QRegExp rx("<img.+src=.+>");
     // rx.setMinimal(true); //最小匹配
@@ -231,7 +232,7 @@ void FileCleanupWorker::scanPictureByHtml(const QString &htmlCode)
     //     }
     //     pos += rx.matchedLength();
     // }
-    qInfo() << "Picture HTML scan finished";
+    qCInfo(voiceNoteLog) << "Picture HTML scan finished";
 }
 
 /**
@@ -241,11 +242,11 @@ void FileCleanupWorker::scanPictureByHtml(const QString &htmlCode)
  */
 void FileCleanupWorker::scanVoiceByBlocks(const VNOTE_DATAS &datas)
 {
-    qInfo() << "Scanning voice by blocks, voice block count:" << datas.voiceBlocks.size();
+    qCInfo(voiceNoteLog) << "Scanning voice by blocks, voice block count:" << datas.voiceBlocks.size();
     for (auto data : datas.voiceBlocks) {
         if (VNoteBlock::Voice == data->getType()) {
             removeVoicePathBySet(data->ptrVoice->voicePath);
         }
     }
-    qInfo() << "Voice blocks scan finished";
+    qCInfo(voiceNoteLog) << "Voice blocks scan finished";
 }

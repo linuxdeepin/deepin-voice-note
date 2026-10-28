@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "migrationscanner.h"
+#include "ddlog.h"
 
 #include "legacyformatdetector.h"  // LegacyFormatDetector::detect()
 #include "db/dbvisitor.h"                           // DbVisitor::DBNote 列枚举/列名
@@ -89,7 +90,7 @@ ScanResult MigrationScanner::scan()
     if (!QFileInfo(dbPath).isFile()) {
         result.code = ScanErrorCode::DbOpenFailed;
         result.message = QStringLiteral("Database file not found: %1").arg(dbPath);
-        qWarning("MigrationScanner: %s", qPrintable(result.message));
+        qCWarning(voiceNoteLog, "MigrationScanner: %s", qPrintable(result.message));
         return result;
     }
 
@@ -103,7 +104,7 @@ ScanResult MigrationScanner::scan()
             result.code = ScanErrorCode::DbOpenFailed;
             result.message = QStringLiteral("Failed to open database readonly: %1")
                                  .arg(db.lastError().text());
-            qWarning("MigrationScanner: %s", qPrintable(result.message));
+            qCWarning(voiceNoteLog, "MigrationScanner: %s", qPrintable(result.message));
         } else {
             // 列名取自 DbVisitor::DBNote::noteColumnsName，与运行态查询同源，
             // 避免硬编码列名偏差（encrypt 实际落在 expand_filed2 列）。
@@ -119,7 +120,7 @@ ScanResult MigrationScanner::scan()
                 result.code = ScanErrorCode::QueryFailed;
                 result.message = QStringLiteral("Failed to execute scan query: %1")
                                      .arg(query.lastError().text());
-                qWarning("MigrationScanner: %s", qPrintable(result.message));
+                qCWarning(voiceNoteLog, "MigrationScanner: %s", qPrintable(result.message));
             } else {
                 while (query.next()) {
                     // 取消检查点：每行进入前判标志位，快速退出（D3 由 TTP-020 兜底）。
@@ -128,7 +129,7 @@ ScanResult MigrationScanner::scan()
                         result.message = QStringLiteral(
                                              "Scan aborted by cancel request after %1 row(s)")
                                              .arg(result.totalCount);
-                        qInfo("MigrationScanner: %s", qPrintable(result.message));
+                        qCInfo(voiceNoteLog, "MigrationScanner: %s", qPrintable(result.message));
                         break;
                     }
 
@@ -175,7 +176,7 @@ ScanResult MigrationScanner::scan()
                         result.message = QStringLiteral(
                                              "Scan query iteration failed: %1")
                                              .arg(query.lastError().text());
-                        qWarning("MigrationScanner: %s", qPrintable(result.message));
+                        qCWarning(voiceNoteLog, "MigrationScanner: %s", qPrintable(result.message));
                     } else {
                         result.success = true;
                         result.code = ScanErrorCode::None;
@@ -186,7 +187,7 @@ ScanResult MigrationScanner::scan()
                                              .arg(result.needMigrateCount)
                                              .arg(result.alreadyTiptapCount)
                                              .arg(result.abnormalCount);
-                        qInfo("MigrationScanner: %s", qPrintable(result.message));
+                        qCInfo(voiceNoteLog, "MigrationScanner: %s", qPrintable(result.message));
                     }
                 }
             }
