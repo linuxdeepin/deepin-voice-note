@@ -1,9 +1,10 @@
-// Copyright (C) 2019 ~ 2019 UnionTech Software Technology Co.,Ltd.
-// SPDX-FileCopyrightText: 2023 UnionTech Software Technology Co., Ltd.
+// Copyright (C) 2019-2026 UnionTech Software Technology Co.,Ltd.
+// SPDX-FileCopyrightText: 2023-2026 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "gstreamrecorder.h"
+#include "ddlog.h"
 #include "common/utils.h"
 
 #include <DLog>
@@ -50,15 +51,15 @@ gboolean GstBusMessageCb(GstBus *bus, GstMessage *msg, void *userdata)
 GstreamRecorder::GstreamRecorder(QObject *parent)
     : QObject(parent)
 {
-    qDebug() << "Initializing GstreamRecorder...";
+    qCDebug(voiceNoteLog) << "Initializing GstreamRecorder...";
     // check if current in linglong, update GST_PLUGIN_PATH
     if (Utils::inLinglongEnv()) {
         qputenv("GST_PLUGIN_PATH", QByteArray(INSTALL_LIB_PATH) + QByteArray("/gstreamer-1.0"));
-        qDebug() << "Running in Linglong environment, updated GST_PLUGIN_PATH";
+        qCDebug(voiceNoteLog) << "Running in Linglong environment, updated GST_PLUGIN_PATH";
     }
 
     gst_init(nullptr, nullptr);
-    qDebug() << "GStreamer initialized successfully";
+    qCDebug(voiceNoteLog) << "GStreamer initialized successfully";
 }
 
 /**
@@ -67,7 +68,7 @@ GstreamRecorder::GstreamRecorder(QObject *parent)
  */
 bool GstreamRecorder::createPipe()
 {
-    qDebug() << "Creating GStreamer pipeline...";
+    qCDebug(voiceNoteLog) << "Creating GStreamer pipeline...";
     GstElement *audioSrc = nullptr; //声音采集设备
     GstElement *audioResample = nullptr; //重采样
     GstElement *audioConvert = nullptr; //格式转换
@@ -82,12 +83,12 @@ bool GstreamRecorder::createPipe()
     do {
         audioSrc = gst_element_factory_make("pulsesrc", "audioSrc");
         if (audioSrc == nullptr) {
-            qCritical() << "Failed to create audio source element (pulsesrc)";
+            qCCritical(voiceNoteLog) << "Failed to create audio source element (pulsesrc)";
             break;
         }
         if (!m_currentDevice.isEmpty()) {
             g_object_set(reinterpret_cast<gpointer *>(audioSrc), "device", m_currentDevice.toLatin1().data(), nullptr);
-            qDebug() << "Set audio source device to:" << m_currentDevice;
+            qCDebug(voiceNoteLog) << "Set audio source device to:" << m_currentDevice;
         }
 
         //       audiowebrtcdsp= gst_element_factory_make("webrtcdsp","audiowebrtcdsp");
@@ -104,48 +105,48 @@ bool GstreamRecorder::createPipe()
 
         audioResample = gst_element_factory_make("audioresample", nullptr);
         if (audioResample == nullptr) {
-            qCritical() << "Failed to create audio resample element";
+            qCCritical(voiceNoteLog) << "Failed to create audio resample element";
             break;
         }
         audioConvert = gst_element_factory_make("audioconvert", "audioconvert");
         if (audioConvert == nullptr) {
-            qCritical() << "Failed to create audio convert element";
+            qCCritical(voiceNoteLog) << "Failed to create audio convert element";
             break;
         }
         audioQueue = gst_element_factory_make("queue", "audioqueue");
         if (audioQueue == nullptr) {
-            qCritical() << "Failed to create audio queue element";
+            qCCritical(voiceNoteLog) << "Failed to create audio queue element";
             break;
         }
         audioEncoder = gst_parse_bin_from_description(mp3Encoder.toLatin1().constData(),
                                                       true, nullptr);
         if (audioEncoder == nullptr) {
-            qCritical() << "Failed to create audio encoder element with description:" << mp3Encoder;
+            qCCritical(voiceNoteLog) << "Failed to create audio encoder element with description:" << mp3Encoder;
             break;
         }
         GstPad *pad = gst_element_get_static_pad(audioEncoder, "sink");
         if (pad) {
             gst_pad_add_probe(pad, GST_PAD_PROBE_TYPE_BUFFER, bufferProbe, this, nullptr);
             gst_object_unref(pad);
-            qDebug() << "Added buffer probe to encoder sink pad";
+            qCDebug(voiceNoteLog) << "Added buffer probe to encoder sink pad";
         } else {
-            qCritical() << "Failed to get encoder sink pad";
+            qCCritical(voiceNoteLog) << "Failed to get encoder sink pad";
             break;
         }
         audioOutput = gst_element_factory_make("filesink", "filesink");
         if (audioOutput == nullptr) {
-            qCritical() << "Failed to create file sink element";
+            qCCritical(voiceNoteLog) << "Failed to create file sink element";
             break;
         }
         if (!m_outputFile.isEmpty()) {
             g_object_set(reinterpret_cast<gpointer *>(audioOutput), "location", m_outputFile.toLatin1().constData(), nullptr);
-            qDebug() << "Set output file to:" << m_outputFile;
+            qCDebug(voiceNoteLog) << "Set output file to:" << m_outputFile;
         }
         m_pipeline = gst_pipeline_new("deepin-voice-note");
         GstBus *bus = gst_pipeline_get_bus(reinterpret_cast<GstPipeline *>(m_pipeline));
         gst_bus_add_watch(bus, GstBusMessageCb, this);
         gst_object_unref(bus);
-        qDebug() << "Created pipeline and added bus watch";
+        qCDebug(voiceNoteLog) << "Created pipeline and added bus watch";
 
         gst_bin_add_many(reinterpret_cast<GstBin *>(m_pipeline), audioSrc,
                          /*audiowebrtcdsp,audiowebrtcechoprobe,*/
@@ -158,14 +159,14 @@ bool GstreamRecorder::createPipe()
                                    audioOutput, nullptr)) {
             objectUnref(m_pipeline);
             m_pipeline = nullptr;
-            qCritical() << "Failed to link pipeline elements";
+            qCCritical(voiceNoteLog) << "Failed to link pipeline elements";
             return success;
         }
-        qDebug() << "Successfully linked all pipeline elements";
+        qCDebug(voiceNoteLog) << "Successfully linked all pipeline elements";
         success = true;
     } while (!success);
     if (!success) {
-        qWarning() << "Pipeline creation failed, cleaning up elements";
+        qCWarning(voiceNoteLog) << "Pipeline creation failed, cleaning up elements";
         objectUnref(audioSrc);
         objectUnref(audioResample);
         objectUnref(audioConvert);
@@ -183,7 +184,7 @@ bool GstreamRecorder::createPipe()
  */
 void GstreamRecorder::deinit()
 {
-    qDebug() << "Deinitializing GstreamRecorder...";
+    qCDebug(voiceNoteLog) << "Deinitializing GstreamRecorder...";
     stopRecord();
 
     // 确保管道状态切换到 NULL 再释放，避免 GStreamer 在 PLAYING 状态析构元素
@@ -193,7 +194,7 @@ void GstreamRecorder::deinit()
         m_pipeline = nullptr;
     }
 
-    qDebug() << "GstreamRecorder deinitialized";
+    qCDebug(voiceNoteLog) << "GstreamRecorder deinitialized";
 }
 
 /**
@@ -225,14 +226,14 @@ void GstreamRecorder::GetGstState(int *state, int *pending)
  */
 bool GstreamRecorder::startRecord()
 {
-    qDebug() << "Starting recording...";
+    qCDebug(voiceNoteLog) << "Starting recording...";
     if (m_pipeline == nullptr && !createPipe()) {
-        qCritical() << "Failed to create pipeline for recording";
+        qCCritical(voiceNoteLog) << "Failed to create pipeline for recording";
         return false;
     }
 
     if (!m_format.isValid()) {
-        qDebug() << "Initializing audio format";
+        qCDebug(voiceNoteLog) << "Initializing audio format";
         initFormat();
     }
 
@@ -240,18 +241,18 @@ bool GstreamRecorder::startRecord()
     int pending = -1;
     GetGstState(&state, &pending);
     if (state == GST_STATE_PLAYING) {
-        qDebug() << "Pipeline already in playing state";
+        qCDebug(voiceNoteLog) << "Pipeline already in playing state";
         return true;
     } else if (state == GST_STATE_PAUSED) {
-        qDebug() << "Resuming from paused state";
+        qCDebug(voiceNoteLog) << "Resuming from paused state";
         gst_element_set_state(m_pipeline, GST_STATE_PLAYING);
         return true;
     }
     if (gst_element_set_state(m_pipeline, GST_STATE_PLAYING) == GST_STATE_CHANGE_FAILURE) {
-        qCritical() << "Failed to set pipeline to playing state";
+        qCCritical(voiceNoteLog) << "Failed to set pipeline to playing state";
         return false;
     }
-    qDebug() << "Recording started successfully";
+    qCDebug(voiceNoteLog) << "Recording started successfully";
     return true;
 }
 
@@ -261,32 +262,32 @@ bool GstreamRecorder::startRecord()
 void GstreamRecorder::stopRecord()
 {
     if (m_pipeline) {
-        qDebug() << "Stopping recording...";
+        qCDebug(voiceNoteLog) << "Stopping recording...";
         
         // 获取当前管道状态
         int state = -1;
         int pending = -1;
         GetGstState(&state, &pending);
-        qDebug() << "Current pipeline state:" << state << "pending:" << pending;
+        qCDebug(voiceNoteLog) << "Current pipeline state:" << state << "pending:" << pending;
         
         // 如果管道处于暂停状态，需要先恢复播放才能正确处理EOS事件
         // 否则EOS事件无法传播到下游元素，会导致无限等待
         if (state == GST_STATE_PAUSED) {
-            qDebug() << "Pipeline is paused, resuming to playing state for proper EOS handling";
+            qCDebug(voiceNoteLog) << "Pipeline is paused, resuming to playing state for proper EOS handling";
             gst_element_set_state(m_pipeline, GST_STATE_PLAYING);
             
             // 等待状态转换完成
             GstStateChangeReturn ret = gst_element_get_state(m_pipeline, nullptr, nullptr, GST_SECOND);
             if (ret == GST_STATE_CHANGE_FAILURE) {
-                qWarning() << "Failed to resume pipeline from paused state";
+                qCWarning(voiceNoteLog) << "Failed to resume pipeline from paused state";
             } else {
-                qDebug() << "Successfully resumed pipeline from paused state";
+                qCDebug(voiceNoteLog) << "Successfully resumed pipeline from paused state";
             }
         }
         
         // 发送EOS事件并等待其处理完成，确保所有数据都被正确写入文件
         // 这样可以避免录音数据丢失或文件损坏的问题
-        qDebug() << "Sending EOS event to pipeline";
+        qCDebug(voiceNoteLog) << "Sending EOS event to pipeline";
         gst_element_send_event(m_pipeline, gst_event_new_eos());
         
         GstBus *bus = gst_element_get_bus(m_pipeline);
@@ -295,10 +296,10 @@ void GstreamRecorder::stopRecord()
             GstClockTime timeout = 5 * GST_SECOND;
             GstMessage *msg = gst_bus_timed_pop_filtered(bus, timeout, GST_MESSAGE_EOS);
             if (msg) {
-                qDebug() << "Received EOS message successfully";
+                qCDebug(voiceNoteLog) << "Received EOS message successfully";
                 gst_message_unref(msg);
             } else {
-                qWarning() << "Timeout waiting for EOS message, proceeding anyway";
+                qCWarning(voiceNoteLog) << "Timeout waiting for EOS message, proceeding anyway";
             }
             gst_object_unref(bus);
         }
@@ -313,7 +314,7 @@ void GstreamRecorder::stopRecord()
  */
 void GstreamRecorder::pauseRecord()
 {
-    qDebug() << "Pausing recording...";
+    qCDebug(voiceNoteLog) << "Pausing recording...";
     if (m_pipeline != nullptr) {
         int state = -1;
         int pending = -1;
@@ -321,7 +322,7 @@ void GstreamRecorder::pauseRecord()
 
         if (state == GST_STATE_PLAYING) {
             gst_element_set_state(m_pipeline, GST_STATE_PAUSED);
-            qDebug() << "Recording paused";
+            qCDebug(voiceNoteLog) << "Recording paused";
         }
     }
 }
@@ -333,7 +334,7 @@ void GstreamRecorder::pauseRecord()
 void GstreamRecorder::setDevice(const QString &device)
 {
     if (device != m_currentDevice) {
-        qDebug() << "Changing audio device from" << m_currentDevice << "to" << device;
+        qCDebug(voiceNoteLog) << "Changing audio device from" << m_currentDevice << "to" << device;
         m_currentDevice = device;
         if (m_pipeline != nullptr) {
             GstElement *audioSrc = gst_bin_get_by_name(reinterpret_cast<GstBin *>(m_pipeline), "audioSrc");
@@ -348,16 +349,16 @@ void GstreamRecorder::setDevice(const QString &device)
  */
 void GstreamRecorder::setOutputFile(const QString &path)
 {
-    qDebug() << "Setting output file to:" << path;
+    qCDebug(voiceNoteLog) << "Setting output file to:" << path;
     
     // 如果管道已存在且要设置不同的输出文件，必须销毁旧管道
     if (m_pipeline != nullptr && m_outputFile != path) {
-        qDebug() << "=== Pipeline Reuse Fix === Detected new output file, destroying old pipeline";
-        qDebug() << "Previous output file:" << m_outputFile; 
-        qDebug() << "New output file:" << path;
+        qCDebug(voiceNoteLog) << "=== Pipeline Reuse Fix === Detected new output file, destroying old pipeline";
+        qCDebug(voiceNoteLog) << "Previous output file:" << m_outputFile; 
+        qCDebug(voiceNoteLog) << "New output file:" << path;
         
         // 销毁旧管道以避免filesink location修改问题
-        qDebug() << "Destroying existing pipeline to avoid filesink location modification";
+        qCDebug(voiceNoteLog) << "Destroying existing pipeline to avoid filesink location modification";
 
         // 完成了正常的 EOS 处理和文件写入，这里只做快速清理：
         // 确保管道处于 NULL 状态后再 unref，避免 GStreamer 在 PLAYING 状态析构元素。
@@ -366,11 +367,11 @@ void GstreamRecorder::setOutputFile(const QString &path)
             objectUnref(m_pipeline);
             m_pipeline = nullptr;
         }
-        qDebug() << "Old pipeline destroyed, will create new pipeline for next recording";
+        qCDebug(voiceNoteLog) << "Old pipeline destroyed, will create new pipeline for next recording";
     } else if (m_pipeline != nullptr) {
-        qDebug() << "Pipeline exists but output file is same, no need to rebuild";
+        qCDebug(voiceNoteLog) << "Pipeline exists but output file is same, no need to rebuild";
     } else {
-        qDebug() << "Pipeline does not exist, will create new one on next recording";
+        qCDebug(voiceNoteLog) << "Pipeline does not exist, will create new one on next recording";
     }
     
     // 更新输出文件路径
@@ -394,14 +395,14 @@ bool GstreamRecorder::doBusMessage(GstMessage *message)
         gst_message_parse_error(message, &error, &dbg);
 
         if (dbg) {
-            qDebug() << "Debug info:" << dbg;
+            qCDebug(voiceNoteLog) << "Debug info:" << dbg;
             g_free(dbg);
         }
 
         if (error) {
             QString errMsg = error->message;
             emit errorMsg(errMsg);
-            qCritical() << "Pipeline error:" << errMsg;
+            qCCritical(voiceNoteLog) << "Pipeline error:" << errMsg;
             g_error_free(error);
         }
         break;
@@ -430,7 +431,7 @@ bool GstreamRecorder::doBufferProbe(GstBuffer *buffer)
             data = QByteArray(reinterpret_cast<const char *>(info.data),
                               static_cast<int>(info.size));
             gst_buffer_unmap(buffer, &info);
-            qDebug() << "Processed audio buffer at position:" << position << "ms, size:" << data.size() << "bytes";
+            qCDebug(voiceNoteLog) << "Processed audio buffer at position:" << position << "ms, size:" << data.size() << "bytes";
         } else {
             return true;
         }
@@ -464,7 +465,7 @@ void GstreamRecorder::bufferProbed()
  */
 void GstreamRecorder::setStateToNull()
 {
-    qDebug() << "Setting pipeline state to NULL...";
+    qCDebug(voiceNoteLog) << "Setting pipeline state to NULL...";
     GstState cur_state = GST_STATE_NULL, pending = GST_STATE_NULL;
     gst_element_get_state(m_pipeline, &cur_state, &pending, 0);
     if (cur_state == GST_STATE_NULL) {
@@ -476,7 +477,7 @@ void GstreamRecorder::setStateToNull()
     gst_element_set_state(m_pipeline, GST_STATE_READY);
     gst_element_get_state(m_pipeline, nullptr, nullptr, static_cast<GstClockTime>(-1));
     gst_element_set_state(m_pipeline, GST_STATE_NULL);
-    qDebug() << "Pipeline state set to NULL";
+    qCDebug(voiceNoteLog) << "Pipeline state set to NULL";
 }
 
 /**
@@ -484,7 +485,7 @@ void GstreamRecorder::setStateToNull()
  */
 void GstreamRecorder::initFormat()
 {
-    qDebug() << "Initializing audio format...";
+    qCDebug(voiceNoteLog) << "Initializing audio format...";
     //通道，采样率
     m_format.setChannelCount(2);
     m_format.setSampleRate(44100);
@@ -497,7 +498,7 @@ void GstreamRecorder::initFormat()
 #else
     m_format.setSampleFormat(QAudioFormat::Int16);
 #endif
-    qDebug() << "Audio format initialized:"
+    qCDebug(voiceNoteLog) << "Audio format initialized:"
              << "\n  - Channels:" << m_format.channelCount()
              << "\n  - Sample rate:" << m_format.sampleRate()
 #ifdef USE_QT5

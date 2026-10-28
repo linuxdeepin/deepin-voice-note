@@ -1,4 +1,5 @@
 #include "recording_curves.h"
+#include "ddlog.h"
 
 #include <QPainter>
 #include <cmath>
@@ -10,62 +11,62 @@ RecordingCurves::RecordingCurves(QQuickItem *parent)
     : QQuickPaintedItem(parent)
     , m_timer(new QTimer(this))
 {
-    qInfo() << "RecordingCurves constructor called";
+    qCInfo(voiceNoteLog) << "RecordingCurves constructor called";
     m_timer->setInterval(1000 / 45);
     connect(m_timer, &QTimer::timeout, this, &RecordingCurves::updateCurves);
-    qInfo() << "RecordingCurves constructor finished";
+    qCInfo(voiceNoteLog) << "RecordingCurves constructor finished";
 }
 
 RecordingCurves::~RecordingCurves()
 {
-    // qInfo() << "RecordingCurves destructor called";
+    // qCInfo(voiceNoteLog) << "RecordingCurves destructor called";
 }
 
 void RecordingCurves::updateVolume(const double &gain)
 {
-    // qInfo() << "updateVolume called with gain:" << gain;
+    // qCInfo(voiceNoteLog) << "updateVolume called with gain:" << gain;
     m_gain = gain;
     update();
-    // qInfo() << "updateVolume finished";
+    // qCInfo(voiceNoteLog) << "updateVolume finished";
 }
 
 void RecordingCurves::startRecording()
 {
-    qInfo() << "startRecording called";
+    qCInfo(voiceNoteLog) << "startRecording called";
     m_recordingActive = true;
     m_timer->start();
-    qInfo() << "startRecording finished";
+    qCInfo(voiceNoteLog) << "startRecording finished";
 }
 
 void RecordingCurves::stopRecording()
 {
-    qInfo() << "stopRecording called";
+    qCInfo(voiceNoteLog) << "stopRecording called";
     m_recordingActive = false;
     m_timer->stop();
     m_phase = 0.0;
     m_gain = 0.0;  // 添加这一行，重置增益为0
     update();
-    qInfo() << "stopRecording finished";
+    qCInfo(voiceNoteLog) << "stopRecording finished";
 }
 
 void RecordingCurves::pauseRecording()
 {
-    qInfo() << "pauseRecording called, timer active:" << m_timer->isActive();
+    qCInfo(voiceNoteLog) << "pauseRecording called, timer active:" << m_timer->isActive();
     // 仅在录音流程中生效：未 startRecording 或已 stopRecording 时忽略，
     // 避免暂停接口在非录制态误启动定时器；录制中保持暂停/恢复切换语义
     if (!m_recordingActive) {
-        qInfo() << "pauseRecording ignored: recording is not active";
+        qCInfo(voiceNoteLog) << "pauseRecording ignored: recording is not active";
         return;
     }
     if (m_timer->isActive()) {
         m_gain = 0.0;
         m_timer->stop();
-        qInfo() << "Recording paused";
+        qCInfo(voiceNoteLog) << "Recording paused";
     } else {
         m_timer->start();
-        qInfo() << "Recording resumed";
+        qCInfo(voiceNoteLog) << "Recording resumed";
     }
-    qInfo() << "pauseRecording finished";
+    qCInfo(voiceNoteLog) << "pauseRecording finished";
 }
 
 bool RecordingCurves::isRecordingActive() const
@@ -75,17 +76,17 @@ bool RecordingCurves::isRecordingActive() const
 
 void RecordingCurves::updateCurves()
 {
-    // qInfo() << "updateCurves called";
+    // qCInfo(voiceNoteLog) << "updateCurves called";
     m_phase += M_PI;
     if (m_phase > 170*M_PI)
         m_phase = 0;
     update();
-    // qInfo() << "updateCurves finished";
+    // qCInfo(voiceNoteLog) << "updateCurves finished";
 }
 
 void RecordingCurves::paint(QPainter *painter)
 {
-    // qInfo() << "paint called";
+    // qCInfo(voiceNoteLog) << "paint called";
     painter->setRenderHint(QPainter::Antialiasing);
 
     auto rect = boundingRect();
@@ -133,5 +134,5 @@ void RecordingCurves::paint(QPainter *painter)
     painter->setPen(QPen(QBrush(gradient), 1));
 #endif
     painter->drawPolyline(points.constData(), points.size());
-    // qInfo() << "paint finished";
+    // qCInfo(voiceNoteLog) << "paint finished";
 }
