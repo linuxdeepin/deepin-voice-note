@@ -4,6 +4,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "common/vnotedatamanager.h"
+#include "common/logger.h"
+#include "ddlog.h"
 #include "common/VNoteMainManager.h"
 #include "common/jscontent.h"
 #include "common/imageprovider.h"
@@ -50,20 +52,34 @@ static void activateExistingInstanceViaDBus()
                          "org.deepin.voicenote",
                          QDBusConnection::sessionBus());
     if (iface.isValid()) {
-        qInfo() << "Calling ActivateWindow on existing instance via D-Bus";
+        qCInfo(voiceNoteLog) << "Calling ActivateWindow on existing instance via D-Bus";
         iface.asyncCall("ActivateWindow");
     } else {
-        qWarning() << "D-Bus interface not available:" << QDBusConnection::sessionBus().lastError().message();
+        qCWarning(voiceNoteLog) << "D-Bus interface not available:" << QDBusConnection::sessionBus().lastError().message();
     }
 }
 
 int main(int argc, char *argv[])
 {
+    // set log format and register console and journal appenders
+    // （参考 deepin-reader：日志格式中包含分类，便于按分类观察日志级别切换）
+    const QString logFormat = "%{time}{yy-MM-ddTHH:mm:ss.zzz} [%{type:-7}] [%{category}] <%{function}:%{line}> %{message}";
+    DLogManager::setLogFormat(logFormat);
+#if (DTK_VERSION >= DTK_VERSION_CHECK(5, 6, 8, 0))
+    DLogManager::registerJournalAppender();
+#endif
+    DLogManager::registerConsoleAppender();
+
+    // 动态日志规则监听必须放在最前面（任何日志打印、DApplication 创建之前）：
+    // 先读取并清除 QT_LOGGING_RULES 环境变量，再应用 DConfig log_rules，
+    // 并监听 DConfig 变更实现运行中动态调整日志级别。
+    MLogger logger;
+
 #ifdef __mips64
     // MIPS64 特殊处理：设置环境变量以避免 DTK 配置系统的线程问题
     qputenv("DTK_DISABLE_DCONFIG_CACHE", "1");
     qputenv("DTK_FORCE_SYNC_DCONFIG", "1");
-    qDebug() << "MIPS64: Applied DTK configuration workarounds";
+    qCDebug(voiceNoteLog) << "MIPS64: Applied DTK configuration workarounds";
 #endif
 
 #ifdef __sw_64__
@@ -72,14 +88,17 @@ int main(int argc, char *argv[])
 
     DApplication *app = new DApplication(argc, argv);
 
-    qInfo() << "Starting deepin-voice-note application...";
+    // register file appender must after Application instance created
+    DLogManager::registerFileAppender();
+
+    qCInfo(voiceNoteLog) << "Starting deepin-voice-note application...";
     
 #ifdef __mips64
     // MIPS64: 延迟单实例检查，避免早期的线程问题
     QTimer::singleShot(100, [app]() {
         DGuiApplicationHelper::instance()->setSingleInstanceInterval(-1);
         if (!DGuiApplicationHelper::instance()->setSingleInstance(app->applicationName(), DGuiApplicationHelper::UserScope)) {
-            qWarning() << "Another instance of deepin-voice-note is already running";
+            qCWarning(voiceNoteLog) << "Another instance of deepin-voice-note is already running";
             activateExistingInstanceViaDBus();
             QCoreApplication::exit(0);
         }
@@ -87,7 +106,7 @@ int main(int argc, char *argv[])
 #else
     DGuiApplicationHelper::instance()->setSingleInstanceInterval(-1);
     if (!DGuiApplicationHelper::instance()->setSingleInstance(app->applicationName(), DGuiApplicationHelper::UserScope)) {
-        qWarning() << "Another instance of deepin-voice-note is already running";
+        qCWarning(voiceNoteLog) << "Another instance of deepin-voice-note is already running";
         activateExistingInstanceViaDBus();
         return 0;
     }
@@ -99,7 +118,7 @@ int main(int argc, char *argv[])
     app->setOrganizationName("deepin");
     app->setApplicationName("deepin-voice-note");
     app->setApplicationVersion(VERSION);
-    qInfo() << "Application initialized with version:" << VERSION;
+    qCInfo(voiceNoteLog) << "Application initialized with version:" << VERSION;
 
 #ifndef NDEBUG
     qputenv("QTWEBENGINE_REMOTE_DEBUGGING", "7777");
@@ -107,7 +126,7 @@ int main(int argc, char *argv[])
     VNoteMainManager::instance()->initQMLRegister();
     
     ImageProvider *imageProvider = ImageProvider::instance();
-    qInfo() << "QML types initialized successfully";
+    qCInfo(voiceNoteLog) << "QML types initialized successfully";
 
     app->loadTranslator();
     app->setApplicationDisplayName(QObject::tr("deepin-voice-note"));
@@ -122,7 +141,7 @@ int main(int argc, char *argv[])
         app,
         [url](QObject *obj, const QUrl &objUrl) {
             if (!obj && url == objUrl) {
-                qCritical() << "Failed to create QML object from URL:" << url.toString();
+                qCCritical(voiceNoteLog) << "Failed to create QML object from URL:" << url.toString();
                 QCoreApplication::exit(-1);
             }
         },
@@ -138,19 +157,17 @@ int main(int argc, char *argv[])
             rootWindow->requestActivate();
         }
     }
-    qInfo() << "QML engine loaded successfully";
+    qCInfo(voiceNoteLog) << "QML engine loaded successfully";
 
     // Tiptap 已作为默认富文本编辑器，默认执行存量 Summernote 数据迁移。
     // 如需临时回退旧编辑器，可显式设置 DVN_TIPTAP_DISABLE=1。
     if (TiptapChannelBridge::instance()->tiptapEnabled()) {
         MigrationViewController::instance()->start();
     } else {
-        qInfo() << "Tiptap migration skipped because Tiptap is disabled by environment";
+        qCInfo(voiceNoteLog) << "Tiptap migration skipped because Tiptap is disabled by environment";
     }
 
-    DLogManager::registerConsoleAppender();
-    DLogManager::registerFileAppender();
-    qInfo() << "Log system initialized";
+    qCInfo(voiceNoteLog) << "Log system initialized";
 
     return app->exec();
 }
