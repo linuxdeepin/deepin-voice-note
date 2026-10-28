@@ -290,6 +290,7 @@ Item {
         Accessible.name: "FolderDragControl"
         Accessible.role: Accessible.Pane
         id: dragControl
+        parent: root.Window.window ? root.Window.window.contentItem : root
 
     }
 
@@ -664,7 +665,6 @@ Item {
 
                 acceptedButtons: Qt.LeftButton | Qt.RightButton
                 anchors.fill: parent
-                drag.target: this
                 enabled: parent.enabled
                 hoverEnabled: true
 
@@ -735,8 +735,9 @@ Item {
                         var globPos = mapToGlobal(mouse.x, mouse.y);
                         dragControl.itemNumber = 1;
                         dragControl.visible = true;
-                        dragControl.x = globPos.x;
-                        dragControl.y = globPos.y;
+                        var dragPos = dragControl.parent.mapFromGlobal(globPos.x, globPos.y);
+                        dragControl.x = dragPos.x;
+                        dragControl.y = dragPos.y;
                         folderListView.indexAt(globPos.x, globPos.y);
                         mouseChanged(globPos.x, globPos.y);
                     } else {
@@ -744,11 +745,15 @@ Item {
                     }
                 }
                 onPressed: function(mouse) {
+                    if (mouse.button === Qt.LeftButton && Window.window)
+                        Window.window.listPointerDown = true;
                     startMove[0] = mouse.x;
                     startMove[1] = mouse.y;
                     folderListView.dragSourceFolderId = model.folderId;
                 }
                 onReleased: {
+                    if (Window.window)
+                        Window.window.listPointerDown = false;
                     startMove = [-1, -1];
                     if (held) {
                         held = false;
@@ -783,6 +788,8 @@ Item {
                     }
                 }
                 onCanceled: {
+                    if (Window.window)
+                        Window.window.listPointerDown = false;
                     startMove = [-1, -1];
                     held = false;
                     folderListView.clearDragState();

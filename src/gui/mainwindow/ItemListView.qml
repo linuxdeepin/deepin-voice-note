@@ -390,6 +390,7 @@ Item {
         Accessible.role: Accessible.Pane
 
         id: dragControl
+        parent: rootItem.Window.window ? rootItem.Window.window.contentItem : rootItem
 
     }
 
@@ -1062,7 +1063,6 @@ Item {
 
                 acceptedButtons: Qt.LeftButton | Qt.RightButton
                 anchors.fill: parent
-                drag.target: this
                 hoverEnabled: true
 
                 onClicked: {
@@ -1177,18 +1177,23 @@ Item {
                         dragControl.itemNumber = validIndexes.length;
                         dragControl.itemText = itemModel.get(validIndexes[0]).name;
                         dragControl.visible = true;
-                        dragControl.x = globPos.x;
-                        dragControl.y = globPos.y;
+                        var dragPos = dragControl.parent.mapFromGlobal(globPos.x, globPos.y);
+                        dragControl.x = dragPos.x;
+                        dragControl.y = dragPos.y;
                         mouseChanged(globPos.x, globPos.y);
                     } else {
                         dragControl.visible = false;
                     }
                 }
                 onPressed: function(mouse) {
+                    if (mouse.button === Qt.LeftButton && Window.window)
+                        Window.window.listPointerDown = true;
                     startMove[0] = mouse.x;
                     startMove[1] = mouse.y;
                 }
                 onReleased: function(mouse) {
+                    if (Window.window)
+                        Window.window.listPointerDown = false;
                     if (isRecordingAudio || isPlay) {
                         startMove = [-1, -1];
                         held = false;
@@ -1199,6 +1204,13 @@ Item {
                     if (held && dragControl.visible && mouse.button === Qt.LeftButton) {
                         dropRelease();
                     }
+                    held = false;
+                    dragControl.visible = false;
+                }
+                onCanceled: {
+                    if (Window.window)
+                        Window.window.listPointerDown = false;
+                    startMove = [-1, -1];
                     held = false;
                     dragControl.visible = false;
                 }

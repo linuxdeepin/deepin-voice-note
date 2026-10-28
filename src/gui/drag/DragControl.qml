@@ -1,9 +1,8 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
-import QtQuick.Window 2.15
 import org.deepin.dtk 1.0
 
-Window {
+Item {
     property int folderItemWidth: 200
     property var imageSource: ""
     property bool isFolder: false
@@ -13,13 +12,10 @@ Window {
     property var itemText: ""
     property int noteItemWidth: 240
 
-    color: "transparent"
-    // color: "green"
-    //设置无标题栏
-    flags: Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint | Qt.WindowDoesNotAcceptFocus | Qt.WindowTransparentForInput
     height: 100
     visible: false
     width: 300
+    z: 10000
 
     Rectangle {
         id: rect2
