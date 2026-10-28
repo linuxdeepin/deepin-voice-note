@@ -1,11 +1,12 @@
 #include "qtplayer.h"
+#include "ddlog.h"
 
 #include <QDebug>
 
 QtPlayer::QtPlayer(QObject *parent)
     : VoicePlayerBase(parent)
 {
-    qInfo() << "Initializing QtPlayer";
+    qCInfo(voiceNoteLog) << "Initializing QtPlayer";
     m_player = new QMediaPlayer(this);
     
 #ifdef USE_QT5
@@ -22,22 +23,22 @@ QtPlayer::QtPlayer(QObject *parent)
 
 QtPlayer::~QtPlayer()
 {
-    qDebug() << "Destroying QtPlayer";
+    qCDebug(voiceNoteLog) << "Destroying QtPlayer";
     if (m_player) {
         delete m_player;
         m_player = nullptr;
-        qDebug() << "Media player deleted";
+        qCDebug(voiceNoteLog) << "Media player deleted";
     }
     if (m_audioOutput) {
         delete m_audioOutput;
         m_audioOutput = nullptr;
-        qDebug() << "Audio output deleted";
+        qCDebug(voiceNoteLog) << "Audio output deleted";
     }
 }
 
 void QtPlayer::setFilePath(QString path)
 {
-    qDebug() << "Setting media file path:" << path;
+    qCDebug(voiceNoteLog) << "Setting media file path:" << path;
 #ifdef USE_QT5
     // Qt5 版本使用 setMedia
     m_player->setMedia(QUrl(path));
@@ -72,7 +73,7 @@ VoicePlayerBase::PlayerState QtPlayer::getState()
     VoicePlayerBase::PlayerState state = VoicePlayerBase::None;
     QMediaPlayer::MediaStatus mediaState = m_player->mediaStatus();
     if (mediaState == QMediaPlayer::EndOfMedia) {
-        qDebug() << "Media playback reached end";
+        qCDebug(voiceNoteLog) << "Media playback reached end";
         return VoicePlayerBase::PlayerState::Ended;
     }
     
@@ -82,18 +83,18 @@ VoicePlayerBase::PlayerState QtPlayer::getState()
     switch(playState) {
     case QMediaPlayer::PlayingState:
         state = VoicePlayerBase::PlayerState::Playing;
-        qDebug() << "Player state: Playing";
+        qCDebug(voiceNoteLog) << "Player state: Playing";
         break;
     case QMediaPlayer::PausedState:
         state = VoicePlayerBase::PlayerState::Paused;
-        qDebug() << "Player state: Paused";
+        qCDebug(voiceNoteLog) << "Player state: Paused";
         break;
     case QMediaPlayer::StoppedState:
         state = VoicePlayerBase::PlayerState::Stopped;
-        qDebug() << "Player state: Stopped";
+        qCDebug(voiceNoteLog) << "Player state: Stopped";
         break;
     default:
-        qDebug() << "Player state: Unknown";
+        qCDebug(voiceNoteLog) << "Player state: Unknown";
         break;
     }
 #else
@@ -102,18 +103,18 @@ VoicePlayerBase::PlayerState QtPlayer::getState()
     switch(playState) {
     case QMediaPlayer::PlayingState:
         state = VoicePlayerBase::PlayerState::Playing;
-        qDebug() << "Player state: Playing";
+        qCDebug(voiceNoteLog) << "Player state: Playing";
         break;
     case QMediaPlayer::PausedState:
         state = VoicePlayerBase::PlayerState::Paused;
-        qDebug() << "Player state: Paused";
+        qCDebug(voiceNoteLog) << "Player state: Paused";
         break;
     case QMediaPlayer::StoppedState:
         state = VoicePlayerBase::PlayerState::Stopped;
-        qDebug() << "Player state: Stopped";
+        qCDebug(voiceNoteLog) << "Player state: Stopped";
         break;
     default:
-        qDebug() << "Player state: Unknown";
+        qCDebug(voiceNoteLog) << "Player state: Unknown";
         break;
     }
 #endif
@@ -125,9 +126,9 @@ void QtPlayer::initConnection()
     connect(m_player, &QMediaPlayer::durationChanged, this, &QtPlayer::durationChanged);
     connect(m_player, &QMediaPlayer::positionChanged, this, &QtPlayer::positionChanged);
     connect(m_player, &QMediaPlayer::mediaStatusChanged, [=](QMediaPlayer::MediaStatus status){
-        qDebug() << "Media status changed:" << status;
+        qCDebug(voiceNoteLog) << "Media status changed:" << status;
         if (status == QMediaPlayer::EndOfMedia) {
-            qDebug() << "Emitting playEnd signal";
+            qCDebug(voiceNoteLog) << "Emitting playEnd signal";
             emit playEnd();
         }
     });

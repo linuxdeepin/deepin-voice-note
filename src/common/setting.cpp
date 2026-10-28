@@ -1,9 +1,10 @@
-// Copyright (C) 2019 ~ 2019 UnionTech Software Technology Co.,Ltd.
-// SPDX-FileCopyrightText: 2023 UnionTech Software Technology Co., Ltd.
+// Copyright (C) 2019-2026 UnionTech Software Technology Co.,Ltd.
+// SPDX-FileCopyrightText: 2023-2026 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "setting.h"
+#include "ddlog.h"
 
 #include <DSettingsOption>
 #include <DApplication>
@@ -21,12 +22,12 @@ DWIDGET_USE_NAMESPACE
  */
 void GenerateSettingTranslate()
 {
-    qInfo() << "Generating setting translations";
+    qCInfo(voiceNoteLog) << "Generating setting translations";
     auto basic = DApplication::translate("Setting", "Basic");
     auto audio_source = DApplication::translate("Setting", "Audio Source");
     auto audio_internal = DApplication::translate("Setting", "Internal");
     auto audio_micphone = DApplication::translate("Setting", "Microphone");
-    qInfo() << "Setting translations generated";
+    qCInfo(voiceNoteLog) << "Setting translations generated";
 }
 
 /**
@@ -37,9 +38,9 @@ void GenerateSettingTranslate()
 CustemBackend::CustemBackend(const QString &filepath, QObject *parent)
     : DSettingsBackend(parent)
 {
-    qInfo() << "CustemBackend constructor called with filepath:" << filepath;
+    qCInfo(voiceNoteLog) << "CustemBackend constructor called with filepath:" << filepath;
     m_settings = new QSettings(filepath, QSettings::IniFormat);
-    qInfo() << "CustemBackend constructor finished";
+    qCInfo(voiceNoteLog) << "CustemBackend constructor finished";
 }
 
 /**
@@ -58,14 +59,14 @@ CustemBackend::~CustemBackend()
  */
 QStringList CustemBackend::keys() const
 {
-    qInfo() << "Getting all keys from settings";
+    qCInfo(voiceNoteLog) << "Getting all keys from settings";
     QStringList keyList = m_settings->allKeys();
     for (auto &it : keyList) {
         if (it.indexOf('.') == -1) {
             it.insert(0, "old.");
         }
     }
-    qInfo() << "Keys retrieval finished, count:" << keyList.size();
+    qCInfo(voiceNoteLog) << "Keys retrieval finished, count:" << keyList.size();
     return keyList;
 }
 
@@ -76,14 +77,14 @@ QStringList CustemBackend::keys() const
  */
 QVariant CustemBackend::getOption(const QString &key) const
 {
-    qInfo() << "Getting option for key:" << key;
+    qCInfo(voiceNoteLog) << "Getting option for key:" << key;
     QVariant value;
     if (key.startsWith("old.")) {
         value = m_settings->value(key.right(key.length() - 4));
     } else {
         value = m_settings->value(key);
     }
-    qInfo() << "Option retrieval finished for key:" << key;
+    qCInfo(voiceNoteLog) << "Option retrieval finished for key:" << key;
     return value;
 }
 
@@ -92,9 +93,9 @@ QVariant CustemBackend::getOption(const QString &key) const
  */
 void CustemBackend::doSync()
 {
-    qInfo() << "Syncing settings";
+    qCInfo(voiceNoteLog) << "Syncing settings";
     m_settings->sync();
-    qInfo() << "Settings sync finished";
+    qCInfo(voiceNoteLog) << "Settings sync finished";
 }
 
 /**
@@ -104,7 +105,7 @@ void CustemBackend::doSync()
  */
 void CustemBackend::doSetOption(const QString &key, const QVariant &value)
 {
-    qInfo() << "Setting option, key:" << key << "value:" << value;
+    qCInfo(voiceNoteLog) << "Setting option, key:" << key << "value:" << value;
     m_writeLock.lock();
     if (key.startsWith("old.")) {
         m_settings->setValue(key.right(key.length() - 4), value);
@@ -113,7 +114,7 @@ void CustemBackend::doSetOption(const QString &key, const QVariant &value)
     }
     m_settings->sync();
     m_writeLock.unlock();
-    qInfo() << "Option setting finished for key:" << key;
+    qCInfo(voiceNoteLog) << "Option setting finished for key:" << key;
 }
 
 /**
@@ -122,7 +123,7 @@ void CustemBackend::doSetOption(const QString &key, const QVariant &value)
  */
 setting::setting()
 {
-    qInfo() << "Setting constructor called";
+    qCInfo(voiceNoteLog) << "Setting constructor called";
     QString vnoteConfigBasePath =
         QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
 
@@ -135,7 +136,7 @@ setting::setting()
     m_backend = new CustemBackend(configDir.filePath() + QString("config.conf"), this);
     m_setting = DSettings::fromJsonFile(":/deepin-voice-note-setting.json");
     m_setting->setBackend(m_backend);
-    qInfo() << "Setting constructor finished";
+    qCInfo(voiceNoteLog) << "Setting constructor finished";
 }
 
 /**
