@@ -4,6 +4,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "vnoteforlder.h"
+#include "ddlog.h"
 #include "common/vnotedatamanager.h"
 #include "db/vnoteitemoper.h"
 #include <QDebug>
@@ -15,7 +16,7 @@
  */
 VNoteFolder::VNoteFolder()
 {
-    qInfo() << "VNoteFolder constructor called";
+    qCInfo(voiceNoteLog) << "VNoteFolder constructor called";
 }
 
 /**
@@ -58,13 +59,13 @@ qint32 VNoteFolder::getNotesCount()
     VNOTE_ITEMS_MAP *folderNotes = getNotes();
 
     if (Q_LIKELY(nullptr != folderNotes)) {
-        qInfo() << "folderNotes is not nullptr";
+        qCInfo(voiceNoteLog) << "folderNotes is not nullptr";
         folderNotes->lock.lockForRead();
         nCount = folderNotes->folderNotes.count();
         folderNotes->lock.unlock();
     }
 
-    qInfo() << "Notes count retrieval finished, count:" << nCount;
+    qCInfo(voiceNoteLog) << "Notes count retrieval finished, count:" << nCount;
     return nCount;
 }
 
@@ -74,13 +75,13 @@ qint32 VNoteFolder::getNotesCount()
  */
 VNOTE_ITEMS_MAP *VNoteFolder::getNotes()
 {
-    qInfo() << "Getting notes";
+    qCInfo(voiceNoteLog) << "Getting notes";
     if (Q_UNLIKELY(nullptr == notes)) {
-        qInfo() << "notes is nullptr";
+        qCInfo(voiceNoteLog) << "notes is nullptr";
         VNOTE_ITEMS_MAP *folderNotes = VNoteDataManager::instance()->getFolderNotes(id);
         notes = folderNotes;
     }
 
-    qInfo() << "Notes retrieval finished";
+    qCInfo(voiceNoteLog) << "Notes retrieval finished";
     return notes;
 }

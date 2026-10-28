@@ -4,6 +4,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "vnotedatamanager.h"
+#include "ddlog.h"
 #include "db/vnotedbmanager.h"
 #include "task/loadfolderworker.h"
 #include "task/loadnoteitemsworker.h"
@@ -25,7 +26,7 @@ VNoteDataManager *VNoteDataManager::_instance = nullptr;
 VNoteDataManager::VNoteDataManager(QObject *parent)
     : QObject(parent)
 {
-    qDebug() << "Initializing VNoteDataManager";
+    qCDebug(voiceNoteLog) << "Initializing VNoteDataManager";
 }
 
 /**
@@ -61,7 +62,7 @@ VNOTE_FOLDERS_MAP *VNoteDataManager::getNoteFolders()
  */
 VNoteFolder *VNoteDataManager::addFolder(VNoteFolder *folder)
 {
-    qDebug() << "Adding folder:" << (folder ? folder->id : -1);
+    qCDebug(voiceNoteLog) << "Adding folder:" << (folder ? folder->id : -1);
     VNoteFolder *retFlder = nullptr;
 
     if (nullptr != folder) {
@@ -71,9 +72,9 @@ VNoteFolder *VNoteDataManager::addFolder(VNoteFolder *folder)
 
         if (it == m_qspNoteFoldersMap->folders.end()) {
             m_qspNoteFoldersMap->folders.insert(folder->id, folder);
-            qDebug() << "New folder added with ID:" << folder->id;
+            qCDebug(voiceNoteLog) << "New folder added with ID:" << folder->id;
         } else {
-            qDebug() << "Replacing existing folder with ID:" << folder->id;
+            qCDebug(voiceNoteLog) << "Replacing existing folder with ID:" << folder->id;
             QScopedPointer<VNoteFolder> release(*it);
 
             m_qspNoteFoldersMap->folders.remove(folder->id);
@@ -84,7 +85,7 @@ VNoteFolder *VNoteDataManager::addFolder(VNoteFolder *folder)
 
         retFlder = folder;
     } else {
-        qWarning() << "Attempted to add null folder";
+        qCWarning(voiceNoteLog) << "Attempted to add null folder";
     }
 
     return retFlder;
@@ -97,7 +98,7 @@ VNoteFolder *VNoteDataManager::addFolder(VNoteFolder *folder)
  */
 VNoteFolder *VNoteDataManager::getFolder(qint64 folderId)
 {
-    qDebug() << "Getting folder with ID:" << folderId;
+    qCDebug(voiceNoteLog) << "Getting folder with ID:" << folderId;
     VNoteFolder *retFlder = nullptr;
 
     m_qspNoteFoldersMap->lock.lockForRead();
@@ -106,9 +107,9 @@ VNoteFolder *VNoteDataManager::getFolder(qint64 folderId)
 
     if (it != m_qspNoteFoldersMap->folders.end()) {
         retFlder = *it;
-        qDebug() << "Folder found with ID:" << folderId;
+        qCDebug(voiceNoteLog) << "Folder found with ID:" << folderId;
     } else {
-        qDebug() << "Folder not found with ID:" << folderId;
+        qCDebug(voiceNoteLog) << "Folder not found with ID:" << folderId;
     }
 
     m_qspNoteFoldersMap->lock.unlock();
@@ -123,7 +124,7 @@ VNoteFolder *VNoteDataManager::getFolder(qint64 folderId)
  */
 VNoteFolder *VNoteDataManager::delFolder(qint64 folderId)
 {
-    qDebug() << "Deleting folder with ID:" << folderId;
+    qCDebug(voiceNoteLog) << "Deleting folder with ID:" << folderId;
     VNoteFolder *retFlder = nullptr;
 
     m_qspNoteFoldersMap->lock.lockForWrite();
@@ -143,7 +144,7 @@ VNoteFolder *VNoteDataManager::delFolder(qint64 folderId)
             QScopedPointer<VNOTE_ITEMS_MAP> foldersMap(itemsMap);
 
             //Remove voice files in the folder
-            qDebug() << "Removing voice files for folder:" << folderId;
+            qCDebug(voiceNoteLog) << "Removing voice files for folder:" << folderId;
             for (auto it : foldersMap->folderNotes) {
                 it->delNoteData();
             }
@@ -154,9 +155,9 @@ VNoteFolder *VNoteDataManager::delFolder(qint64 folderId)
 
         retFlder = *itFolder;
         m_qspNoteFoldersMap->folders.erase(itFolder);
-        qDebug() << "Folder and associated notes deleted successfully";
+        qCDebug(voiceNoteLog) << "Folder and associated notes deleted successfully";
     } else {
-        qWarning() << "Folder not found for deletion:" << folderId;
+        qCWarning(voiceNoteLog) << "Folder not found for deletion:" << folderId;
     }
 
     m_qspNoteFoldersMap->lock.unlock();
@@ -173,7 +174,7 @@ qint32 VNoteDataManager::folderCount()
     m_qspNoteFoldersMap->lock.lockForRead();
     int count = m_qspNoteFoldersMap->folders.size();
     m_qspNoteFoldersMap->lock.unlock();
-    qDebug() << "Current folder count:" << count;
+    qCDebug(voiceNoteLog) << "Current folder count:" << count;
     return count;
 }
 
@@ -207,9 +208,9 @@ VNoteItem *VNoteDataManager::addNote(VNoteItem *note)
 
             if (noteIter == notesInFolder->folderNotes.end()) {
                 notesInFolder->folderNotes.insert(note->noteId, note);
-                qDebug() << "New note added with ID:" << note->noteId;
+                qCDebug(voiceNoteLog) << "New note added with ID:" << note->noteId;
             } else {
-                qDebug() << "Replacing existing note with ID:" << note->noteId;
+                qCDebug(voiceNoteLog) << "Replacing existing note with ID:" << note->noteId;
                 //Release old and insert new
                 QScopedPointer<VNoteItem> release(*noteIter);
 
@@ -219,7 +220,7 @@ VNoteItem *VNoteDataManager::addNote(VNoteItem *note)
 
             notesInFolder->lock.unlock();
         } else {
-            qInfo() << "Creating new folder for note, folder ID:" << note->folderId;
+            qCInfo(voiceNoteLog) << "Creating new folder for note, folder ID:" << note->folderId;
 
             VNOTE_ITEMS_MAP *folderNotes = new VNOTE_ITEMS_MAP();
 
@@ -234,7 +235,7 @@ VNoteItem *VNoteDataManager::addNote(VNoteItem *note)
 
         retNote = note;
     } else {
-        qWarning() << "Attempted to add null note";
+        qCWarning(voiceNoteLog) << "Attempted to add null note";
     }
 
     return retNote;
@@ -248,7 +249,7 @@ VNoteItem *VNoteDataManager::addNote(VNoteItem *note)
  */
 VNoteItem *VNoteDataManager::getNote(qint64 folderId, qint32 noteId)
 {
-    qDebug() << "Getting note from folder:" << folderId << "note ID:" << noteId;
+    qCDebug(voiceNoteLog) << "Getting note from folder:" << folderId << "note ID:" << noteId;
     VNoteItem *retNote = nullptr;
 
     m_qspAllNotesMap->lock.lockForRead();
@@ -271,14 +272,14 @@ VNoteItem *VNoteDataManager::getNote(qint64 folderId, qint32 noteId)
 
         if (noteIter != notesInFolder->folderNotes.end()) {
             retNote = *noteIter;
-            qDebug() << "Note found";
+            qCDebug(voiceNoteLog) << "Note found";
         } else {
-            qDebug() << "Note not found";
+            qCDebug(voiceNoteLog) << "Note not found";
         }
 
         notesInFolder->lock.unlock();
     } else {
-        qCritical() << "Folder not found for note retrieval:" << folderId;
+        qCCritical(voiceNoteLog) << "Folder not found for note retrieval:" << folderId;
     }
 
     m_qspAllNotesMap->lock.unlock();
@@ -294,7 +295,7 @@ VNoteItem *VNoteDataManager::getNote(qint64 folderId, qint32 noteId)
  */
 VNoteItem *VNoteDataManager::delNote(qint64 folderId, qint32 noteId)
 {
-    qDebug() << "Deleting note from folder:" << folderId << "note ID:" << noteId;
+    qCDebug(voiceNoteLog) << "Deleting note from folder:" << folderId << "note ID:" << noteId;
     VNoteItem *retNote = nullptr;
 
     m_qspAllNotesMap->lock.lockForWrite();
@@ -319,15 +320,15 @@ VNoteItem *VNoteDataManager::delNote(qint64 folderId, qint32 noteId)
             retNote = *noteIter;
             notesInFolder->folderNotes.erase(noteIter);
             //Remove voice file of voice note
-            qDebug() << "Note deleted, removing associated data";
+            qCDebug(voiceNoteLog) << "Note deleted, removing associated data";
             retNote->delNoteData();
         } else {
-            qDebug() << "Note not found for deletion";
+            qCDebug(voiceNoteLog) << "Note not found for deletion";
         }
 
         notesInFolder->lock.unlock();
     } else {
-        qCritical() << "Folder not found for note deletion:" << folderId;
+        qCCritical(voiceNoteLog) << "Folder not found for note deletion:" << folderId;
     }
 
     m_qspAllNotesMap->lock.unlock();
@@ -342,7 +343,7 @@ VNoteItem *VNoteDataManager::delNote(qint64 folderId, qint32 noteId)
  */
 qint32 VNoteDataManager::folderNotesCount(qint64 folderId)
 {
-    qDebug() << "Getting note count for folder:" << folderId;
+    qCDebug(voiceNoteLog) << "Getting note count for folder:" << folderId;
     qint32 notesCount = 0;
 
     VNOTE_ITEMS_MAP *folderNotes = getFolderNotes(folderId);
@@ -351,9 +352,9 @@ qint32 VNoteDataManager::folderNotesCount(qint64 folderId)
         folderNotes->lock.lockForRead();
         notesCount = folderNotes->folderNotes.count();
         folderNotes->lock.unlock();
-        qDebug() << "Folder contains" << notesCount << "notes";
+        qCDebug(voiceNoteLog) << "Folder contains" << notesCount << "notes";
     } else {
-        qDebug() << "Folder not found for note count";
+        qCDebug(voiceNoteLog) << "Folder not found for note count";
     }
 
     return notesCount;
@@ -366,7 +367,7 @@ qint32 VNoteDataManager::folderNotesCount(qint64 folderId)
  */
 VNOTE_ITEMS_MAP *VNoteDataManager::getFolderNotes(qint64 folderId)
 {
-    qDebug() << "Getting notes for folder:" << folderId;
+    qCDebug(voiceNoteLog) << "Getting notes for folder:" << folderId;
     VNOTE_ITEMS_MAP *folderNotes = nullptr;
 
     m_qspAllNotesMap->lock.lockForRead();
@@ -376,9 +377,9 @@ VNOTE_ITEMS_MAP *VNoteDataManager::getFolderNotes(qint64 folderId)
 
     if (it != m_qspAllNotesMap->notes.end()) {
         folderNotes = *it;
-        qDebug() << "Found existing folder notes";
+        qCDebug(voiceNoteLog) << "Found existing folder notes";
     } else {
-        qDebug() << "Creating new folder notes map";
+        qCDebug(voiceNoteLog) << "Creating new folder notes map";
         folderNotes = new VNOTE_ITEMS_MAP();
         folderNotes->autoRelease = true;
         m_qspAllNotesMap->notes.insert(folderId, folderNotes);
@@ -415,10 +416,10 @@ QPixmap VNoteDataManager::getDefaultIcon(qint32 index, IconsType type)
  */
 bool VNoteDataManager::isAllDatasReady() const
 {
-    qDebug() << "Checking data ready state:" << m_fDataState;
+    qCDebug(voiceNoteLog) << "Checking data ready state:" << m_fDataState;
     bool ready = ((m_fDataState & DataState::FolderDataReady)
                  && (m_fDataState & DataState::NotesDataReady));
-    qDebug() << "Data ready state:" << ready;
+    qCDebug(voiceNoteLog) << "Data ready state:" << ready;
     return ready;
 }
 
@@ -438,7 +439,7 @@ void VNoteDataManager::reqNoteDefIcons()
  */
 void VNoteDataManager::reqNoteFolders()
 {
-    qDebug() << "Requesting note folders";
+    qCDebug(voiceNoteLog) << "Requesting note folders";
     if (m_pForldesLoadThread == nullptr) {
         m_pForldesLoadThread = new LoadFolderWorker();
         m_pForldesLoadThread->setAutoDelete(true);
@@ -447,9 +448,9 @@ void VNoteDataManager::reqNoteFolders()
                 this, &VNoteDataManager::onFoldersLoaded);
 
         QThreadPool::globalInstance()->start(m_pForldesLoadThread);
-        qDebug() << "Folder load worker started";
+        qCDebug(voiceNoteLog) << "Folder load worker started";
     } else {
-        qDebug() << "Folder load already in progress";
+        qCDebug(voiceNoteLog) << "Folder load already in progress";
     }
 }
 
@@ -458,7 +459,7 @@ void VNoteDataManager::reqNoteFolders()
  */
 void VNoteDataManager::reqNoteItems()
 {
-    qDebug() << "Requesting note items";
+    qCDebug(voiceNoteLog) << "Requesting note items";
     if (m_pNotesLoadThread == nullptr) {
         m_pNotesLoadThread = new LoadNoteItemsWorker();
         m_pNotesLoadThread->setAutoDelete(true);
@@ -467,15 +468,15 @@ void VNoteDataManager::reqNoteItems()
                 this, &VNoteDataManager::onAllNotesLoaded);
 
         QThreadPool::globalInstance()->start(m_pNotesLoadThread);
-        qDebug() << "Note items load worker started";
+        qCDebug(voiceNoteLog) << "Note items load worker started";
     } else {
-        qDebug() << "Note items load already in progress";
+        qCDebug(voiceNoteLog) << "Note items load already in progress";
     }
 }
 
 void VNoteDataManager::reloadAllData()
 {
-    qInfo() << "Reloading all note data";
+    qCInfo(voiceNoteLog) << "Reloading all note data";
     m_fDataState = DataState::DataNotLoaded;
     reqNoteFolders();
     reqNoteItems();
@@ -497,9 +498,9 @@ VNOTE_ALL_NOTES_MAP *VNoteDataManager::getAllNotesInFolder()
 void VNoteDataManager::onFoldersLoaded(VNOTE_FOLDERS_MAP *foldesMap)
 {
     //Release old data
-    qDebug() << "Folders loaded, processing data";
+    qCDebug(voiceNoteLog) << "Folders loaded, processing data";
     if (m_qspNoteFoldersMap != nullptr) {
-        qInfo() << "Releasing old folders map, size:" << m_qspNoteFoldersMap->folders.size();
+        qCInfo(voiceNoteLog) << "Releasing old folders map, size:" << m_qspNoteFoldersMap->folders.size();
 
         m_qspNoteFoldersMap->lock.lockForWrite();
 
@@ -513,7 +514,7 @@ void VNoteDataManager::onFoldersLoaded(VNOTE_FOLDERS_MAP *foldesMap)
 
     m_qspNoteFoldersMap.reset(foldesMap);
 
-    qInfo() << "New folders map loaded, size:" << m_qspNoteFoldersMap->folders.size();
+    qCInfo(voiceNoteLog) << "New folders map loaded, size:" << m_qspNoteFoldersMap->folders.size();
 
     //Object is already deleted
     m_pForldesLoadThread = nullptr;
@@ -525,7 +526,7 @@ void VNoteDataManager::onFoldersLoaded(VNOTE_FOLDERS_MAP *foldesMap)
 
     // Send data ready signal if data ready
     if (isAllDatasReady()) {
-        qDebug() << "All data ready, emitting signal";
+        qCDebug(voiceNoteLog) << "All data ready, emitting signal";
         emit onAllDatasReady();
     }
 }
@@ -537,9 +538,9 @@ void VNoteDataManager::onFoldersLoaded(VNOTE_FOLDERS_MAP *foldesMap)
 void VNoteDataManager::onAllNotesLoaded(VNOTE_ALL_NOTES_MAP *notesMap)
 {
     //Release old data
-    qDebug() << "All notes loaded, processing data";
+    qCDebug(voiceNoteLog) << "All notes loaded, processing data";
     if (m_qspAllNotesMap != nullptr) {
-        qInfo() << "Releasing old notes map, folder count:" << m_qspAllNotesMap->notes.size();
+        qCInfo(voiceNoteLog) << "Releasing old notes map, folder count:" << m_qspAllNotesMap->notes.size();
 
         m_qspAllNotesMap->lock.lockForWrite();
 
@@ -558,7 +559,7 @@ void VNoteDataManager::onAllNotesLoaded(VNOTE_ALL_NOTES_MAP *notesMap)
 
     m_qspAllNotesMap.reset(notesMap);
 
-    qInfo() << "New notes map loaded, folder count:" << m_qspAllNotesMap->notes.size();
+    qCInfo(voiceNoteLog) << "New notes map loaded, folder count:" << m_qspAllNotesMap->notes.size();
 
     //Object is already deleted
     m_pNotesLoadThread = nullptr;
@@ -570,7 +571,7 @@ void VNoteDataManager::onAllNotesLoaded(VNOTE_ALL_NOTES_MAP *notesMap)
 
     //Send data ready signal if data ready
     if (isAllDatasReady()) {
-        qDebug() << "All data ready, emitting signal";
+        qCDebug(voiceNoteLog) << "All data ready, emitting signal";
         emit onAllDatasReady();
     }
 }

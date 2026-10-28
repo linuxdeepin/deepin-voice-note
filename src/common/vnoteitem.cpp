@@ -4,6 +4,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "vnoteitem.h"
+#include "ddlog.h"
 #include "common/utils.h"
 #include "search/searchdocumentextractor.h"
 #include "search/searchtextnormalizer.h"
@@ -68,7 +69,7 @@ static const QString htmlHead =
  */
 VNoteItem::VNoteItem()
 {
-    qDebug() << "Creating new VNoteItem";
+    qCDebug(voiceNoteLog) << "Creating new VNoteItem";
 }
 
 /**
@@ -77,9 +78,9 @@ VNoteItem::VNoteItem()
  */
 bool VNoteItem::isValid()
 {
-    qInfo() << "Checking note validity - ID:" << noteId << "Folder ID:" << folderId;
+    qCInfo(voiceNoteLog) << "Checking note validity - ID:" << noteId << "Folder ID:" << folderId;
     bool valid = (noteId > INVALID_ID && folderId > INVALID_ID);
-    qDebug() << "Checking note validity - ID:" << noteId << "Folder ID:" << folderId << "Valid:" << valid;
+    qCDebug(voiceNoteLog) << "Checking note validity - ID:" << noteId << "Folder ID:" << folderId << "Valid:" << valid;
     return valid;
 }
 
@@ -88,12 +89,12 @@ bool VNoteItem::isValid()
  */
 void VNoteItem::delNoteData()
 {
-    qInfo() << "Deleting note data for note ID:" << noteId;
+    qCInfo(voiceNoteLog) << "Deleting note data for note ID:" << noteId;
     //Clear note attachments
     for (auto it : datas.datas) {
         it->releaseSpecificData();
     }
-    qInfo() << "Note data deletion finished";
+    qCInfo(voiceNoteLog) << "Note data deletion finished";
 }
 
 /**
@@ -103,7 +104,7 @@ void VNoteItem::delNoteData()
  */
 bool VNoteItem::search(const QString &keyword)
 {
-    qDebug() << "Searching for keyword:" << keyword << "in note ID:" << noteId;
+    qCDebug(voiceNoteLog) << "Searching for keyword:" << keyword << "in note ID:" << noteId;
     const QString normalizedKeyword = SearchTextNormalizer::normalize(keyword);
     if (normalizedKeyword.isEmpty()) {
         return false;
@@ -112,12 +113,12 @@ bool VNoteItem::search(const QString &keyword)
     const SearchDocument document = SearchDocumentExtractor::extract(this);
     for (const SearchSegment &segment : document.segments) {
         if (SearchTextNormalizer::normalize(segment.text).contains(normalizedKeyword)) {
-            qInfo() << "Search finished, result: true";
+            qCInfo(voiceNoteLog) << "Search finished, result: true";
             return true;
         }
     }
 
-    qInfo() << "Search finished, result: false";
+    qCInfo(voiceNoteLog) << "Search finished, result: false";
     return false;
 }
 
@@ -134,9 +135,9 @@ bool VNoteItem::search(const QString &keyword)
  */
 void VNoteItem::setMetadata(const QVariant &meta)
 {
-    qInfo() << "Setting metadata for note ID:" << noteId;
+    qCInfo(voiceNoteLog) << "Setting metadata for note ID:" << noteId;
     metaData = meta;
-    qInfo() << "Metadata setting finished";
+    qCInfo(voiceNoteLog) << "Metadata setting finished";
 }
 
 /**
@@ -145,9 +146,9 @@ void VNoteItem::setMetadata(const QVariant &meta)
  */
 void VNoteItem::setFolder(VNoteFolder *folder)
 {
-    qInfo() << "Setting folder for note ID:" << noteId;
+    qCInfo(voiceNoteLog) << "Setting folder for note ID:" << noteId;
     ownFolder = folder;
-    qInfo() << "Folder setting finished";
+    qCInfo(voiceNoteLog) << "Folder setting finished";
 }
 
 /**
@@ -217,13 +218,13 @@ VNoteBlock *VNoteItem::newBlock(int type)
  */
 void VNoteItem::addBlock(VNoteBlock *block)
 {
-    qInfo() << "Adding block to note ID:" << noteId << "block type:" << block->getType();
+    qCInfo(voiceNoteLog) << "Adding block to note ID:" << noteId << "block type:" << block->getType();
     if (VNoteBlock::Voice == block->getType()) {
         maxVoiceId++;
     }
 
     datas.addBlock(block);
-    qInfo() << "Block addition finished";
+    qCInfo(voiceNoteLog) << "Block addition finished";
 }
 
 /**
@@ -233,13 +234,13 @@ void VNoteItem::addBlock(VNoteBlock *block)
  */
 void VNoteItem::addBlock(VNoteBlock *before, VNoteBlock *block)
 {
-    qInfo() << "Adding block before another block to note ID:" << noteId << "block type:" << block->getType();
+    qCInfo(voiceNoteLog) << "Adding block before another block to note ID:" << noteId << "block type:" << block->getType();
     if (VNoteBlock::Voice == block->getType()) {
         maxVoiceId++;
     }
 
     datas.addBlock(before, block);
-    qInfo() << "Block addition finished";
+    qCInfo(voiceNoteLog) << "Block addition finished";
 }
 
 /**
@@ -248,9 +249,9 @@ void VNoteItem::addBlock(VNoteBlock *before, VNoteBlock *block)
  */
 void VNoteItem::delBlock(VNoteBlock *block)
 {
-    qInfo() << "Deleting block from note ID:" << noteId << "block type:" << block->getType();
+    qCInfo(voiceNoteLog) << "Deleting block from note ID:" << noteId << "block type:" << block->getType();
     datas.delBlock(block);
-    qInfo() << "Block deletion finished";
+    qCInfo(voiceNoteLog) << "Block deletion finished";
 }
 
 /**
@@ -260,24 +261,24 @@ void VNoteItem::delBlock(VNoteBlock *block)
  */
 bool VNoteItem::haveVoice() const
 {
-    qDebug() << "Checking for voice content in note ID:" << noteId;
+    qCDebug(voiceNoteLog) << "Checking for voice content in note ID:" << noteId;
     const QString meta = metaDataConstRef().toString();
     if (TiptapDocumentExporter::isTiptapEnvelope(meta)) {
         const bool hasVoice = TiptapDocumentExporter::hasVoice(meta);
-        qInfo() << "Tiptap voice content check finished, result:" << hasVoice;
+        qCInfo(voiceNoteLog) << "Tiptap voice content check finished, result:" << hasVoice;
         return hasVoice;
     }
 
     if (htmlCode.isEmpty()) {
         bool hasVoice = datas.voiceBlocks.size() > 0;
-        qInfo() << "Voice content check finished, result:" << hasVoice;
+        qCInfo(voiceNoteLog) << "Voice content check finished, result:" << hasVoice;
         return hasVoice;
     }
     //匹配语音块标签的正则表达式
     QRegularExpression rx("<div.+jsonkey.+>");
     QRegularExpressionMatch match = rx.match(htmlCode);
     bool hasVoice = match.hasMatch();
-    qDebug() << "Rich text format - Has voice:" << hasVoice;
+    qCDebug(voiceNoteLog) << "Rich text format - Has voice:" << hasVoice;
     return hasVoice;
 }
 
@@ -287,17 +288,17 @@ bool VNoteItem::haveVoice() const
  */
 bool VNoteItem::haveText() const
 {
-    qDebug() << "Checking for text content in note ID:" << noteId;
+    qCDebug(voiceNoteLog) << "Checking for text content in note ID:" << noteId;
     const QString meta = metaDataConstRef().toString();
     if (TiptapDocumentExporter::isTiptapEnvelope(meta)) {
         const bool hasText = TiptapDocumentExporter::hasText(meta);
-        qDebug() << "Tiptap format - Has text/exportable content:" << hasText;
+        qCDebug(voiceNoteLog) << "Tiptap format - Has text/exportable content:" << hasText;
         return hasText;
     }
 
     if (!htmlCode.isEmpty()) { //富文本文本内容判断
         bool hasText = (htmlCode != "<p><br></p>");
-        qDebug() << "Rich text format - Has text:" << hasText;
+        qCDebug(voiceNoteLog) << "Rich text format - Has text:" << hasText;
         return hasText;
     }
 
@@ -308,7 +309,7 @@ bool VNoteItem::haveText() const
             break;
         }
     }
-    qDebug() << "Legacy format - Has text:" << fHaveText;
+    qCDebug(voiceNoteLog) << "Legacy format - Has text:" << fHaveText;
     return fHaveText;
 }
 
@@ -318,23 +319,23 @@ bool VNoteItem::haveText() const
  */
 qint32 VNoteItem::voiceCount() const
 {
-    qDebug() << "Getting voice count for note ID:" << noteId;
+    qCDebug(voiceNoteLog) << "Getting voice count for note ID:" << noteId;
     const QString meta = metaDataConstRef().toString();
     if (TiptapDocumentExporter::isTiptapEnvelope(meta)) {
         const qint32 count = TiptapDocumentExporter::voiceJsons(meta).size();
-        qInfo() << "Tiptap voice count retrieval finished, count:" << count;
+        qCInfo(voiceNoteLog) << "Tiptap voice count retrieval finished, count:" << count;
         return count;
     }
 
     //老版本
     if (htmlCode.isEmpty()) {
         qint32 count = datas.voiceBlocks.size();
-        qInfo() << "Voice count retrieval finished, count:" << count;
+        qCInfo(voiceNoteLog) << "Voice count retrieval finished, count:" << count;
         return count;
     }
     //新富文本版本
     qint32 count = getVoiceJsons().size();
-    qInfo() << "Voice count retrieval finished, count:" << count;
+    qCInfo(voiceNoteLog) << "Voice count retrieval finished, count:" << count;
     return count;
 }
 
@@ -345,11 +346,11 @@ qint32 VNoteItem::voiceCount() const
  */
 QStringList VNoteItem::getVoiceJsons() const
 {
-    qDebug() << "Getting voice JSONs for note ID:" << noteId;
+    qCDebug(voiceNoteLog) << "Getting voice JSONs for note ID:" << noteId;
     const QString meta = metaDataConstRef().toString();
     if (TiptapDocumentExporter::isTiptapEnvelope(meta)) {
         const QStringList list = TiptapDocumentExporter::voiceJsons(meta);
-        qDebug() << "Found" << list.size() << "Tiptap voice JSONs";
+        qCDebug(voiceNoteLog) << "Found" << list.size() << "Tiptap voice JSONs";
         return list;
     }
 
@@ -365,7 +366,7 @@ QStringList VNoteItem::getVoiceJsons() const
             list << jsonMatch.captured(0).replace("&quot;", "\"");
         }
     }
-    qDebug() << "Found" << list.size() << "voice JSONs";
+    qCDebug(voiceNoteLog) << "Found" << list.size() << "voice JSONs";
     return list;
 }
 
@@ -376,7 +377,7 @@ QStringList VNoteItem::getVoiceJsons() const
  */
 QString VNoteItem::getFullHtml() const
 {
-    qDebug() << "Generating full HTML for note ID:" << noteId;
+    qCDebug(voiceNoteLog) << "Generating full HTML for note ID:" << noteId;
     const QString meta = metaDataConstRef().toString();
     if (TiptapDocumentExporter::isTiptapEnvelope(meta)) {
         return TiptapDocumentExporter::toHtml(meta);
@@ -401,7 +402,7 @@ QString VNoteItem::getFullHtml() const
     //查找语音块
     QRegularExpressionMatch voiceMatch = rx.match(htmlCode);
     if (voiceMatch.hasMatch()) {
-        qDebug() << "Processing voice blocks in HTML";
+        qCDebug(voiceNoteLog) << "Processing voice blocks in HTML";
         while ((last = voiceMatch.capturedStart(pos)) != -1) {
             html.append(htmlCode.mid(pos, last - pos));
             pos = last;
@@ -414,7 +415,7 @@ QString VNoteItem::getFullHtml() const
                 last = voicePathMatch.capturedStart();
                 QString base64 = "";
                 if (!Utils::pictureToBase64(voicePathMatch.captured(0), base64)) {
-                    qWarning() << "Failed to convert image to base64:" << voicePathMatch.captured(0);
+                    qCWarning(voiceNoteLog) << "Failed to convert image to base64:" << voicePathMatch.captured(0);
                     html.append(imgLabel);
                 } else {
                     html.append(imgLabel.mid(0, last))
@@ -427,7 +428,7 @@ QString VNoteItem::getFullHtml() const
     }
     //html文件添加尾部
     html.append(htmlCode.mid(pos, htmlCode.size() - pos)).append("</div> </body> </html>");
-    qDebug() << "HTML generation completed";
+    qCDebug(voiceNoteLog) << "HTML generation completed";
     return html;
 }
 
@@ -525,13 +526,13 @@ VNVoiceBlock::~VNVoiceBlock()
  */
 void VNVoiceBlock::releaseSpecificData()
 {
-    qDebug() << "Releasing voice block specific data for path:" << voicePath;
+    qCDebug(voiceNoteLog) << "Releasing voice block specific data for path:" << voicePath;
     QFileInfo fileInfo(voicePath);
 
     if (fileInfo.exists()) {
         bool removed = QFile::remove(voicePath);
-        qDebug() << "Voice file removal" << (removed ? "successful" : "failed");
+        qCDebug(voiceNoteLog) << "Voice file removal" << (removed ? "successful" : "failed");
     } else {
-        qDebug() << "Voice file does not exist:" << voicePath;
+        qCDebug(voiceNoteLog) << "Voice file does not exist:" << voicePath;
     }
 }
