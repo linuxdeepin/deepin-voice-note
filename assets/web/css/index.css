@@ -134,7 +134,7 @@ div.main-wrapper .top-info .operator button.btn-clear {
 	font-size:14px;
 	font-family:SourceHanSansSC-Medium,SourceHanSansSC;
 	font-weight:500;
-	color:rgba(65,77,104,1);
+	color:#000000;
 	line-height: 36px;
 	box-sizing: content-box;
 	cursor: pointer;
@@ -411,7 +411,7 @@ div.context-menu-wrap ul.list .disabled-li:hover {
 	font-size:14px;
 	font-family:SourceHanSansSC-Medium,SourceHanSansSC;
 	font-weight:500;
-	color:rgba(65,77,104,1);
+	color:#000000;
 }
 .content-right {
 	float: right;
