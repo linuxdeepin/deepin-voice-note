@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "vnote_message_dialog_handler.h"
+#include "ddlog.h"
 
 #include <QApplication>
 #include <QDebug>
@@ -27,7 +28,7 @@ QString translateWithChineseFallback(const char *sourceText, const QString &chin
 VNoteMessageDialogHandler::VNoteMessageDialogHandler(QObject *parent)
     : QObject(parent)
 {
-    qInfo() << "VNoteMessageDialogHandler constructor called";
+    qCInfo(voiceNoteLog) << "VNoteMessageDialogHandler constructor called";
 }
 
 VNoteMessageDialogHandler::MessageType VNoteMessageDialogHandler::messageType() const
@@ -40,7 +41,7 @@ void VNoteMessageDialogHandler::setMessageType(MessageType type)
 {
     // qInfo() << "Setting message type to:" << type;
     if (type != m_messageType) {
-        qInfo() << "Setting message type to:" << type;
+        qCInfo(voiceNoteLog) << "Setting message type to:" << type;
         m_messageType = type;
 
         initMessage();
@@ -110,7 +111,7 @@ bool VNoteMessageDialogHandler::singleButton() const
 
 void VNoteMessageDialogHandler::initMessage()
 {
-    qInfo() << "Initializing message";
+    qCInfo(voiceNoteLog) << "Initializing message";
     m_mainMessage = initMainMessage();
     Q_EMIT mainMessageChanged();
 
@@ -131,12 +132,12 @@ void VNoteMessageDialogHandler::initMessage()
         m_singleButton = singleBtn;
         Q_EMIT singleButtonChanged();
     }
-    qInfo() << "Message initialization finished";
+    qCInfo(voiceNoteLog) << "Message initialization finished";
 }
 
 QString VNoteMessageDialogHandler::initMainMessage() const
 {
-    qInfo() << "Initializing main message for type:" << m_messageType;
+    qCInfo(voiceNoteLog) << "Initializing main message for type:" << m_messageType;
     switch (m_messageType) {
         case DeleteFolder:
             return QApplication::translate("VNoteMessageDialogHandler", "Are you sure you want to delete this notebook?");
@@ -178,13 +179,13 @@ QString VNoteMessageDialogHandler::initMainMessage() const
             break;
     }
 
-    qInfo() << "message type is unknown, return empty string";
+    qCInfo(voiceNoteLog) << "message type is unknown, return empty string";
     return {};
 }
 
 QString VNoteMessageDialogHandler::initDetailMessage() const
 {
-    qInfo() << "Initializing detail message for type:" << m_messageType;
+    qCInfo(voiceNoteLog) << "Initializing detail message for type:" << m_messageType;
     switch (m_messageType) {
         case DeleteFolder:
             return QApplication::translate("VNoteMessageDialogHandler", "All notes in it will be deleted");
@@ -202,17 +203,17 @@ QString VNoteMessageDialogHandler::initDetailMessage() const
 
 QString VNoteMessageDialogHandler::initWarnConfirm() const
 {
-    qInfo() << "Initializing warn confirm message for type:" << m_messageType;
+    qCInfo(voiceNoteLog) << "Initializing warn confirm message for type:" << m_messageType;
     switch (m_messageType) {
         case DeleteNote:
         case DeleteFolder:
-            qInfo() << "type is DeleteNote or DeleteFolder";
+            qCInfo(voiceNoteLog) << "type is DeleteNote or DeleteFolder";
             return QApplication::translate("VNoteMessageDialogHandler", "Delete");
         default:
             break;
     }
 
-    qInfo() << "type is not DeleteNote or DeleteFolder";
+    qCInfo(voiceNoteLog) << "type is not DeleteNote or DeleteFolder";
     return {};
 }
 
@@ -232,17 +233,17 @@ QString VNoteMessageDialogHandler::initCancelText() const
 
 bool VNoteMessageDialogHandler::initSingleButton() const
 {
-    qInfo() << "Initializing single button flag for type:" << m_messageType;
+    qCInfo(voiceNoteLog) << "Initializing single button flag for type:" << m_messageType;
     switch (m_messageType) {
         case AsrTimeLimit:
         case NoPermission:
         case VoicePathNoAvail:
-            qInfo() << "type is AsrTimeLimit or NoPermission or VoicePathNoAvail";
+            qCInfo(voiceNoteLog) << "type is AsrTimeLimit or NoPermission or VoicePathNoAvail";
             return true;
         default:
             break;
     }
 
-    qInfo() << "type is not AsrTimeLimit or NoPermission or VoicePathNoAvail";
+    qCInfo(voiceNoteLog) << "type is not AsrTimeLimit or NoPermission or VoicePathNoAvail";
     return false;
 }

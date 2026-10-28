@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "VoiceNoteDBusService.h"
+#include "ddlog.h"
 #include "../common/VNoteMainManager.h"
 #include "../common/vnotedatamanager.h"
 #include "../common/vnoteforlder.h"
@@ -31,24 +32,24 @@ VoiceNoteDBusService::~VoiceNoteDBusService()
 
 bool VoiceNoteDBusService::initDBusService()
 {
-    qInfo() << "Initializing D-Bus service";
+    qCInfo(voiceNoteLog) << "Initializing D-Bus service";
 
     QDBusConnection connection = QDBusConnection::sessionBus();
 
     if (!connection.registerService("org.deepin.voicenote")) {
-        qWarning() << "Failed to register D-Bus service:" << connection.lastError().message();
+        qCWarning(voiceNoteLog) << "Failed to register D-Bus service:" << connection.lastError().message();
         return false;
     }
 
     if (!connection.registerObject("/org/deepin/voicenote", this,
                                    QDBusConnection::ExportAllSlots)) {
-        qWarning() << "Failed to register D-Bus object:" << connection.lastError().message();
+        qCWarning(voiceNoteLog) << "Failed to register D-Bus object:" << connection.lastError().message();
         return false;
     }
 
-    qInfo() << "  D-Bus service registered successfully";
-    qInfo() << "  Service: org.deepin.voicenote";
-    qInfo() << "  Object: /org/deepin/voicenote";
+    qCInfo(voiceNoteLog) << "  D-Bus service registered successfully";
+    qCInfo(voiceNoteLog) << "  Service: org.deepin.voicenote";
+    qCInfo(voiceNoteLog) << "  Object: /org/deepin/voicenote";
 
     trackMainWindowState();
 
@@ -75,12 +76,12 @@ void VoiceNoteDBusService::trackMainWindowState()
 
 void VoiceNoteDBusService::ActivateWindow()
 {
-    qInfo() << "D-Bus: ActivateWindow called";
+    qCInfo(voiceNoteLog) << "D-Bus: ActivateWindow called";
 
     auto windows = qApp->topLevelWindows();
     if (!windows.isEmpty()) {
         QWindow *window = windows.first();
-        qWarning() << "[ActivateWindow] m_wasMaximized:" << m_wasMaximized
+        qCWarning(voiceNoteLog) << "[ActivateWindow] m_wasMaximized:" << m_wasMaximized
                    << " windowState:" << window->windowState();
         if (m_wasMaximized) {
             window->showMaximized();
@@ -90,27 +91,27 @@ void VoiceNoteDBusService::ActivateWindow()
         window->raise();
         window->requestActivate();
     } else {
-        qWarning() << "[ActivateWindow] No top-level windows found";
+        qCWarning(voiceNoteLog) << "[ActivateWindow] No top-level windows found";
     }
 }
 
 QString VoiceNoteDBusService::GetNotesList()
 {
-    qInfo() << "D-Bus: GetNotesList called";
+    qCInfo(voiceNoteLog) << "D-Bus: GetNotesList called";
     
     QJsonObject root;
     
     // 获取所有文件夹
     VNOTE_FOLDERS_MAP *folders = VNoteDataManager::instance()->getNoteFolders();
     if (!folders) {
-        qWarning() << "Failed to get folders";
+        qCWarning(voiceNoteLog) << "Failed to get folders";
         return "{}";
     }
     
     // 获取所有笔记
     VNOTE_ALL_NOTES_MAP *allNotes = VNoteDataManager::instance()->getAllNotesInFolder();
     if (!allNotes) {
-        qWarning() << "Failed to get notes";
+        qCWarning(voiceNoteLog) << "Failed to get notes";
         return "{}";
     }
     
@@ -143,18 +144,18 @@ QString VoiceNoteDBusService::GetNotesList()
     }
     
     QString result = QJsonDocument(root).toJson(QJsonDocument::Compact);
-    qInfo() << "D-Bus: Returning notes list with" << root.size() << "folders";
+    qCInfo(voiceNoteLog) << "D-Bus: Returning notes list with" << root.size() << "folders";
     
     return result;
 }
 
 bool VoiceNoteDBusService::RecordVoice(int folderId, int noteId)
 {
-    qInfo() << "D-Bus: RecordVoice called with folderId:" << folderId << "noteId:" << noteId;
+    qCInfo(voiceNoteLog) << "D-Bus: RecordVoice called with folderId:" << folderId << "noteId:" << noteId;
     
     VNoteMainManager *manager = VNoteMainManager::instance();
     if (!manager) {
-        qWarning() << "Failed to get VNoteMainManager instance";
+        qCWarning(voiceNoteLog) << "Failed to get VNoteMainManager instance";
         return false;
     }
     
@@ -163,11 +164,11 @@ bool VoiceNoteDBusService::RecordVoice(int folderId, int noteId)
         QWindow *window = windows.first();
         window->raise();
         window->requestActivate();
-        qInfo() << "  Window activated";
+        qCInfo(voiceNoteLog) << "  Window activated";
     }
     
     if (folderId == -1 || noteId == -1) {
-        qInfo() << "  Creating new folder and note";
+        qCInfo(voiceNoteLog) << "  Creating new folder and note";
         
         manager->vNoteCreateFolder();
         QThread::msleep(200);
@@ -176,14 +177,14 @@ bool VoiceNoteDBusService::RecordVoice(int folderId, int noteId)
         QThread::msleep(200);
         
         VoiceRecoderHandler::instance()->startRecoder();
-        qInfo() << "Recording started in new note";
+        qCInfo(voiceNoteLog) << "Recording started in new note";
         return true;
     }
     
     // 3. 验证文件夹是否存在
     VNoteFolder *targetFolder = manager->getFloderById(folderId);
     if (!targetFolder) {
-        qWarning() << "  Folder not found:" << folderId;
+        qCWarning(voiceNoteLog) << "  Folder not found:" << folderId;
         return false;
     }
     
@@ -191,35 +192,35 @@ bool VoiceNoteDBusService::RecordVoice(int folderId, int noteId)
     VNoteItemOper noteOper;
     VNoteItem *targetNote = noteOper.getNote(folderId, noteId);
     if (!targetNote) {
-        qWarning() << "  Note not found:" << noteId << "in folder:" << folderId;
+        qCWarning(voiceNoteLog) << "  Note not found:" << noteId << "in folder:" << folderId;
         return false;
     }
     
     // 5. 切换到目标文件夹
     int folderIndex = manager->getFloderIndexById(folderId);
     if (folderIndex == -1) {
-        qWarning() << "  Folder index not found for folder:" << folderId;
+        qCWarning(voiceNoteLog) << "  Folder index not found for folder:" << folderId;
         return false;
     }
     
-    qInfo() << "  Switching to folder:" << folderId << "(index:" << folderIndex << ")";
+    qCInfo(voiceNoteLog) << "  Switching to folder:" << folderId << "(index:" << folderIndex << ")";
     manager->vNoteFloderChanged(folderIndex);
     QThread::msleep(200);
     
     // 6. 切换到目标笔记并更新UI选中状态
-    qInfo() << "  Switching to note:" << noteId;
+    qCInfo(voiceNoteLog) << "  Switching to note:" << noteId;
     manager->vNoteChangedWithUIUpdate(noteId);
     QThread::msleep(300); 
     
     // 7. 开始录音
     auto *recorder = VoiceRecoderHandler::instance();
     if (recorder->getRecoderType() != VoiceRecoderHandler::Idle) {
-        qWarning() << "Cannot start recording: already recording or paused";
+        qCWarning(voiceNoteLog) << "Cannot start recording: already recording or paused";
         return false;
     }
     
     recorder->startRecoder();
-    qInfo() << "Recording started successfully";
+    qCInfo(voiceNoteLog) << "Recording started successfully";
     
     return true;
 }
