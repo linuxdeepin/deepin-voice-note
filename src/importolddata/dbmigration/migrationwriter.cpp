@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "migrationwriter.h"
+#include "ddlog.h"
 
 #include "legacyformatdetector.h"       // LegacyFormatDetector::detect()/formatName()
 #include "migrationhtmlconverter.h"     // MigrationHtmlConverter::convert()
@@ -101,7 +102,7 @@ MigrationWriter::NoteRow MigrationWriter::readNoteRow(QSqlDatabase &db, qint32 n
         result->code = WriteErrorCode::ReadFailed;
         result->message = QStringLiteral("Failed to read note: %1")
                               .arg(readQuery.lastError().text());
-        qWarning("MigrationWriter: note_id=%lld folder_id=%lld %s",
+        qCWarning(voiceNoteLog, "MigrationWriter: note_id=%lld folder_id=%lld %s",
                  static_cast<long long>(noteId),
                  static_cast<long long>(folderId),
                  qPrintable(result->message));
@@ -112,7 +113,7 @@ MigrationWriter::NoteRow MigrationWriter::readNoteRow(QSqlDatabase &db, qint32 n
         // 查无此行：原数据（无）保留，按 NoteNotFound 上报。
         result->code = WriteErrorCode::NoteNotFound;
         result->message = QStringLiteral("note_id not found");
-        qInfo("MigrationWriter: note_id=%lld folder_id=%lld not found",
+        qCInfo(voiceNoteLog, "MigrationWriter: note_id=%lld folder_id=%lld not found",
               static_cast<long long>(noteId),
               static_cast<long long>(folderId));
         return row;
@@ -154,7 +155,7 @@ QJsonObject MigrationWriter::convertByFormat(LegacyFormat format,
             result->warnings = *warnings;
             result->code = WriteErrorCode::ConvertFailed;
             result->message = QStringLiteral("html convert failed");
-            qWarning("MigrationWriter: note_id=%lld folder_id=%lld "
+            qCWarning(voiceNoteLog, "MigrationWriter: note_id=%lld folder_id=%lld "
                      "format=%s convert failed",
                      static_cast<long long>(noteId),
                      static_cast<long long>(folderId),
@@ -172,7 +173,7 @@ QJsonObject MigrationWriter::convertByFormat(LegacyFormat format,
             result->warnings = *warnings;
             result->code = WriteErrorCode::ConvertFailed;
             result->message = QStringLiteral("noteDatas convert failed");
-            qWarning("MigrationWriter: note_id=%lld folder_id=%lld "
+            qCWarning(voiceNoteLog, "MigrationWriter: note_id=%lld folder_id=%lld "
                      "format=%s convert failed",
                      static_cast<long long>(noteId),
                      static_cast<long long>(folderId),
@@ -220,7 +221,7 @@ void MigrationWriter::validateAndPersist(QSqlDatabase &db, const QJsonObject &en
         result->message =
             QStringLiteral("envelope validation failed: %1 error(s)")
                 .arg(validated.errors.size());
-        qWarning("MigrationWriter: note_id=%lld folder_id=%lld "
+        qCWarning(voiceNoteLog, "MigrationWriter: note_id=%lld folder_id=%lld "
                  "format=%s validation failed",
                  static_cast<long long>(noteId),
                  static_cast<long long>(folderId),
@@ -253,7 +254,7 @@ void MigrationWriter::validateAndPersist(QSqlDatabase &db, const QJsonObject &en
         result->code = WriteErrorCode::WriteFailed;
         result->message =
             QStringLiteral("update failed: %1").arg(writeQuery.lastError().text());
-        qWarning("MigrationWriter: note_id=%lld folder_id=%lld "
+        qCWarning(voiceNoteLog, "MigrationWriter: note_id=%lld folder_id=%lld "
                  "format=%s write failed",
                  static_cast<long long>(noteId),
                  static_cast<long long>(folderId),
@@ -266,7 +267,7 @@ void MigrationWriter::validateAndPersist(QSqlDatabase &db, const QJsonObject &en
         result->code = WriteErrorCode::WriteFailed;
         result->message =
             QStringLiteral("update affected %1 row(s)").arg(writeQuery.numRowsAffected());
-        qWarning("MigrationWriter: note_id=%lld folder_id=%lld "
+        qCWarning(voiceNoteLog, "MigrationWriter: note_id=%lld folder_id=%lld "
                  "format=%s unexpected rows affected",
                  static_cast<long long>(noteId),
                  static_cast<long long>(folderId),
@@ -279,7 +280,7 @@ void MigrationWriter::validateAndPersist(QSqlDatabase &db, const QJsonObject &en
     result->code = WriteErrorCode::None;
     result->originalDataPreserved = false;
     result->message = QStringLiteral("migrated");
-    qInfo("MigrationWriter: note_id=%lld folder_id=%lld format=%s migrated",
+    qCInfo(voiceNoteLog, "MigrationWriter: note_id=%lld folder_id=%lld format=%s migrated",
           static_cast<long long>(noteId),
           static_cast<long long>(folderId),
           qPrintable(LegacyFormatDetector::formatName(format)));
@@ -296,7 +297,7 @@ WriteResult MigrationWriter::writeOne(qint32 folderId, qint32 noteId)
     if (!QFileInfo(dbPath).isFile()) {
         result.code = WriteErrorCode::ReadFailed;
         result.message = QStringLiteral("Database file not found: %1").arg(dbPath);
-        qWarning("MigrationWriter: note_id=%lld folder_id=%lld %s",
+        qCWarning(voiceNoteLog, "MigrationWriter: note_id=%lld folder_id=%lld %s",
                  static_cast<long long>(noteId),
                  static_cast<long long>(folderId),
                  qPrintable(result.message));
@@ -314,7 +315,7 @@ WriteResult MigrationWriter::writeOne(qint32 folderId, qint32 noteId)
             result.code = WriteErrorCode::ReadFailed;
             result.message = QStringLiteral("Failed to open database: %1")
                                  .arg(db.lastError().text());
-            qWarning("MigrationWriter: note_id=%lld folder_id=%lld %s",
+            qCWarning(voiceNoteLog, "MigrationWriter: note_id=%lld folder_id=%lld %s",
                      static_cast<long long>(noteId),
                      static_cast<long long>(folderId),
                      qPrintable(result.message));
@@ -330,14 +331,14 @@ WriteResult MigrationWriter::writeOne(qint32 folderId, qint32 noteId)
                     result.code = WriteErrorCode::None;
                     result.originalDataPreserved = true;
                     result.message = QStringLiteral("already tiptap, skipped");
-                    qInfo("MigrationWriter: note_id=%lld folder_id=%lld format=%s skipped",
+                    qCInfo(voiceNoteLog, "MigrationWriter: note_id=%lld folder_id=%lld format=%s skipped",
                           static_cast<long long>(noteId),
                           static_cast<long long>(folderId),
                           qPrintable(LegacyFormatDetector::formatName(format)));
                 } else if (format == LegacyFormat::Invalid) {
                     result.code = WriteErrorCode::UnsupportedFormat;
                     result.message = QStringLiteral("unrecognized meta_data format");
-                    qWarning("MigrationWriter: note_id=%lld folder_id=%lld format=%s %s",
+                    qCWarning(voiceNoteLog, "MigrationWriter: note_id=%lld folder_id=%lld format=%s %s",
                              static_cast<long long>(noteId),
                              static_cast<long long>(folderId),
                              qPrintable(LegacyFormatDetector::formatName(format)),
@@ -356,7 +357,7 @@ WriteResult MigrationWriter::writeOne(qint32 folderId, qint32 noteId)
                         result.warnings = warnings;
                         result.code = WriteErrorCode::ConvertFailed;
                         result.message = QStringLiteral("convert produced empty envelope");
-                        qWarning("MigrationWriter: note_id=%lld folder_id=%lld empty envelope",
+                        qCWarning(voiceNoteLog, "MigrationWriter: note_id=%lld folder_id=%lld empty envelope",
                                  static_cast<long long>(noteId),
                                  static_cast<long long>(folderId));
                     } else {

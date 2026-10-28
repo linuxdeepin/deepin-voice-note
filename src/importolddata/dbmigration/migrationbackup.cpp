@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "migrationbackup.h"
+#include "ddlog.h"
 
 #include "globaldef.h"            // DEEPIN_VOICE_NOTE
 #include "db/vnotedbmanager.h"    // VNoteDbManager::DBVERSION
@@ -105,7 +106,7 @@ bool MigrationBackup::copyWalSidecar(const QString &sourceDb, const QString &bac
             const QString target = backupDb + suffix;
             if (!QFile::copy(sidecar, target)) {
                 allOk = false;
-                qWarning("MigrationBackup: failed to copy WAL sidecar %s -> %s",
+                qCWarning(voiceNoteLog, "MigrationBackup: failed to copy WAL sidecar %s -> %s",
                          qPrintable(sidecar), qPrintable(target));
             }
         }
@@ -119,11 +120,11 @@ bool MigrationBackup::verifyIntegrity(const QString &sourcePath, const QString &
     const qint64 sourceSize = QFileInfo(sourcePath).size();
     const qint64 backupSize = QFileInfo(backupPath).size();
     if (backupSize <= 0) {
-        qWarning("MigrationBackup: backup is empty (0 bytes)");
+        qCWarning(voiceNoteLog, "MigrationBackup: backup is empty (0 bytes)");
         return false;
     }
     if (sourceSize != backupSize) {
-        qWarning("MigrationBackup: size mismatch source=%lld backup=%lld",
+        qCWarning(voiceNoteLog, "MigrationBackup: size mismatch source=%lld backup=%lld",
                  static_cast<long long>(sourceSize), static_cast<long long>(backupSize));
         return false;
     }
@@ -137,21 +138,21 @@ bool MigrationBackup::verifyIntegrity(const QString &sourcePath, const QString &
         db.setDatabaseName(backupPath);
         db.setConnectOptions(QStringLiteral("QSQLITE_OPEN_READONLY"));
         if (!db.open()) {
-            qWarning("MigrationBackup: cannot open backup readonly: %s",
+            qCWarning(voiceNoteLog, "MigrationBackup: cannot open backup readonly: %s",
                      qPrintable(db.lastError().text()));
         } else {
             QSqlQuery query(db);
             if (!query.exec(QStringLiteral("PRAGMA integrity_check"))) {
-                qWarning("MigrationBackup: integrity_check exec failed: %s",
+                qCWarning(voiceNoteLog, "MigrationBackup: integrity_check exec failed: %s",
                          qPrintable(query.lastError().text()));
             } else if (query.next()) {
                 const QString value = query.value(0).toString();
                 ok = (value.compare(QStringLiteral("ok"), Qt::CaseInsensitive) == 0);
                 if (!ok) {
-                    qWarning("MigrationBackup: integrity_check returned: %s", qPrintable(value));
+                    qCWarning(voiceNoteLog, "MigrationBackup: integrity_check returned: %s", qPrintable(value));
                 }
             } else {
-                qWarning("MigrationBackup: integrity_check returned no rows");
+                qCWarning(voiceNoteLog, "MigrationBackup: integrity_check returned no rows");
             }
             db.close();
         }
@@ -171,7 +172,7 @@ BackupResult MigrationBackup::backup()
     if (!QFileInfo::exists(sourcePath)) {
         result.code = BackupErrorCode::SourceNotFound;
         result.message = QStringLiteral("Source database not found: %1").arg(sourcePath);
-        qWarning("MigrationBackup: %s", qPrintable(result.message));
+        qCWarning(voiceNoteLog, "MigrationBackup: %s", qPrintable(result.message));
         return result;
     }
 
@@ -180,7 +181,7 @@ BackupResult MigrationBackup::backup()
     if (!dir.exists() && !dir.mkpath(backupDirPath)) {
         result.code = BackupErrorCode::DestDirCreateFailed;
         result.message = QStringLiteral("Failed to create backup directory: %1").arg(backupDirPath);
-        qWarning("MigrationBackup: %s", qPrintable(result.message));
+        qCWarning(voiceNoteLog, "MigrationBackup: %s", qPrintable(result.message));
         return result;
     }
 
@@ -194,7 +195,7 @@ BackupResult MigrationBackup::backup()
     if (QFileInfo::exists(backupPath)) {
         result.code = BackupErrorCode::AlreadyExists;
         result.message = QStringLiteral("Backup target already exists: %1").arg(backupPath);
-        qWarning("MigrationBackup: %s", qPrintable(result.message));
+        qCWarning(voiceNoteLog, "MigrationBackup: %s", qPrintable(result.message));
         return result;
     }
 
@@ -203,7 +204,7 @@ BackupResult MigrationBackup::backup()
         result.code = BackupErrorCode::CopyFailed;
         result.message = QStringLiteral("Failed to copy database: %1 -> %2")
                              .arg(sourcePath, backupPath);
-        qWarning("MigrationBackup: %s", qPrintable(result.message));
+        qCWarning(voiceNoteLog, "MigrationBackup: %s", qPrintable(result.message));
         return result;
     }
 
@@ -213,7 +214,7 @@ BackupResult MigrationBackup::backup()
         cleanupBackupArtifacts(backupPath);
         result.code = BackupErrorCode::CopyFailed;
         result.message = QStringLiteral("Failed to copy WAL sidecar for backup: %1").arg(backupPath);
-        qWarning("MigrationBackup: %s", qPrintable(result.message));
+        qCWarning(voiceNoteLog, "MigrationBackup: %s", qPrintable(result.message));
         return result;
     }
 
@@ -222,7 +223,7 @@ BackupResult MigrationBackup::backup()
         cleanupBackupArtifacts(backupPath);
         result.code = BackupErrorCode::IntegrityCheckFailed;
         result.message = QStringLiteral("Integrity check failed for backup: %1").arg(backupPath);
-        qWarning("MigrationBackup: %s", qPrintable(result.message));
+        qCWarning(voiceNoteLog, "MigrationBackup: %s", qPrintable(result.message));
         return result;
     }
 
@@ -231,7 +232,7 @@ BackupResult MigrationBackup::backup()
     result.backupPath = backupPath;
     result.code = BackupErrorCode::None;
     result.message = QStringLiteral("Backup succeeded: %1").arg(backupPath);
-    qInfo("MigrationBackup: %s (size=%lld bytes)", qPrintable(result.message),
+    qCInfo(voiceNoteLog, "MigrationBackup: %s (size=%lld bytes)", qPrintable(result.message),
           static_cast<long long>(QFileInfo(backupPath).size()));
     return result;
 }
@@ -244,7 +245,7 @@ BackupResult MigrationBackup::restoreFromBackup(const QString &backupPath)
     if (!QFileInfo(backupPath).isFile()) {
         result.code = BackupErrorCode::SourceNotFound;
         result.message = QStringLiteral("Backup file not found: %1").arg(backupPath);
-        qWarning("MigrationBackup: %s", qPrintable(result.message));
+        qCWarning(voiceNoteLog, "MigrationBackup: %s", qPrintable(result.message));
         return result;
     }
 
@@ -255,7 +256,7 @@ BackupResult MigrationBackup::restoreFromBackup(const QString &backupPath)
     if (!QDir().exists(targetDir) && !QDir().mkpath(targetDir)) {
         result.code = BackupErrorCode::DestDirCreateFailed;
         result.message = QStringLiteral("Failed to create target directory: %1").arg(targetDir);
-        qWarning("MigrationBackup: %s", qPrintable(result.message));
+        qCWarning(voiceNoteLog, "MigrationBackup: %s", qPrintable(result.message));
         return result;
     }
 
@@ -267,7 +268,7 @@ BackupResult MigrationBackup::restoreFromBackup(const QString &backupPath)
     if (!QFile::copy(backupPath, tmpPath)) {
         result.code = BackupErrorCode::CopyFailed;
         result.message = QStringLiteral("Failed to copy backup to temp: %1 -> %2").arg(backupPath, tmpPath);
-        qWarning("MigrationBackup: %s", qPrintable(result.message));
+        qCWarning(voiceNoteLog, "MigrationBackup: %s", qPrintable(result.message));
         return result;
     }
 
@@ -277,7 +278,7 @@ BackupResult MigrationBackup::restoreFromBackup(const QString &backupPath)
         cleanupBackupArtifacts(tmpPath);
         result.code = BackupErrorCode::CopyFailed;
         result.message = QStringLiteral("Failed to copy WAL sidecar to temp: %1").arg(tmpPath);
-        qWarning("MigrationBackup: %s", qPrintable(result.message));
+        qCWarning(voiceNoteLog, "MigrationBackup: %s", qPrintable(result.message));
         return result;
     }
 
@@ -286,7 +287,7 @@ BackupResult MigrationBackup::restoreFromBackup(const QString &backupPath)
         cleanupBackupArtifacts(tmpPath);
         result.code = BackupErrorCode::IntegrityCheckFailed;
         result.message = QStringLiteral("Integrity check failed for restore temp: %1").arg(tmpPath);
-        qWarning("MigrationBackup: %s", qPrintable(result.message));
+        qCWarning(voiceNoteLog, "MigrationBackup: %s", qPrintable(result.message));
         return result;
     }
 
@@ -300,7 +301,7 @@ BackupResult MigrationBackup::restoreFromBackup(const QString &backupPath)
     //    Qt 的 QFile::rename 在目标已存在时返回 false 不覆盖，故用 std::rename。
     if (std::rename(QFile::encodeName(tmpPath).constData(),
                     QFile::encodeName(targetPath).constData()) != 0) {
-        qWarning("MigrationBackup: rename failed: %s -> %s (%s)",
+        qCWarning(voiceNoteLog, "MigrationBackup: rename failed: %s -> %s (%s)",
                  qPrintable(tmpPath), qPrintable(targetPath),
                  qPrintable(QString::fromLocal8Bit(strerror(errno))));
         QFile::remove(tmpPath);
@@ -314,7 +315,7 @@ BackupResult MigrationBackup::restoreFromBackup(const QString &backupPath)
         removeWalSidecar(targetPath);
         result.code = BackupErrorCode::CopyFailed;
         result.message = QStringLiteral("Failed to copy WAL sidecar for restore: %1").arg(targetPath);
-        qWarning("MigrationBackup: %s", qPrintable(result.message));
+        qCWarning(voiceNoteLog, "MigrationBackup: %s", qPrintable(result.message));
         return result;
     }
 
@@ -322,6 +323,6 @@ BackupResult MigrationBackup::restoreFromBackup(const QString &backupPath)
     result.backupPath = targetPath;
     result.code = BackupErrorCode::None;
     result.message = QStringLiteral("Restore succeeded: %1 -> %2").arg(backupPath, targetPath);
-    qInfo("MigrationBackup: %s", qPrintable(result.message));
+    qCInfo(voiceNoteLog, "MigrationBackup: %s", qPrintable(result.message));
     return result;
 }

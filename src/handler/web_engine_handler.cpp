@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "web_engine_handler.h"
+#include "ddlog.h"
 #include "jscontent.h"
 #include "metadataparser.h"
 #include "vnoteitem.h"
@@ -102,11 +103,11 @@ bool copyTiptapTranscriptTextToClipboard(const QVariant &menuJson)
 
     const QString text = value.mid(int(strlen(kTiptapTranscriptTextPrefix)));
     if (!copyPlainTextToClipboard(text)) {
-        qWarning() << "Cannot copy Tiptap transcript: empty text";
+        qCWarning(voiceNoteLog) << "Cannot copy Tiptap transcript: empty text";
         return false;
     }
 
-    qInfo() << "Tiptap transcript text copied to clipboard, length:" << text.length();
+    qCInfo(voiceNoteLog) << "Tiptap transcript text copied to clipboard, length:" << text.length();
     return true;
 }
 
@@ -114,7 +115,7 @@ bool copyTiptapVoiceBlockToClipboard(const QVariant &menuJson)
 {
     const QString voiceInfoJson = menuJson.toString();
     if (voiceInfoJson.isEmpty()) {
-        qWarning() << "Cannot copy Tiptap voice block: empty menu json";
+        qCWarning(voiceNoteLog) << "Cannot copy Tiptap voice block: empty menu json";
         return false;
     }
 
@@ -123,7 +124,7 @@ bool copyTiptapVoiceBlockToClipboard(const QVariant &menuJson)
     if (parseError.error != QJsonParseError::NoError
         || voiceInfo.value(QStringLiteral("voiceId")).toString().isEmpty()
         || voiceInfo.value(QStringLiteral("voicePath")).toString().isEmpty()) {
-        qWarning() << "Cannot copy Tiptap voice block: invalid menu json" << parseError.errorString();
+        qCWarning(voiceNoteLog) << "Cannot copy Tiptap voice block: invalid menu json" << parseError.errorString();
         return false;
     }
 
@@ -137,7 +138,7 @@ bool copyTiptapVoiceBlockToClipboard(const QVariant &menuJson)
     mimeData->setText(title.isEmpty() ? QStringLiteral("voice") : title);
 
     QApplication::clipboard()->setMimeData(mimeData);
-    qInfo() << "Tiptap voice block copied to clipboard, voiceId:"
+    qCInfo(voiceNoteLog) << "Tiptap voice block copied to clipboard, voiceId:"
             << voiceInfo.value(QStringLiteral("voiceId")).toString();
     return true;
 }
@@ -182,7 +183,7 @@ bool pasteTiptapVoiceBlockFromClipboard()
 {
     const QString clipboardJson = tiptapVoiceBlockClipboardJson();
     if (clipboardJson.isEmpty()) {
-        qWarning() << "Cannot paste Tiptap voice block: clipboard json is empty";
+        qCWarning(voiceNoteLog) << "Cannot paste Tiptap voice block: clipboard json is empty";
         return false;
     }
 
@@ -190,7 +191,7 @@ bool pasteTiptapVoiceBlockFromClipboard()
     QJsonObject voiceInfo = QJsonDocument::fromJson(clipboardJson.toUtf8(), &parseError).object();
     if (parseError.error != QJsonParseError::NoError
         || voiceInfo.value(QStringLiteral("voicePath")).toString().isEmpty()) {
-        qWarning() << "Cannot paste Tiptap voice block: invalid clipboard json" << parseError.errorString();
+        qCWarning(voiceNoteLog) << "Cannot paste Tiptap voice block: invalid clipboard json" << parseError.errorString();
         return false;
     }
 
@@ -200,7 +201,7 @@ bool pasteTiptapVoiceBlockFromClipboard()
 
     TiptapChannelBridge::instance()->sendInsertVoiceBlock(
         QString::fromUtf8(QJsonDocument(voiceInfo).toJson(QJsonDocument::Compact)));
-    qInfo() << "Tiptap voice block paste requested from clipboard, voiceId:"
+    qCInfo(voiceNoteLog) << "Tiptap voice block paste requested from clipboard, voiceId:"
             << voiceInfo.value(QStringLiteral("voiceId")).toString();
     return true;
 }
@@ -251,7 +252,7 @@ WebEngineHandler::WebEngineHandler(QObject *parent)
     , m_voicePlayerHandler(new VoicePlayerHandler(this))
     , m_voiceToTextHandler(new VoiceToTextHandler(this))
 {
-    qInfo() << "WebEngineHandler constructor called";
+    qCInfo(voiceNoteLog) << "WebEngineHandler constructor called";
     initFontsInformation();
     // 字体服务可能在应用启动阶段尚未就绪。这里先把已取得的系统字体
     // 缓存到 Tiptap 通道，编辑器就绪后会立即补发，避免下拉只剩占位项。
@@ -282,27 +283,27 @@ WebEngineHandler::WebEngineHandler(QObject *parent)
     // 监听录音状态变化，控制编辑器中语音播放按钮的启用/禁用
     connect(VoiceRecoderHandler::instance(), &VoiceRecoderHandler::recoderStateChange, this, 
             [](VoiceRecoderHandler::RecoderType type) {
-        qInfo() << "WebEngineHandler: Recording state changed to:" << type;
+        qCInfo(voiceNoteLog) << "WebEngineHandler: Recording state changed to:" << type;
         // 录音时禁用播放按钮，非录音时启用
         bool enablePlayButton = (type != VoiceRecoderHandler::Recording);
-        qInfo() << "WebEngineHandler: Setting voice play button enable to:" << enablePlayButton;
+        qCInfo(voiceNoteLog) << "WebEngineHandler: Setting voice play button enable to:" << enablePlayButton;
         Q_EMIT JsContent::instance()->callJsSetVoicePlayBtnEnable(enablePlayButton);
     });
     
-    qInfo() << "WebEngineHandler constructor finished";
+    qCInfo(voiceNoteLog) << "WebEngineHandler constructor finished";
 }
 
 QObject *WebEngineHandler::target() const
 {
-    // qInfo() << "Getting target web engine";
+    // qCInfo(voiceNoteLog) << "Getting target web engine";
     return m_targetWebEngine;
 }
 
 void WebEngineHandler::setTarget(QObject *targetWebEngine)
 {
-    qInfo() << "Setting target web engine";
+    qCInfo(voiceNoteLog) << "Setting target web engine";
     if (targetWebEngine != m_targetWebEngine) {
-        qInfo() << "targetWebEngine is not equal to m_targetWebEngine";
+        qCInfo(voiceNoteLog) << "targetWebEngine is not equal to m_targetWebEngine";
         if (m_targetWebEngine)
             m_targetWebEngine->removeEventFilter(this);
         m_targetWebEngine = targetWebEngine;
@@ -310,7 +311,7 @@ void WebEngineHandler::setTarget(QObject *targetWebEngine)
             m_targetWebEngine->installEventFilter(this);
         Q_EMIT targetChanged();
     }
-    qInfo() << "Target web engine setting finished";
+    qCInfo(voiceNoteLog) << "Target web engine setting finished";
 }
 
 bool WebEngineHandler::eventFilter(QObject *watched, QEvent *event)
@@ -377,9 +378,9 @@ bool WebEngineHandler::eventFilter(QObject *watched, QEvent *event)
  */
 QVariant WebEngineHandler::callJsSynchronous(const QString &function)
 {
-    qInfo() << "Calling JS function synchronously:" << function;
+    qCInfo(voiceNoteLog) << "Calling JS function synchronously:" << function;
     if (m_callJsLoop.isRunning()) {
-        qCritical() << "reentrant call js function!";
+        qCCritical(voiceNoteLog) << "reentrant call js function!";
         return {};
     }
 
@@ -389,7 +390,7 @@ QVariant WebEngineHandler::callJsSynchronous(const QString &function)
         m_callJsLoop.exec();
     }
 
-    qInfo() << "JS function call finished";
+    qCInfo(voiceNoteLog) << "JS function call finished";
     return m_callJsResult;
 }
 
@@ -398,10 +399,10 @@ QVariant WebEngineHandler::callJsSynchronous(const QString &function)
  */
 void WebEngineHandler::onCallJsResult(const QVariant &result)
 {
-    qInfo() << "JS call result received";
+    qCInfo(voiceNoteLog) << "JS call result received";
     m_callJsResult = result;
     m_callJsLoop.exit();
-    qInfo() << "JS call result handling finished";
+    qCInfo(voiceNoteLog) << "JS call result handling finished";
 }
 
 /**
@@ -409,14 +410,14 @@ void WebEngineHandler::onCallJsResult(const QVariant &result)
  */
 void WebEngineHandler::initFontsInformation()
 {
-    qDebug() << "Initializing fonts information";
+    qCDebug(voiceNoteLog) << "Initializing fonts information";
     // 初始化字体服务Dus接口
     m_appearanceDBusInterface = new QDBusInterface(DEEPIN_DAEMON_APPEARANCE_SERVICE,
                                                    DEEPIN_DAEMON_APPEARANCE_PATH,
                                                    DEEPIN_DAEMON_APPEARANCE_INTERFACE,
                                                    QDBusConnection::sessionBus());
     if (m_appearanceDBusInterface->isValid()) {
-        qInfo() << "Font service initialized successfully. Service:" << DEEPIN_DAEMON_APPEARANCE_SERVICE 
+        qCInfo(voiceNoteLog) << "Font service initialized successfully. Service:" << DEEPIN_DAEMON_APPEARANCE_SERVICE 
                 << "Path:" << DEEPIN_DAEMON_APPEARANCE_PATH 
                 << "Interface:" << DEEPIN_DAEMON_APPEARANCE_INTERFACE;
         
@@ -447,15 +448,15 @@ void WebEngineHandler::initFontsInformation()
             }
         }
 
-        qInfo() << "Default font with translation:" << m_defaultFont;
+        qCInfo(voiceNoteLog) << "Default font with translation:" << m_defaultFont;
         // sort for display name
         std::sort(m_fontList.begin(), m_fontList.end(), [=](const QString &obj1, const QString &obj2) {
             QCollator qc;
             return qc.compare(obj1, obj2) < 0;
         });
-        qDebug() << "Font list sorted, total fonts:" << m_fontList.size();
+        qCDebug(voiceNoteLog) << "Font list sorted, total fonts:" << m_fontList.size();
     } else {
-        qWarning() << "Font service initialization failed. Service:" << DEEPIN_DAEMON_APPEARANCE_SERVICE << "not found";
+        qCWarning(voiceNoteLog) << "Font service initialization failed. Service:" << DEEPIN_DAEMON_APPEARANCE_SERVICE << "not found";
     }
 
     // 外观服务不可用时仍使用 Qt 的系统字体库兜底。字体名保持系统原值，
@@ -475,9 +476,9 @@ void WebEngineHandler::initFontsInformation()
     if (m_defaultFont.isEmpty() && !m_fontList.isEmpty()) {
         m_defaultFont = m_fontList.first();
     }
-    qInfo() << "System font list ready, total fonts:" << m_fontList.size()
+    qCInfo(voiceNoteLog) << "System font list ready, total fonts:" << m_fontList.size()
             << "default font:" << m_defaultFont;
-    qInfo() << "Fonts information initialization finished";
+    qCInfo(voiceNoteLog) << "Fonts information initialization finished";
 }
 
 /*!
@@ -485,7 +486,7 @@ void WebEngineHandler::initFontsInformation()
  */
 void WebEngineHandler::connectWebContent()
 {
-    qInfo() << "Connecting web content";
+    qCInfo(voiceNoteLog) << "Connecting web content";
     connect(JsContent::instance(), &JsContent::getfontinfo, this, [this]() {
         Q_EMIT JsContent::instance()->callJsSetFontList(m_fontList, m_defaultFont);
     });
@@ -579,7 +580,7 @@ void WebEngineHandler::connectWebContent()
         }
     });
 
-    qInfo() << "Web content connection finished";
+    qCInfo(voiceNoteLog) << "Web content connection finished";
 }
 
 /*!
@@ -588,7 +589,7 @@ void WebEngineHandler::connectWebContent()
 #ifdef USE_QT5
 void WebEngineHandler::onContextMenuRequested(QObject *request)
 {
-    qInfo() << "Context menu requested";
+    qCInfo(voiceNoteLog) << "Context menu requested";
     // 从 QObject* 中安全地获取属性
     const QPoint pos = request->property("position").toPoint();
 
@@ -610,12 +611,12 @@ void WebEngineHandler::onContextMenuRequested(QObject *request)
     default:
         break;
     }
-    qInfo() << "Context menu request handling finished";
+    qCInfo(voiceNoteLog) << "Context menu request handling finished";
 }
 #else
 void WebEngineHandler::onContextMenuRequested(QWebEngineContextMenuRequest *request)
 {
-    qInfo() << "Context menu requested";
+    qCInfo(voiceNoteLog) << "Context menu requested";
     switch (menuType) {
     case VoiceMenu: {
         processVoiceMenuRequest(request);
@@ -629,7 +630,7 @@ void WebEngineHandler::onContextMenuRequested(QWebEngineContextMenuRequest *requ
     default:
         break;
     }
-    qInfo() << "Context menu request handling finished";
+    qCInfo(voiceNoteLog) << "Context menu request handling finished";
 }
 #endif
 
@@ -639,7 +640,7 @@ void WebEngineHandler::onContextMenuRequested(QWebEngineContextMenuRequest *requ
 
 void WebEngineHandler::onInsertVoiceItem(const QString &voicePath, quint64 voiceSize)
 {
-    qDebug() << "Inserting voice item, path:" << voicePath << "size:" << voiceSize << "ms";
+    qCDebug(voiceNoteLog) << "Inserting voice item, path:" << voicePath << "size:" << voiceSize << "ms";
 
     VNVoiceBlock data;
     data.ptrVoice->voiceSize = voiceSize;
@@ -662,12 +663,12 @@ void WebEngineHandler::onInsertVoiceItem(const QString &voicePath, quint64 voice
 
     // 关闭应用时，需要同步插入语音并进行后台更新
     if (OpsStateInterface::instance()->isAppQuit()) {
-        qDebug() << "App is quitting, performing synchronous voice insertion";
+        qCDebug(voiceNoteLog) << "App is quitting, performing synchronous voice insertion";
         callJsSynchronous(QString("insertVoiceItem('%1')").arg(value.toString()));
         return;
     }
     emit JsContent::instance()->callJsInsertVoice(value.toString());
-    qInfo() << "Voice item insertion finished";
+    qCInfo(voiceNoteLog) << "Voice item insertion finished";
 }
 
 /**
@@ -675,7 +676,7 @@ void WebEngineHandler::onInsertVoiceItem(const QString &voicePath, quint64 voice
  */
 void WebEngineHandler::onThemeChanged()
 {
-    qDebug() << "Theme changed, updating UI";
+    qCDebug(voiceNoteLog) << "Theme changed, updating UI";
     DGuiApplicationHelper *dAppHelper = DGuiApplicationHelper::instance();
     DPalette dp = dAppHelper->applicationPalette();
     // 获取系统高亮色
@@ -690,7 +691,7 @@ void WebEngineHandler::onThemeChanged()
     // Tiptap 编辑器主题下发（复用取色逻辑，只增一路）
     QString themeStr = (theme == DGuiApplicationHelper::LightType) ? QStringLiteral("light") : QStringLiteral("dark");
     TiptapChannelBridge::instance()->emitThemeProvided(themeStr, activeHightColor, disableHightColor, backgroundColor);
-    qInfo() << "Theme change handling finished";
+    qCInfo(voiceNoteLog) << "Theme change handling finished";
 }
 
 /**
@@ -698,10 +699,10 @@ void WebEngineHandler::onThemeChanged()
  */
 void WebEngineHandler::onSaveMenuParam(int type, const QVariant &json)
 {
-    qInfo() << "Saving menu parameter, type:" << type;
+    qCInfo(voiceNoteLog) << "Saving menu parameter, type:" << type;
     menuType = static_cast<Menu>(type);
     menuJson = json;
-    qInfo() << "Menu parameter saving finished";
+    qCInfo(voiceNoteLog) << "Menu parameter saving finished";
 }
 
 /**
@@ -709,12 +710,12 @@ void WebEngineHandler::onSaveMenuParam(int type, const QVariant &json)
  */
 void WebEngineHandler::onMenuClicked(ActionManager::ActionKind kind)
 {
-    qInfo() << "Menu clicked, kind:" << kind;
+    qCInfo(voiceNoteLog) << "Menu clicked, kind:" << kind;
     switch (kind) {
         case ActionManager::VoiceAsSave:
             // 另存语音
             if (!saveMP3()) {
-                qWarning() << "Failed to save MP3";
+                qCWarning(voiceNoteLog) << "Failed to save MP3";
                 Q_EMIT requestMessageDialog(VNoteMessageDialogHandler::SaveFailed);
             }
             break;
@@ -789,7 +790,7 @@ void WebEngineHandler::onMenuClicked(ActionManager::ActionKind kind)
             // Qt5 中使用 QAudioDeviceInfo 检查音频输出设备
             QList<QAudioDeviceInfo> outputDevices = QAudioDeviceInfo::availableDevices(QAudio::AudioOutput);
             if (outputDevices.isEmpty()) {
-                qWarning() << "No audio output devices available";
+                qCWarning(voiceNoteLog) << "No audio output devices available";
                 QString errString = VTextSpeechAndTrManager::instance()->errorString(VTextSpeechAndTrManager::NoOutputDevice);
                 if (!errString.isEmpty()) {
                     Q_EMIT popupToast(errString, VTextSpeechAndTrManager::NoOutputDevice);
@@ -799,7 +800,7 @@ void WebEngineHandler::onMenuClicked(ActionManager::ActionKind kind)
 #else
             QList<QAudioDevice> outputDevices = QMediaDevices::audioOutputs();
             if (outputDevices.isEmpty()) {
-                qWarning() << "No audio output devices available";
+                qCWarning(voiceNoteLog) << "No audio output devices available";
                 QString errString = VTextSpeechAndTrManager::instance()->errorString(VTextSpeechAndTrManager::NoOutputDevice);
                 if (!errString.isEmpty()) {
                     Q_EMIT popupToast(errString, VTextSpeechAndTrManager::NoOutputDevice);
@@ -809,7 +810,7 @@ void WebEngineHandler::onMenuClicked(ActionManager::ActionKind kind)
 #endif
             auto status = VTextSpeechAndTrManager::instance()->onTextToSpeech();
             if (VTextSpeechAndTrManager::Success != status) {
-                qWarning() << "Text to speech failed with status:" << status;
+                qCWarning(voiceNoteLog) << "Text to speech failed with status:" << status;
                 QString errString = VTextSpeechAndTrManager::instance()->errorString(status);
                 if (!errString.isEmpty()) {
                     Q_EMIT popupToast(errString, status);
@@ -848,7 +849,7 @@ void WebEngineHandler::onMenuClicked(ActionManager::ActionKind kind)
         default:
             break;
     }
-    qInfo() << "Menu click handling finished";
+    qCInfo(voiceNoteLog) << "Menu click handling finished";
 }
 
 /**
@@ -857,16 +858,16 @@ void WebEngineHandler::onMenuClicked(ActionManager::ActionKind kind)
  */
 void WebEngineHandler::onPaste(bool isVoice)
 {
-    qDebug() << "Paste operation requested, isVoice:" << isVoice;
+    qCDebug(voiceNoteLog) << "Paste operation requested, isVoice:" << isVoice;
     if (TiptapChannelBridge::instance()->tiptapEnabled() && hasTiptapVoiceBlockClipboard()) {
         if (pasteTiptapVoiceBlockFromClipboard()) {
-            qInfo() << "Tiptap voice block paste handled directly";
+            qCInfo(voiceNoteLog) << "Tiptap voice block paste handled directly";
             return;
         }
     }
 
     if (isVoice) {
-        qInfo() << "Paste operation requested, isVoice is true";
+        qCInfo(voiceNoteLog) << "Paste operation requested, isVoice is true";
 #ifdef USE_QT5
         Q_EMIT triggerWebAction((int)QWebEnginePage::Paste);
 #else
@@ -884,7 +885,7 @@ void WebEngineHandler::onPaste(bool isVoice)
     // data URL，交给 TiptapChannelBridge::jsPasteImage 统一落盘。
     if (TiptapChannelBridge::instance()->tiptapEnabled() && mimeData) {
         if (mimeData->hasUrls()) {
-            qInfo() << "Tiptap paste: mimeData has urls";
+            qCInfo(voiceNoteLog) << "Tiptap paste: mimeData has urls";
             VNoteMainManager::instance()->insertImages(mimeData->urls());
             return;
         }
@@ -897,37 +898,37 @@ void WebEngineHandler::onPaste(bool isVoice)
                     const QString dataUrl = QStringLiteral("data:image/png;base64,")
                             + QString::fromLatin1(imageBytes.toBase64());
                     TiptapChannelBridge::instance()->jsPasteImage(dataUrl);
-                    qInfo() << "Tiptap paste: clipboard image routed to Tiptap";
+                    qCInfo(voiceNoteLog) << "Tiptap paste: clipboard image routed to Tiptap";
                     return;
                 }
             }
-            qWarning() << "Tiptap paste: clipboard image is invalid";
+            qCWarning(voiceNoteLog) << "Tiptap paste: clipboard image is invalid";
             return;
         }
     }
 
     // Summernote 路径：存在文件 URL 或位图时由 JsContent 负责落盘。
     if (mimeData && mimeData->hasUrls()) {
-        qInfo() << "mimeData has urls";
+        qCInfo(voiceNoteLog) << "mimeData has urls";
         QStringList paths;
         for (const auto &url : mimeData->urls()) {
             paths.push_back(url.path());
         }
-        qDebug() << "Pasting URLs:" << paths;
+        qCDebug(voiceNoteLog) << "Pasting URLs:" << paths;
         JsContent::instance()->insertImages(paths);
     } else if (mimeData && mimeData->hasImage()) {
-        qDebug() << "Pasting image from clipboard";
+        qCDebug(voiceNoteLog) << "Pasting image from clipboard";
         JsContent::instance()->insertImages(qvariant_cast<QImage>(mimeData->imageData()));
     } else {
         // 无图片文件，直接调用web端的粘贴事件
-        qDebug() << "Pasting text content";
+        qCDebug(voiceNoteLog) << "Pasting text content";
 #ifdef USE_QT5
         Q_EMIT triggerWebAction((int)QWebEnginePage::Paste);
 #else
         Q_EMIT triggerWebAction(QWebEnginePage::Paste);
 #endif
     }
-    qInfo() << "Paste operation finished";
+    qCInfo(voiceNoteLog) << "Paste operation finished";
 }
 
 /*!
@@ -936,7 +937,7 @@ void WebEngineHandler::onPaste(bool isVoice)
 #ifdef USE_QT5
 void WebEngineHandler::processVoiceMenuRequest(QObject *request)
 {
-    qInfo() << "Processing voice menu request";
+    qCInfo(voiceNoteLog) << "Processing voice menu request";
     m_voiceBlock.reset(new VNVoiceBlock);
     MetaDataParser dataParser;
     // 解析json数据
@@ -967,17 +968,17 @@ void WebEngineHandler::processVoiceMenuRequest(QObject *request)
     // 请求界面弹出右键菜单
     const QPoint pos = request->property("position").toPoint();
     Q_EMIT requestShowMenu(VoiceMenu, pos);
-    qInfo() << "Voice menu request processing finished";
+    qCInfo(voiceNoteLog) << "Voice menu request processing finished";
 }
 #else
 void WebEngineHandler::processVoiceMenuRequest(QWebEngineContextMenuRequest *request)
 {
-    qInfo() << "Processing voice menu request";
+    qCInfo(voiceNoteLog) << "Processing voice menu request";
     m_voiceBlock.reset(new VNVoiceBlock);
     MetaDataParser dataParser;
     // 解析json数据
     if (!dataParser.parse(menuJson, m_voiceBlock.get())) {
-        qInfo() << "Failed to parse menu json";
+        qCInfo(voiceNoteLog) << "Failed to parse menu json";
         return;
     }
 
@@ -988,7 +989,7 @@ void WebEngineHandler::processVoiceMenuRequest(QWebEngineContextMenuRequest *req
 
     // 语音文件不存在使用弹出提示
     if (!QFile::exists(m_voiceBlock->voicePath)) {
-        qInfo() << "Voice file does not exist";
+        qCInfo(voiceNoteLog) << "Voice file does not exist";
         // 异步操作，防止阻塞前端事件
         QTimer::singleShot(0, this, [this] {
             Q_EMIT requestMessageDialog(VNoteMessageDialogHandler::VoicePathNoAvail);
@@ -1004,7 +1005,7 @@ void WebEngineHandler::processVoiceMenuRequest(QWebEngineContextMenuRequest *req
     ActionManager::instance()->enableAction(ActionManager::VoiceToText, !OpsStateInterface::instance()->isVoice2Text());
     // 请求界面弹出右键菜单
     Q_EMIT requestShowMenu(VoiceMenu, request->position());
-    qInfo() << "Voice menu request processing finished";
+    qCInfo(voiceNoteLog) << "Voice menu request processing finished";
 }
 #endif
 
@@ -1014,7 +1015,7 @@ void WebEngineHandler::processVoiceMenuRequest(QWebEngineContextMenuRequest *req
 #ifdef USE_QT5
 void WebEngineHandler::processTextMenuRequest(QObject *request)
 {
-    qInfo() << "Processing text menu request";
+    qCInfo(voiceNoteLog) << "Processing text menu request";
     // 此处的逻辑是"兜底"，主要逻辑已由QML实现，以确保在所有情况下状态正确
     const int intFlags = request->property("editFlags").toInt();
     auto flags = static_cast<QWebEngineContextMenuData::EditFlags>(intFlags);
@@ -1025,36 +1026,36 @@ void WebEngineHandler::processTextMenuRequest(QObject *request)
 
     // 设置普通菜单项状态
     if (flags.testFlag(QWebEngineContextMenuData::CanSelectAll)) {
-        qInfo() << "flags has CanSelectAll";
+        qCInfo(voiceNoteLog) << "flags has CanSelectAll";
         ActionManager::instance()->enableAction(ActionManager::TxtSelectAll, true);
     }
     if (flags.testFlag(QWebEngineContextMenuData::CanCopy)) {
-        qInfo() << "flags has CanCopy";
+        qCInfo(voiceNoteLog) << "flags has CanCopy";
         ActionManager::instance()->enableAction(ActionManager::TxtCopy, true);
         ActionManager::instance()->enableAction(ActionManager::TxtSpeech, true);
     }
     if (flags.testFlag(QWebEngineContextMenuData::CanCut)) {
-        qInfo() << "flags has CanCut";
+        qCInfo(voiceNoteLog) << "flags has CanCut";
         ActionManager::instance()->enableAction(ActionManager::TxtCut, true);
     }
     if (flags.testFlag(QWebEngineContextMenuData::CanDelete)) {
-        qInfo() << "flags has CanDelete";
+        qCInfo(voiceNoteLog) << "flags has CanDelete";
         ActionManager::instance()->enableAction(ActionManager::TxtDelete, true);
     }
     if (flags.testFlag(QWebEngineContextMenuData::CanPaste)) {
-        qInfo() << "flags has CanPaste";
+        qCInfo(voiceNoteLog) << "flags has CanPaste";
         ActionManager::instance()->enableAction(ActionManager::TxtPaste, true);
         ActionManager::instance()->enableAction(ActionManager::TxtDictation, true);
     }
 
     const QPoint pos = request->property("position").toPoint();
     Q_EMIT requestShowMenu(TxtMenu, pos);
-    qInfo() << "Text menu request processing finished";
+    qCInfo(voiceNoteLog) << "Text menu request processing finished";
 }
 #else
 void WebEngineHandler::processTextMenuRequest(QWebEngineContextMenuRequest *request)
 {
-    qInfo() << "Processing text menu request";
+    qCInfo(voiceNoteLog) << "Processing text menu request";
     ActionManager::instance()->resetCtxMenu(ActionManager::MenuType::TxtCtxMenu, false); // 重置菜单选项
 
     // TASK-37707: Disable now
@@ -1065,35 +1066,35 @@ void WebEngineHandler::processTextMenuRequest(QWebEngineContextMenuRequest *requ
     // 设置普通菜单项状态
     // 可全选
     if (flags.testFlag(QWebEngineContextMenuRequest::CanSelectAll)) {
-        qInfo() << "flags has CanSelectAll";
+        qCInfo(voiceNoteLog) << "flags has CanSelectAll";
         ActionManager::instance()->enableAction(ActionManager::TxtSelectAll, true);
     }
     // 可复制
     if (flags.testFlag(QWebEngineContextMenuRequest::CanCopy)) {
-        qInfo() << "flags has CanCopy";
+        qCInfo(voiceNoteLog) << "flags has CanCopy";
         ActionManager::instance()->enableAction(ActionManager::TxtCopy, true);
         ActionManager::instance()->enableAction(ActionManager::TxtSpeech, true);
     }
     // 可剪切
     if (flags.testFlag(QWebEngineContextMenuRequest::CanCut)) {
-        qInfo() << "flags has CanCut";
+        qCInfo(voiceNoteLog) << "flags has CanCut";
         ActionManager::instance()->enableAction(ActionManager::TxtCut, true);
     }
     // 可删除
     if (flags.testFlag(QWebEngineContextMenuRequest::CanDelete)) {
-        qInfo() << "flags has CanDelete";
+        qCInfo(voiceNoteLog) << "flags has CanDelete";
         ActionManager::instance()->enableAction(ActionManager::TxtDelete, true);
     }
     // 可粘贴
     if (flags.testFlag(QWebEngineContextMenuRequest::CanPaste)) {
-        qInfo() << "flags has CanPaste";
+        qCInfo(voiceNoteLog) << "flags has CanPaste";
         ActionManager::instance()->enableAction(ActionManager::TxtPaste, true);
         ActionManager::instance()->enableAction(ActionManager::TxtDictation, true);
     }
 
     // 请求界面弹出右键菜单
     Q_EMIT requestShowMenu(TxtMenu, request->position());
-    qInfo() << "Text menu request processing finished";
+    qCInfo(voiceNoteLog) << "Text menu request processing finished";
 }
 #endif
 
@@ -1105,7 +1106,7 @@ void WebEngineHandler::processTextMenuRequest(QWebEngineContextMenuRequest *requ
 #else
 void WebEngineHandler::processPictureMenuRequest(QWebEngineContextMenuRequest *request)
 {
-    qInfo() << "Processing picture menu request";
+    qCInfo(voiceNoteLog) << "Processing picture menu request";
     ActionManager::instance()->resetCtxMenu(ActionManager::MenuType::PictureCtxMenu, true);
 
     auto flags = request->editFlags();
@@ -1113,32 +1114,32 @@ void WebEngineHandler::processPictureMenuRequest(QWebEngineContextMenuRequest *r
     // 设置普通菜单项状态
     // 可全选
     if (flags.testFlag(QWebEngineContextMenuRequest::CanSelectAll)) {
-        qInfo() << "flags has CanSelectAll";
+        qCInfo(voiceNoteLog) << "flags has CanSelectAll";
         ActionManager::instance()->enableAction(ActionManager::PictureSelectAll, true);
     }
     // 可复制
     if (flags.testFlag(QWebEngineContextMenuRequest::CanCopy)) {
-        qInfo() << "flags has CanCopy";
+        qCInfo(voiceNoteLog) << "flags has CanCopy";
         ActionManager::instance()->enableAction(ActionManager::PictureCopy, true);
     }
     // 可剪切
     if (flags.testFlag(QWebEngineContextMenuRequest::CanCut)) {
-        qInfo() << "flags has CanCut";
+        qCInfo(voiceNoteLog) << "flags has CanCut";
         ActionManager::instance()->enableAction(ActionManager::PictureCut, true);
     }
     // 可删除
     if (flags.testFlag(QWebEngineContextMenuRequest::CanDelete)) {
-        qInfo() << "flags has CanDelete";
+        qCInfo(voiceNoteLog) << "flags has CanDelete";
         ActionManager::instance()->enableAction(ActionManager::PictureDelete, true);
     }
     // 可粘贴
     if (flags.testFlag(QWebEngineContextMenuRequest::CanPaste)) {
-        qInfo() << "flags has CanPaste";
+        qCInfo(voiceNoteLog) << "flags has CanPaste";
         ActionManager::instance()->enableAction(ActionManager::PicturePaste, true);
     }
 
     Q_EMIT requestShowMenu(PictureMenu, request->position());
-    qInfo() << "Picture menu request processing finished";
+    qCInfo(voiceNoteLog) << "Picture menu request processing finished";
 }
 #endif
 
@@ -1147,50 +1148,50 @@ void WebEngineHandler::processPictureMenuRequest(QWebEngineContextMenuRequest *r
  */
 bool WebEngineHandler::isVoicePaste()
 {
-    qInfo() << "Checking if voice paste";
+    qCInfo(voiceNoteLog) << "Checking if voice paste";
     // 调用web前端接口
     return callJsSynchronous("returnCopyFlag()").toBool();
 }
 
 bool WebEngineHandler::saveMP3()
 {
-    qInfo() << "Saving MP3";
+    qCInfo(voiceNoteLog) << "Saving MP3";
     if (!m_voiceBlock) {
-        qWarning() << "No voice block available for saving";
+        qCWarning(voiceNoteLog) << "No voice block available for saving";
         return false;
     }
     
     QString savedPath = setting::instance()->getOption(VNOTE_EXPORT_TEXT_PATH_KEY).toString();
     QString defaultDir;
     if (!savedPath.isEmpty()) {
-        qInfo() << "savedPath is not empty";
+        qCInfo(voiceNoteLog) << "savedPath is not empty";
         defaultDir = savedPath;
     } else {
-        qInfo() << "savedPath is empty";
+        qCInfo(voiceNoteLog) << "savedPath is empty";
         defaultDir = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
     }
     
     QString defaultName = defaultDir + "/" + m_voiceBlock.get()->voiceTitle + ".mp3";
-    qDebug() << "Saving MP3 with default name:" << defaultName;
+    qCDebug(voiceNoteLog) << "Saving MP3 with default name:" << defaultName;
     QString fileName = QFileDialog::getSaveFileName(0, tr("save as MP3"), defaultName, "*.mp3");
     if (!fileName.isEmpty()) {
-        qInfo() << "fileName is not empty";
+        qCInfo(voiceNoteLog) << "fileName is not empty";
         QFileInfo fileInfo(fileName);
         QDir dir = fileInfo.absoluteDir();
         if (!dir.exists()) {
-            qWarning() << "Target directory does not exist:" << dir.path();
+            qCWarning(voiceNoteLog) << "Target directory does not exist:" << dir.path();
             return false;
         }
         
         setting::instance()->setOption(VNOTE_EXPORT_TEXT_PATH_KEY, dir.path());
-        qDebug() << "Saved unified export path to settings:" << dir.path();
+        qCDebug(voiceNoteLog) << "Saved unified export path to settings:" << dir.path();
         
         // 如果目标文件已存在，先删除它（因为 QFile::copy 不会覆盖已存在的文件）
         // 用户已经在 getSaveFileName 对话框中确认覆盖
         if (QFile::exists(fileName)) {
-            qDebug() << "Target file exists, removing it before copy:" << fileName;
+            qCDebug(voiceNoteLog) << "Target file exists, removing it before copy:" << fileName;
             if (!QFile::remove(fileName)) {
-                qWarning() << "Failed to remove existing file:" << fileName;
+                qCWarning(voiceNoteLog) << "Failed to remove existing file:" << fileName;
                 return false;
             }
         }
@@ -1198,35 +1199,35 @@ bool WebEngineHandler::saveMP3()
         QFile tmpFile(m_voiceBlock.get()->voicePath);
         bool copyResult = tmpFile.copy(fileName);
         if (!copyResult) {
-            qWarning() << "Failed to copy voice file from:" << m_voiceBlock.get()->voicePath << "to:" << fileName;
+            qCWarning(voiceNoteLog) << "Failed to copy voice file from:" << m_voiceBlock.get()->voicePath << "to:" << fileName;
         }
         return copyResult;
     }
-    qInfo() << "MP3 saving finished, result is true";
+    qCInfo(voiceNoteLog) << "MP3 saving finished, result is true";
     return true;
 }
 
 void WebEngineHandler::savePictureAs()
 {
-    qInfo() << "Saving picture as";
+    qCInfo(voiceNoteLog) << "Saving picture as";
     // web端图片src为相对/web路径，需先解析为磁盘真实路径，否则复制失败
     QString originalPath = normalizePicturePath(menuJson.toString());
     if (originalPath.isEmpty()) {
         // 路径无法解析，提示保存失败，避免执行注定失败的复制
-        qWarning() << "Failed to normalize picture path:" << menuJson.toString();
+        qCWarning(voiceNoteLog) << "Failed to normalize picture path:" << menuJson.toString();
         Q_EMIT requestMessageDialog(VNoteMessageDialogHandler::SaveFailed);
         return;
     }
     saveAsFile(originalPath, QStandardPaths::writableLocation(QStandardPaths::PicturesLocation), "image");
-    qInfo() << "Picture saving finished";
+    qCInfo(voiceNoteLog) << "Picture saving finished";
 }
 
 QString WebEngineHandler::saveAsFile(const QString &originalPath, QString dirPath, const QString &defalutName)
 {
     // 存储文件夹默认为桌面
-    qDebug() << "Saving file, original path:" << originalPath << "default name:" << defalutName;
+    qCDebug(voiceNoteLog) << "Saving file, original path:" << originalPath << "default name:" << defalutName;
     if (dirPath.isEmpty()) {
-        qInfo() << "dirPath is empty";
+        qCInfo(voiceNoteLog) << "dirPath is empty";
         dirPath = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
     }
 
@@ -1237,26 +1238,26 @@ QString WebEngineHandler::saveAsFile(const QString &originalPath, QString dirPat
     // 获取需要保存的文件位置，默认路径为用户图片文件夹，默认文件名为原文件名
     QString newPath = QFileDialog::getSaveFileName(0, "", dir, filter);
     if (newPath.isEmpty()) {
-        qDebug() << "Save operation cancelled by user";
+        qCDebug(voiceNoteLog) << "Save operation cancelled by user";
         return "";
     }
     // 添加文件后缀
     if (!newPath.endsWith(fileInfo.suffix())) {
-        qInfo() << "newPath does not end with fileInfo.suffix";
+        qCInfo(voiceNoteLog) << "newPath does not end with fileInfo.suffix";
         newPath += ("." + fileInfo.suffix());
     }
 
     QFileInfo info(newPath);
     if (!QFileInfo(info.dir().path()).isWritable()) {
-        qWarning() << "No write permission for directory:" << info.dir().path();
+        qCWarning(voiceNoteLog) << "No write permission for directory:" << info.dir().path();
         emit requestMessageDialog(VNoteMessageDialogHandler::NoPermission);
         return "";
     }
     if (info.exists()) {
-        qInfo() << "File already exists";
+        qCInfo(voiceNoteLog) << "File already exists";
         // 文件已存在，删除原文件
         if (!info.isWritable()) {
-            qWarning() << "No write permission for file:" << newPath;
+            qCWarning(voiceNoteLog) << "No write permission for file:" << newPath;
             emit requestMessageDialog(VNoteMessageDialogHandler::NoPermission);
             return "";
         }
@@ -1265,10 +1266,10 @@ QString WebEngineHandler::saveAsFile(const QString &originalPath, QString dirPat
 
     // 复制文件
     if (!QFile::copy(originalPath, newPath)) {
-        qCritical() << "File copy failed from:" << originalPath << "to:" << newPath;
+        qCCritical(voiceNoteLog) << "File copy failed from:" << originalPath << "to:" << newPath;
         emit requestMessageDialog(VNoteMessageDialogHandler::SaveFailed);
         return "";
     }
-    qInfo() << "File saved successfully to:" << newPath;
+    qCInfo(voiceNoteLog) << "File saved successfully to:" << newPath;
     return newPath;
 }
