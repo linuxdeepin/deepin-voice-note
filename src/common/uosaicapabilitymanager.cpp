@@ -63,17 +63,19 @@ bool UosAiCapabilityManager::isUpdateRequired(Status status) const
 
 bool UosAiCapabilityManager::openUosAiInAppStore() const
 {
-    QDBusInterface appStore(kAppStoreService,
-                            kAppStorePath,
-                            kAppStoreInterface,
-                            QDBusConnection::sessionBus());
-    appStore.setTimeout(kDbusTimeoutMs);
-    if (!appStore.isValid()) {
-        qWarning() << "App Store D-Bus interface is invalid:" << appStore.lastError().message();
-        return false;
-    }
-
-    QDBusMessage reply = appStore.call(QStringLiteral("openBusinessUri"), kUosAiAppStoreUri);
+    // Do not gate this call on QDBusInterface::isValid(). That check performs
+    // an introspection and returns false when App Store is not running yet,
+    // even though a method call on the well-known name would activate it.
+    // If the first App Store window was closed, the service name is gone and
+    // the old check also blocked every subsequent launch.
+    QDBusMessage message = QDBusMessage::createMethodCall(kAppStoreService,
+                                                          kAppStorePath,
+                                                          kAppStoreInterface,
+                                                          QStringLiteral("openBusinessUri"));
+    message << kUosAiAppStoreUri;
+    QDBusMessage reply = QDBusConnection::sessionBus().call(message,
+                                                            QDBus::Block,
+                                                            kDbusTimeoutMs);
     if (reply.type() == QDBusMessage::ErrorMessage) {
         qWarning() << "Failed to open UOS AI detail in App Store:" << reply.errorMessage();
         return false;
