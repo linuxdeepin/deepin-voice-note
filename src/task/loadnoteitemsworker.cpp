@@ -4,6 +4,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "loadnoteitemsworker.h"
+#include "ddlog.h"
 #include "db/vnoteitemoper.h"
 #include "globaldef.h"
 #include <QDebug>
@@ -19,7 +20,7 @@
 LoadNoteItemsWorker::LoadNoteItemsWorker(QObject *parent)
     : VNTask(parent)
 {
-    qInfo() << "LoadNoteItemsWorker constructor called";
+    qCInfo(voiceNoteLog) << "LoadNoteItemsWorker constructor called";
 }
 
 /**
@@ -27,7 +28,7 @@ LoadNoteItemsWorker::LoadNoteItemsWorker(QObject *parent)
  */
 void LoadNoteItemsWorker::run()
 {
-    qInfo() << "LoadNoteItemsWorker run called";
+    qCInfo(voiceNoteLog) << "LoadNoteItemsWorker run called";
     static struct timeval start, backups, end;
 
     gettimeofday(&start, nullptr);
@@ -38,12 +39,12 @@ void LoadNoteItemsWorker::run()
 
     gettimeofday(&end, nullptr);
 
-    qDebug() << "LoadNoteItemsWorker(ms):" << TM(start, end);
+    qCDebug(voiceNoteLog) << "LoadNoteItemsWorker(ms):" << TM(start, end);
 
     //TODO:
     //    Add load folder code here
 
-    qDebug() << __FUNCTION__ << " load all notes ok:" << notesMap->notes.size() /*<< " thread id:" << QThread::currentThreadId()*/;
+    qCDebug(voiceNoteLog) << __FUNCTION__ << " load all notes ok:" << notesMap->notes.size() /*<< " thread id:" << QThread::currentThreadId()*/;
 
     emit onAllNotesLoaded(notesMap);
 }

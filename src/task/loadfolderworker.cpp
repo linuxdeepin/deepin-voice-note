@@ -4,6 +4,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "loadfolderworker.h"
+#include "ddlog.h"
 #include <QDebug>
 #include "common/vnoteforlder.h"
 #include "db/vnotefolderoper.h"
@@ -20,7 +21,7 @@
 LoadFolderWorker::LoadFolderWorker(QObject *parent)
     : VNTask(parent)
 {
-    qInfo() << "LoadFolderWorker constructor called";
+    qCInfo(voiceNoteLog) << "LoadFolderWorker constructor called";
 }
 
 /**
@@ -28,7 +29,7 @@ LoadFolderWorker::LoadFolderWorker(QObject *parent)
  */
 void LoadFolderWorker::run()
 {
-    qInfo() << "LoadFolderWorker run called";
+    qCInfo(voiceNoteLog) << "LoadFolderWorker run called";
     static struct timeval start, backups, end;
 
     gettimeofday(&start, nullptr);
@@ -39,12 +40,12 @@ void LoadFolderWorker::run()
 
     gettimeofday(&end, nullptr);
 
-    qDebug() << "LoadFolderWorker(ms):" << TM(start, end);
+    qCDebug(voiceNoteLog) << "LoadFolderWorker(ms):" << TM(start, end);
 
     //TODO:
     //    Add load folder code here
 
-    qDebug() << __FUNCTION__ << " load folders ok:" << foldersMap/* << " thread id:" << QThread::currentThreadId()*/;
+    qCDebug(voiceNoteLog) << __FUNCTION__ << " load folders ok:" << foldersMap/* << " thread id:" << QThread::currentThreadId()*/;
 
     emit onFoldersLoaded(foldersMap);
 }
