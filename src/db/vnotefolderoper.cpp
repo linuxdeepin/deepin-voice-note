@@ -4,6 +4,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "vnotefolderoper.h"
+#include "ddlog.h"
 #include "common/utils.h"
 #include "common/vnoteforlder.h"
 #include "common/vnotedatamanager.h"
@@ -27,7 +28,7 @@ DWIDGET_USE_NAMESPACE
 VNoteFolderOper::VNoteFolderOper(VNoteFolder *folder)
     : m_folder(folder)
 {
-    qInfo() << "VNoteFolderOper constructor called";
+    qCInfo(voiceNoteLog) << "VNoteFolderOper constructor called";
 }
 
 /**
@@ -47,7 +48,7 @@ bool VNoteFolderOper::isNoteItemLoaded()
  */
 bool VNoteFolderOper::deleteVNoteFolder(qint64 folderId)
 {
-    qDebug() << "Deleting folder with ID:" << folderId;
+    qCDebug(voiceNoteLog) << "Deleting folder with ID:" << folderId;
     bool delOK = false;
 
     DelFolderDbVisitor delFolderVisitor(
@@ -56,9 +57,9 @@ bool VNoteFolderOper::deleteVNoteFolder(qint64 folderId)
     if (VNoteDbManager::instance()->deleteData(&delFolderVisitor)) {
         delOK = true;
         QScopedPointer<VNoteFolder> release(VNoteDataManager::instance()->delFolder(folderId));
-        qInfo() << "Successfully deleted folder:" << folderId;
+        qCInfo(voiceNoteLog) << "Successfully deleted folder:" << folderId;
     } else {
-        qWarning() << "Failed to delete folder:" << folderId;
+        qCWarning(voiceNoteLog) << "Failed to delete folder:" << folderId;
     }
 
     return delOK;
@@ -71,12 +72,12 @@ bool VNoteFolderOper::deleteVNoteFolder(qint64 folderId)
  */
 bool VNoteFolderOper::deleteVNoteFolder(VNoteFolder *folder)
 {
-    qDebug() << "Deleting folder:" << (folder ? folder->name : "null");
+    qCDebug(voiceNoteLog) << "Deleting folder:" << (folder ? folder->name : "null");
     bool delOK = true;
     if (nullptr != folder) {
         delOK = deleteVNoteFolder(folder->id);
     } else {
-        qWarning() << "Cannot delete null folder";
+        qCWarning(voiceNoteLog) << "Cannot delete null folder";
     }
 
     return delOK;
@@ -89,11 +90,11 @@ bool VNoteFolderOper::deleteVNoteFolder(VNoteFolder *folder)
  */
 bool VNoteFolderOper::renameVNoteFolder(const QString &folderName)
 {
-    qDebug() << "Renaming folder to:" << folderName;
+    qCDebug(voiceNoteLog) << "Renaming folder to:" << folderName;
     bool isUpdateOK = true;
 
     if (nullptr != m_folder) {
-        qInfo() << "Renaming folder to:" << folderName;
+        qCInfo(voiceNoteLog) << "Renaming folder to:" << folderName;
         QString oldFolderName = m_folder->name;
         QDateTime oldModifyTime = m_folder->modifyTime;
 
@@ -103,15 +104,15 @@ bool VNoteFolderOper::renameVNoteFolder(const QString &folderName)
         RenameFolderDbVisitor renameFolderVisitor(VNoteDbManager::instance()->getVNoteDb(), m_folder, nullptr);
 
         if (Q_UNLIKELY(!VNoteDbManager::instance()->updateData(&renameFolderVisitor))) {
-            qWarning() << "Failed to rename folder from" << oldFolderName << "to" << folderName;
+            qCWarning(voiceNoteLog) << "Failed to rename folder from" << oldFolderName << "to" << folderName;
             m_folder->name = oldFolderName;
             m_folder->modifyTime = oldModifyTime;
             isUpdateOK = false;
         } else {
-            qInfo() << "Successfully renamed folder from" << oldFolderName << "to" << folderName;
+            qCInfo(voiceNoteLog) << "Successfully renamed folder from" << oldFolderName << "to" << folderName;
         }
     } else {
-        qWarning() << "Cannot rename null folder";
+        qCWarning(voiceNoteLog) << "Cannot rename null folder";
         isUpdateOK = false;
     }
 
@@ -124,7 +125,7 @@ bool VNoteFolderOper::renameVNoteFolder(const QString &folderName)
  */
 VNOTE_FOLDERS_MAP *VNoteFolderOper::loadVNoteFolders()
 {
-    qDebug() << "Loading all note folders";
+    qCDebug(voiceNoteLog) << "Loading all note folders";
     VNOTE_FOLDERS_MAP *foldersMap = new VNOTE_FOLDERS_MAP();
 
     //DataManager should set autoRelease flag
@@ -133,9 +134,9 @@ VNOTE_FOLDERS_MAP *VNoteFolderOper::loadVNoteFolders()
     FolderQryDbVisitor folderVisitor(VNoteDbManager::instance()->getVNoteDb(), nullptr, foldersMap);
 
     if (!VNoteDbManager::instance()->queryData(&folderVisitor)) {
-        qCritical() << "Failed to query folders";
+        qCCritical(voiceNoteLog) << "Failed to query folders";
     } else {
-        qInfo() << "Successfully loaded" << foldersMap->folders.size() << "folders";
+        qCInfo(voiceNoteLog) << "Successfully loaded" << foldersMap->folders.size() << "folders";
     }
 
     return foldersMap;
@@ -148,11 +149,11 @@ VNOTE_FOLDERS_MAP *VNoteFolderOper::loadVNoteFolders()
  */
 VNoteFolder *VNoteFolderOper::addFolder(VNoteFolder &folder)
 {
-    qDebug() << "Adding new folder:" << folder.name;
+    qCDebug(voiceNoteLog) << "Adding new folder:" << folder.name;
     
     //Initialize
     folder.defaultIcon = getDefaultIcon();
-    qDebug() << "Using default icon index:" << folder.defaultIcon;
+    qCDebug(voiceNoteLog) << "Using default icon index:" << folder.defaultIcon;
 
     VNoteFolder *newFolder = new VNoteFolder();
 
@@ -161,13 +162,13 @@ VNoteFolder *VNoteFolderOper::addFolder(VNoteFolder &folder)
     if (VNoteDbManager::instance()->insertData(&addFolderVisitor)) {
         VNoteDataManager::instance()->addFolder(newFolder);
 
-        qInfo() << "Successfully added new folder:"
+        qCInfo(voiceNoteLog) << "Successfully added new folder:"
                 << "ID:" << newFolder->id
                 << "Name:" << newFolder->name
                 << "Create time:" << newFolder->createTime
                 << "Modify time:" << newFolder->modifyTime;
     } else {
-        qCritical() << "Failed to add folder:"
+        qCCritical(voiceNoteLog) << "Failed to add folder:"
                     << "ID:" << newFolder->id
                     << "Name:" << newFolder->name
                     << "Create time:" << newFolder->createTime
@@ -210,16 +211,16 @@ qint32 VNoteFolderOper::getFoldersCount()
  */
 qint32 VNoteFolderOper::getNotesCount(qint64 folderId)
 {
-    qDebug() << "Getting notes count for folder:" << folderId;
+    qCDebug(voiceNoteLog) << "Getting notes count for folder:" << folderId;
     VNOTE_ITEMS_MAP *notesInFollder = VNoteDataManager::instance()->getFolderNotes(folderId);
 
     qint32 notesCount = 0;
 
     if (nullptr != notesInFollder) {
         notesCount = notesInFollder->folderNotes.size();
-        qDebug() << "Found" << notesCount << "notes in folder:" << folderId;
+        qCDebug(voiceNoteLog) << "Found" << notesCount << "notes in folder:" << folderId;
     } else {
-        qDebug() << "No notes found in folder:" << folderId;
+        qCDebug(voiceNoteLog) << "No notes found in folder:" << folderId;
     }
 
     return notesCount;
@@ -231,11 +232,11 @@ qint32 VNoteFolderOper::getNotesCount(qint64 folderId)
  */
 qint32 VNoteFolderOper::getNotesCount()
 {
-    qInfo() << "Getting notes count";
+    qCInfo(voiceNoteLog) << "Getting notes count";
     qint32 notesCount = 0;
 
     if (m_folder != nullptr) {
-        qInfo() << "Getting notes count for folder:" << m_folder->id;
+        qCInfo(voiceNoteLog) << "Getting notes count for folder:" << m_folder->id;
         notesCount = getNotesCount(m_folder->id);
     }
 
@@ -248,7 +249,7 @@ qint32 VNoteFolderOper::getNotesCount()
  */
 QString VNoteFolderOper::getDefaultFolderName()
 {
-    qInfo() << "Getting default folder name";
+    qCInfo(voiceNoteLog) << "Getting default folder name";
     //TODO:
     //    The default folder is auto-increment, and
     //may be separate data for different category in future.
@@ -261,15 +262,15 @@ QString VNoteFolderOper::getDefaultFolderName()
 
     //Need reset the folder table id if data are empty.
     if (foldersCount == 0) {
-        qDebug() << "No existing folders, will reset folder table ID";
+        qCDebug(voiceNoteLog) << "No existing folders, will reset folder table ID";
         folderIdVisitor.extraData().data.flag = true;
     }
 
     if (VNoteDbManager::instance()->queryData(&folderIdVisitor)) {
         defaultFolderName += QString("%1").arg(foldersCount + 1);
-        qDebug() << "Generated default folder name:" << defaultFolderName;
+        qCDebug(voiceNoteLog) << "Generated default folder name:" << defaultFolderName;
     } else {
-        qWarning() << "Failed to generate default folder name";
+        qCWarning(voiceNoteLog) << "Failed to generate default folder name";
     }
 
     return defaultFolderName;
