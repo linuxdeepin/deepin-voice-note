@@ -4,6 +4,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "loadiconsworker.h"
+#include "ddlog.h"
 #include "common/vnotedatamanager.h"
 
 #include <QPixmap>
@@ -24,7 +25,7 @@ QReadWriteLock VNoteDataManager::m_iconLock;
 LoadIconsWorker::LoadIconsWorker(QObject *parent)
     : VNTask(parent)
 {
-    qInfo() << "LoadIconsWorker constructor called";
+    qCInfo(voiceNoteLog) << "LoadIconsWorker constructor called";
     //Hold the lock at constructor, this can void
     //other thread acess the icons before that being
     //loaded.
@@ -38,21 +39,21 @@ LoadIconsWorker::LoadIconsWorker(QObject *parent)
  */
 QPixmap LoadIconsWorker::greyPix(QPixmap pix)
 {
-    qInfo() << "LoadIconsWorker greyPix called";
+    qCInfo(voiceNoteLog) << "LoadIconsWorker greyPix called";
     // 输入验证
     if (pix.isNull() || pix.size().isEmpty()) {
-        qWarning() << "LoadIconsWorker::greyPix: Invalid input pixmap";
+        qCWarning(voiceNoteLog) << "LoadIconsWorker::greyPix: Invalid input pixmap";
         return QPixmap();
     }
 
 #ifdef __mips64
     // MIPS64 特殊处理：避免 QPainter 相关的内存对齐问题
-    qDebug() << "Using MIPS64-specific greyPix implementation";
+    qCDebug(voiceNoteLog) << "Using MIPS64-specific greyPix implementation";
     
     // 转换为 QImage 进行处理
     QImage image = pix.toImage();
     if (image.isNull()) {
-        qWarning() << "Failed to convert QPixmap to QImage";
+        qCWarning(voiceNoteLog) << "Failed to convert QPixmap to QImage";
         return pix; // 返回原图像作为后备
     }
     
