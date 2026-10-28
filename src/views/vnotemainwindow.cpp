@@ -38,6 +38,7 @@
 #include "views/vnoterecordbar.h"
 #include "widgets/vnoteiconbutton.h"
 #include "widgets/vnotepushbutton.h"
+#include "widgets/vnoteelidepushbutton.h"
 #include "task/vnmainwnddelayinittask.h"
 #include "task/filecleanupworker.h"
 
@@ -448,7 +449,7 @@ void VNoteMainWindow::initLeftView()
     m_leftView->expand(notepadRootIndex);
     leftHolderLayout->addWidget(m_leftView);
 
-    m_addNotepadBtn = new DPushButton(DApplication::translate("VNoteMainWindow", "Create Notebook"),
+    m_addNotepadBtn = new VNoteElidePushButton(DApplication::translate("VNoteMainWindow", "Create Notebook"),
                                       m_leftViewHolder);
     m_addNotepadBtn->installEventFilter(this);
 
