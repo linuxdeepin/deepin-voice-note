@@ -35,6 +35,12 @@
 static VNoteFolder *stub_addFolder_null(VNoteFolder &) { return nullptr; }
 static VNoteItem *stub_addNote_null(VNoteItem &) { return nullptr; }
 static bool stub_true() { return true; }
+static QString g_modifiedNoteTitle;
+static bool stub_captureModifiedTitle(VNoteItemOper &, const QString &title)
+{
+    g_modifiedNoteTitle = title;
+    return true;
+}
 
 // ---- PMS 补强回归用例 stub 辅助（只计数/返回固定值，不写 DB） ----
 static int g_addNoteCalls = 0;
@@ -316,6 +322,50 @@ TEST(VNoteMainManagerUT, BUG330295_renameNote_reloadsAndKeepsSelection)
         EXPECT_EQ(QStringLiteral("武汉-UT"), titleSpy.first().at(1).toString());
     }
     EXPECT_EQ(noteId, m->currentNoteId()) << "selection must stay on renamed note";
+}
+
+// BUG 381091: 笔记标题含首尾空格时，列表和内联重命名都必须先裁剪，再写库和发信号。
+TEST(VNoteMainManagerUT, BUG381091_renameNote_trimsLeadingAndTrailingSpaces)
+{
+    VNoteMainManager *m = VNoteMainManager::instance();
+    if (!m->m_richTextManager)
+        m->m_richTextManager = new WebRichTextManager();
+
+    int noteId = -1;
+    VNOTE_ALL_NOTES_MAP *all = VNoteDataManager::instance()->getAllNotesInFolder();
+    if (all) {
+        all->lock.lockForRead();
+        auto fit = all->notes.constFind(0);
+        if (fit != all->notes.constEnd() && fit.value()) {
+            fit.value()->lock.lockForRead();
+            for (auto nit = fit.value()->folderNotes.begin();
+                 nit != fit.value()->folderNotes.end(); ++nit) {
+                if (nit.key() > 0) {
+                    noteId = static_cast<int>(nit.key());
+                    break;
+                }
+            }
+            fit.value()->lock.unlock();
+        }
+        all->lock.unlock();
+    }
+    if (noteId < 0)
+        GTEST_SKIP() << "no pre-seeded note in folder 0";
+
+    m->doSwitchNote(noteId);
+    QSignalSpy titleSpy(m, &VNoteMainManager::noteTitleChanged);
+    Stub sRename, sPlay;
+    g_modifiedNoteTitle.clear();
+    sRename.set(ADDR(VNoteItemOper, modifyNoteTitle), stub_captureModifiedTitle);
+    sPlay.set(ADDR(OpsStateInterface, isPlaying), stub_isPlaying_false);
+
+    m->renameNote(noteId, QStringLiteral("  BUG381091  "));
+
+    EXPECT_EQ(QStringLiteral("BUG381091"), g_modifiedNoteTitle)
+        << "database rename must use the trimmed title";
+    ASSERT_EQ(1, titleSpy.count());
+    EXPECT_EQ(QStringLiteral("BUG381091"), titleSpy.first().at(1).toString())
+        << "list refresh signal must use the trimmed title";
 }
 
 // BUG 365373: 搜索结果界面无文字记录按 Ctrl+S 异常。修复：删除已不存在的
