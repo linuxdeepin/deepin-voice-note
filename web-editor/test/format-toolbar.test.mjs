@@ -1382,11 +1382,11 @@ test('note title selection uses text selection background and white foreground',
 // 背景色面板
 // ---------------------------------------------------------------------------
 
-test('backColor keeps the Summernote default transparent indicator', () => {
+test('backColor uses the story default yellow indicator', () => {
   const { editor, host } = createEditorWithToolbar()
   assert.equal(
     host.querySelector('button[data-format="backColor"]').style.getPropertyValue('--dvn-current-color'),
-    'transparent',
+    BACK_COLORS[0][1],
   )
   editor.destroy()
 })
@@ -1447,49 +1447,98 @@ test('color panels share dropdown theme and switch palettes in dark mode', () =>
   editor.destroy()
 })
 
-test('color palettes select their first color by default', () => {
+test('color palettes select the story default colors', () => {
   const { editor, host } = createEditorWithToolbar()
   const forePanel = host.querySelector('[data-panel="foreColor"]')
   const backPanel = host.querySelector('[data-panel="backColor"]')
 
   assert.equal(forePanel.querySelector('button[data-color]:first-child').getAttribute('aria-pressed'), 'true')
-  assert.equal(backPanel.querySelector('button[data-color]:first-child').getAttribute('aria-pressed'), 'true')
+  assert.equal(backPanel.querySelector('button[data-color="transparent"]').getAttribute('aria-pressed'), 'false')
+  assert.equal(
+    backPanel.querySelector(`button[data-color="${BACK_COLORS[0][1]}"]`).getAttribute('aria-pressed'),
+    'true',
+  )
   assert.equal(forePanel.querySelectorAll('button[data-color][aria-pressed="true"]').length, 1)
   assert.equal(backPanel.querySelectorAll('button[data-color][aria-pressed="true"]').length, 1)
   editor.destroy()
 })
 
-test('foreColor reflects collapsed cursor color context', () => {
+test('foreColor keeps the last toolbar selection when the cursor moves', () => {
   const { editor, host } = createEditorWithToolbar()
-  markEditorFocused(editor)
-
+  editor.commands.setContent({
+    type: 'doc',
+    content: [
+      { type: 'paragraph', content: [{ type: 'text', text: 'colored' }] },
+      { type: 'paragraph' },
+    ],
+  })
+  editor.chain().focus().setTextSelection(findTextRange(editor, 'colored')).run()
   const color = 'rgb(1, 100, 255)'
   const panel = host.querySelector('[data-panel="foreColor"]')
   const cell = panel.querySelector(`button[data-color="${color}"]`)
   assert.ok(cell)
   cell.click()
 
+  editor.chain().focus('end').run()
+  editor.commands.insertContent('typed')
   assert.equal(host.querySelector('button[data-format="foreColor"]').style.getPropertyValue('--dvn-current-color'), color)
   assert.equal(cell.getAttribute('aria-pressed'), 'true')
+  assert.equal(textMarkAttrs(editor, 'typed', 'color').color, color, 'typing in an empty paragraph must reuse the last text color')
   editor.destroy()
 })
 
-test('backColor reflects collapsed cursor highlight context', () => {
+test('backColor keeps the last toolbar selection when the cursor moves', () => {
   const { editor, host } = createEditorWithToolbar()
-  markEditorFocused(editor)
-
+  editor.commands.setContent({
+    type: 'doc',
+    content: [
+      { type: 'paragraph', content: [{ type: 'text', text: 'highlighted' }] },
+      { type: 'paragraph' },
+    ],
+  })
+  editor.chain().focus().setTextSelection(findTextRange(editor, 'highlighted')).run()
   const color = 'rgba(130, 178, 255, 0.2)'
   const panel = host.querySelector('[data-panel="backColor"]')
   const cell = panel.querySelector(`button[data-color="${color}"]`)
   assert.ok(cell)
   cell.click()
 
+  editor.chain().focus('end').run()
+  editor.commands.insertContent('typed')
   assert.equal(host.querySelector('button[data-format="backColor"]').style.getPropertyValue('--dvn-current-color'), color)
   assert.equal(cell.getAttribute('aria-pressed'), 'true')
+  assert.equal(textMarkAttrs(editor, 'typed', 'highlight').color, color, 'typing in an empty paragraph must reuse the last highlight color')
   editor.destroy()
 })
 
-test('color palettes show no selected swatch for mixed text and highlight colors', () => {
+test('transparent backColor keeps subsequent input unhighlighted', () => {
+  const { editor, host } = createEditorWithToolbar()
+  editor.commands.setContent({
+    type: 'doc',
+    content: [
+      {
+        type: 'paragraph',
+        content: [{
+          type: 'text',
+          text: 'highlighted',
+          marks: [{ type: 'highlight', attrs: { color: 'rgba(255, 215, 0, 0.2)' } }],
+        }],
+      },
+      { type: 'paragraph' },
+    ],
+  })
+  editor.chain().focus().setTextSelection(findTextRange(editor, 'highlighted')).run()
+  host.querySelector('[data-panel="backColor"] button[data-color="transparent"]').click()
+
+  editor.chain().focus('end').run()
+  editor.commands.insertContent('typed')
+
+  assert.equal(textHasMark(editor, 'highlighted', 'highlight'), false)
+  assert.equal(textHasMark(editor, 'typed', 'highlight'), false)
+  editor.destroy()
+})
+
+test('color palettes keep the last toolbar selection for mixed text and highlight colors', () => {
   const { editor, host } = createEditorWithToolbar()
   editor.commands.setContent({
     type: 'doc',
@@ -1504,24 +1553,33 @@ test('color palettes show no selected swatch for mixed text and highlight colors
   })
   const forePanel = host.querySelector('[data-panel="foreColor"]')
   const backPanel = host.querySelector('[data-panel="backColor"]')
+  const selectedForeColor = 'rgb(1, 100, 255)'
+  const selectedBackColor = 'rgba(130, 178, 255, 0.2)'
+
+  forePanel.querySelector(`button[data-color="${selectedForeColor}"]`).click()
+  backPanel.querySelector(`button[data-color="${selectedBackColor}"]`).click()
 
   selectTextSpan(editor, 'red', 'plain')
-  assert.equal(forePanel.querySelectorAll('button[data-color][aria-pressed="true"]').length, 0)
+  assert.equal(
+    forePanel.querySelector(`button[data-color="${selectedForeColor}"]`).getAttribute('aria-pressed'),
+    'true',
+  )
 
   selectTextSpan(editor, 'plain', 'yellow')
-  assert.equal(backPanel.querySelectorAll('button[data-color][aria-pressed="true"]').length, 0)
+  assert.equal(
+    backPanel.querySelector(`button[data-color="${selectedBackColor}"]`).getAttribute('aria-pressed'),
+    'true',
+  )
 
   editor.chain().focus().setTextSelection(findTextRange(editor, 'red')).run()
-  assert.equal(forePanel.querySelectorAll('button[data-color][aria-pressed="true"]').length, 1)
   assert.equal(
-    forePanel.querySelector('button[data-color="rgb(205, 35, 62)"]').getAttribute('aria-pressed'),
+    forePanel.querySelector(`button[data-color="${selectedForeColor}"]`).getAttribute('aria-pressed'),
     'true',
   )
 
   editor.chain().focus().setTextSelection(findTextRange(editor, 'yellow')).run()
-  assert.equal(backPanel.querySelectorAll('button[data-color][aria-pressed="true"]').length, 1)
   assert.equal(
-    backPanel.querySelector('button[data-color="rgba(255, 215, 0, 0.2)"]').getAttribute('aria-pressed'),
+    backPanel.querySelector(`button[data-color="${selectedBackColor}"]`).getAttribute('aria-pressed'),
     'true',
   )
   editor.destroy()
