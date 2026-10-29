@@ -25,6 +25,14 @@ VNoteApplication::VNoteApplication(int &argc, char **argv)
     : DApplication(argc, argv)
 {
     connect(DGuiApplicationHelper::instance(), &DGuiApplicationHelper::newProcessInstance, this, &VNoteApplication::onNewProcessInstance);
+
+    // Ensure QWebEngineView and other resources are cleaned up before the
+    // application fully exits, regardless of which quit path is taken.
+    connect(qApp, &QCoreApplication::aboutToQuit, this, [this]() {
+        if (m_qspMainWnd) {
+            m_qspMainWnd->release();
+        }
+    });
 }
 
 /**

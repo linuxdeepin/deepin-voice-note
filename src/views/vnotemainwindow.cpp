@@ -61,6 +61,7 @@
 #include <QScrollBar>
 #include <QLocale>
 #include <QDesktopServices>
+#include <QThreadPool>
 
 static OpsStateInterface *stateOperation = nullptr;
 
@@ -1852,17 +1853,38 @@ void VNoteMainWindow::switchWidget(WindowType type)
  */
 void VNoteMainWindow::release()
 {
+    if (m_isReleased) {
+        return;
+    }
+    m_isReleased = true;
+
     //Save main window size
     if (!isMaximized()) {
         setting::instance()->setOption(VNOTE_MAINWND_SZ_KEY, saveGeometry());
     }
 
     VTextSpeechAndTrManager::onStopTextToSpeech();
-    m_richTextEdit->updateNote();
+    if (m_richTextEdit) {
+        m_richTextEdit->updateNote();
+    }
 
     if (stateOperation->isVoice2Text()) {
         QScopedPointer<VNoteA2TManager> releaseA2TManger(m_a2tManager);
         releaseA2TManger->stopAsr();
+    }
+
+    // Explicitly release QWebEngineView to ensure QWebEnginePage/QWebEngineProfile
+    // are destroyed before the application quits, preventing Chromium subprocesses
+    // from blocking process exit.
+    if (m_richTextEdit) {
+        delete m_richTextEdit;
+        m_richTextEdit = nullptr;
+    }
+
+    // Wait for background tasks (e.g., delay init, file cleanup) to finish
+    // before exiting, to avoid dangling threads during application shutdown.
+    if (!QThreadPool::globalInstance()->waitForDone(3000)) {
+        qWarning() << "VNoteMainWindow::release: QThreadPool::waitForDone timed out after 3000ms";
     }
 }
 
