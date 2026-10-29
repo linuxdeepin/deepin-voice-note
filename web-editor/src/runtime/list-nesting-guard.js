@@ -71,6 +71,53 @@ function normalizedTextblockIndentLevel(value) {
   return Math.min(MAX_LIST_NESTING_DEPTH - 1, Math.floor(level))
 }
 
+function emptyListItemInfo(editor) {
+  const { selection } = editor.state
+  if (!selection.empty || !(selection instanceof TextSelection)) return null
+
+  const { $from } = selection
+  if ($from.parent.type.name !== 'paragraph' || $from.parent.content.size !== 0) return null
+
+  let itemDepth = 0
+  for (let depth = $from.depth; depth > 0; depth -= 1) {
+    if (LIST_ITEM_TYPES.has($from.node(depth).type.name)) {
+      itemDepth = depth
+      break
+    }
+  }
+  if (!itemDepth) return null
+
+  const item = $from.node(itemDepth)
+  if (item.childCount !== 1) return null
+  const itemPos = $from.before(itemDepth)
+  const structuralDepth = listItemDepthAt(editor.state.doc, itemPos)
+  const indentLevel = normalizedIndentLevel(item.attrs?.dvnIndentLevel, structuralDepth)
+  return {
+    item,
+    itemPos,
+    indentLevel,
+    visualDepth: Math.min(MAX_LIST_NESTING_DEPTH, structuralDepth + indentLevel),
+  }
+}
+
+// 空列表项回车时按视觉层级逐级下降。混合结构下 ProseMirror 只看结构深度，
+// 会把视觉三级项直接提升成一级；这里优先消减 dvnIndentLevel，再走结构反缩进。
+function descendEmptyListItem(editor) {
+  const info = emptyListItemInfo(editor)
+  if (!info || info.visualDepth <= 1) return false
+
+  if (info.indentLevel > 0) {
+    const tr = editor.state.tr.setNodeMarkup(info.itemPos, undefined, {
+      ...info.item.attrs,
+      dvnIndentLevel: info.indentLevel - 1,
+    })
+    editor.view.dispatch(tr.scrollIntoView())
+    return true
+  }
+
+  return liftActiveListItem(editor)
+}
+
 // 统一列表/待办列表键盘缩进规则：Tab 最多进入三层，Shift+Tab 反缩进。
 export const ListNestingGuard = Extension.create({
   name: 'listNestingGuard',
@@ -160,6 +207,7 @@ export const ListNestingGuard = Extension.create({
         if (!isInListItem(this.editor) && !selectionCoversListItems(this.editor)) return false
         return liftActiveListItem(this.editor)
       },
+      Enter: () => descendEmptyListItem(this.editor),
       // 行首 Backspace 与 Shift+Tab 同语义：逐级反缩进，一级时退出列表
       // （变成普通文本块）。旧实现走 core Keymap 的 joinBackward，会把当前项
       // 并进上一个列表项、生成“一个 listItem 多个段落”的结构，于是无论按多少
