@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import toolbarCss from './format-toolbar.css?inline'
-import { AllSelection, TextSelection } from '@tiptap/pm/state'
+import { AllSelection, Plugin, PluginKey, TextSelection } from '@tiptap/pm/state'
+import { Mark } from '@tiptap/pm/model'
 import boldIconUrl from '../../../src/web/css/createfont/svg/bold.svg?url'
 import italicIconUrl from '../../../src/web/css/createfont/svg/Italic.svg?url'
 import underlineIconUrl from '../../../src/web/css/createfont/svg/underline.svg?url'
@@ -49,8 +50,9 @@ function headingOptions(strings) {
 
 const TOOLBAR_STYLE_ID = 'dvn-tiptap-format-toolbar-style'
 const TOOLBAR_LEFT_MARGIN = 10
-const DEFAULT_FORE_COLOR = 'var(--dvn-editor-fg, rgb(65, 77, 104))'
-const DEFAULT_BACK_COLOR = 'transparent'
+const DEFAULT_FORE_COLOR = 'rgb(0, 0, 0)'
+const DEFAULT_BACK_COLOR = 'rgba(255, 215, 0, 0.2)'
+const PERSISTENT_COLOR_PLUGIN_KEY = new PluginKey('dvnPersistentColorInput')
 
 function normalizeCssColor(value) {
   if (!value) return ''
@@ -499,11 +501,15 @@ function clearMarkColor(editor, markName) {
   editor.chain().focus().unsetMark(markName).run()
 }
 
-function buildColorPicker(editor, kind, colors, apply, clear, readActive, onOpen, strings) {
+function buildColorPicker(editor, kind, colors, apply, clear, onOpen, strings) {
   // kind: 'foreColor' | 'backColor'
   const wrapper = createEl('span', { class: 'tiptap-color-picker' })
   const title = kind === 'foreColor' ? strings.fontColor : strings.textHighlightColor
-  let currentColor = ''
+  let paletteRows = Array.isArray(colors) ? colors : []
+  // 背景色第一个色块是透明；Story 要求默认背景色为黄色。
+  let selectedColorIndex = kind === 'backColor' ? 1 : 0
+  let currentColor = paletteRows.flat()[selectedColorIndex] || (kind === 'foreColor' ? DEFAULT_FORE_COLOR : DEFAULT_BACK_COLOR)
+  let explicitSelection = false
 
   const icon = createEl('span', { class: 'tiptap-color-icon' }, [
     createSvgIcon(kind === 'foreColor' ? 'textColor' : 'marker'),
@@ -595,15 +601,26 @@ function buildColorPicker(editor, kind, colors, apply, clear, readActive, onOpen
     }
   }
 
-  function setCurrentColor(color, mixed = false) {
-    // 颜色指示条跟随当前输入上下文；无颜色时恢复 Summernote 的默认值。
-    currentColor = color || ''
-    wrapper.classList.toggle('is-mixed', Boolean(mixed))
-    applyButton.style.setProperty('--dvn-current-color', currentColor || (kind === 'foreColor' ? DEFAULT_FORE_COLOR : DEFAULT_BACK_COLOR))
+  function syncCurrentColorState() {
+    applyButton.style.setProperty('--dvn-current-color', currentColor)
+    for (const [index, cell] of Array.from(panel.querySelectorAll('button[data-color]')).entries()) {
+      cell.setAttribute('aria-pressed', index === selectedColorIndex ? 'true' : 'false')
+    }
+  }
+
+  function setCurrentColor(color) {
+    // 颜色按钮只表达用户最后一次选择，不读取光标或选区里的 mark。
+    const nextColor = color || (kind === 'foreColor' ? DEFAULT_FORE_COLOR : DEFAULT_BACK_COLOR)
+    const flatColors = paletteRows.flat()
+    const matchedIndex = flatColors.findIndex((candidate) => sameCssColor(candidate, nextColor))
+    if (matchedIndex >= 0) selectedColorIndex = matchedIndex
+    currentColor = nextColor
+    syncCurrentColorState()
   }
 
   applyButton.addEventListener('click', (event) => {
     event.stopPropagation()
+    explicitSelection = true
     if (!currentColor || currentColor === 'transparent') {
       clear(editor)
     } else {
@@ -635,6 +652,8 @@ function buildColorPicker(editor, kind, colors, apply, clear, readActive, onOpen
           style: `background: ${color};`,
         })
         cell.addEventListener('click', () => {
+          setCurrentColor(color)
+          explicitSelection = true
           if (color === 'transparent') {
             clear(editor)
           } else {
@@ -648,7 +667,16 @@ function buildColorPicker(editor, kind, colors, apply, clear, readActive, onOpen
   }
 
   function setColors(nextColors) {
-    appendColorCells(Array.isArray(nextColors) ? nextColors : [])
+    paletteRows = Array.isArray(nextColors) ? nextColors : []
+    const flatColors = paletteRows.flat()
+    selectedColorIndex = flatColors.length > 0
+      ? Math.max(0, Math.min(selectedColorIndex, flatColors.length - 1))
+      : -1
+    currentColor = selectedColorIndex >= 0
+      ? flatColors[selectedColorIndex]
+      : (kind === 'foreColor' ? DEFAULT_FORE_COLOR : DEFAULT_BACK_COLOR)
+    appendColorCells(paletteRows)
+    syncCurrentColorState()
   }
 
   wrapper.appendChild(applyButton)
@@ -656,8 +684,18 @@ function buildColorPicker(editor, kind, colors, apply, clear, readActive, onOpen
   wrapper.appendChild(panel)
 
   setColors(colors)
-  setCurrentColor('')
-  return { wrapper, toggle: menuButton, applyButton, menuButton, panel, openPanel, closePanel, setCurrentColor, setColors, readActive }
+  return {
+    wrapper,
+    toggle: menuButton,
+    applyButton,
+    menuButton,
+    panel,
+    openPanel,
+    closePanel,
+    setColors,
+    getCurrentColor: () => currentColor,
+    hasExplicitSelection: () => explicitSelection,
+  }
 }
 
 function createStyledSelect({ control, title, options, onChange, onOpen }) {
@@ -1009,7 +1047,6 @@ export function createFormatToolbar(editor, host, uiStrings = DEFAULT_TIPTAP_UI_
     FORE_COLORS,
     (editor, color) => applyMarkColor(editor, 'color', 'color', color),
     (editor) => clearMarkColor(editor, 'color'),
-    () => editor.getAttributes('color').color,
     (pickerWrapper) => {
       if (!overflowPanel.contains(pickerWrapper)) closeOverflowPanel()
       backPicker.closePanel()
@@ -1027,7 +1064,6 @@ export function createFormatToolbar(editor, host, uiStrings = DEFAULT_TIPTAP_UI_
     BACK_COLORS,
     (editor, color) => applyHighlight(editor, color),
     (editor) => clearHighlight(editor),
-    () => editor.getAttributes('highlight').color,
     (pickerWrapper) => {
       if (!overflowPanel.contains(pickerWrapper)) closeOverflowPanel()
       forePicker.closePanel()
@@ -1045,6 +1081,42 @@ export function createFormatToolbar(editor, host, uiStrings = DEFAULT_TIPTAP_UI_
   }
 
   syncColorPalettesForTheme()
+
+  // 颜色按钮是“输入模式”而不是当前光标样式：用户选过颜色后，后续在空段落、
+  // 空格或其他位置输入时仍应沿用上一次选择。这里只维护 collapsing cursor 的
+  // storedMarks，不改动已有正文的 mark。
+  const persistentColorPlugin = new Plugin({
+    key: PERSISTENT_COLOR_PLUGIN_KEY,
+    appendTransaction(transactions, _oldState, newState) {
+      if (!forePicker.hasExplicitSelection() && !backPicker.hasExplicitSelection()) return null
+      if (!newState.selection.empty) return null
+      if (transactions.some((transaction) => transaction.getMeta(PERSISTENT_COLOR_PLUGIN_KEY))) return null
+
+      const currentMarks = newState.storedMarks ?? newState.selection.$from.marks()
+      let nextMarks = [...currentMarks]
+
+      const colorType = newState.schema.marks.color
+      if (colorType && forePicker.hasExplicitSelection()) {
+        const color = forePicker.getCurrentColor()
+        nextMarks = nextMarks.filter((mark) => mark.type !== colorType)
+        if (color && color !== 'transparent') nextMarks.push(colorType.create({ color }))
+      }
+
+      const highlightType = newState.schema.marks.highlight
+      if (highlightType && backPicker.hasExplicitSelection()) {
+        const color = backPicker.getCurrentColor()
+        nextMarks = nextMarks.filter((mark) => mark.type !== highlightType)
+        if (color && color !== 'transparent') nextMarks.push(highlightType.create({ color }))
+      }
+
+      if (Mark.sameSet(currentMarks, nextMarks)) return null
+      const tr = newState.tr.setStoredMarks(nextMarks)
+      tr.setMeta(PERSISTENT_COLOR_PLUGIN_KEY, true)
+      return tr
+    },
+  })
+  editor.registerPlugin(persistentColorPlugin)
+
   toolbar.appendChild(colorGroup)
   const colorListSeparator = createSeparator()
   toolbar.appendChild(colorListSeparator)
@@ -1364,20 +1436,8 @@ export function createFormatToolbar(editor, host, uiStrings = DEFAULT_TIPTAP_UI_
       sizeControl.setValue(sizeContext.value || '14')
     }
 
-    // 颜色同样按整个选区判断。混合颜色时不选中调色板里的任何一格，
-    // 避免把选区中第一个颜色误当成整体已激活的颜色。
-    const foreContext = hasEditorContext
-      ? uniformMarkContext(editor.state, 'color', 'color', normalizeCssColor)
-      : { value: '', mixed: false }
-    const backContext = hasEditorContext
-      ? uniformMarkContext(editor.state, 'highlight', 'color', value => normalizeCssColor(value || 'transparent'))
-      : { value: '', mixed: false }
-    const foreColor = foreContext.mixed ? '' : foreContext.value
-    const backColor = backContext.mixed ? '' : (backContext.value || 'transparent')
-    forePicker.setCurrentColor(foreColor, foreContext.mixed)
-    backPicker.setCurrentColor(backColor, backContext.mixed)
-    syncColorCells(forePicker.panel, foreColor, foreContext.mixed)
-    syncColorCells(backPicker.panel, backColor, backContext.mixed)
+    // Story：文字颜色/背景颜色不跟随光标或选区样式，始终保留用户上次选择。
+    // picker 自己维护选择状态，这里刻意不从 editor state 读取 color/highlight。
 
     // 列表/待办按钮表达当前输入位置的列表类型。用户点击序列号/序列点后
     // 会生成折叠光标所在的列表上下文，按钮需要立即进入 active 状态。
@@ -1389,20 +1449,6 @@ export function createFormatToolbar(editor, host, uiStrings = DEFAULT_TIPTAP_UI_
     }
     listButtons.indentList.disabled = !hasEditorContext || !canIndentActiveListItem(editor)
     listButtons.outdentList.disabled = !hasEditorContext || !canOutdentActiveListItem(editor)
-  }
-
-  function syncColorCells(panel, activeColor, mixed = false) {
-    const cells = Array.from(panel.querySelectorAll('button[data-color]'))
-    const hasActiveColor = Boolean(activeColor)
-    for (const [index, cell] of cells.entries()) {
-      const color = cell.getAttribute('data-color')
-      // When the current context has no explicit color, keep the first palette
-      // item selected as the default option.  This matches the palette's
-      // visual default without applying a mark to the document.
-      const isDefault = !mixed && !hasActiveColor && index === 0
-      const isActive = (hasActiveColor && sameCssColor(color, activeColor)) || isDefault
-      cell.setAttribute('aria-pressed', !mixed && isActive ? 'true' : 'false')
-    }
   }
 
   editor.on('transaction', syncActiveStates)
@@ -1451,6 +1497,7 @@ export function createFormatToolbar(editor, host, uiStrings = DEFAULT_TIPTAP_UI_
       updateOverflowMode()
     },
     destroy() {
+      editor.unregisterPlugin?.(PERSISTENT_COLOR_PLUGIN_KEY)
       document.removeEventListener('click', onOutsideClick)
       window.removeEventListener('resize', updateOverflowMode)
       window.removeEventListener('dvn-theme-applied', onThemeApplied)
