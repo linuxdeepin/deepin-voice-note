@@ -1447,12 +1447,13 @@ void VNoteMainManager::renameFolderById(const int &folderId, const QString &name
 
 void VNoteMainManager::renameNote(const int &index, const QString &newName)
 {
-    qCDebug(voiceNoteLog) << "Renaming note at index" << index << "to:" << newName;
+    const QString normalizedName = newName.trimmed();
+    qCDebug(voiceNoteLog) << "Renaming note at index" << index << "to:" << normalizedName;
     VNoteItem *item = getNoteById(index);
-    if (item && !newName.isEmpty() && newName != item->noteTitle) {
+    if (item && !normalizedName.isEmpty() && normalizedName != item->noteTitle) {
         qCInfo(voiceNoteLog) << "rename note!";
         VNoteItemOper noteOps(item);
-        if (noteOps.modifyNoteTitle(newName)) {
+        if (noteOps.modifyNoteTitle(normalizedName)) {
             qCDebug(voiceNoteLog) << "Note renamed successfully";
             // 播放中不重新加载列表，避免中断播放状态
             if (!OpsStateInterface::instance()->isPlaying() && !isInSearchMode()) {
@@ -1463,12 +1464,12 @@ void VNoteMainManager::renameNote(const int &index, const QString &newName)
                 }
             } else {
                 qCDebug(voiceNoteLog) << "Playing audio, skip reloading to preserve play state";
-                item->noteTitle = newName;
+                item->noteTitle = normalizedName;
             }
             // 标题变更统一通知列表和工作区，避免工作区标题只在播放状态下刷新。
-            emit noteTitleChanged(index, newName);
+            emit noteTitleChanged(index, normalizedName);
             if (index == m_currentNoteId) {
-                emit currentNoteChanged(index, newName);
+                emit currentNoteChanged(index, normalizedName);
             }
         } else {
             qCWarning(voiceNoteLog) << "Failed to rename note";
