@@ -1,5 +1,5 @@
 // Copyright (C) 2019 ~ 2020 Deepin Technology Co., Ltd.
-// SPDX-FileCopyrightText: 2023 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2023-2026 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -241,6 +241,7 @@ QString VTextSpeechAndTrManager::errorString(Status status)
 {
     switch (status) {
         case NotInstalled:
+        case Disable:
             return QObject::tr("Please install 'UOS AI' from the App Store before using");
         case NoInputDevice:
             return QObject::tr("No audio input device detected. Please check and try again");
@@ -252,25 +253,27 @@ QString VTextSpeechAndTrManager::errorString(Status status)
     }
 }
 
+bool VTextSpeechAndTrManager::isDictationServiceAvailable()
+{
+    QDBusMessage dictationMsg =
+        QDBusMessage::createMethodCall(kFlytekService, "/aiassistant/iat", "com.iflytek.aiassistant.iat", "getIatEnable");
+    QDBusReply<bool> dictationStateRet = QDBusConnection::sessionBus().call(dictationMsg, QDBus::BlockWithGui);
+    return dictationStateRet.isValid();
+}
+
 VTextSpeechAndTrManager::Status VTextSpeechAndTrManager::checkValid()
 {
     qDebug() << "Checking UOS AI validity, current status:" << m_status;
     switch (m_status) {
         case NotInstalled:
             // 通过检测getSpeechToTextEnable接口是否可以调用来判断是否安装
-            {
-                QDBusMessage dictationMsg =
-                    QDBusMessage::createMethodCall(kFlytekService, "/aiassistant/iat", "com.iflytek.aiassistant.iat", "getIatEnable");
-                QDBusReply<bool> dictationStateRet = QDBusConnection::sessionBus().call(dictationMsg, QDBus::BlockWithGui);
-
-                if (dictationStateRet.isValid()) {
-                    qInfo() << "Speech-to-text interface callable, UOS AI considered installed";
-                    m_status = Enable;
-                } else {
-                    qWarning() << "Speech-to-text interface not callable, UOS AI not installed:" << dictationStateRet.error().message();
-                    m_status = NotInstalled;
-                    break;
-                }
+            if (isDictationServiceAvailable()) {
+                qInfo() << "Speech-to-text interface callable, UOS AI considered installed";
+                m_status = Enable;
+            } else {
+                qWarning() << "Speech-to-text interface not callable, UOS AI not installed";
+                m_status = NotInstalled;
+                break;
             }
             break;
             //Q_FALLTHROUGH();
@@ -283,6 +286,10 @@ VTextSpeechAndTrManager::Status VTextSpeechAndTrManager::checkValid()
             }
         } break;
         default:
+            if (m_status == Enable && !isDictationServiceAvailable()) {
+                qWarning() << "UOS AI DBus service no longer available, marking as NotInstalled";
+                m_status = NotInstalled;
+            }
             break;
     }
 
