@@ -9,6 +9,7 @@
 #include "common/datatypedef.h"
 #include "globaldef.h"
 #include "widgets/vnoteiconbutton.h"
+#include "widgets/vnoteelidepushbutton.h"
 #include "common/vnoteitem.h"
 
 #include <DMainWindow>
@@ -290,7 +291,7 @@ private:
     MiddleView *m_middleView {nullptr};
     WebRichTextEditor *m_richTextEdit {nullptr};
 
-    DPushButton *m_addNotepadBtn {nullptr};
+    VNoteElidePushButton *m_addNotepadBtn {nullptr};
     DFloatingButton *m_addNoteBtn {nullptr};
     DAnchorsBase *m_buttonAnchor {nullptr};
 
