@@ -15,6 +15,7 @@ import tiptapEditorHtml from '../src/runtime/tiptap-editor.html?raw'
 import { syncEmptyPlaceholderState } from '../src/runtime/empty-placeholder-state.js'
 import { createEmptyDoc, createEnvelope, validateEnvelope } from '../src/schema/document-envelope.js'
 import { listItemMarkerFontSize } from '../src/runtime/normal-list-markers.js'
+import { replaceEditorContentWithoutHistory } from '../src/runtime/undo-redo.js'
 
 function defineGlobal(name, value) {
   Object.defineProperty(globalThis, name, {
@@ -3722,5 +3723,235 @@ test('font size wraps underline and strike marks so text decoration follows larg
   assert.match(html, /<ul><li><p><span style="font-size: 36px;"><s>bulletStrike<\/s><\/span><\/p><\/li><\/ul>/)
   assert.match(html, /<ol><li><p><span style="font-size: 36px;"><s>orderedStrike<\/s><\/span><\/p><\/li><\/ol>/)
   assert.match(html, /<ul data-type="taskList"><li data-checked="false" data-type="taskItem"><label><input type="checkbox"><span><\/span><\/label><div><p><span style="font-size: 36px;"><s>taskStrike<\/s><\/span><\/p><\/div><\/li><\/ul>/)
+  editor.destroy()
+})
+
+function selectionVisualDepth(editor) {
+  const { $from } = editor.state.selection
+  let structuralDepth = 0
+  let indentLevel = 0
+  for (let depth = 1; depth <= $from.depth; depth += 1) {
+    const node = $from.node(depth)
+    if (node.type.name !== 'listItem' && node.type.name !== 'taskItem') continue
+    structuralDepth += 1
+    indentLevel = Number(node.attrs?.dvnIndentLevel) || 0
+  }
+  if (!structuralDepth) return 0
+  const maxExtraIndent = Math.max(0, 3 - structuralDepth)
+  return Math.min(3, structuralDepth + Math.min(maxExtraIndent, indentLevel))
+}
+
+for (const { name, listType, itemType, attrs } of [
+  { name: 'bullet list', listType: 'bulletList', itemType: 'listItem' },
+  { name: 'ordered list', listType: 'orderedList', itemType: 'listItem' },
+  { name: 'task list', listType: 'taskList', itemType: 'taskItem', attrs: { checked: false } },
+]) {
+  test(`BUG381009 structural ${name} Enter descends 3 -> 2 -> 1 -> plain`, () => {
+    const { editor, window } = createEditorWithToolbar()
+    editor.commands.setContent(threeLevelListDoc(itemType, listType))
+    markEditorFocused(editor)
+    editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'four')).run()
+
+    pressEnter(editor, window)
+    assert.equal(selectionVisualDepth(editor), 3)
+    pressEnter(editor, window)
+    assert.equal(selectionVisualDepth(editor), 2)
+    pressEnter(editor, window)
+    assert.equal(selectionVisualDepth(editor), 1)
+    pressEnter(editor, window)
+    assert.equal(selectionVisualDepth(editor), 0)
+    editor.destroy()
+  })
+
+  test(`BUG381009 visual indent ${name} Enter descends 3 -> 2 -> 1 -> plain`, () => {
+    const { editor, window } = createEditorWithToolbar()
+    const item = (text, indentLevel) => ({
+      type: itemType,
+      attrs: { ...(attrs || {}), dvnIndentLevel: indentLevel },
+      content: [{ type: 'paragraph', content: [{ type: 'text', text }] }],
+    })
+    editor.commands.setContent({
+      type: 'doc',
+      content: [{
+        type: listType,
+        content: [item('root', 0), item('child', 1), item('three', 2), item('next', 0)],
+      }],
+    })
+    markEditorFocused(editor)
+    editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'three')).run()
+
+    pressEnter(editor, window)
+    assert.equal(selectionVisualDepth(editor), 3)
+    pressEnter(editor, window)
+    assert.equal(selectionVisualDepth(editor), 2)
+    pressEnter(editor, window)
+    assert.equal(selectionVisualDepth(editor), 1)
+    pressEnter(editor, window)
+    assert.equal(selectionVisualDepth(editor), 0)
+    editor.destroy()
+  })
+
+  test(`BUG381009 reindented ${name} parent keeps existing child at level three`, () => {
+    const { editor, window } = createEditorWithToolbar()
+    editor.commands.setContent(threeLevelListDoc(itemType, listType))
+    markEditorFocused(editor)
+
+    editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'child')).run()
+    pressTab(editor, window, true)
+    editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'child')).run()
+    pressTab(editor, window)
+    editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'four')).run()
+
+    pressEnter(editor, window)
+    assert.equal(selectionVisualDepth(editor), 3)
+    pressEnter(editor, window)
+    assert.equal(selectionVisualDepth(editor), 2)
+    editor.destroy()
+  })
+
+  test(`BUG381009 mixed indent ${name} Enter descends one visual level`, () => {
+    const { editor, window } = createEditorWithToolbar()
+    const item = (text, extra = []) => ({
+      type: itemType,
+      ...(attrs ? { attrs: { ...attrs } } : {}),
+      content: [
+        { type: 'paragraph', content: [{ type: 'text', text }] },
+        ...extra,
+      ],
+    })
+    editor.commands.setContent({
+      type: 'doc',
+      content: [{
+        type: listType,
+        content: [item('root', [{
+          type: listType,
+          content: [item('child', [{
+            type: listType,
+            content: [item('three'), item('four')],
+          }])],
+        }])],
+      }],
+    })
+    markEditorFocused(editor)
+    editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'four')).run()
+
+    pressTab(editor, window, true)
+    editor.commands.insertContent('x')
+    pressTab(editor, window, true)
+    editor.commands.insertContent('x')
+    pressEnter(editor, window)
+    pressTab(editor, window)
+    editor.commands.insertContent('x')
+    pressTab(editor, window)
+    editor.commands.insertContent('x')
+    pressTab(editor, window)
+    pressEnter(editor, window)
+    assert.equal(selectionVisualDepth(editor), 3)
+    pressEnter(editor, window)
+    assert.equal(selectionVisualDepth(editor), 2)
+    pressEnter(editor, window)
+    assert.equal(selectionVisualDepth(editor), 1)
+    editor.destroy()
+  })
+}
+
+test('BUG381009 heading list item Enter descends one visual level at a time', () => {
+  const { editor, window } = createEditorWithToolbar()
+  const item = (text, indentLevel) => ({
+    type: 'listItem',
+    attrs: { dvnIndentLevel: indentLevel },
+    content: [{
+      type: 'heading',
+      attrs: { level: 1 },
+      content: text ? [{ type: 'text', text }] : [],
+    }],
+  })
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{
+      type: 'orderedList',
+      content: [item('root', 0), item('child', 1), item('three', 2), item('next', 0)],
+    }],
+  })
+  markEditorFocused(editor)
+  editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'three')).run()
+
+  pressEnter(editor, window)
+  assert.equal(selectionVisualDepth(editor), 3)
+  pressEnter(editor, window)
+  assert.equal(selectionVisualDepth(editor), 2)
+  pressEnter(editor, window)
+  assert.equal(selectionVisualDepth(editor), 1)
+  pressEnter(editor, window)
+  assert.equal(selectionVisualDepth(editor), 0)
+  editor.destroy()
+})
+
+test('BUG381009 cross-type nested list Enter descends 3 -> 2 -> 1 -> plain', () => {
+  const { editor, window } = createEditorWithToolbar()
+  const task = (text) => ({
+    type: 'taskItem',
+    attrs: { checked: false, dvnIndentLevel: 0 },
+    content: [{ type: 'paragraph', content: [{ type: 'text', text }] }],
+  })
+  const listItem = (text, extra = []) => ({
+    type: 'listItem',
+    attrs: { dvnIndentLevel: 0 },
+    content: [{ type: 'paragraph', content: [{ type: 'text', text }] }, ...extra],
+  })
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{
+      type: 'bulletList',
+      content: [listItem('root', [{
+        type: 'orderedList',
+        attrs: { start: 1 },
+        content: [listItem('child', [{
+          type: 'taskList',
+          content: [task('three'), task('four')],
+        }])],
+      }])],
+    }],
+  })
+  markEditorFocused(editor)
+  editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'four')).run()
+
+  pressEnter(editor, window)
+  assert.equal(selectionVisualDepth(editor), 3)
+  pressEnter(editor, window)
+  assert.equal(selectionVisualDepth(editor), 2)
+  pressEnter(editor, window)
+  assert.equal(selectionVisualDepth(editor), 1)
+  pressEnter(editor, window)
+  assert.equal(selectionVisualDepth(editor), 0)
+  editor.destroy()
+})
+
+test('BUG381009 empty visual indent downgrade can be undone and redone', () => {
+  const { editor, window } = createEditorWithToolbar()
+  const item = (text, indentLevel) => ({
+    type: 'listItem',
+    attrs: { dvnIndentLevel: indentLevel },
+    content: [{ type: 'paragraph', content: [{ type: 'text', text }] }],
+  })
+  replaceEditorContentWithoutHistory(editor, {
+    type: 'doc',
+    content: [{
+      type: 'orderedList',
+      content: [item('root', 0), item('child', 1), item('three', 2)],
+    }],
+  })
+  markEditorFocused(editor)
+  editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'three')).run()
+
+  pressEnter(editor, window)
+  assert.equal(selectionVisualDepth(editor), 3)
+  pressEnter(editor, window)
+  assert.equal(selectionVisualDepth(editor), 2)
+
+  assert.equal(editor.commands.undo(), true)
+  assert.equal(selectionVisualDepth(editor), 3)
+  assert.equal(editor.commands.redo(), true)
+  assert.equal(selectionVisualDepth(editor), 2)
   editor.destroy()
 })
