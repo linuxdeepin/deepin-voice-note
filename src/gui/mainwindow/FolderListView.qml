@@ -595,7 +595,7 @@ Item {
                     Layout.fillWidth: true
                     Layout.rightMargin: 5
                     bottomPadding: 0
-                    implicitHeight: 24
+                    implicitHeight: Math.ceil(folderItemFontMetrics.height)
                     maximumLength: 64
                     text: model.name
                     topPadding: 0

@@ -37,6 +37,11 @@ Item {
     property Item scrollBarParent: null
     property int scrollBarRightAnchor: 0
 
+    FontMetrics {
+        id: renameFontMetrics
+        font: DTK.fontManager.t6
+    }
+
     signal deleteFinished
     signal deleteNotes(int number)
     signal dropRelease
@@ -944,7 +949,7 @@ Item {
                     rightPadding: 30 
                     topPadding: 4
                     bottomPadding: 4
-                    implicitHeight: Math.max(30, Math.ceil(font.pixelSize * 1.6))
+                    implicitHeight: Math.max(30, Math.ceil(renameFontMetrics.height) + topPadding + bottomPadding)
                     maximumLength: 24
                     Layout.preferredHeight: (function() {
                         var itemH = rootItemDelegate.height;
