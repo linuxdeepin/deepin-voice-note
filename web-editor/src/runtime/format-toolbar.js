@@ -50,6 +50,7 @@ function headingOptions(strings) {
 
 const TOOLBAR_STYLE_ID = 'dvn-tiptap-format-toolbar-style'
 const TOOLBAR_LEFT_MARGIN = 10
+const TOOLBAR_RIGHT_MARGIN = 10
 const DEFAULT_FORE_COLOR = 'rgb(0, 0, 0)'
 const DEFAULT_BACK_COLOR = 'rgba(255, 215, 0, 0.2)'
 const PERSISTENT_COLOR_PLUGIN_KEY = new PluginKey('dvnPersistentColorInput')
@@ -1340,10 +1341,9 @@ export function createFormatToolbar(editor, host, uiStrings = DEFAULT_TIPTAP_UI_
     closeOverflowPanel()
     const hostWidth = host.clientWidth || document.documentElement.clientWidth || window.innerWidth || 0
     if (!hostWidth) return
-    // 顶部工具栏只在左侧保留 10px，与宿主实际布局一致；右侧不再额外
-    // 扣除 10px，避免正常窗口下因这段虚拟边距过早把末尾资源按钮折叠。
+    // 顶部工具栏在左右两侧各保留 10px 实际边距，与宿主实际布局一致。
     // Summernote 的 385px 只用于 airPopover 定位参考，不能限制当前常驻顶部工具栏。
-    const maxToolbarWidth = Math.max(0, hostWidth - TOOLBAR_LEFT_MARGIN)
+    const maxToolbarWidth = Math.max(0, hostWidth - TOOLBAR_LEFT_MARGIN - TOOLBAR_RIGHT_MARGIN)
 
     overflowSet.clear()
     renderOverflowLayout()
