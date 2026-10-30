@@ -815,7 +815,7 @@ Item {
                     Layout.alignment: Text.AlignRight
                     Layout.preferredHeight: 30
                     Layout.preferredWidth: 30
-                    Layout.rightMargin: 10
+                    Layout.rightMargin: 0
                     Layout.topMargin: 10
                     display: AbstractButton.IconOnly
                     icon.height: 16
@@ -951,7 +951,7 @@ Item {
                         Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
                         Layout.preferredHeight: 30
                         Layout.preferredWidth: 30
-                        Layout.rightMargin: 10
+                        Layout.rightMargin: 0
                         enabled: !rootWindow.isRecordingAudio
                                   && !folderListView.isPlay
                                   && !webEngineView.titleBar.isPlaying
