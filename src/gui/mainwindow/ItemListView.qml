@@ -1241,7 +1241,7 @@ Item {
 
             delegate: Rectangle {
                 color: "transparent"
-                height: section == "top" ? Math.max(18, Math.ceil(sectionStickyFontMetrics.height) + 6) : 16
+                height: section == "top" ? Math.max(18, Math.ceil(sectionStickyFontMetrics.height) + 6) : (VNoteMainManager.getTop() ? 16 : 0)
                 width: parent.width
 
                 FontMetrics {
