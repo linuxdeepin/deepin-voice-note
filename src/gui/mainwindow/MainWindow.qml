@@ -934,10 +934,12 @@ Item {
                         id: label
 
                         Layout.fillWidth: true
-                        Layout.preferredHeight: 18
+                        Layout.preferredHeight: 30
+                        Layout.alignment: Qt.AlignVCenter
                         color: DTK.themeType === ApplicationHelper.LightType ? "#BB000000" : "#BBFFFFFF"
                         elide: Text.ElideRight
                         font.pixelSize: 16
+                        verticalAlignment: Text.AlignVCenter
                         text: ""
                     }
 
