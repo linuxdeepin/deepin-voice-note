@@ -43,30 +43,18 @@ Window {
 
     Image {
         id: img
+        objectName: "PreviewImage"
+
+        readonly property real fitScale: sourceSize.width > 0 && sourceSize.height > 0
+            ? Math.min(1, root.width * 0.8 / sourceSize.width, root.height * 0.8 / sourceSize.height)
+            : 1
 
         anchors.centerIn: backRect
         fillMode: Image.PreserveAspectFit
+        height: sourceSize.height * fitScale
         source: root.imageSource
+        width: sourceSize.width * fitScale
         z: 100
-
-        onStatusChanged: {
-            if (status === Image.Ready) {
-                if (img.sourceSize.width > (root.width * 0.8)) {
-                    img.width = root.width * 0.8;
-                } else {
-                    img.width = img.sourceSize.width;
-                }
-                if (img.sourceSize.width > (root.width * 0.8)) {
-                    img.height = root.height * 0.8;
-                } else {
-                    img.height = img.sourceSize.height;
-                }
-                // sourceSize.width = img.width;
-                // sourceSize.height = img.height;
-                closeBtn.x = (root.width + img.width - closeBtn.width) / 2;
-                closeBtn.y = (root.height - img.height) / 2 - closeBtn.height;
-            }
-        }
     }
 
     Rectangle {
@@ -79,9 +67,12 @@ Window {
 
     FloatingButton {
         id: closeBtn
+        objectName: "PreviewCloseButton"
 
         Accessible.name: "ClosePictureView"
         checked: false
+        x: Math.max(0, Math.min(root.width - width, img.x + img.width - width / 2))
+        y: Math.max(0, Math.min(root.height - height, img.y - height / 2))
         z: 100
 
         onClicked: {
