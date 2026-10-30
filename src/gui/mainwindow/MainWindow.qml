@@ -731,7 +731,7 @@ Item {
         Rectangle {
             id: leftDragHandle
 
-            x: leftBgArea.width
+            anchors.left: leftBgArea.right
             height: parent.height
             width: 5
             color: "transparent"
@@ -778,7 +778,7 @@ Item {
         Rectangle {
             id: middleBgArea
 
-            x: leftBgArea.width + leftDragHandle.width
+            anchors.left: leftDragHandle.right
             height: parent.height
             width: middleViewWidth - 5
             clip: true
@@ -1014,7 +1014,7 @@ Item {
         Rectangle {
             id: rightDragHandle
 
-            x: middleBgArea.x + middleBgArea.width
+            anchors.left: middleBgArea.right
             height: parent.height
             width: 5
             color: middleBgArea.color
@@ -1066,9 +1066,9 @@ Item {
         Rectangle {
             id: rightBgArea
 
-            x: rightDragHandle.x + rightDragHandle.width
+            anchors.left: rightDragHandle.right
             height: parent.height
-            width: parent.width - x
+            anchors.right: parent.right
             // 删除当前记事本的最后一条笔记后，Tiptap Loader 会整体隐藏，
             // 避免残留上一条笔记。这里必须继续铺满编辑器画布色；若保持
             // 半透明，会把主窗口灰底直接暴露出来，和正常空白编辑器不一致。
