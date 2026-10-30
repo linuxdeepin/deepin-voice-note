@@ -508,11 +508,14 @@ bool VNoteMainManager::vNoteDeleteFolder(const int &index)
 bool VNoteMainManager::vNoteDeleteFolderById(const int &folderId)
 {
     qCDebug(voiceNoteLog) << "Deleting folder with ID:" << folderId;
-    // 录音或播放中禁止删除
-    if (VoiceRecoderHandler::instance()->getRecoderType() == VoiceRecoderHandler::Recording
-        || OpsStateInterface::instance()->isPlaying()) {
-        qCWarning(voiceNoteLog) << "Cannot delete folder while recording or playing";
+    // 录音中禁止删除
+    if (VoiceRecoderHandler::instance()->getRecoderType() == VoiceRecoderHandler::Recording) {
+        qCWarning(voiceNoteLog) << "Cannot delete folder while recording";
         return false;
+    }
+    // 播放中先停止播放，避免删除正在播放的资源导致异常
+    if (OpsStateInterface::instance()->isPlaying()) {
+        JsContent::instance()->jsCallPlayVoiceStop();
     }
     VNoteFolder *folder = getFloderById(folderId);
     const bool deletingCurrentFolder = (folderId == m_currentFolderIndex);
@@ -997,11 +1000,14 @@ VNoteItem *VNoteMainManager::deleteNoteById(const int &id)
 bool VNoteMainManager::deleteNote(const QList<int> &index)
 {
     qCDebug(voiceNoteLog) << "Deleting" << index.size() << "notes";
-    // 录音或播放中禁止删除
-    if (VoiceRecoderHandler::instance()->getRecoderType() == VoiceRecoderHandler::Recording
-        || OpsStateInterface::instance()->isPlaying()) {
-        qCWarning(voiceNoteLog) << "Cannot delete note while recording or playing";
+    // 录音中禁止删除
+    if (VoiceRecoderHandler::instance()->getRecoderType() == VoiceRecoderHandler::Recording) {
+        qCWarning(voiceNoteLog) << "Cannot delete note while recording";
         return false;
+    }
+    // 播放中先停止播放，避免删除正在播放的资源导致异常
+    if (OpsStateInterface::instance()->isPlaying()) {
+        JsContent::instance()->jsCallPlayVoiceStop();
     }
     for (int noteId : index) {
         if (hasActiveVoiceToTextTaskForNote(noteId)) {
