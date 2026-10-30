@@ -1,3 +1,23 @@
+deepin-voice-note (6.6.5) unstable; urgency=medium
+
+  * fix: persist toolbar text and highlight colors
+  * fix: descend empty nested list items by visual level
+  * fix: trim whitespace from note titles
+  * fix: use theme-aware styling for sticky notes section
+  * fix: limit note title maximumLength to 24 characters
+  * feat: 适配调试模式——common 模块日志分类化 (2/6)
+  * feat: 适配调试模式——数据迁移与任务模块日志分类化 (5/6)
+  * feat: 适配调试模式——db/dbus/handler 模块日志分类化 (4/6)
+  * feat: 适配调试模式——common 模块日志分类化 (3/6)
+  * feat: 适配调试模式——后台任务模块日志分类化 (6/6)
+  * feat: 适配调试模式——日志分类与动态监听基础设施 (1/6)
+  * fix: allow reopening UOS AI page in App Store
+  * fix: restore context menu paste on blank editor area
+  * fix: correct UOS AI update dialog layout
+  * fix: elide notebook name to prevent covering new note button
+
+ -- dengzhongyuan <dengzhongyuan@uniontech.com>  Fri, 30 Oct 2026 10:57:41 +0800
+
 deepin-voice-note (6.6.4) unstable; urgency=medium
 
   * fix(export): preserve foreground color in highlighted HTML
