@@ -51,6 +51,7 @@ void ActionManager::initMenu()
     // NotebookCtxMenu 记事本页面右键菜单
     makeAction(NotebookRename, QCoreApplication::translate("NotebookContextMenu", "Rename"));
     makeAction(NotebookDelete, QCoreApplication::translate("NotebookContextMenu", "Delete"));
+    makeAction(NotebookSeparator, {}, MenuSeparatorComponent);
     makeAction(NotebookAddNew, QCoreApplication::translate("NotebookContextMenu", "New note"));
 
     // NoteCtxMenu 笔记本页面右键菜单
@@ -61,7 +62,7 @@ void ActionManager::initMenu()
     makeAction(NoteSeparator, {}, MenuSeparatorComponent);
     makeAction(NoteSave, QCoreApplication::translate("NotesContextMenu", "Save note"), MenuComponent);
     makeAction(NoteSaveVoice, QCoreApplication::translate("NotesContextMenu", "Save voice recording"));
-    makeAction(NoteSeparator, {}, MenuSeparatorComponent);
+    makeAction(NoteSeparator2, {}, MenuSeparatorComponent);
     makeAction(NoteAddNew, QCoreApplication::translate("NotesContextMenu", "New note"));
 
     // SaveNoteCtxMenu 保存笔记二级菜单项文案
@@ -74,6 +75,7 @@ void ActionManager::initMenu()
     makeAction(VoiceAsSave, QCoreApplication::translate("NoteDetailContextMenu", "Save as MP3"));
     makeAction(VoiceToText, QCoreApplication::translate("NoteDetailContextMenu", "Voice to Text"));
     makeAction(VoiceDelete, QCoreApplication::translate("NoteDetailContextMenu", "Delete"));
+    makeAction(VoiceSeparator, {}, MenuSeparatorComponent);
     makeAction(VoiceSelectAll, QCoreApplication::translate("NoteDetailContextMenu", "Select all"));
     makeAction(VoiceCopy, QCoreApplication::translate("NoteDetailContextMenu", "Copy"));
     makeAction(VoiceCut, QCoreApplication::translate("NoteDetailContextMenu", "Cut"));
@@ -82,6 +84,7 @@ void ActionManager::initMenu()
     // PictureCtxMenu 初始化图片文本右键菜单
     makeAction(PictureView, QCoreApplication::translate("NoteDetailContextMenu", "View"));
     makeAction(PictureDelete, QCoreApplication::translate("NoteDetailContextMenu", "Delete"));
+    makeAction(PictureSeparator, {}, MenuSeparatorComponent);
     makeAction(PictureSelectAll, QCoreApplication::translate("NoteDetailContextMenu", "Select all"));
     makeAction(PictureCopy, QCoreApplication::translate("NoteDetailContextMenu", "Copy"));
     makeAction(PictureCut, QCoreApplication::translate("NoteDetailContextMenu", "Cut"));

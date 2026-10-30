@@ -20,6 +20,7 @@ public:
         NotebookMenuBase,
         NotebookRename = NotebookMenuBase,
         NotebookDelete,
+        NotebookSeparator,
         NotebookAddNew,
         // Add notebook menu item begin {
 
@@ -32,9 +33,10 @@ public:
         NoteTop,
         NoteMove,
         NoteDelete,
+        NoteSeparator,
         NoteSave,
         NoteSaveVoice,
-        NoteSeparator,
+        NoteSeparator2,
         NoteAddNew,
         // Add note menu item begin {
 
@@ -46,6 +48,7 @@ public:
         VoiceAsSave = VoiceMenuBase,
         VoiceToText,
         VoiceDelete,
+        VoiceSeparator,
         VoiceSelectAll,
         VoiceCopy,
         VoiceCut,
@@ -59,6 +62,7 @@ public:
         PictureMenuBase,
         PictureView = PictureMenuBase,
         PictureDelete,
+        PictureSeparator,
         PictureSelectAll,
         PictureCopy,
         PictureCut,
