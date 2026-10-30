@@ -17,6 +17,10 @@ DialogWindow {
 
     signal moveToFolder(int index)
 
+    FontMetrics {
+        id: buttonFontMetrics
+    }
+
     height: 365
     width: 370
 
@@ -152,6 +156,7 @@ DialogWindow {
                 Accessible.name: "CancelButton"
                 Accessible.role: Accessible.Button
                 Layout.preferredWidth: 171
+                implicitHeight: Math.max(36, Math.ceil(buttonFontMetrics.height) + 12)
                 text: qsTr("Cancel")
 
                 onClicked: {
@@ -170,6 +175,7 @@ DialogWindow {
                 Accessible.role: Accessible.Button
                 Layout.alignment: Qt.AlignRight
                 Layout.preferredWidth: 171
+                implicitHeight: Math.max(36, Math.ceil(buttonFontMetrics.height) + 12)
                 enabled: index !== -1
                 text: qsTr("Ok")
 
