@@ -1607,7 +1607,7 @@ function changeColor(flag, activeColor, disableColor, backgroundColor) {
         setVoiceButColor(global_activeColor, global_disableColor)
     }
 
-    var menuItemFg = flag == 1 ? 'black' : 'rgba(197,207,224,1)';
+    var menuItemFg = flag == 1 ? 'black' : 'rgba(255,255,255,0.7)';
     var scrollbarThumb = flag == 1 ? 'rgba(0, 0, 0, 0.30)' : 'rgba(255, 255, 255, 0.20)';
     document.documentElement.style.setProperty('--vn-menu-hover-bg', activeColor);
     document.documentElement.style.setProperty('--vn-menu-item-fg', menuItemFg);
