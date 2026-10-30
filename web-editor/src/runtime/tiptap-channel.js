@@ -516,6 +516,9 @@ function applyTheme(theme, highlightColor, disableHighlightColor, backgroundColo
   root.style.setProperty('--dvn-panel-border', isDark ? '#444444' : '#cccccc')
   root.style.setProperty('--dvn-toolbar-border', isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.08)')
   root.style.setProperty('--dvn-toolbar-fg', isDark ? 'rgba(192, 198, 212, 1)' : 'rgba(63, 63, 63, 1)')
+  root.style.setProperty('--dvn-tooltip-bg', isDark ? 'rgba(42, 42, 42, 0.98)' : 'rgba(245, 245, 245, 0.98)')
+  root.style.setProperty('--dvn-tooltip-fg', isDark ? 'rgba(192, 198, 212, 1)' : '#3f3f3f')
+  root.style.setProperty('--dvn-tooltip-border', isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.08)')
   root.style.setProperty('--dvn-editor-fg', isDark ? 'rgba(192, 198, 212, 1)' : 'rgba(0, 0, 0, 1)')
   // 浅色主题使用设计稿的黑色 30% 透明度；深色主题使用 Summernote 的浅色
   // 文字色，避免黑色透明文字与 #242424 背景融为一体。正文占位符继续
