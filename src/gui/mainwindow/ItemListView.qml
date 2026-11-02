@@ -941,7 +941,7 @@ Item {
                     Layout.bottomMargin: isSearch ? 0 : (10 - 8)  
                     font: DTK.fontManager.t6
                     leftPadding: 6
-                    rightPadding: 30 
+                    rightPadding: 10
                     topPadding: 4
                     bottomPadding: 4
                     implicitHeight: Math.max(30, Math.ceil(font.pixelSize * 1.6))
