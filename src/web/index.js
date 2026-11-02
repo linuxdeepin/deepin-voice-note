@@ -1086,6 +1086,7 @@ function updatePlayBackState(playback, state) {
 function toggleState(state) {
     updatePlayBackState(activePlayback, state);
     updatePlayBackState(airVoicePlayback, state);
+    setFocusColor(state == '0' ? 1 : 2);
 }
 
 /**

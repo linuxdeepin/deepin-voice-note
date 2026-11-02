@@ -677,6 +677,7 @@ function removeNullP() {
  * @returns {any}
  */
 function toggleState(state) {
+    setFocusColor(state == '0' ? 1 : 2);
     if (state == '0') {
         $('.voicebtn').removeClass('pause').addClass('play');
         activeVoice.removeClass('play').addClass('pause');
