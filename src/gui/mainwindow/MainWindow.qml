@@ -95,7 +95,29 @@ Item {
             } else if (leftBgArea.visible) {
                 leftBgArea.width -= reduce;
                 tmpLeftAreaWidth = leftBgArea.width;
+            } else {
+                middleBgArea.width = middleAreaMinWidth - rightDragHandle.width;
             }
+        }
+    }
+
+    Connections {
+        target: Window.window
+
+        function onVisibilityChanged() {
+            Qt.callLater(function() {
+                if (layoutInitialized && rightBgArea.width < rightAreaMinWidth) {
+                    var reduce = rightAreaMinWidth - rightBgArea.width;
+                    if (middleBgArea.width - reduce >= middleAreaMinWidth - rightDragHandle.width) {
+                        middleBgArea.width -= reduce;
+                    } else if (leftBgArea.visible) {
+                        leftBgArea.width -= reduce;
+                        tmpLeftAreaWidth = leftBgArea.width;
+                    } else {
+                        middleBgArea.width = middleAreaMinWidth - rightDragHandle.width;
+                    }
+                }
+            });
         }
     }
 
@@ -1069,6 +1091,7 @@ Item {
             x: rightDragHandle.x + rightDragHandle.width
             height: parent.height
             width: parent.width - x
+            clip: true
             // 删除当前记事本的最后一条笔记后，Tiptap Loader 会整体隐藏，
             // 避免残留上一条笔记。这里必须继续铺满编辑器画布色；若保持
             // 半透明，会把主窗口灰底直接暴露出来，和正常空白编辑器不一致。
@@ -1332,6 +1355,13 @@ Item {
                 var deficit = rightAreaMinWidth - rightAvailable;
                 targetMiddleWidth = Math.max(middleAreaMinWidth - rightDragHandle.width,
                                              middleBgArea.width - deficit);
+                var rightAfterShrink = rowLayout.width - tmpLeftAreaWidth - 5
+                                       - targetMiddleWidth - rightDragHandle.width;
+                if (rightAfterShrink < rightAreaMinWidth) {
+                    tmpLeftAreaWidth = Math.max(leftAreaMinWidth,
+                        rowLayout.width - rightAreaMinWidth - 5
+                        - targetMiddleWidth - rightDragHandle.width);
+                }
             } else {
                 targetMiddleWidth = middleBgArea.width;
             }
