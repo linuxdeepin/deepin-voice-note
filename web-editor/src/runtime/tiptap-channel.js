@@ -515,20 +515,20 @@ function applyTheme(theme, highlightColor, disableHighlightColor, backgroundColo
   root.style.setProperty('--dvn-toolbar-border-soft', isDark ? 'rgba(0, 0, 0, 0.30)' : 'rgba(0, 0, 0, 0.04)')
   root.style.setProperty('--dvn-panel-border', isDark ? '#444444' : '#cccccc')
   root.style.setProperty('--dvn-toolbar-border', isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.08)')
-  root.style.setProperty('--dvn-toolbar-fg', isDark ? 'rgba(192, 198, 212, 1)' : 'rgba(63, 63, 63, 1)')
-  root.style.setProperty('--dvn-editor-fg', isDark ? 'rgba(192, 198, 212, 1)' : 'rgba(0, 0, 0, 1)')
-  // 浅色主题使用设计稿的黑色 30% 透明度；深色主题使用 Summernote 的浅色
-  // 文字色，避免黑色透明文字与 #242424 背景融为一体。正文占位符继续
-  // 使用较弱的灰色，与标题的层级保持区分。
-  root.style.setProperty('--dvn-title-fg', isDark ? 'rgba(192, 198, 212, 1)' : 'rgba(0, 0, 0, 0.30)')
-  root.style.setProperty('--dvn-placeholder-fg', isDark ? 'rgba(109, 124, 136, 1)' : 'rgba(0, 0, 0, 0.30)')
+  // 工具栏 normal 使用 70% 前景色，hover 使用 100% 前景色。
+  root.style.setProperty('--dvn-toolbar-fg', isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.7)')
+  root.style.setProperty('--dvn-editor-fg', isDark ? '#DCDCDC' : 'rgba(0, 0, 0, 1)')
+  // 占位文本需要同时保证明暗主题下的可见性：浅色使用黑色 30%，
+  // 深色使用白色 30%；深色下黑色 30% 会与 #242424 背景融为一体。
+  root.style.setProperty('--dvn-title-fg', isDark ? 'rgba(220, 220, 220, 0.7)' : 'rgba(0, 0, 0, 0.30)')
+  root.style.setProperty('--dvn-placeholder-fg', isDark ? 'rgba(220, 220, 220, 0.3)' : 'rgba(0, 0, 0, 0.30)')
   root.style.setProperty('--dvn-toolbar-separator', isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)')
   root.style.setProperty('--dvn-scrollbar-thumb', isDark ? 'rgba(255, 255, 255, 0.20)' : 'rgba(0, 0, 0, 0.30)')
   root.style.setProperty('--dvn-scrollbar-thumb-hover', isDark ? 'rgba(255, 255, 255, 0.25)' : 'rgba(0, 0, 0, 0.50)')
   root.style.setProperty('--dvn-scrollbar-thumb-active', isDark ? 'rgba(255, 255, 255, 0.30)' : 'rgba(0, 0, 0, 0.40)')
   root.style.setProperty('--dvn-hover-bg', isDark ? '#3d3d3d' : '#f0f0f0')
   root.style.setProperty('--dvn-press-bg', isDark ? '#4a4a4a' : '#e5e5e5')
-  root.style.setProperty('--dvn-toolbar-hover-fg', isDark ? 'rgba(255, 255, 255, 0.95)' : 'rgba(0, 0, 0, 0.85)')
+  root.style.setProperty('--dvn-toolbar-hover-fg', isDark ? '#ffffff' : '#000000')
   root.style.setProperty('--dvn-clear-btn-bg', isDark ? '#2d2d2d' : '#fafafa')
   root.style.setProperty('--dvn-color-chip-border', isDark ? 'rgba(255, 255, 255, 0.18)' : 'rgba(0, 0, 0, 0.20)')
   root.style.setProperty('--dvn-color-transparent-bg', isDark ? '#242424' : '#ffffff')
@@ -536,9 +536,9 @@ function applyTheme(theme, highlightColor, disableHighlightColor, backgroundColo
   root.style.setProperty('--dvn-active-outline', highlightColor || '#0086cc')
   // Summernote 深色主题在 #242424 画布上使用白色 5% 的语音块背景。
   root.style.setProperty('--dvn-voice-bg', isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)')
-  root.style.setProperty('--dvn-voice-title', isDark ? 'rgba(192, 198, 212, 1)' : 'rgba(0, 26, 46, 1)')
-  root.style.setProperty('--dvn-voice-text', isDark ? 'rgba(192, 198, 212, 1)' : 'rgba(65, 77, 104, 1)')
-  root.style.setProperty('--dvn-voice-subtitle', isDark ? 'rgba(109, 124, 136, 1)' : 'rgba(138, 161, 180, 1)')
+  root.style.setProperty('--dvn-voice-title', isDark ? '#DCDCDC' : 'rgba(0, 26, 46, 1)')
+  root.style.setProperty('--dvn-voice-text', isDark ? '#DCDCDC' : 'rgba(65, 77, 104, 1)')
+  root.style.setProperty('--dvn-voice-subtitle', isDark ? 'rgba(140, 140, 140, 1)' : 'rgba(138, 161, 180, 1)')
   root.style.setProperty('--dvn-voice-divider', isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)')
   const themeEvent = typeof CustomEvent === 'function'
     ? new CustomEvent('dvn-theme-applied', { detail: { theme: root.dataset.dvnTheme } })
