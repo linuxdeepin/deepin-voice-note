@@ -153,6 +153,15 @@ function connectVoiceSignal(bridge, signalName) {
       voiceToTextCompleted: 'onToTextCompleted',
     }
     const handlerName = eventMap[signalName]
+    if (signalName === 'voicePlaybackStateChanged') {
+      const playbackState = args[1]
+      const prosemirror = document.querySelector('.ProseMirror')
+      if (prosemirror) {
+        prosemirror.style.caretColor = (playbackState === 0 || playbackState === '0')
+          ? 'transparent'
+          : ''
+      }
+    }
     dispatchVoice(voiceId, handlerName, ...args.slice(1))
   })
 }
