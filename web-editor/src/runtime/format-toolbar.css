@@ -336,6 +336,11 @@
     color: var(--dvn-toolbar-hover-fg, #000000);
 }
 
+.tiptap-toolbar .tiptap-select-wrap:hover .tiptap-select-button,
+.tiptap-toolbar .tiptap-select-wrap.is-open .tiptap-select-button {
+    color: var(--dvn-toolbar-hover-fg, #000000);
+}
+
 .tiptap-toolbar button.is-active .tiptap-icon,
 .tiptap-toolbar button[aria-pressed="true"] .tiptap-icon {
     color: var(--dvn-menu-selected-fg, #ffffff);
