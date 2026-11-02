@@ -504,7 +504,7 @@ function applyTheme(theme, highlightColor, disableHighlightColor, backgroundColo
   root.style.setProperty('--dvn-toolbar-bg', isDark ? 'rgba(42, 42, 42, 1)' : 'rgba(245, 245, 245, 1)')
   // DTK-style popup surface: keep the panel translucent so the editor canvas
   // softly shows through, while retaining a solid fallback when blur is absent.
-  root.style.setProperty('--dvn-menu-bg', isDark ? 'rgba(37, 37, 37, 0.92)' : 'rgba(247, 247, 247, 0.92)')
+  root.style.setProperty('--dvn-menu-bg', isDark ? 'rgba(37, 37, 37, 0.80)' : 'rgba(247, 247, 247, 0.80)')
   root.style.setProperty('--dvn-menu-solid-bg', isDark ? '#252525' : '#f7f7f7')
   root.style.setProperty('--dvn-menu-border', isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.06)')
   root.style.setProperty('--dvn-menu-inner-border', isDark ? 'rgba(255, 255, 255, 0.10)' : 'rgba(255, 255, 255, 0.70)')
