@@ -1241,16 +1241,17 @@ Item {
 
             delegate: Rectangle {
                 color: "transparent"
-                height: section == "top" ? Math.max(18, Math.ceil(sectionStickyFontMetrics.height) + 6) : 16
+                height: section == "top" ? Math.max(18, Math.ceil(sectionStickyFontMetrics.height) + 12) : 16
                 width: parent.width
 
                 FontMetrics {
                     id: sectionStickyFontMetrics
-                    font.pixelSize: 12
+                    font: DTK.fontManager.t8
                 }
 
                 RowLayout {
                     anchors.left: parent.left
+                    anchors.leftMargin: 6
                     anchors.verticalCenter: parent.verticalCenter
                     spacing: 4
                     visible: section == "top" && !isSearch
@@ -1259,17 +1260,17 @@ Item {
                     DciIcon {
                         id: sectionPinIcon
                         
-                        Layout.preferredWidth: 12
-                        Layout.preferredHeight: 12
+                        Layout.preferredWidth: 16
+                        Layout.preferredHeight: 16
                         name: "pin_top"
-                        sourceSize: Qt.size(12, 12)
+                        sourceSize: Qt.size(16, 16)
                         theme: DTK.themeType
                         palette: DTK.makeIconPalette(parent.palette)
                     }
                     
                     Text {
-                        color: DTK.themeType === ApplicationHelper.LightType ? "#b3000000" : "#b3ffffff"
-                        font.pixelSize: 12
+                        color: DTK.themeType === ApplicationHelper.LightType ? "#8AA1B4" : "#6D7C88"
+                        font: DTK.fontManager.t8
                         verticalAlignment: Text.AlignVCenter
                         text: qsTr("Sticky Notes")
                     }
@@ -1277,7 +1278,7 @@ Item {
 
                 Rectangle {
                     anchors.centerIn: parent
-                    color: "#0D000000"
+                    color: DTK.themeType === ApplicationHelper.LightType ? "#0D000000" : "#0DFFFFFF"
                     height: 1
                     visible: section != "top" && VNoteMainManager.getTop() && !isSearch
                     width: parent.width
