@@ -164,7 +164,7 @@ ExportNoteWorker::ExportError ExportNoteWorker::exportText()
                 // so without this step the placeholder leaks into the txt
                 // export and the real transcription is lost.
                 {
-                    QRegularExpression jsonKeyRe("jsonKey='([^']*)'");
+                    QRegularExpression jsonKeyRe("jsonKey=\"([^\"]*)\"");
                     auto it = jsonKeyRe.globalMatch(html);
                     struct VoiceBoxInfo {
                         int matchEnd;
@@ -173,12 +173,13 @@ ExportNoteWorker::ExportError ExportNoteWorker::exportText()
                     QVector<VoiceBoxInfo> vbInfos;
                     while (it.hasNext()) {
                         auto match = it.next();
+                        QString jsonStr = match.captured(1);
+                        jsonStr.replace("&quot;", "\"");
+                        jsonStr.replace("&amp;", "&");
                         QJsonDocument jsonDoc =
-                            QJsonDocument::fromJson(match.captured(1).toUtf8());
+                            QJsonDocument::fromJson(jsonStr.toUtf8());
                         QString text = jsonDoc.object().value("text").toString();
-                        if (!text.isEmpty()) {
-                            vbInfos.append({match.capturedEnd(0), text});
-                        }
+                        vbInfos.append({match.capturedEnd(0), text});
                     }
                     // Process end-to-start so earlier offsets stay valid
                     for (int i = vbInfos.size() - 1; i >= 0; --i) {
