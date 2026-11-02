@@ -731,9 +731,10 @@ Item {
     Connections {
         function handleUpdateNoteList(notesData) {
             itemModel.clear();
+            var items = [];
             for (var i = 0; i < notesData.length; i++) {
                 var itemIsTop = notesData[i].isTop ? "top" : "normal";
-                itemModel.append({
+                items.push({
                     name: notesData[i].name,
                     time: notesData[i].time,
                     isTop: itemIsTop,
@@ -742,6 +743,7 @@ Item {
                     noteId: notesData[i].noteId
                 });
             }
+            itemModel.append(items);
         }
 
         target: VNoteMainManager
@@ -798,6 +800,7 @@ Item {
         anchors.fill: parent
         boundsBehavior: Flickable.StopAtBounds
         clip: true
+        cacheBuffer: 2000
         model: itemModel
         spacing: itemSpacing
         visible: true
@@ -846,17 +849,14 @@ Item {
             radius: 6
             width: itemListView.width
 
-            // 与 DccItemBackground 一致：卡片底部 1px 淡阴影
-            BoxShadow {
-                anchors.fill: parent
-                cornerRadius: rootItemDelegate.radius
-                hollow: true
-                shadowBlur: 0
-                shadowColor: DTK.themeType === ApplicationHelper.LightType ? Qt.rgba(0, 0, 0, 0.05)
-                                                                           : Qt.rgba(0, 0, 0, 0.3)
-                shadowOffsetX: 0
-                shadowOffsetY: 1
-                spread: 0
+            // 卡片底部 1px 淡阴影（纯 Rectangle 替代 BoxShadow，消除离屏 FBO 渲染开销）
+            Rectangle {
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+                height: 1
+                color: DTK.themeType === ApplicationHelper.LightType ? Qt.rgba(0, 0, 0, 0.05)
+                                                                      : Qt.rgba(0, 0, 0, 0.3)
                 visible: !rootItemDelegate.isSelected
                 z: -1
             }

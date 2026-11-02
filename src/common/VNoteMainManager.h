@@ -84,6 +84,7 @@ public:
     Q_INVOKABLE void saveUserSelectedPath(const QString &path, const SaveAsType type);
     Q_INVOKABLE void reloadAfterMigration();
     Q_INVOKABLE bool openUosAiInAppStore();
+    Q_INVOKABLE bool isWeakGpuPlatform() const;
 
     /**
      * @brief 获取当前笔记 ID
