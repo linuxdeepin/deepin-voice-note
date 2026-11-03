@@ -1045,8 +1045,10 @@ void WebEngineHandler::processTextMenuRequest(QObject *request)
     if (flags.testFlag(QWebEngineContextMenuData::CanPaste)) {
         qCInfo(voiceNoteLog) << "flags has CanPaste";
         ActionManager::instance()->enableAction(ActionManager::TxtPaste, true);
-        ActionManager::instance()->enableAction(ActionManager::TxtDictation, true);
     }
+    const bool textEditable = request->property("isContentEditable").toBool();
+    ActionManager::instance()->enableAction(ActionManager::TxtDictation,
+            textEditable && !OpsStateInterface::instance()->isVoice2Text());
 
     const QPoint pos = request->property("position").toPoint();
     Q_EMIT requestShowMenu(TxtMenu, pos);
@@ -1089,8 +1091,9 @@ void WebEngineHandler::processTextMenuRequest(QWebEngineContextMenuRequest *requ
     if (flags.testFlag(QWebEngineContextMenuRequest::CanPaste)) {
         qCInfo(voiceNoteLog) << "flags has CanPaste";
         ActionManager::instance()->enableAction(ActionManager::TxtPaste, true);
-        ActionManager::instance()->enableAction(ActionManager::TxtDictation, true);
     }
+    ActionManager::instance()->enableAction(ActionManager::TxtDictation,
+            request->isContentEditable() && !OpsStateInterface::instance()->isVoice2Text());
 
     // 请求界面弹出右键菜单
     Q_EMIT requestShowMenu(TxtMenu, request->position());
