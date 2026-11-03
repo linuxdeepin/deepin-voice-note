@@ -682,8 +682,9 @@ Item {
                         ActionManager.enableAction(ActionManager.TxtDelete, (flags & 16) !== 0)
                         // 只有能复制时，才能朗读
                         ActionManager.enableAction(ActionManager.TxtSpeech, (flags & 2) !== 0)
-                        // 只有能粘贴时，才能听写
-                        ActionManager.enableAction(ActionManager.TxtDictation, (flags & 8) !== 0)
+                        // 听写只依赖当前编辑器是否可编辑，与剪贴板能否粘贴无关。
+                        ActionManager.enableAction(ActionManager.TxtDictation,
+                                req.isContentEditable && !rootItem.isVoiceToText)
                     }
 
                     // 对于所有菜单类型，都调用C++的处理器
@@ -862,7 +863,7 @@ Item {
                         var nativeEditFlags = Number(req.editFlags);
                         tiptapWebView.runJavaScript(
                             "(function(){"
-                            + "function flags(canSelectAll,canCopy,canCut,canPaste,canDelete){return {canSelectAll:!!canSelectAll,canCopy:!!canCopy,canCut:!!canCut,canPaste:!!canPaste,canDelete:!!canDelete,canSpeech:!!canCopy,canDictation:!!canPaste};}"
+                            + "function flags(canSelectAll,canCopy,canCut,canPaste,canDelete){return {canSelectAll:!!canSelectAll,canCopy:!!canCopy,canCut:!!canCut,canPaste:!!canPaste,canDelete:!!canDelete,canSpeech:!!canCopy};}"
                             + "function selectionInside(target){var sel=window.getSelection();if(!target||!sel||sel.rangeCount===0)return false;for(var i=0;i<sel.rangeCount;i++){var r=sel.getRangeAt(i);var a=r.startContainer;var b=r.endContainer;if(target===a||target.contains(a)||target===b||target.contains(b))return true;}return false;}"
                             + "function selectionTouches(target){var sel=window.getSelection();if(!sel||sel.rangeCount===0||sel.isCollapsed||!sel.toString())return false;for(var i=0;i<sel.rangeCount;i++){var r=sel.getRangeAt(i);if(r.intersectsNode){try{if(r.intersectsNode(target))return true;}catch(e){}}else{var cr=document.createRange();cr.selectNodeContents(target);if(r.compareBoundaryPoints(Range.END_TO_START,cr)>0&&r.compareBoundaryPoints(Range.START_TO_END,cr)<0)return true;}}return false;}"
                             + "var el=document.elementFromPoint(" + sx + "," + sy + ");"
@@ -919,7 +920,6 @@ Item {
                                         var clipboardCanPaste = TiptapChannel.clipboardHasPasteContent();
                                         flags.canPaste = !!flags.canPaste
                                                 && (clipboardCanPaste || (Number.isFinite(nativeEditFlags) && (nativeEditFlags & 8) !== 0));
-                                        flags.canDictation = flags.canPaste;
                                     }
                                     ActionManager.enableAction(ActionManager.TxtSelectAll, !!flags.canSelectAll);
                                     ActionManager.enableAction(ActionManager.TxtCopy, !!flags.canCopy);
@@ -927,7 +927,8 @@ Item {
                                     ActionManager.enableAction(ActionManager.TxtPaste, !!flags.canPaste);
                                     ActionManager.enableAction(ActionManager.TxtDelete, !!flags.canDelete);
                                     ActionManager.enableAction(ActionManager.TxtSpeech, !!flags.canSpeech);
-                                    ActionManager.enableAction(ActionManager.TxtDictation, !!flags.canDictation);
+                                    ActionManager.enableAction(ActionManager.TxtDictation,
+                                            !!info.inEditor && !rootItem.isVoiceToText);
                                     txtCtxMenu.popup(Qt.point(rawX, rawY));
                                     return;
                                 }
