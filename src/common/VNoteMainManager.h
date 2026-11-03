@@ -62,6 +62,7 @@ public:
     Q_INVOKABLE void renameFolderById(const int &folderId, const QString &name);
     Q_INVOKABLE void renameNote(const int &index, const QString &newName);
     Q_INVOKABLE QString getNotePlainTitle(const int &noteId);
+    Q_INVOKABLE QString makeHighlightedTitle(const QString &title) const;
     Q_INVOKABLE void vNoteSearch(const QString &text);
     Q_INVOKABLE void updateNoteWithResult(const QString &result);
     Q_INVOKABLE void updateNoteWithResultForNote(int noteId, const QString &result);
