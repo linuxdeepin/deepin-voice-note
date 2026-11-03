@@ -735,6 +735,7 @@ Item {
                 var itemIsTop = notesData[i].isTop ? "top" : "normal";
                 itemModel.append({
                     name: notesData[i].name,
+                    highlightedTitle: notesData[i].highlightedTitle || "",
                     time: notesData[i].time,
                     isTop: itemIsTop,
                     icon: notesData[i].icon,
@@ -768,7 +769,13 @@ Item {
         onNoteTitleChanged: function(noteId, newTitle) {
             for (var i = 0; i < itemModel.count; i++) {
                 if (itemModel.get(i).noteId === noteId) {
-                    itemModel.set(i, { "name": newTitle });
+                    var highlightedTitle = isSearch
+                        ? VNoteMainManager.makeHighlightedTitle(newTitle)
+                        : "";
+                    itemModel.set(i, {
+                        "name": newTitle,
+                        "highlightedTitle": highlightedTitle
+                    });
                     console.log("Updated note title in list without reload, noteId:", noteId);
                     break;
                 }
@@ -816,13 +823,31 @@ Item {
         delegate: Rectangle {
             id: rootItemDelegate
 
-            Accessible.name: model.name
-            Accessible.description: qsTr("Note item")
-            Accessible.role: Accessible.ListItem
             property bool hovered: false
             property bool isRename: false
             property bool isSelected: selectedNoteItem.indexOf(index) !== -1
             property var startMove: [-1, -1]
+            property string plainTitle: model.name || ""
+            property string displayTitle: {
+                if (!isSearch)
+                    return rootItemDelegate.plainTitle;
+
+                var highlightedTitle = model.highlightedTitle
+                    || VNoteMainManager.makeHighlightedTitle(rootItemDelegate.plainTitle);
+
+                if (!isSelected)
+                    return highlightedTitle;
+
+                // 选中项背景和搜索命中的默认高亮色相同，直接使用会出现蓝底蓝字。
+                // 选中态仅改用高亮前景色，不改变原有文字样式。
+                var selectedTextColor = noteNameLabel.palette.highlightedText.toString();
+                return highlightedTitle.replace(/<span style="color: [^"]*">/g,
+                    '<span style="color: ' + selectedTextColor + ';">');
+            }
+
+            Accessible.name: rootItemDelegate.plainTitle
+            Accessible.description: qsTr("Note item")
+            Accessible.role: Accessible.ListItem
 
             // 选中态始终使用系统主题高亮色；失焦时也不退化成灰色，
             // 避免编辑器获得焦点后笔记选中项看起来像未选中。
@@ -864,7 +889,7 @@ Item {
             Keys.onPressed: function(event) {
                 if (isRename) {
                     if (event.key === Qt.Key_Escape) {
-                        renameLine.text = model.name;
+                        renameLine.text = rootItemDelegate.plainTitle;
                         isRename = false;
                         rootItem.forceActiveFocus();
                     } else if (event.key === Qt.Key_Enter || event.key === Qt.Key_Return) {
@@ -905,7 +930,8 @@ Item {
                     font: DTK.fontManager.t6
                     height: implicitHeight
                     horizontalAlignment: Text.AlignHLeft
-                    text: model.name
+                    text: rootItemDelegate.displayTitle
+                    textFormat: isSearch ? Text.RichText : Text.PlainText
                     visible: !isRename
                 }
 
@@ -924,8 +950,16 @@ Item {
                 ToolTip {
                     id: itemNameTip
 
-                    text: model.name
+                    text: rootItemDelegate.plainTitle
                     visible: rootItemDelegate.hovered
+
+                    contentItem: Text {
+                        text: itemNameTip.text
+                        textFormat: Text.PlainText
+                        font: itemNameTip.font
+                        wrapMode: Text.Wrap
+                        color: itemNameTip.palette.toolTipText
+                    }
                 }
 
                 LineEdit {
@@ -964,7 +998,7 @@ Item {
                             return Math.min(implicitHeight, Math.max(30, available));
                         }
                     })()
-                    text: model.name
+                    text: rootItemDelegate.plainTitle
                     visible: rootItemDelegate.isRename
 
                     backgroundColor: Palette {
