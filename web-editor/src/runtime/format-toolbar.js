@@ -2,8 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import toolbarCss from './format-toolbar.css?inline'
-import { AllSelection, Plugin, PluginKey, TextSelection } from '@tiptap/pm/state'
-import { Mark } from '@tiptap/pm/model'
+import { AllSelection, TextSelection } from '@tiptap/pm/state'
 import boldIconUrl from '../../../src/web/css/createfont/svg/bold.svg?url'
 import italicIconUrl from '../../../src/web/css/createfont/svg/Italic.svg?url'
 import underlineIconUrl from '../../../src/web/css/createfont/svg/underline.svg?url'
@@ -52,7 +51,6 @@ const TOOLBAR_STYLE_ID = 'dvn-tiptap-format-toolbar-style'
 const TOOLBAR_LEFT_MARGIN = 10
 const DEFAULT_FORE_COLOR = 'rgb(0, 0, 0)'
 const DEFAULT_BACK_COLOR = 'rgba(255, 215, 0, 0.2)'
-const PERSISTENT_COLOR_PLUGIN_KEY = new PluginKey('dvnPersistentColorInput')
 
 function normalizeCssColor(value) {
   if (!value) return ''
@@ -509,7 +507,6 @@ function buildColorPicker(editor, kind, colors, apply, clear, onOpen, strings) {
   // 背景色第一个色块是透明；Story 要求默认背景色为黄色。
   let selectedColorIndex = kind === 'backColor' ? 1 : 0
   let currentColor = paletteRows.flat()[selectedColorIndex] || (kind === 'foreColor' ? DEFAULT_FORE_COLOR : DEFAULT_BACK_COLOR)
-  let explicitSelection = false
 
   const icon = createEl('span', { class: 'tiptap-color-icon' }, [
     createSvgIcon(kind === 'foreColor' ? 'textColor' : 'marker'),
@@ -620,8 +617,8 @@ function buildColorPicker(editor, kind, colors, apply, clear, onOpen, strings) {
 
   applyButton.addEventListener('click', (event) => {
     event.stopPropagation()
-    explicitSelection = true
-    if (!currentColor || currentColor === 'transparent') {
+    if (!currentColor || currentColor === 'transparent'
+      || (kind === 'backColor' && editor.isActive('highlight', { color: currentColor }))) {
       clear(editor)
     } else {
       apply(editor, currentColor)
@@ -653,7 +650,6 @@ function buildColorPicker(editor, kind, colors, apply, clear, onOpen, strings) {
         })
         cell.addEventListener('click', () => {
           setCurrentColor(color)
-          explicitSelection = true
           if (color === 'transparent') {
             clear(editor)
           } else {
@@ -693,8 +689,12 @@ function buildColorPicker(editor, kind, colors, apply, clear, onOpen, strings) {
     openPanel,
     closePanel,
     setColors,
+    reset() {
+      const defaultIndex = kind === 'backColor' ? 1 : 0
+      setCurrentColor(paletteRows.flat()[defaultIndex])
+      closePanel()
+    },
     getCurrentColor: () => currentColor,
-    hasExplicitSelection: () => explicitSelection,
   }
 }
 
@@ -852,6 +852,7 @@ export function createFormatToolbar(editor, host, uiStrings = DEFAULT_TIPTAP_UI_
   if (!editor) throw new Error('editor instance is required')
   if (!host) throw new Error('toolbar host element is required')
   const strings = { ...DEFAULT_TIPTAP_UI_STRINGS, ...(uiStrings || {}) }
+  let toolbarNoteId = null
 
   injectToolbarStyles()
   injectTaskListStyles()
@@ -1081,41 +1082,6 @@ export function createFormatToolbar(editor, host, uiStrings = DEFAULT_TIPTAP_UI_
   }
 
   syncColorPalettesForTheme()
-
-  // 颜色按钮是“输入模式”而不是当前光标样式：用户选过颜色后，后续在空段落、
-  // 空格或其他位置输入时仍应沿用上一次选择。这里只维护 collapsing cursor 的
-  // storedMarks，不改动已有正文的 mark。
-  const persistentColorPlugin = new Plugin({
-    key: PERSISTENT_COLOR_PLUGIN_KEY,
-    appendTransaction(transactions, _oldState, newState) {
-      if (!forePicker.hasExplicitSelection() && !backPicker.hasExplicitSelection()) return null
-      if (!newState.selection.empty) return null
-      if (transactions.some((transaction) => transaction.getMeta(PERSISTENT_COLOR_PLUGIN_KEY))) return null
-
-      const currentMarks = newState.storedMarks ?? newState.selection.$from.marks()
-      let nextMarks = [...currentMarks]
-
-      const colorType = newState.schema.marks.color
-      if (colorType && forePicker.hasExplicitSelection()) {
-        const color = forePicker.getCurrentColor()
-        nextMarks = nextMarks.filter((mark) => mark.type !== colorType)
-        if (color && color !== 'transparent') nextMarks.push(colorType.create({ color }))
-      }
-
-      const highlightType = newState.schema.marks.highlight
-      if (highlightType && backPicker.hasExplicitSelection()) {
-        const color = backPicker.getCurrentColor()
-        nextMarks = nextMarks.filter((mark) => mark.type !== highlightType)
-        if (color && color !== 'transparent') nextMarks.push(highlightType.create({ color }))
-      }
-
-      if (Mark.sameSet(currentMarks, nextMarks)) return null
-      const tr = newState.tr.setStoredMarks(nextMarks)
-      tr.setMeta(PERSISTENT_COLOR_PLUGIN_KEY, true)
-      return tr
-    },
-  })
-  editor.registerPlugin(persistentColorPlugin)
 
   toolbar.appendChild(colorGroup)
   const colorListSeparator = createSeparator()
@@ -1466,6 +1432,13 @@ export function createFormatToolbar(editor, host, uiStrings = DEFAULT_TIPTAP_UI_
   window.addEventListener('scroll', clampOverflowPanelToViewport, true)
 
   return {
+    setNoteId(noteId) {
+      const nextId = Number(noteId)
+      if (!Number.isFinite(nextId) || nextId === toolbarNoteId) return
+      toolbarNoteId = nextId
+      forePicker.reset()
+      backPicker.reset()
+    },
     setOnPickImage(fn) {
       onPickImage = typeof fn === 'function' ? fn : null
     },
@@ -1497,7 +1470,6 @@ export function createFormatToolbar(editor, host, uiStrings = DEFAULT_TIPTAP_UI_
       updateOverflowMode()
     },
     destroy() {
-      editor.unregisterPlugin?.(PERSISTENT_COLOR_PLUGIN_KEY)
       document.removeEventListener('click', onOutsideClick)
       window.removeEventListener('resize', updateOverflowMode)
       window.removeEventListener('dvn-theme-applied', onThemeApplied)
