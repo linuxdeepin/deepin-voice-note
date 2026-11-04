@@ -210,7 +210,6 @@ function initSummernote() {
     // 默认选中
     setSelectColorButton($('[data-value="#414D68"]'))
     setSelectColorButton($('[data-value="transparent"]'))
-    $('.icon-backcolor .path5').addClass('transparentColor')
     if ($('.icon-backcolor .slopingside').length === 0) {
         $('.icon-backcolor').append('<div class="slopingside"></div>')
     }
