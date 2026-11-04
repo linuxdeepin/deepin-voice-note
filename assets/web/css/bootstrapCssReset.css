@@ -267,6 +267,18 @@
      transform: rotate(45deg);
  }
 
+ .icon-backcolor {
+     position: relative;
+ }
+
+ .icon-backcolor .slopingside {
+     position: absolute;
+     top: 50%;
+     left: 50%;
+     margin-left: -10px;
+     margin-top: -1px;
+ }
+
  .note-backcolor .backColor-dropdown {
      padding-right: 2px !important;
  }
