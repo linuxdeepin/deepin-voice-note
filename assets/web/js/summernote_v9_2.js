@@ -6309,12 +6309,10 @@
                                 if (eventName == 'backColor') {
                                     $('.icon-backcolor .path6').css('color', value)
                                     if (value == 'transparent') {
-                                        $('.icon-backcolor .path5').addClass('transparentColor')
                                         if ($('.icon-backcolor .slopingside').length === 0) {
                                             $('.icon-backcolor').append('<div class="slopingside"></div>')
                                         }
                                     } else {
-                                        $('.icon-backcolor .path5').removeClass('transparentColor')
                                         $('.icon-backcolor .slopingside').remove()
                                     }
                                 } else if (eventName == 'foreColor') {
