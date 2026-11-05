@@ -1435,9 +1435,22 @@
             var childNode = point.node.childNodes[point.offset];
             var clone = insertAfter(point.node.cloneNode(false), point.node);
             appendChildNodes(clone, listNext(childNode));
+            if (!nodeLength(clone)) {
+                var srcChildren = point.node.childNodes;
+                for (var i = 0; i < srcChildren.length; i++) {
+                    if (srcChildren[i].tagName === "SPAN" && srcChildren[i].getAttribute("style")) {
+                        clone.appendChild(srcChildren[i].cloneNode(false));
+                        break;
+                    }
+                }
+            }
             if (!isSkipPaddingBlankHTML) {
                 paddingBlankHTML(point.node);
-                paddingBlankHTML(clone);
+                if (nodeLength(clone) === 1 && clone.childNodes[0].tagName === "SPAN" && !nodeLength(clone.childNodes[0])) {
+                    paddingBlankHTML(clone.childNodes[0]);
+                } else {
+                    paddingBlankHTML(clone);
+                }
             }
             return clone;
         }
