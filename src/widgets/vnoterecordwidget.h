@@ -1,5 +1,5 @@
 // Copyright (C) 2019 ~ 2020 Uniontech Software Technology Co.,Ltd.
-// SPDX-FileCopyrightText: 2023 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2023-2026 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -40,6 +40,9 @@ public slots:
     //录音数据改变
     void onAudioBufferProbed(const QAudioBuffer &buffer);
     void onChangeTheme();
+
+protected:
+    void paintEvent(QPaintEvent *event) override;
 
 private:
     //初始化UI布局

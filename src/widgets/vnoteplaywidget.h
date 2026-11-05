@@ -1,5 +1,5 @@
 // Copyright (C) 2019 ~ 2020 Uniontech Software Technology Co.,Ltd.
-// SPDX-FileCopyrightText: 2023 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2023-2026 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -55,8 +55,10 @@ public slots:
 protected:
     //事件过滤器
     bool eventFilter(QObject *o, QEvent *e) override;
+    void paintEvent(QPaintEvent *event) override;
 
 private:
+    void onChangeTheme();
     void initUI();
     void initConnection();
     //初始化播放库
