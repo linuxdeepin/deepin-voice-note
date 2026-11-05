@@ -617,8 +617,8 @@ function buildColorPicker(editor, kind, colors, apply, clear, onOpen, strings) {
 
   applyButton.addEventListener('click', (event) => {
     event.stopPropagation()
-    if (!currentColor || currentColor === 'transparent'
-      || (kind === 'backColor' && editor.isActive('highlight', { color: currentColor }))) {
+    // 主按钮只表达应用当前颜色，重复点击同一颜色不能变成取消。
+    if (!currentColor || currentColor === 'transparent') {
       clear(editor)
     } else {
       apply(editor, currentColor)

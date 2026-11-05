@@ -17680,11 +17680,65 @@ const VoiceBlock = Node3.create({
 });
 var index_default$1 = ListItem;
 var index_default = TaskItem;
+const taskCheckboxIntentKey = "dvnTaskCheckboxIntent";
 const ListItemWithHeading = index_default$1.extend({
   content: "(paragraph|heading) block*"
 });
 const TaskItemWithHeading = index_default.extend({
-  content: "(paragraph|heading) block*"
+  content: "(paragraph|heading) block*",
+  addCommands() {
+    return {
+      ...this.parent?.(),
+      // position 可由 checkbox NodeView 明确传入；省略时作用于光标所在待办。
+      setTaskChecked: (checked, position) => ({ tr, dispatch }) => {
+        if (typeof checked !== "boolean") return false;
+        let pos = position;
+        if (pos === void 0) {
+          const { $from } = tr.selection;
+          for (let depth = $from.depth; depth > 0; depth -= 1) {
+            if ($from.node(depth).type.name === this.name) {
+              pos = $from.before(depth);
+              break;
+            }
+          }
+        }
+        if (!Number.isInteger(pos) || pos < 0 || pos >= tr.doc.content.size) return false;
+        const node = tr.doc.nodeAt(pos);
+        if (node?.type.name !== this.name) return false;
+        if (dispatch) {
+          tr.setNodeMarkup(pos, void 0, { ...node.attrs, checked });
+          const intents = tr.getMeta(taskCheckboxIntentKey) || [];
+          tr.setMeta(taskCheckboxIntentKey, [...intents, {
+            pos,
+            checked,
+            mappingIndex: tr.mapping.maps.length
+          }]);
+        }
+        return true;
+      }
+    };
+  },
+  addNodeView() {
+    const parentNodeView = this.parent();
+    return (props) => {
+      const nodeView = parentNodeView(props);
+      const checkbox = nodeView.dom.firstElementChild.querySelector('input[type="checkbox"]');
+      const onChange = (event) => {
+        if (!props.editor.isEditable) return;
+        event.stopImmediatePropagation();
+        const position = props.getPos();
+        if (typeof position !== "number") return;
+        props.editor.chain().focus(void 0, { scrollIntoView: false }).setTaskChecked(checkbox.checked, position).run();
+      };
+      checkbox.addEventListener("change", onChange, true);
+      const destroy = nodeView.destroy?.bind(nodeView);
+      nodeView.destroy = () => {
+        checkbox.removeEventListener("change", onChange, true);
+        destroy?.();
+      };
+      return nodeView;
+    };
+  }
 });
 function createTiptapSchemaV1() {
   return getSchema([
