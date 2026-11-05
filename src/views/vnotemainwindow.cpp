@@ -2077,7 +2077,7 @@ bool VNoteMainWindow::eventFilter(QObject *o, QEvent *e)
         m_buttonAnchor->setBottomMargin(17);
         //qDebug() << m_middleViewHolder->geometry() << m_noteBookName->height() << m_noteBookName->geometry();
         updateFolderName();
-        return true;
+        return false;
     }
 
     if (e->type() == QEvent::KeyPress) {
