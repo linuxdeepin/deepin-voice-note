@@ -1,5 +1,5 @@
 // Copyright (C) 2019 ~ 2020 Uniontech Software Technology Co.,Ltd.
-// SPDX-FileCopyrightText: 2023 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2023-2026 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -746,6 +746,12 @@ void VNoteMainWindow::initSpliterView()
     initLeftView();
     initMiddleView();
     initRightView();
+
+    DPalette splitterPalette = DApplicationHelper::instance()->palette(m_mainWndSpliter);
+    DGuiApplicationHelper::ColorType theme = DGuiApplicationHelper::instance()->themeType();
+    QColor borderColor = theme == DGuiApplicationHelper::DarkType ? QColor(80, 80, 80) : QColor(180, 180, 180);
+    splitterPalette.setColor(DPalette::FrameBorder, borderColor);
+    m_mainWndSpliter->setPalette(splitterPalette);
 
     // Disable spliter drag & resize
     /*
@@ -2381,6 +2387,13 @@ void VNoteMainWindow::onSaveVoicesShortcut()
  */
 void VNoteMainWindow::onThemeChanged()
 {
+    if (m_mainWndSpliter) {
+        DPalette splitterPalette = DApplicationHelper::instance()->palette(m_mainWndSpliter);
+        DGuiApplicationHelper::ColorType theme = DGuiApplicationHelper::instance()->themeType();
+        QColor borderColor = theme == DGuiApplicationHelper::DarkType ? QColor(80, 80, 80) : QColor(180, 180, 180);
+        splitterPalette.setColor(DPalette::FrameBorder, borderColor);
+        m_mainWndSpliter->setPalette(splitterPalette);
+    }
     showNotepadList();
 }
 
