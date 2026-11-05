@@ -6,6 +6,7 @@ import { Plugin, TextSelection } from '@tiptap/pm/state'
 
 import {
   isInListItem,
+  indentSelectedPlainTextBlocks,
   joinParagraphBackwardIntoPreviousList,
   joinParagraphForwardIntoCurrentList,
   joinAdjacentSameTypeLists,
@@ -25,13 +26,6 @@ function insertPlainText(editor, from, to = from) {
   tr.setSelection(TextSelection.create(tr.doc, from + PLAIN_TEXT_TAB.length))
   editor.view.dispatch(tr.scrollIntoView())
   return true
-}
-
-// 有文本选区时，与旧版 Summernote 的 insertTab 一致：删除选区后插入 4 个 NBSP。
-function insertPlainTextTab(editor) {
-  const { selection } = editor.state
-  if (selection.empty || !(selection instanceof TextSelection)) return false
-  return insertPlainText(editor, selection.from, selection.to)
 }
 
 // 普通段落中的空光标按 Tab，在当前光标处插入纯文本缩进。
@@ -106,16 +100,31 @@ function descendEmptyListItem(editor) {
   const info = emptyListItemInfo(editor)
   if (!info || info.visualDepth <= 1) return false
 
+  // splitListItem 为下一项设置的 storedMarks 代表用户仍在使用的文字格式。
+  // 空项继续回车反缩进时，无论只改视觉层级还是通过 liftListItem 改结构，
+  // 都不能把这种待输入格式当成空项的格式而清除。
+  const typingMarks = editor.state.storedMarks
+  let descended = false
   if (info.indentLevel > 0) {
     const tr = editor.state.tr.setNodeMarkup(info.itemPos, undefined, {
       ...info.item.attrs,
       dvnIndentLevel: info.indentLevel - 1,
     })
     editor.view.dispatch(tr.scrollIntoView())
-    return true
+    descended = true
+  } else {
+    descended = liftActiveListItem(editor)
   }
 
-  return liftActiveListItem(editor)
+  // liftListItem 及其结构归一化会重建选区，不能只在最初的改属性事务
+  // 设置 marks；应当在整次缩进结束后恢复，且不产生独立的 Undo 步骤。
+  if (descended && typingMarks !== null && editor.state.selection.empty
+      && editor.state.storedMarks !== typingMarks) {
+    const tr = editor.state.tr.setStoredMarks(typingMarks)
+    tr.setMeta('addToHistory', false)
+    editor.view.dispatch(tr)
+  }
+  return descended
 }
 
 // 统一列表/待办列表键盘缩进规则：Tab 最多进入三层，Shift+Tab 反缩进。
@@ -191,8 +200,17 @@ export const ListNestingGuard = Extension.create({
       Tab: () => {
         normalizeWholeDocumentSelection(this.editor)
 
-        // 选区：任意位置都替换成 4 个 NBSP。
-        if (insertPlainTextTab(this.editor)) return true
+        // 非空文本选区必须按块分流，不能先删除选区再插入 NBSP：
+        // - 普通段落：保留正文，给每个选中段落加文本缩进；
+        // - 列表项：允许无父项的视觉游离项，每个选中项按快照各升一级；
+        // - 混合选区：列表项和普通段落分别处理。
+        const { selection } = this.editor.state
+        if (!selection.empty && selection instanceof TextSelection) {
+          const plainIndented = indentSelectedPlainTextBlocks(this.editor, PLAIN_TEXT_TAB)
+          const coversListItems = selectionCoversListItems(this.editor)
+          if (coversListItems) sinkActiveListItem(this.editor)
+          if (plainIndented || coversListItems) return true
+        }
 
         // 空光标：普通段落行首/空段落插入纯文本缩进；列表内仍执行列表缩进。
         if (insertParagraphIndent(this.editor)) return true
