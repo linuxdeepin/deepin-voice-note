@@ -168,7 +168,8 @@ void MoveView::paintNormal(QPaintEvent *e)
             painter.setPen(QPen(color3));
             painter.setBrush(color3);
             //绘制笔记数量
-            QRect numberRect(QPoint(212 - ((widths - 7) / 2), 7), QSize(16 + (widths - 7), 19));
+            QRectF numberRect(fontMetrics.boundingRect(numString));
+            numberRect.moveCenter(QPointF(220, 18));
             painter.drawText(numberRect, Qt::AlignCenter, numString);
         }
     }
@@ -278,7 +279,8 @@ void MoveView::paintComposite(QPaintEvent *e)
             painter.setPen(QPen(color3));
             painter.setBrush(color3);
             //绘制笔记数量
-            QRect numberRect(QPoint(240 - ((widths - 7) / 2), 19), QSize(16 + (widths - 7), 19));
+            QRectF numberRect(fontMetrics.boundingRect(numString));
+            numberRect.moveCenter(QPointF(248, 28));
             painter.drawText(numberRect, Qt::AlignCenter, numString);
         }
         //单个笔记拖拽
