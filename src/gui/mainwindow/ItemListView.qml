@@ -310,7 +310,7 @@ Item {
              event.accepted = true;
              break;
         case Qt.Key_Delete:
-            if (rootItem.isDragging || webVisible || isRecordingAudio || isPlay || isVoiceToText) {
+            if (rootItem.isDragging || webVisible || isRecordingAudio || isVoiceToText) {
                 console.log("No notes available, cannot delete");
                 return;
             }
@@ -643,7 +643,7 @@ Item {
 
             ActionManager.enableVoicePlayActions(!isPlay && !isRecordingAudio);
             // 录音、播放或语音转文字中禁用删除
-            ActionManager.enableAction(ActionManager.NoteDelete, !isRecordingAudio && !isPlay && !isVoiceToText);
+            ActionManager.enableAction(ActionManager.NoteDelete, !isRecordingAudio && !isVoiceToText);
             
             // 在搜索状态下禁用移动、置顶和新建笔记选项
             if (isSearching) {
