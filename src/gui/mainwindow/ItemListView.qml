@@ -25,6 +25,7 @@ Item {
     property int itemSpacing: 6
     property alias model: itemModel
     property alias moveToFolderDialog: dialogWindow
+    property alias noteCtxMenu: noteCtxMenu
     property var sourceFolderModel
     property int currentFolderIndex: -1
     property var saveFilters: ["TXT(*.txt);;HTML(*.html)", "TXT(*.txt)", "HTML(*.html)", "MP3(*.mp3)"]
