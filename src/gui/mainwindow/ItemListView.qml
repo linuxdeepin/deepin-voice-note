@@ -645,10 +645,10 @@ Item {
             // 录音、播放或语音转文字中禁用删除
             ActionManager.enableAction(ActionManager.NoteDelete, !isRecordingAudio && !isPlay && !isVoiceToText);
             
-            // 在搜索状态下禁用移动、置顶和新建笔记选项
+            // 在搜索状态下仅禁用新建笔记，移动和置顶按录音/播放/语音转文字条件控制
             if (isSearching) {
-                ActionManager.enableAction(ActionManager.NoteMove, false);
-                ActionManager.enableAction(ActionManager.NoteTop, false);
+                ActionManager.enableAction(ActionManager.NoteMove, !isRecordingAudio && !isPlay && !isVoiceToText);
+                ActionManager.enableAction(ActionManager.NoteTop, contextValid);
                 ActionManager.enableAction(ActionManager.NoteAddNew, false);
             } else {
                 // 录音、播放或语音转文字时禁用移动和新建（会影响当前笔记），但置顶保持可用
