@@ -60,6 +60,10 @@ DialogWindow {
 
                 property bool isHovered: false
 
+                // Tab 焦点到达列表时，选中项显示对比色边框
+                border.color: palette.highlightedText
+                border.width: folderList.activeFocus && index === folderList.currentIndex ? 2 : 0
+
                 color: index === dialog.index
                     ? palette.highlight
                     : (isHovered ? (DTK.themeType === ApplicationHelper.LightType ? "#1A000000" : "#1AFFFFFF") : "transparent")
