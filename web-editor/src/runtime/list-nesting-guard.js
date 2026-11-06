@@ -158,6 +158,7 @@ export const ListNestingGuard = Extension.create({
     return [new Plugin({
       appendTransaction: (transactions, _oldState, newState) => {
         if (!transactions.some((transaction) => transaction.docChanged)) return null
+        if (transactions.some((transaction) => transaction.getMeta('dvnPreserveVisualDepth'))) return null
 
         let tr = null
         newState.doc.descendants((node, pos) => {
