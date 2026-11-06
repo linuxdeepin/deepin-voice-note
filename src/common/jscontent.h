@@ -47,6 +47,11 @@ public:
     // 提供前端 AppData 基准路径：file://{AppData}/
     Q_INVOKABLE QString jsCallGetAppDataPath();
 
+    // 用户点击编辑区时请求显示/重新显示软键盘。
+    Q_INVOKABLE void jsCallShowInputMethod();
+    // 新建笔记程序化聚焦后隐藏软键盘，保留原生光标。
+    Q_INVOKABLE void jsCallHideInputMethod();
+
 signals:
     void callJsInitData(const QString &jsonData); //调用web前端，设置json格式数据
     void callJsSetHtml(const QString &html); //调用web前端，设置html格式数据
