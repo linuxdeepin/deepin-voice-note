@@ -1122,7 +1122,7 @@ Item {
                         itemListView.onSaveAudio();
                     }
                     onSaveNote: {
-                        itemListView.onSaveNote();
+                        itemListView.onSaveNoteWithFormatChoice();
                     }
                 }
             }
