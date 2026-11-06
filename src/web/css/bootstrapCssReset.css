@@ -78,8 +78,9 @@ p {
 
 .tooltip-inner {
     border-radius: 8px;
-    background-color: #F0F2F4 !important;
+    background-color: #F0F2F4;
     color: #000;
+    font-style: normal;
     margin-bottom: 1px;
     overflow: hidden;
     box-shadow: 0px 3px 10px 1px rgba(0, 0, 0, 0.15);
