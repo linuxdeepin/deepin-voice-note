@@ -6,7 +6,7 @@ import { Plugin, PluginKey } from '@tiptap/pm/state'
 import { taskCheckboxIntentKey } from '../extensions/task-checkbox-intent.js'
 
 export const taskListCascadePluginKey = new PluginKey('taskListCascade')
-const taskListNormalizationDoneKey = new PluginKey('taskListNormalizationDone')
+export const taskListNormalizationDoneKey = new PluginKey('taskListNormalizationDone')
 
 const LIST_TYPES = new Set(['bulletList', 'orderedList', 'taskList'])
 const LIST_ITEM_TYPES = new Set(['listItem', 'taskItem'])

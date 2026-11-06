@@ -366,11 +366,6 @@ function injectTaskListStyles() {
   style.id = TASK_LIST_STYLE_ID
   style.textContent = [
     'ul[data-type="taskList"] { list-style: none; padding-left: 0; }',
-    'ul[data-type="taskList"] ul[data-type="taskList"] { padding-left: 20px; }',
-    'ul[data-type="taskList"] > li > div > ul[data-type="taskList"] { margin-left: -20px; }',
-    'ul[data-type="taskList"] > li > div > ul[data-type="taskList"] > li > div > ul[data-type="taskList"] > li > div > ul[data-type="taskList"] { padding-left: 0; }',
-    'ul[data-type="taskList"] > li[data-dvn-indent-level="1"] > div > ul[data-type="taskList"] { margin-left: -40px; }',
-    'ul[data-type="taskList"] > li[data-dvn-indent-level="2"] > div > ul[data-type="taskList"] { margin-left: -60px; }',
     // 勾选框与 • / 1. 用同一套规则：勾选框固定 13px，不跟随正文字号；
     // label 盒高用 1lh * max(1, ratio) 跟踪首行有效行盒，align-items:center
     // 把勾选框放在首行中心。li 用 flex-start 让 label 从首行顶部开始，

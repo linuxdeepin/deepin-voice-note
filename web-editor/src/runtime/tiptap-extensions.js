@@ -23,6 +23,7 @@ import { ColorMark } from '../extensions/color-mark.js'
 import { FontFamilyMark } from '../extensions/font-family-mark.js'
 import { FontSizeMark } from '../extensions/font-size-mark.js'
 import { FontWeightMark } from '../extensions/font-weight-mark.js'
+import { EmptyBlockTypingMarks } from '../extensions/empty-block-typing-marks.js'
 import { ImageBlock } from '../extensions/image-block.js'
 import { VoiceBlock } from '../extensions/voice-block.js'
 import { ListItemWithHeading, TaskItemWithHeading } from '../extensions/list-item-with-heading.js'
@@ -62,6 +63,7 @@ export function createTiptapExtensions(uiStrings) {
     Strike,
     ColorMark,
     Highlight.configure({ multicolor: true }),
+    EmptyBlockTypingMarks,
     UndoRedo,
     SelectionClickReset,
     RangeSelectionHighlight,
