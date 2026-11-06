@@ -18,6 +18,7 @@
 #include "globaldef.h"
 #include "actionmanager.h"
 #include "utils.h"
+#include <QSysInfo>
 #include "vtextspeechandtrmanager.h"
 #include "uosaicapabilitymanager.h"
 #include "handler/web_engine_handler.h"
@@ -273,6 +274,25 @@ QObject *tiptapChannelBridge_provider(QQmlEngine *engine, QJSEngine *scriptEngin
     Q_UNUSED(scriptEngine)
 
     return TiptapChannelBridge::instance();
+}
+
+bool VNoteMainManager::isWeakGpuPlatform() const
+{
+    static bool weakGpu = []() {
+        const QString arch = QSysInfo::currentCpuArchitecture();
+        qCInfo(voiceNoteLog) << "Current CPU architecture:" << arch;
+        if (arch == "arm64" || arch == "aarch64" ||
+            arch == "mips64" || arch == "loongarch64") {
+            qCInfo(voiceNoteLog) << "Weak GPU platform detected, blur effects will be disabled";
+            return true;
+        }
+        if (Utils::isLoongsonPlatform()) {
+            qCInfo(voiceNoteLog) << "Loongson platform detected via /proc/cpuinfo";
+            return true;
+        }
+        return false;
+    }();
+    return weakGpu;
 }
 
 void VNoteMainManager::initQMLRegister()
