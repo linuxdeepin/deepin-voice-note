@@ -243,6 +243,7 @@ function mountToolbar() {
   toolbar?.destroy()
   toolbarHost.replaceChildren()
   toolbar = createFormatToolbar(editor, toolbarHost, uiStrings)
+  toolbar.setNoteId(currentTitleNoteId)
   toolbar.setResourceButtonsEnabled(resourceButtonsEnabled.voice, resourceButtonsEnabled.image)
 
   // 工具栏可能先于 QWebChannel 完成绑定就已经可见。先缓存用户操作，
@@ -298,6 +299,7 @@ function setNoteTitle(value) {
 
 function loadNoteTitle(noteId, title) {
   currentTitleNoteId = Number(noteId)
+  toolbar?.setNoteId(currentTitleNoteId)
   savedTitle = normalizeNoteTitle(title)
   setNoteTitle(savedTitle)
 }

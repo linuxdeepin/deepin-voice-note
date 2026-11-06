@@ -608,6 +608,11 @@ Item {
                     }
 
                     onActiveFocusChanged: {
+                        // 右键菜单会短暂抢走输入框焦点。此时不能按“真正离开编辑”
+                        // 处理，否则会提前退出重命名并清空选区，导致复制置灰。
+                        if (contextMenuVisible) {
+                            return;
+                        }
                         folderMouseArea.enabled = false;
                         if (activeFocus) {
                             selectAll();

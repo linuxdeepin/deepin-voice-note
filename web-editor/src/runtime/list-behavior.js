@@ -4,7 +4,7 @@
 import { AllSelection, NodeSelection, Selection, TextSelection } from '@tiptap/pm/state'
 import { canJoin } from '@tiptap/pm/transform'
 import { closeHistory } from '@tiptap/pm/history'
-import { taskListCascadePluginKey } from './task-list-cascade.js'
+import { normalizeTaskParentCheckedStates, taskListCascadePluginKey, taskListNormalizationDoneKey } from './task-list-cascade.js'
 
 export const MAX_LIST_NESTING_DEPTH = 3
 export const MAX_LIST_EXTRA_INDENT = MAX_LIST_NESTING_DEPTH - 1
@@ -190,17 +190,9 @@ export function isInListItem(editor) {
 }
 
 function canUseExtraIndent(info) {
-  // 规则：只有"已经在二级/三级"，或"本身带着 dvnIndentLevel"（历史数据、
-  // 反缩进后被拆出来的游离子树，视觉层级存在属性里）才允许继续用额外缩进
-  // 补齐/恢复到最多三级。
-  //
-  // 不能把"顶层首项 + 前面还有别的块"当成游离项：Tab 反缩进一级项时，
-  // ProseMirror 会把它的子列表拆成新的顶层列表块，该块首项靠
-  // preserveDescendantListVisualDepths 写回的 dvnIndentLevel>0 就能继续
-  // Tab；而"列表前面恰好有内容"（例如选中图片后转成列表、列表上面还有正文）
-  // 只是普通的一级唯一项，按 B04 不得凭空缩进，否则出现悬空缩进。
-  return (info.structuralDepth > 1 || info.indentLevel > 0)
-    && info.indentLevel < maxExtraIndentForStructuralDepth(info.structuralDepth)
+  // 视觉缩进模型允许没有父项的游离项存在。一级首项、二级首项都可以
+  // 通过 dvnIndentLevel 继续推进，唯一硬限制是最终视觉层级不能超过三级。
+  return info.indentLevel < maxExtraIndentForStructuralDepth(info.structuralDepth)
 }
 
 // ---- 块身份定位 -----------------------------------------------------------
@@ -649,65 +641,70 @@ function liftSelectedListItems(editor) {
   return true
 }
 
-// 范围选区下 Tab：选区覆盖的每一项各升一级。与反缩进对称，分两种手段——
-//  - 能靠 dvnIndentLevel 表达的（已有视觉缩进，或处在结构二级及以上还有余量）
-//    一次属性事务统一 +1；
-//  - 纯结构下沉的项，把选区收敛到这批项上交给 ProseMirror 的 sinkListItem
-//    范围语义处理（逐项调用会一层套一层，结果不对）。
+// 范围选区下 Tab：选区覆盖的每一项各升一级。
+//
+// 视觉缩进模型允许游离项，二级/三级不要求存在结构父项，因此批量 Tab 不需要
+// 再逐项调用 sinkListItem 或反复重定位。否则前一项修改后的 dvnIndentLevel
+// 会被后一项当成 previousSibling 的缩进基准，出现一次 Tab 从一级跳到三级。
+// 这里只基于选区快照计算每一项的目标视觉层级，并在同一个事务里统一写入。
 function sinkSelectedListItems(editor) {
   const outerBlocks = collectSelectionBlocks(editor.state.doc, editor.state.selection)
   const items = selectionTopListItems(editor)
   if (!items.length) return false
   if (items.length === 1 && activeListItemInfo(editor)) return false
 
-  const visual = []
-  const structural = []
+  const tr = editor.state.tr
+  let changed = false
   for (const item of items) {
     const indentLevel = indentLevelOfItem(item)
-    const maxLevel = maxExtraIndentForStructuralDepth(item.structuralDepth)
-    if (item.structuralDepth > 1 || indentLevel > 0) {
-      if (indentLevel < maxLevel) visual.push({ ...item, indentLevel })
-    } else {
-      structural.push(item)
-    }
+    const visualDepth = Math.min(
+      MAX_LIST_NESTING_DEPTH,
+      item.structuralDepth + indentLevel,
+    )
+    if (visualDepth >= MAX_LIST_NESTING_DEPTH) continue
+    tr.setNodeMarkup(item.pos, undefined, {
+      ...item.node.attrs,
+      dvnIndentLevel: indentLevel + 1,
+    })
+    changed = true
   }
-  if (!visual.length && !structural.length) return false
 
-  if (visual.length) {
-    const tr = editor.state.tr
-    for (const { pos, node, indentLevel } of visual) {
-      tr.setNodeMarkup(pos, undefined, { ...node.attrs, dvnIndentLevel: indentLevel + 1 })
-    }
+  if (changed) {
     tr.setSelection(editor.state.selection.map(tr.doc, tr.mapping))
     editor.view.dispatch(tr.scrollIntoView())
   }
 
-  if (structural.length) {
-    const itemType = structural[0].node.type.name
-    const firstPos = structural[0].pos
-    const lastEntry = structural[structural.length - 1]
-    const doc = editor.state.doc
-    const lastPos = lastEntry.pos
-    if (firstPos <= doc.content.size && lastPos <= doc.content.size) {
-      const from = Selection.near(doc.resolve(firstPos + 1), 1).from
-      const lastNode = doc.nodeAt(lastPos)
-      const to = lastNode
-        ? Selection.near(doc.resolve(Math.min(lastPos + lastNode.nodeSize - 1, doc.content.size)), -1).from
-        : from
-      editor.commands.setTextSelection({ from: Math.min(from, to), to: Math.max(from, to) })
-      const info = activeListItemInfo(editor)
-      const detachedHandled = info
-        && !editor.can().sinkListItem(itemType)
-        && indentDetachedListFirstItem(editor, info)
-      if (!detachedHandled) editor.chain().focus().sinkListItem(itemType).run()
-      // 批量下沉后，后续未选中兄弟可能仍靠 dvnIndentLevel 保持视觉二级。
-      // 与单光标路径一样并回当前真实子列表，避免它们继续漂到三级。
-      mergeFollowingVisualSiblingsIntoCurrentList(editor)
-    }
-  }
+  // 即使所有选中项都已到三级，也要吞掉 Tab，不能落回浏览器默认焦点切换。
+  // 同时把选区恢复回同一批块，保证连续操作语义稳定。
+  restoreSelectionOverBlocks(
+    editor,
+    outerBlocks[0] ?? items[0],
+    outerBlocks[outerBlocks.length - 1] ?? items[items.length - 1],
+  )
+  return true
+}
 
-  // 还原覆盖同一批块的选区（含普通段落，与反缩进同口径）。
-  restoreSelectionOverBlocks(editor, outerBlocks[0] ?? items[0], outerBlocks[outerBlocks.length - 1] ?? items[items.length - 1])
+// 非空普通文字选区按 Tab：给选区覆盖的普通段落各加一个文本缩进。
+// 不删除选中文字；插入后通过 mapping 还原原选区，保证可以连续操作。
+export function indentSelectedPlainTextBlocks(editor, tabText) {
+  const { selection } = editor.state
+  if (selection.empty || !(selection instanceof TextSelection)) return false
+  if (typeof tabText !== 'string' || !tabText.length) return false
+
+  const blocks = collectSelectionBlocks(editor.state.doc, selection)
+    .filter((entry) => entry.kind === 'paragraph')
+  if (!blocks.length) return false
+
+  const doc = editor.state.doc
+  const tr = editor.state.tr
+  for (const entry of [...blocks].reverse()) {
+    const textblock = entryTextblock(doc, entry)
+    if (!textblock) continue
+    tr.insertText(tabText, textblock.pos + 1)
+  }
+  if (!tr.docChanged) return false
+  tr.setSelection(selection.map(tr.doc, tr.mapping))
+  editor.view.dispatch(tr.scrollIntoView())
   return true
 }
 
@@ -722,12 +719,21 @@ function setActiveListExtraIndent(editor, level) {
   // 重新计算选区时仍可能把光标推到相邻位置。视觉缩进必须保持光标/项内选区
   // 原样，尤其是 Tab/Shift+Tab 连续操作和随机组合场景。
   const pendingSelection = captureActiveTextblockSelection(editor)
+  const descendantVisualDepths = collectDescendantListVisualDepths(editor, info)
   const tr = editor.state.tr.setNodeMarkup(info.pos, undefined, {
     ...info.node.attrs,
     dvnIndentLevel: nextLevel,
   })
+  // 视觉层级变化会改变直接视觉父子关系，必须同步归一化任务父项状态。
+  // 例如 A 从视觉二级退到一级后，原本视觉同级的未完成 C 会变成 A 的
+  // 视觉子项，A 不能再保持已勾选。
+  if (info.node.type.name === 'taskItem') {
+    normalizeTaskParentCheckedStates(tr)
+    tr.setMeta(taskListCascadePluginKey, true)
+  }
   editor.view.dispatch(tr.scrollIntoView())
   restoreTextblockSelection(editor, pendingSelection)
+  preserveDescendantListVisualDepths(editor, descendantVisualDepths, info.pos)
   return true
 }
 
@@ -830,18 +836,15 @@ function listsCanMerge(left, right, { preserveOrderedStart = false } = {}) {
 // 后代原本已经到三级，仅把各项的 dvnIndentLevel 减一并不足以抵消这次结构
 // 下沉（0 不能再减），会冒出四级列表。这里预估挂回后的最大视觉层级，超过
 // 上限时保留“扁平列表 + dvnIndentLevel”的视觉父子关系，不强行改结构。
-function maxVisualDepthAfterNestingList(node, structuralDepth) {
+function maxVisualDepthForList(node, itemStructuralDepth) {
   if (!LIST_TYPES.has(node?.type?.name)) return 0
   let maxDepth = 0
   node.forEach((item) => {
-    const currentIndent = Math.max(0, Math.floor(Number(item.attrs?.dvnIndentLevel) || 0))
-    maxDepth = Math.max(maxDepth, structuralDepth + 1 + Math.max(0, currentIndent - 1))
+    const indent = Math.max(0, Math.floor(Number(item.attrs?.dvnIndentLevel) || 0))
+    maxDepth = Math.max(maxDepth, itemStructuralDepth + indent)
     item.forEach((child) => {
       if (LIST_TYPES.has(child.type.name)) {
-        maxDepth = Math.max(
-          maxDepth,
-          maxVisualDepthAfterNestingList(child, structuralDepth + 1),
-        )
+        maxDepth = Math.max(maxDepth, maxVisualDepthForList(child, itemStructuralDepth + 1))
       }
     })
   })
@@ -868,8 +871,9 @@ export function nestAdjacentVisualLists(tr, { skipLists = null } = {}) {
           if (!skipLists?.has(next)) {
             const leftDepth = Number(child.lastChild?.attrs?.dvnIndentLevel) || 0
             const rightDepth = Number(next.firstChild?.attrs?.dvnIndentLevel) || 0
-            const rightStructuralDepth = listItemDepthAtPosition(tr.doc, childPos + child.nodeSize + 1)
-            const nextMaxVisualDepth = maxVisualDepthAfterNestingList(next, rightStructuralDepth)
+            const leftStructuralDepth = listItemDepthAtPosition(tr.doc, childPos + 1)
+            const nestedPreview = adjustListSubtreeVisualDepth(next, -1)
+            const nextMaxVisualDepth = maxVisualDepthForList(nestedPreview, leftStructuralDepth + 1)
             if (
               rightDepth > leftDepth
               && LIST_ITEM_TYPES.has(child.lastChild?.type?.name)
@@ -895,7 +899,19 @@ export function nestAdjacentVisualLists(tr, { skipLists = null } = {}) {
 
     const leftItems = childNodesOf(boundary.left)
     const lastItem = leftItems[leftItems.length - 1]
-    const nested = adjustListSubtreeVisualDepth(boundary.right, -1)
+    const rightItems = childNodesOf(boundary.right)
+    const leftDepth = Number(lastItem.attrs?.dvnIndentLevel) || 0
+    const tailIndex = rightItems.findIndex(
+      (item) => (Number(item.attrs?.dvnIndentLevel) || 0) <= leftDepth,
+    )
+    const nestedItems = tailIndex < 0 ? rightItems : rightItems.slice(0, tailIndex)
+    const tailItems = tailIndex < 0 ? [] : rightItems.slice(tailIndex)
+    const nestedSource = boundary.right.type.create(
+      boundary.right.attrs,
+      nestedItems,
+      boundary.right.marks,
+    )
+    const nested = adjustListSubtreeVisualDepth(nestedSource, -1)
     const nextLastItem = lastItem.type.create(
       lastItem.attrs,
       [...childNodesOf(lastItem), nested],
@@ -903,10 +919,17 @@ export function nestAdjacentVisualLists(tr, { skipLists = null } = {}) {
     )
     leftItems[leftItems.length - 1] = nextLastItem
     const nextLeft = boundary.left.type.create(boundary.left.attrs, leftItems, boundary.left.marks)
+    const replacement = tailItems.length
+      ? [nextLeft, boundary.right.type.create(
+          listFragmentAttrs(boundary.right, tailIndex),
+          tailItems,
+          boundary.right.marks,
+        )]
+      : nextLeft
     tr.replaceWith(
       boundary.leftPos,
       boundary.rightPos + boundary.right.nodeSize,
-      nextLeft,
+      replacement,
     )
   }
   return tr
@@ -1565,6 +1588,14 @@ function switchListTypeForSelection(editor, targetListType, selection, cursorCon
     selectedLists,
     preserveOrderedStart: true,
   })
+  // 转成待办时，新 taskItem 的 checked 默认是 false。转换事务为了避免
+  // 误级联未选中祖先而禁用了全局任务插件，但父项完成态仍必须按转换后的
+  // 直接视觉子项重新归一化，否则会出现“父项已勾选、所有子项未勾选”。
+  // 必须先完成归一化再构造选区；setNodeMarkup 虽不改尺寸，但会生成新文档，
+  // 旧文档上构造的 Selection 不能再交给当前 transaction。
+  if (targetListType === 'taskList') {
+    normalizeTaskParentCheckedStates(tr)
+  }
   const nextSelection = cursorContext
     ? cursorSelectionAfterTransform(tr.doc, cursorContext)
     : selectionForRangeContext(tr.doc, rangeContext) ?? selectionAfterListConversion(
@@ -1576,6 +1607,9 @@ function switchListTypeForSelection(editor, targetListType, selection, cursorCon
   if (!nextSelection) return false
   tr.setSelection(nextSelection)
   tr.setMeta(taskListCascadePluginKey, true)
+  // 转换只改变目标列表类型，不能让全局任务插件重算无关任务的 checked。
+  // 目标为待办时，上面已经显式完成父项归一化并保留新建项的未勾选状态。
+  tr.setMeta(taskListNormalizationDoneKey, true)
   editor.view.dispatch(closeHistory(tr).scrollIntoView())
   return true
 }
@@ -1743,6 +1777,44 @@ function rememberListLiftRoundTrip(
   return true
 }
 
+function currentTaskCheckedStates(doc) {
+  const occurrences = new Map()
+  const states = new Map()
+  doc.descendants((node) => {
+    if (node.type.name !== 'taskItem') return true
+    const text = ownTextblockText(node)
+    const occurrence = occurrences.get(text) || 0
+    occurrences.set(text, occurrence + 1)
+    states.set(`${text}\u0000${occurrence}`, Boolean(node.attrs?.checked))
+    return true
+  })
+  return states
+}
+
+// 反缩进/缩进往返恢复的是结构和视觉层级，不应当回滚期间已经正确重算的
+// 待办勾选状态。例如未勾选子项使父项自动取消勾选后，随后 Tab 恢复结构时
+// 不能从旧快照把父项重新勾选。用文本和出现次序匹配后，把当前 checked 值
+// 合并回恢复后的文档。
+function preserveCurrentTaskCheckedStates(tr, currentStates) {
+  if (!currentStates.size) return
+  const occurrences = new Map()
+  const updates = []
+  tr.doc.descendants((node, pos) => {
+    if (node.type.name !== 'taskItem') return true
+    const text = ownTextblockText(node)
+    const occurrence = occurrences.get(text) || 0
+    occurrences.set(text, occurrence + 1)
+    const nextChecked = currentStates.get(`${text}\u0000${occurrence}`)
+    if (nextChecked !== undefined && Boolean(node.attrs?.checked) !== nextChecked) {
+      updates.push({ pos, node, checked: nextChecked })
+    }
+    return true
+  })
+  for (const { pos, node, checked } of updates) {
+    tr.setNodeMarkup(pos, undefined, { ...node.attrs, checked })
+  }
+}
+
 function restoreTopLevelLiftForListFormatting(editor, targetListType) {
   const context = listLiftRoundTripContexts.get(editor.state.doc)
   if (!context?.topLevelLift || context.originalListType !== targetListType) return false
@@ -1760,14 +1832,21 @@ function restoreTopLevelLiftForListFormatting(editor, targetListType) {
     to: context.selectionOffsets.to + caretDelta,
   }
 
+  const currentStates = currentTaskCheckedStates(editor.state.doc)
   const tr = editor.state.tr.replaceWith(
     0,
     editor.state.doc.content.size,
     context.beforeDoc.content,
   )
-  tr.setMeta(taskListCascadePluginKey, true)
-  const restoredTarget = tr.doc.nodeAt(context.targetItemPos)
+  preserveCurrentTaskCheckedStates(tr, currentStates)
+  let restoredTarget = tr.doc.nodeAt(context.targetItemPos)
   if (!restoredTarget || !LIST_ITEM_TYPES.has(restoredTarget.type.name)) return false
+  if (targetListType === 'taskList' && restoredTarget.type.name === 'taskItem') {
+    normalizeTaskParentCheckedStates(tr)
+    restoredTarget = tr.doc.nodeAt(context.targetItemPos)
+    tr.setMeta(taskListNormalizationDoneKey, true)
+  }
+  tr.setMeta(taskListCascadePluginKey, true)
   return dispatchWithRestoredListItemSelection(
     editor,
     tr,
@@ -1803,11 +1882,14 @@ function restoreListLiftRoundTrip(editor, info) {
   // 只替换反缩进时的外层列表不够：任务列表的级联插件会在这笔事务之后继续
   // 归一化祖先 taskItem 的 checked，因此它位于替换范围之外。往返恢复必须回到
   // 用户按键前的完整文档快照，否则深层结构虽然顺序恢复，祖先勾选状态仍会漂移。
+  const currentStates = currentTaskCheckedStates(editor.state.doc)
   const tr = editor.state.tr.replaceWith(
     0,
     editor.state.doc.content.size,
     context.beforeDoc.content,
   )
+  // 恢复旧结构，但保留往返期间已经正确重算或由用户修改的勾选状态。
+  preserveCurrentTaskCheckedStates(tr, currentStates)
   // 这笔事务是在恢复用户按键前的完整快照，不应再按“结构位置相同”的启发式
   // 重新级联 checked；深层项移动后，旧/新文档相同坐标可能对应不同任务项。
   tr.setMeta(taskListCascadePluginKey, true)
@@ -2049,13 +2131,18 @@ export function canOutdentActiveListItem(editor) {
 }
 
 export function sinkActiveListItem(editor) {
+  // Tab 只改视觉缩进，不代表用户取消了当前字体/背景格式。
+  const typingMarks = editor.state.selection.empty ? editor.state.storedMarks : null
   // 范围选区：先走批量路径。**不能**先要求"光标所在的列表项"——全选/拖选全文时
   // $from 可能落在普通段落（被反缩进踢出列表的块）上，那样第二次 Tab 就失效了。
   // 原子节点选中不是文本范围选区，必须直接走单项路径，否则列表命令会把
   // NodeSelection 映射成 TextSelection，图片选中框消失。
   const pendingAtomicSelection = captureAtomicNodeSelection(editor)
-  if (!pendingAtomicSelection && !editor.state.selection.empty && sinkSelectedListItems(editor)) return true
-  return sinkSingleActiveListItem(editor, { pendingAtomicSelection })
+  const sunk = !pendingAtomicSelection && !editor.state.selection.empty && sinkSelectedListItems(editor)
+    ? true
+    : sinkSingleActiveListItem(editor, { pendingAtomicSelection })
+  restoreExplicitTypingMarks(editor, sunk ? typingMarks : null)
+  return sunk
 }
 
 // 反缩进后，当前项所在列表可能成为前一个列表块之后的独立顶层列表。
@@ -2237,15 +2324,9 @@ function sinkSingleActiveListItem(editor, options = {}) {
       if (indented) restoreAtomicNodeSelection(editor, options.pendingAtomicSelection)
       return true
     }
-    const previousIndent = normalizedIndentLevel(
-      info.previousSibling?.attrs?.dvnIndentLevel,
-      maxExtraIndentForStructuralDepth(info.structuralDepth),
-    )
-    if (previousIndent > 0 && canUseExtraIndent(info)) {
-      const indented = setActiveListExtraIndent(editor, previousIndent)
-      if (indented) restoreAtomicNodeSelection(editor, options.pendingAtomicSelection)
-      return indented
-    }
+    // 不能复制 previousSibling 的 dvnIndentLevel。允许游离项以后，前一项可能
+    // 已经是视觉三级，而当前项仍是一级；复制会把当前项一次 Tab 直接带到三级。
+    // 单点语义始终是“当前视觉层级 + 1”，结构下沉最多也只增加一级。
     // 同反缩进：项内子区间的选区不能在 sinkListItem 之后塌掉。
     const pendingSelection = captureBlockTextSelection(editor, {
       kind: 'item',
@@ -2438,12 +2519,9 @@ function collectDescendantListVisualDepths(editor, info, selectedTexts = null) {
         const selected = Boolean(selectedTexts) && selectedTexts[selectedCursor] === text
         if (selected) selectedCursor += 1
         visualDepths.push({
-          visualDepth: Math.min(
-            MAX_LIST_NESTING_DEPTH,
-            childStructuralDepth + normalizedIndentLevel(
-              child.attrs?.dvnIndentLevel,
-              maxExtraIndentForStructuralDepth(childStructuralDepth),
-            ),
+          visualDepth: childStructuralDepth + normalizedIndentLevel(
+            child.attrs?.dvnIndentLevel,
+            maxExtraIndentForStructuralDepth(childStructuralDepth),
           ),
           text,
           selected,
@@ -2458,11 +2536,13 @@ function collectDescendantListVisualDepths(editor, info, selectedTexts = null) {
   return visualDepths
 }
 
-function setListItemVisualDepthInTransaction(tr, node, pos, structuralDepth, desiredVisualDepth) {
-  const nextIndentLevel = normalizedIndentLevel(
-    desiredVisualDepth - structuralDepth,
-    maxExtraIndentForStructuralDepth(structuralDepth),
-  )
+function setListItemVisualDepthInTransaction(tr, node, pos, structuralDepth, desiredVisualDepth, { allowOverflow = false } = {}) {
+  const nextIndentLevel = allowOverflow
+    ? Math.max(0, Math.floor(desiredVisualDepth - structuralDepth))
+    : normalizedIndentLevel(
+        desiredVisualDepth - structuralDepth,
+        maxExtraIndentForStructuralDepth(structuralDepth),
+      )
   if ((Number(node.attrs?.dvnIndentLevel) || 0) === nextIndentLevel) return false
 
   tr.setNodeMarkup(pos, undefined, {
@@ -2512,7 +2592,10 @@ function preserveListVisualDepthsAfterPosition(editor, visualDepths, fromPos) {
     return true
   })
 
-  if (tr?.docChanged) editor.view.dispatch(tr.scrollIntoView())
+  if (tr?.docChanged) {
+    tr.setMeta('dvnPreserveVisualDepth', true)
+    editor.view.dispatch(tr.scrollIntoView())
+  }
   return true
 }
 
@@ -2553,6 +2636,7 @@ function preserveDescendantListVisualDepths(editor, visualDepths, fallbackFromPo
             childPos,
             childStructuralDepth,
             visualDepths[index].visualDepth,
+            { allowOverflow: true },
           )
         }
         index += 1
@@ -2563,7 +2647,10 @@ function preserveDescendantListVisualDepths(editor, visualDepths, fallbackFromPo
   }
 
   walk(info.node, info.pos, info.structuralDepth)
-  if (tr?.docChanged) editor.view.dispatch(tr.scrollIntoView())
+  if (tr?.docChanged) {
+    tr.setMeta('dvnPreserveVisualDepth', true)
+    editor.view.dispatch(tr.scrollIntoView())
+  }
   return true
 }
 
@@ -2785,10 +2872,24 @@ export function normalizeWholeDocumentSelection(editor) {
 }
 
 export function liftActiveListItem(editor) {
+  // 空项 Shift+Tab 与空项 Enter 的视觉下沉同义：用户仍在使用的显式
+  // 待输入文字格式不能被 liftListItem 重建选区时清掉。
+  const typingMarks = editor.state.selection.empty ? editor.state.storedMarks : null
   // 范围选区：先走批量路径，理由同 sinkActiveListItem。
   const pendingAtomicSelection = captureAtomicNodeSelection(editor)
-  if (!pendingAtomicSelection && !editor.state.selection.empty && liftSelectedListItems(editor)) return true
-  return liftSingleActiveListItem(editor, { pendingAtomicSelection })
+  const lifted = !pendingAtomicSelection && !editor.state.selection.empty && liftSelectedListItems(editor)
+    ? true
+    : liftSingleActiveListItem(editor, { pendingAtomicSelection })
+  restoreExplicitTypingMarks(editor, lifted ? typingMarks : null)
+  return lifted
+}
+
+function restoreExplicitTypingMarks(editor, typingMarks) {
+  if (typingMarks === null || !editor.state.selection.empty
+      || editor.state.storedMarks === typingMarks) return
+  const tr = editor.state.tr.setStoredMarks(typingMarks)
+  tr.setMeta('addToHistory', false)
+  editor.view.dispatch(tr)
 }
 
 // 单个（光标所在）列表项的反缩进。

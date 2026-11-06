@@ -1,3 +1,17 @@
+deepin-voice-note (6.6.6) unstable; urgency=medium
+
+  * test: add rich-text and mixed-list regression coverage
+  * fix: stabilize rich-text editing and color persistence
+  * fix: stabilize mixed list formatting and task state
+  * fix: keep title rename active while context menu is open
+  * fix: scope editor color state to each note
+  * fix: preserve plain note titles in search results
+  * fix: enable dictation in empty editable editor
+  * fix: adjust sticky section font to t8 and increase vertical spacing
+  * fix: align tiptap editor and toolbar colors
+
+ -- dengzhongyuan <dengzhongyuan@uniontech.com>  Fri, 06 Nov 2026 13:08:44 +0800
+
 deepin-voice-note (6.6.5) unstable; urgency=medium
 
   * fix: persist toolbar text and highlight colors

@@ -1485,7 +1485,7 @@ test('foreColor keeps the last toolbar selection when the cursor moves', () => {
   editor.commands.insertContent('typed')
   assert.equal(host.querySelector('button[data-format="foreColor"]').style.getPropertyValue('--dvn-current-color'), color)
   assert.equal(cell.getAttribute('aria-pressed'), 'true')
-  assert.equal(textMarkAttrs(editor, 'typed', 'color').color, color, 'typing in an empty paragraph must reuse the last text color')
+  assert.equal(textHasMark(editor, 'typed', 'color'), false, 'moving to an empty paragraph must not force the previous color')
   editor.destroy()
 })
 
@@ -1509,7 +1509,7 @@ test('backColor keeps the last toolbar selection when the cursor moves', () => {
   editor.commands.insertContent('typed')
   assert.equal(host.querySelector('button[data-format="backColor"]').style.getPropertyValue('--dvn-current-color'), color)
   assert.equal(cell.getAttribute('aria-pressed'), 'true')
-  assert.equal(textMarkAttrs(editor, 'typed', 'highlight').color, color, 'typing in an empty paragraph must reuse the last highlight color')
+  assert.equal(textHasMark(editor, 'typed', 'highlight'), false, 'moving to an empty paragraph must not force the previous highlight')
   editor.destroy()
 })
 
@@ -4013,5 +4013,153 @@ test('BUG381009 empty visual indent downgrade can be undone and redone', () => {
   assert.equal(selectionVisualDepth(editor), 3)
   assert.equal(editor.commands.redo(), true)
   assert.equal(selectionVisualDepth(editor), 2)
+  editor.destroy()
+})
+
+test('color input persists across typing and paragraph breaks, but not a move to plain text', () => {
+  const { editor, host } = createEditorWithToolbar()
+  insertText(editor, 'plain')
+  const fore = FORE_COLORS[0][3]
+  const back = BACK_COLORS[0][1]
+  host.querySelector(`[data-panel="foreColor"] button[data-color="${fore}"]`).click()
+  host.querySelector(`[data-panel="backColor"] button[data-color="${back}"]`).click()
+  insertText(editor, ' colored ')
+  editor.commands.splitBlock()
+  insertText(editor, 'nextpara')
+  assert.equal(textMarkAttrs(editor, 'nextpara', 'color').color, fore)
+  assert.equal(textMarkAttrs(editor, 'nextpara', 'highlight').color, back)
+  editor.commands.setTextSelection(3)
+  insertText(editor, 'plaininsert')
+  assert.equal(textHasMark(editor, 'plaininsert', 'color'), false)
+  assert.equal(textHasMark(editor, 'plaininsert', 'highlight'), false)
+  assert.equal(host.querySelector('[data-format="foreColor"]').style.getPropertyValue('--dvn-current-color'), fore)
+  assert.equal(host.querySelector('[data-format="backColor"]').style.getPropertyValue('--dvn-current-color'), back)
+  editor.destroy()
+})
+
+test('font color button reapplies color but highlight button toggles it off', () => {
+  const { editor, host } = createEditorWithToolbar()
+  const fore = FORE_COLORS[0][3]
+  const back = BACK_COLORS[0][1]
+  host.querySelector(`[data-panel="foreColor"] button[data-color="${fore}"]`).click()
+  host.querySelector('[data-format="foreColor"]').click()
+  host.querySelector('[data-format="backColor"]').click()
+  insertText(editor, 'first')
+  assert.equal(textMarkAttrs(editor, 'first', 'color').color, fore)
+  assert.equal(textMarkAttrs(editor, 'first', 'highlight').color, back)
+  host.querySelector('[data-format="backColor"]').click()
+  insertText(editor, 'second')
+  assert.equal(textMarkAttrs(editor, 'second', 'color').color, fore)
+  assert.equal(textHasMark(editor, 'second', 'highlight'), false)
+  assert.equal(host.querySelector('[data-format="backColor"]').style.getPropertyValue('--dvn-current-color'), back)
+  editor.destroy()
+})
+
+test('loading a new note does not retain the previous note input colors', () => {
+  const { editor, host } = createEditorWithToolbar()
+  host.querySelector(`[data-panel="foreColor"] button[data-color="${FORE_COLORS[0][3]}"]`).click()
+  host.querySelector('[data-format="backColor"]').click()
+  insertText(editor, 'oldnote')
+  replaceEditorContentWithoutHistory(editor, createEmptyDoc())
+  insertText(editor, 'newnote')
+  assert.equal(textHasMark(editor, 'newnote', 'color'), false)
+  assert.equal(textHasMark(editor, 'newnote', 'highlight'), false)
+  editor.destroy()
+})
+
+test('moving into differently formatted existing text uses that text rather than the toolbar color', () => {
+  const { editor, host } = createEditorWithToolbar()
+  const red = FORE_COLORS[1][2]
+  const blue = FORE_COLORS[0][3]
+  const yellow = BACK_COLORS[0][1]
+  const green = BACK_COLORS[0][3]
+  editor.commands.setContent({ type: 'doc', content: [{ type: 'paragraph', content: [
+    { type: 'text', text: 'oldformat', marks: [{ type: 'color', attrs: { color: red } }, { type: 'highlight', attrs: { color: yellow } }] },
+    { type: 'text', text: 'plain' },
+  ] }] })
+  editor.commands.focus('end')
+  host.querySelector(`[data-panel="foreColor"] button[data-color="${blue}"]`).click()
+  host.querySelector(`[data-panel="backColor"] button[data-color="${green}"]`).click()
+  editor.commands.setTextSelection(4)
+  insertText(editor, 'inserted')
+  assert.equal(textMarkAttrs(editor, 'inserted', 'color').color, red)
+  assert.equal(textMarkAttrs(editor, 'inserted', 'highlight').color, yellow)
+  assert.equal(host.querySelector('[data-format="foreColor"]').style.getPropertyValue('--dvn-current-color'), blue)
+  assert.equal(host.querySelector('[data-format="backColor"]').style.getPropertyValue('--dvn-current-color'), green)
+  editor.destroy()
+})
+
+test('color input survives multiple consecutive paragraph breaks', () => {
+  const { editor, host } = createEditorWithToolbar()
+  const fore = FORE_COLORS[0][3]
+  const back = BACK_COLORS[0][1]
+  host.querySelector(`[data-panel="foreColor"] button[data-color="${fore}"]`).click()
+  host.querySelector('[data-format="backColor"]').click()
+  insertText(editor, 'start')
+  editor.commands.splitBlock()
+  editor.commands.splitBlock()
+  insertText(editor, 'afterbreaks')
+  assert.equal(textMarkAttrs(editor, 'afterbreaks', 'color').color, fore)
+  assert.equal(textMarkAttrs(editor, 'afterbreaks', 'highlight').color, back)
+  editor.destroy()
+})
+
+test('default yellow indicator does not highlight new text until applied', () => {
+  const { editor, host } = createEditorWithToolbar()
+  insertText(editor, 'plainbefore')
+  assert.equal(textHasMark(editor, 'plainbefore', 'highlight'), false)
+  host.querySelector('[data-format="backColor"]').click()
+  insertText(editor, 'highlightafter')
+  assert.equal(textMarkAttrs(editor, 'highlightafter', 'highlight').color, BACK_COLORS[0][1])
+  editor.destroy()
+})
+
+test('switching notes immediately after choosing colors clears pending input formatting', () => {
+  const { editor, host } = createEditorWithToolbar()
+  host.querySelector(`[data-panel="foreColor"] button[data-color="${FORE_COLORS[0][3]}"]`).click()
+  host.querySelector('[data-format="backColor"]').click()
+  replaceEditorContentWithoutHistory(editor, createEmptyDoc())
+  insertText(editor, 'newnote')
+  assert.equal(textHasMark(editor, 'newnote', 'color'), false)
+  assert.equal(textHasMark(editor, 'newnote', 'highlight'), false)
+  editor.destroy()
+})
+
+test('toolbar colors reset on note changes but not same-note title updates or reloads', () => {
+  const { editor, host, toolbar } = createEditorWithToolbar()
+  toolbar.setNoteId(1)
+  const fore = FORE_COLORS[0][3]
+  const back = BACK_COLORS[0][3]
+  host.querySelector(`[data-panel="foreColor"] button[data-color="${fore}"]`).click()
+  host.querySelector(`[data-panel="backColor"] button[data-color="${back}"]`).click()
+  replaceEditorContentWithoutHistory(editor, createEmptyDoc())
+  toolbar.setNoteId(1)
+  assert.equal(host.querySelector('[data-format="foreColor"]').style.getPropertyValue('--dvn-current-color'), fore)
+  assert.equal(host.querySelector('[data-format="backColor"]').style.getPropertyValue('--dvn-current-color'), back)
+  toolbar.setNoteId(2)
+  assert.equal(host.querySelector('[data-format="foreColor"]').style.getPropertyValue('--dvn-current-color'), FORE_COLORS[0][0])
+  assert.equal(host.querySelector('[data-format="backColor"]').style.getPropertyValue('--dvn-current-color'), BACK_COLORS[0][1])
+  insertText(editor, 'newnote')
+  assert.equal(textHasMark(editor, 'newnote', 'color'), false)
+  assert.equal(textHasMark(editor, 'newnote', 'highlight'), false)
+  toolbar.destroy()
+  editor.destroy()
+})
+
+test('resetting toolbar colors uses the active theme palette without modifying note text', () => {
+  const { editor, host, toolbar, window } = createEditorWithToolbar()
+  toolbar.setNoteId(1)
+  insertText(editor, 'existing')
+  selectText(editor)
+  host.querySelector(`[data-panel="foreColor"] button[data-color="${FORE_COLORS[0][3]}"]`).click()
+  host.querySelector(`[data-panel="backColor"] button[data-color="${BACK_COLORS[0][3]}"]`).click()
+  document.documentElement.dataset.dvnTheme = 'dark'
+  window.dispatchEvent(new window.CustomEvent('dvn-theme-applied', { detail: { theme: 'dark' } }))
+  const before = JSON.stringify(editor.getJSON())
+  toolbar.setNoteId(2)
+  assert.equal(host.querySelector('[data-format="foreColor"]').style.getPropertyValue('--dvn-current-color'), DARK_FORE_COLORS[0][0])
+  assert.equal(host.querySelector('[data-format="backColor"]').style.getPropertyValue('--dvn-current-color'), DARK_BACK_COLORS[0][1])
+  assert.equal(JSON.stringify(editor.getJSON()), before)
+  toolbar.destroy()
   editor.destroy()
 })

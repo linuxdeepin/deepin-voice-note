@@ -328,6 +328,7 @@ Item {
                 var itemIsTop = notesData[i].isTop ? "top" : "normal";
                 itemListView.model.append({
                     name: notesData[i].name,
+                    highlightedTitle: notesData[i].highlightedTitle || "",
                     time: notesData[i].time,
                     isTop: itemIsTop,
                     icon: notesData[i].icon,
@@ -357,6 +358,7 @@ Item {
             var itemIsTop = noteData.isTop ? "top" : "normal";
             itemListView.model.insert(topSize, {
                 name: noteData.name,
+                highlightedTitle: "",
                 time: noteData.time,
                 isTop: itemIsTop,
                 icon: noteData.icon,

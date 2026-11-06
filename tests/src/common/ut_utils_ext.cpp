@@ -151,6 +151,17 @@ TEST(UtilsExt, richTextAndHtml)
     EXPECT_NE(-1, rt.indexOf("<span style=\"color: "));
     EXPECT_NE(-1, rt.indexOf("key</span>"));
     EXPECT_EQ("title key", Utils::stripHtmlTags(rt));
+    const QString escapedNoMatch = Utils::createRichText(QStringLiteral("提单&关单规范"), QStringLiteral("测试"));
+    EXPECT_EQ(QStringLiteral("提单&amp;关单规范"), escapedNoMatch);
+    EXPECT_EQ(QStringLiteral("提单&关单规范"), Utils::stripHtmlTags(escapedNoMatch));
+    const QString escapedMatch = Utils::createRichText(QStringLiteral("提单&<关单>规范"), QStringLiteral("关单"));
+    EXPECT_NE(-1, escapedMatch.indexOf(QStringLiteral("&amp;&lt;")));
+    EXPECT_NE(-1, escapedMatch.indexOf(QStringLiteral("关单</span>")));
+    EXPECT_EQ(QStringLiteral("提单&<关单>规范"), Utils::stripHtmlTags(escapedMatch));
+    const QString literalMarkupTitle = QStringLiteral("<span>提单&关单规范</span>");
+    const QString escapedMarkupTitle = Utils::createRichText(literalMarkupTitle, QStringLiteral("提单"));
+    EXPECT_NE(-1, escapedMarkupTitle.indexOf(QStringLiteral("&lt;span&gt;")));
+    EXPECT_EQ(literalMarkupTitle, Utils::stripHtmlTags(escapedMarkupTitle));
     EXPECT_EQ("hello", Utils::stripHtmlTags("<b>hello</b>"));
 }
 

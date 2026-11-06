@@ -15395,6 +15395,179 @@ const FontWeightMark = Mark2.create({
     return ["span", mergeAttributes(HTMLAttributes), 0];
   }
 });
+const emptyBlockTypingMarksPluginKey = new PluginKey("emptyBlockTypingMarks");
+const emptyBlockTypingMarksUpdateKey = new PluginKey("emptyBlockTypingMarksUpdate");
+const TEXTBLOCK_TYPES = /* @__PURE__ */ new Set(["paragraph", "heading"]);
+const MARK_TYPES = /* @__PURE__ */ new Set([
+  "bold",
+  "italic",
+  "underline",
+  "strike",
+  "color",
+  "highlight",
+  "fontFamily",
+  "fontSize",
+  "fontWeight"
+]);
+function primitiveAttrs(attrs) {
+  if (!attrs || typeof attrs !== "object" || Array.isArray(attrs)) return {};
+  return Object.fromEntries(
+    Object.entries(attrs).filter(([, value]) => value == null || ["string", "number", "boolean"].includes(typeof value)).sort(([left], [right]) => left.localeCompare(right))
+  );
+}
+function normalizeTypingMarksSnapshot(snapshot) {
+  if (!Array.isArray(snapshot)) return null;
+  const byType = /* @__PURE__ */ new Map();
+  for (const item of snapshot) {
+    if (!item || typeof item !== "object" || !MARK_TYPES.has(item.type)) continue;
+    byType.set(item.type, {
+      type: item.type,
+      attrs: primitiveAttrs(item.attrs)
+    });
+  }
+  const normalized = [...byType.values()].sort((left, right) => left.type.localeCompare(right.type));
+  return normalized.length ? normalized : null;
+}
+function snapshotFromMarks(marks) {
+  return normalizeTypingMarksSnapshot((marks || []).map((mark) => ({
+    type: mark.type.name,
+    attrs: mark.attrs
+  })));
+}
+function marksFromSnapshot(state, snapshot) {
+  const normalized = normalizeTypingMarksSnapshot(snapshot);
+  if (!normalized) return [];
+  const marks = normalized.flatMap(({ type, attrs }) => {
+    const markType = state.schema.marks[type];
+    return markType ? [markType.create(attrs)] : [];
+  });
+  return marks.length ? Mark$1.setFrom(marks) : [];
+}
+function sameSnapshot(left, right) {
+  return JSON.stringify(normalizeTypingMarksSnapshot(left)) === JSON.stringify(normalizeTypingMarksSnapshot(right));
+}
+function selectedEmptyTextblock(state) {
+  const { selection } = state;
+  if (!selection.empty) return null;
+  const { $from } = selection;
+  if (!TEXTBLOCK_TYPES.has($from.parent?.type?.name) || $from.parent.content.size !== 0) return null;
+  return {
+    node: $from.parent,
+    pos: $from.before($from.depth)
+  };
+}
+function blockSnapshot(info) {
+  return normalizeTypingMarksSnapshot(info?.node?.attrs?.dvnTypingMarks);
+}
+function marksAtOldSelection(state) {
+  const info = selectedEmptyTextblock(state);
+  if (info?.node?.attrs?.dvnTypingMarks) return marksFromSnapshot(state, blockSnapshot(info));
+  if (state.storedMarks) return Mark$1.setFrom(state.storedMarks);
+  const { selection, doc: doc2 } = state;
+  if (!selection.empty) {
+    let firstTextMarks = null;
+    doc2.nodesBetween(selection.from, selection.to, (node) => {
+      if (!node.isText) return true;
+      firstTextMarks = node.marks;
+      return false;
+    });
+    if (firstTextMarks) return Mark$1.setFrom(firstTextMarks);
+  }
+  return Mark$1.setFrom(selection.$from.marks() || []);
+}
+function restoreEmptyBlockTypingMarks(view) {
+  const info = selectedEmptyTextblock(view.state);
+  if (!info) return;
+  const snapshot = blockSnapshot(info);
+  const currentSnapshot = snapshotFromMarks(view.state.storedMarks || []);
+  if (sameSnapshot(currentSnapshot, snapshot)) return;
+  view.dispatch(
+    view.state.tr.setStoredMarks(snapshot ? marksFromSnapshot(view.state, snapshot) : null).setMeta(emptyBlockTypingMarksUpdateKey, true)
+  );
+}
+function parseTypingMarksAttribute(element) {
+  const raw = element.getAttribute("data-dvn-typing-marks");
+  if (!raw) return null;
+  try {
+    return normalizeTypingMarksSnapshot(JSON.parse(raw));
+  } catch (_error) {
+    return null;
+  }
+}
+const EmptyBlockTypingMarks = Extension.create({
+  name: "emptyBlockTypingMarks",
+  addGlobalAttributes() {
+    return [{
+      types: [...TEXTBLOCK_TYPES],
+      attributes: {
+        dvnTypingMarks: {
+          default: void 0,
+          keepOnSplit: true,
+          parseHTML: parseTypingMarksAttribute,
+          renderHTML: (attributes) => {
+            const snapshot = normalizeTypingMarksSnapshot(attributes.dvnTypingMarks);
+            return snapshot ? { "data-dvn-typing-marks": JSON.stringify(snapshot) } : {};
+          }
+        }
+      }
+    }];
+  },
+  addProseMirrorPlugins() {
+    return [new Plugin({
+      key: emptyBlockTypingMarksPluginKey,
+      view(view) {
+        queueMicrotask(() => {
+          if (!view.isDestroyed) restoreEmptyBlockTypingMarks(view);
+        });
+        return {
+          update(nextView) {
+            queueMicrotask(() => {
+              if (!nextView.isDestroyed) restoreEmptyBlockTypingMarks(nextView);
+            });
+          }
+        };
+      },
+      appendTransaction: (transactions, oldState, newState) => {
+        if (transactions.some((transaction) => transaction.getMeta(emptyBlockTypingMarksUpdateKey))) return null;
+        if (transactions.some((transaction) => transaction.getMeta("history$") != null)) return null;
+        if (transactions.some((transaction) => transaction.getMeta("preventUpdate"))) return null;
+        const current = selectedEmptyTextblock(newState);
+        if (!current) return null;
+        const docChanged = transactions.some((transaction) => transaction.docChanged);
+        const explicitMarksSet = transactions.some((transaction) => transaction.storedMarksSet && !transaction.docChanged);
+        const currentSnapshot = blockSnapshot(current);
+        if (!explicitMarksSet && !docChanged) {
+          const currentTypingSnapshot = snapshotFromMarks(newState.storedMarks || []);
+          if (sameSnapshot(currentTypingSnapshot, currentSnapshot)) return null;
+          const tr2 = newState.tr.setStoredMarks(currentSnapshot ? marksFromSnapshot(newState, currentSnapshot) : null).setMeta(emptyBlockTypingMarksUpdateKey, true).setMeta("preventClearDocument", true);
+          return tr2;
+        }
+        let nextSnapshot = currentSnapshot;
+        let nextMarks = marksFromSnapshot(newState, currentSnapshot);
+        if (explicitMarksSet) {
+          nextSnapshot = snapshotFromMarks(newState.storedMarks);
+          nextMarks = marksFromSnapshot(newState, nextSnapshot);
+        } else if (docChanged) {
+          const oldInfo = selectedEmptyTextblock(oldState);
+          const blockCreatedOrEmptied = !oldInfo || oldInfo.pos !== current.pos;
+          if (!blockCreatedOrEmptied) return null;
+          const inheritedMarks = marksAtOldSelection(oldState);
+          nextSnapshot = snapshotFromMarks(inheritedMarks);
+          nextMarks = inheritedMarks;
+        }
+        if (sameSnapshot(currentSnapshot, nextSnapshot)) return null;
+        const tr = newState.tr.setNodeMarkup(current.pos, void 0, {
+          ...current.node.attrs,
+          dvnTypingMarks: nextSnapshot ?? void 0
+        });
+        tr.setStoredMarks(nextMarks);
+        tr.setMeta(emptyBlockTypingMarksUpdateKey, true);
+        tr.setMeta("preventClearDocument", true);
+        return tr;
+      }
+    })];
+  }
+});
 var inputRegex = /(?:^|\s)(!\[(.+|:?)]\((\S+)(?:(?:\s+)["'](\S+)["'])?\))$/;
 var Image = Node3.create({
   name: "image",
@@ -17680,11 +17853,65 @@ const VoiceBlock = Node3.create({
 });
 var index_default$1 = ListItem;
 var index_default = TaskItem;
+const taskCheckboxIntentKey = "dvnTaskCheckboxIntent";
 const ListItemWithHeading = index_default$1.extend({
   content: "(paragraph|heading) block*"
 });
 const TaskItemWithHeading = index_default.extend({
-  content: "(paragraph|heading) block*"
+  content: "(paragraph|heading) block*",
+  addCommands() {
+    return {
+      ...this.parent?.(),
+      // position 可由 checkbox NodeView 明确传入；省略时作用于光标所在待办。
+      setTaskChecked: (checked, position) => ({ tr, dispatch }) => {
+        if (typeof checked !== "boolean") return false;
+        let pos = position;
+        if (pos === void 0) {
+          const { $from } = tr.selection;
+          for (let depth = $from.depth; depth > 0; depth -= 1) {
+            if ($from.node(depth).type.name === this.name) {
+              pos = $from.before(depth);
+              break;
+            }
+          }
+        }
+        if (!Number.isInteger(pos) || pos < 0 || pos >= tr.doc.content.size) return false;
+        const node = tr.doc.nodeAt(pos);
+        if (node?.type.name !== this.name) return false;
+        if (dispatch) {
+          tr.setNodeMarkup(pos, void 0, { ...node.attrs, checked });
+          const intents = tr.getMeta(taskCheckboxIntentKey) || [];
+          tr.setMeta(taskCheckboxIntentKey, [...intents, {
+            pos,
+            checked,
+            mappingIndex: tr.mapping.maps.length
+          }]);
+        }
+        return true;
+      }
+    };
+  },
+  addNodeView() {
+    const parentNodeView = this.parent();
+    return (props) => {
+      const nodeView = parentNodeView(props);
+      const checkbox = nodeView.dom.firstElementChild.querySelector('input[type="checkbox"]');
+      const onChange = (event) => {
+        if (!props.editor.isEditable) return;
+        event.stopImmediatePropagation();
+        const position = props.getPos();
+        if (typeof position !== "number") return;
+        props.editor.chain().focus(void 0, { scrollIntoView: false }).setTaskChecked(checkbox.checked, position).run();
+      };
+      checkbox.addEventListener("change", onChange, true);
+      const destroy = nodeView.destroy?.bind(nodeView);
+      nodeView.destroy = () => {
+        checkbox.removeEventListener("change", onChange, true);
+        destroy?.();
+      };
+      return nodeView;
+    };
+  }
 });
 function createTiptapSchemaV1() {
   return getSchema([
@@ -17709,7 +17936,8 @@ function createTiptapSchemaV1() {
     index_default$3.configure({ multicolor: true }),
     FontFamilyMark,
     FontSizeMark,
-    FontWeightMark
+    FontWeightMark,
+    EmptyBlockTypingMarks
   ]);
 }
 const TIPTAP_FORMAT = "tiptap";

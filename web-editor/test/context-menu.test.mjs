@@ -13,7 +13,7 @@ const expression = contextMenu.split('tiptapWebView.runJavaScript(')[1].split(',
 const probe = new Function('sx', 'sy', `return (${expression})`)('200', '400')
 const callback = contextMenu.slice(contextMenu.indexOf('function(result)')).split('\n                            });')[0] + '}'
 
-function setup({ clipboard = true, editable = true, nativeFlags = 0 } = {}) {
+function setup({ clipboard = true, editable = true, nativeFlags = 0, converting = false } = {}) {
   const window = new Window()
   const document = window.document
   document.body.innerHTML = `
@@ -41,9 +41,10 @@ function setup({ clipboard = true, editable = true, nativeFlags = 0 } = {}) {
   }
   for (const name of ['TxtSelectAll', 'TxtCopy', 'TxtCut', 'TxtPaste', 'TxtDelete', 'TxtSpeech', 'TxtDictation']) actionManager[name] = name
   let clipboardQueries = 0
-  const runCallback = new Function('ActionManager', 'TiptapChannel', 'nativeEditFlags', 'handler', 'txtCtxMenu', 'Qt', 'rawX', 'rawY', 'req', `return (${callback})`)(
+  const rootItem = { isVoiceToText: converting }
+  const runCallback = new Function('ActionManager', 'TiptapChannel', 'nativeEditFlags', 'handler', 'txtCtxMenu', 'Qt', 'rawX', 'rawY', 'req', 'rootItem', `return (${callback})`)(
     actionManager, { clipboardHasPasteContent() { clipboardQueries++; return clipboard } }, nativeFlags,
-    { onSaveMenuParam() {}, onContextMenuRequested() {} }, { popup() {} }, { point() {} }, 200, 400, {},
+    { onSaveMenuParam() {}, onContextMenuRequested() {} }, { popup() {} }, { point() {} }, 200, 400, {}, rootItem,
   )
   return {
     window, document, selection, actions,
@@ -66,12 +67,14 @@ for (const selector of ['#app', '#content-scroll', '#text']) {
     assert.equal(env.actions.TxtSelectAll, true)
     assert.equal(env.actions.TxtCut, false)
     assert.equal(env.actions.TxtDelete, false)
+    assert.equal(env.actions.TxtDictation, true)
     assert.equal(env.clipboardQueries, 1)
   })
   test(`empty clipboard keeps paste disabled at ${selector}`, () => {
     const env = setup({ clipboard: false })
     env.menu(selector)
     assert.equal(env.actions.TxtPaste, false)
+    assert.equal(env.actions.TxtDictation, true)
   })
 }
 
@@ -86,6 +89,7 @@ test('native CanPaste fallback still works on blank body', () => {
   const env = setup({ clipboard: false, nativeFlags: 8 })
   env.menu('#app')
   assert.equal(env.actions.TxtPaste, true)
+  assert.equal(env.actions.TxtDictation, true)
 })
 
 for (const selector of ['#note-title-input', '#note-title-host', '#toolbar-button', 'body', '.translateText']) {
@@ -95,6 +99,7 @@ for (const selector of ['#note-title-input', '#note-title-host', '#toolbar-butto
     assert.equal(env.actions.TxtPaste, false)
     assert.equal(env.actions.TxtCut, false)
     assert.equal(env.actions.TxtDelete, false)
+    assert.equal(env.actions.TxtDictation, false)
     assert.equal(env.focusCount, 0)
     assert.equal(env.clipboardQueries, 0)
   })
@@ -105,9 +110,16 @@ for (const selector of ['#app', '#content-scroll', '#text']) {
     const env = setup({ editable: false })
     env.menu(selector)
     assert.equal(env.actions.TxtPaste, false)
+    assert.equal(env.actions.TxtDictation, false)
     assert.equal(env.focusCount, 0)
   })
 }
+
+test('active voice-to-text conversion disables dictation', () => {
+  const env = setup({ converting: true })
+  env.menu('#app')
+  assert.equal(env.actions.TxtDictation, false)
+})
 
 test('selected body text retains copy/cut/delete on blank body', () => {
   const env = setup()

@@ -5,6 +5,7 @@
 #include "search/searchdocumentextractor.h"
 #include "search/searchindexmanager.h"
 #include "search/searchtextnormalizer.h"
+#include "common/utils.h"
 #include "common/vnoteitem.h"
 
 #include <gtest/gtest.h>
@@ -168,6 +169,25 @@ TEST(SearchIndexManager, RefreshFromNotesPicksUpSavedEditsWithoutExplicitUpdate)
     const QList<SearchResult> results = index.search(QStringLiteral("全新保存内容"));
     ASSERT_EQ(results.size(), 1);
     EXPECT_EQ(results.first().noteId, 17);
+}
+
+TEST(SearchIndexManager, KeepsTitlePlainAndBuildsSeparateHighlightedTitle)
+{
+    const QString title = QStringLiteral("<span>提单&关单规范</span>");
+    VNoteItem note = makeNote(21, title, R"json({
+        "format":"tiptap",
+        "schemaVersion":1,
+        "content":{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"正文"}]}]}
+    })json");
+
+    SearchIndexManager index;
+    index.updateNote(&note);
+    const QList<SearchResult> results = index.search(QStringLiteral("提单"));
+    ASSERT_EQ(results.size(), 1);
+    EXPECT_EQ(results.first().titlePlain, title);
+    EXPECT_TRUE(results.first().highlightedTitle.contains(QStringLiteral("&lt;span&gt;")));
+    EXPECT_NE(-1, results.first().highlightedTitle.indexOf(QStringLiteral("提单</span>")));
+    EXPECT_EQ(Utils::stripHtmlTags(results.first().highlightedTitle), title);
 }
 
 TEST(SearchIndexManager, RenameMakesNewTitleSearchableAndDropsOld)

@@ -1486,13 +1486,17 @@ QString VNoteMainManager::getNotePlainTitle(const int &noteId)
     qCDebug(voiceNoteLog) << "Getting plain title for note ID:" << noteId;
     VNoteItem *item = getNoteById(noteId);
     if (item) {
-        QString plainTitle = Utils::stripHtmlTags(item->noteTitle);
-        qCDebug(voiceNoteLog) << "Plain title for note ID" << noteId << ":" << plainTitle;
-        return plainTitle;
+        qCDebug(voiceNoteLog) << "Plain title for note ID" << noteId << ":" << item->noteTitle;
+        return item->noteTitle;
     } else {
         qCWarning(voiceNoteLog) << "Note not found for ID:" << noteId;
         return QString();
     }
+}
+
+QString VNoteMainManager::makeHighlightedTitle(const QString &title) const
+{
+    return Utils::createRichText(title, m_searchText);
 }
 
 void VNoteMainManager::vNoteSearch(const QString &text)
@@ -1543,10 +1547,11 @@ int VNoteMainManager::loadSearchNotes(const QString &key)
             continue;
         }
         QVariantMap data;
-        data.insert(NOTE_NAME_KEY, result.highlightedTitle.isEmpty()
-                                      ? Utils::createRichText(note->noteTitle, key)
-                                      : result.highlightedTitle);
-        data.insert(QStringLiteral("plainTitle"), result.titlePlain);
+        data.insert(NOTE_NAME_KEY, result.titlePlain);
+        data.insert(QStringLiteral("highlightedTitle"),
+                    result.highlightedTitle.isEmpty()
+                        ? Utils::createRichText(result.titlePlain, key)
+                        : result.highlightedTitle);
         data.insert(QStringLiteral("snippet"), result.snippet);
         data.insert(QStringLiteral("matchedField"), searchFieldName(result.bestField));
         data.insert(QStringLiteral("score"), result.score);

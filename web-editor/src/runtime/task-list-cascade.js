@@ -3,11 +3,20 @@
 
 import { Extension } from '@tiptap/core'
 import { Plugin, PluginKey } from '@tiptap/pm/state'
+import { taskCheckboxIntentKey } from '../extensions/task-checkbox-intent.js'
 
 export const taskListCascadePluginKey = new PluginKey('taskListCascade')
+export const taskListNormalizationDoneKey = new PluginKey('taskListNormalizationDone')
+
+const LIST_TYPES = new Set(['bulletList', 'orderedList', 'taskList'])
+const LIST_ITEM_TYPES = new Set(['listItem', 'taskItem'])
 
 function isTaskItem(node) {
   return node?.type?.name === 'taskItem'
+}
+
+function isListItem(node) {
+  return LIST_ITEM_TYPES.has(node?.type?.name)
 }
 
 function checkedOf(node) {
@@ -25,7 +34,7 @@ function taskItemStructuralDepthAt(doc, pos) {
   const $pos = doc.resolve(Math.min(pos + 1, doc.content.size))
   let depth = 0
   for (let index = 1; index <= $pos.depth; index += 1) {
-    if (isTaskItem($pos.node(index))) depth += 1
+    if (isListItem($pos.node(index))) depth += 1
   }
   return depth
 }
@@ -36,132 +45,80 @@ function taskItemVisualDepthAt(doc, pos, node = safeNodeAt(doc, pos)) {
   return Math.min(3, structuralDepth + normalizedIndentLevel(node, structuralDepth))
 }
 
-function parentListInfoAt(doc, itemPos) {
-  const $pos = doc.resolve(Math.min(itemPos + 1, doc.content.size))
-  for (let depth = $pos.depth; depth > 0; depth -= 1) {
-    if (!isTaskItem($pos.node(depth))) continue
+// 连续的顶层列表块共用一棵视觉树：列表类型切换会生成多个兄弟块，
+// 但视觉缩进仍可能表示同一任务分支。普通段落/其他非列表块是硬边界，
+// 会打断父子关系；重新转回列表后，相邻列表块才能重新建立视觉父子关系。
+// 所有 listItem/taskItem 都参与缩进栈，有序/无序项可作为任务的边界。
+function buildVisualTaskGraph(doc) {
+  const byPos = new Map()
+  const stack = []
 
-    const listDepth = depth - 1
-    const listNode = $pos.node(listDepth)
-    if (listNode?.type?.name !== 'taskList') return null
-
-    return {
-      listNode,
-      listPos: $pos.before(listDepth),
-      itemIndex: $pos.index(listDepth),
+  doc.forEach((scope, scopePos) => {
+    if (!LIST_TYPES.has(scope.type?.name)) {
+      stack.length = 0
+      return
     }
-  }
-  return null
-}
 
-function collectTaskItemsFromNestedTaskLists(doc, node, basePos, parentVisualDepth, mode) {
-  const children = []
-  if (!isTaskItem(node)) return children
-
-  node.forEach((child, childOffset) => {
-    if (child?.type?.name !== 'taskList') return
-
-    const listPos = basePos + 1 + childOffset
-    child.forEach((listChild, listChildOffset) => {
-      if (!isTaskItem(listChild)) return
-
-      const childPos = listPos + 1 + listChildOffset
-      const childVisualDepth = taskItemVisualDepthAt(doc, childPos, listChild)
-      if (childVisualDepth <= parentVisualDepth) return
-      if (mode === 'descendants' || childVisualDepth === parentVisualDepth + 1) {
-        children.push({ node: listChild, pos: childPos })
-      }
+    const entries = []
+    scope.descendants((node, relativePos) => {
+      if (!isListItem(node)) return true
+      const pos = scopePos + 1 + relativePos
+      const structuralDepth = taskItemStructuralDepthAt(doc, pos)
+      const visualDepth = Math.min(3, structuralDepth + normalizedIndentLevel(node, structuralDepth))
+      entries.push({
+        node,
+        pos,
+        visualDepth,
+        children: [],
+      })
+      return true
     })
-  })
 
-  return children
-}
-
-function collectTaskItemsFromFollowingVisualSiblings(doc, basePos, parentVisualDepth, mode) {
-  const children = []
-  const parentList = parentListInfoAt(doc, basePos)
-  if (!parentList) return children
-
-  let offset = 1
-  for (let index = 0; index < parentList.listNode.childCount; index += 1) {
-    const sibling = parentList.listNode.child(index)
-    const siblingPos = parentList.listPos + offset
-    offset += sibling.nodeSize
-
-    if (index <= parentList.itemIndex || !isTaskItem(sibling)) continue
-
-    const siblingVisualDepth = taskItemVisualDepthAt(doc, siblingPos, sibling)
-    if (siblingVisualDepth <= parentVisualDepth) break
-    if (mode === 'descendants' || siblingVisualDepth === parentVisualDepth + 1) {
-      children.push({ node: sibling, pos: siblingPos })
+    // 只有前一列表块的末尾本来就处于嵌套视觉层，且后一列表的首项
+    // 仍显示为子级，才允许在块边界恢复父子关系。相邻的独立根级列表
+    // 不能仅因 Tab 将下一块首项下沉就反向改动前块的待办状态。
+    if (stack.length && (!entries.length || stack[stack.length - 1].visualDepth < 2
+        || entries[0].visualDepth < 2)) stack.length = 0
+    for (const entry of entries) {
+      while (stack.length && stack[stack.length - 1].visualDepth >= entry.visualDepth) {
+        stack.pop()
+      }
+      const parent = stack[stack.length - 1]
+      if (parent) parent.children.push(entry)
+      stack.push(entry)
+      byPos.set(entry.pos, entry)
     }
-  }
-
-  return children
-}
-
-function uniqueTaskItems(items) {
-  const seen = new Set()
-  return items.filter((item) => {
-    if (seen.has(item.pos)) return false
-    seen.add(item.pos)
-    return true
   })
+
+  return byPos
 }
 
-function visualTaskItemsUnder(doc, node, basePos, mode) {
-  if (!isTaskItem(node)) return []
-
-  const parentVisualDepth = taskItemVisualDepthAt(doc, basePos, node)
-  return uniqueTaskItems([
-    ...collectTaskItemsFromNestedTaskLists(doc, node, basePos, parentVisualDepth, mode),
-    ...collectTaskItemsFromFollowingVisualSiblings(doc, basePos, parentVisualDepth, mode),
-  ])
+function taskChildren(entry) {
+  return entry?.children?.filter((child) => isTaskItem(child.node)) || []
 }
 
 function taskItemDescendants(doc, node, basePos) {
+  const graph = buildVisualTaskGraph(doc)
   const descendants = []
-  if (!isTaskItem(node)) return descendants
+  const seen = new Set()
 
-  node.descendants((child, relativePos) => {
-    if (!isTaskItem(child)) return true
-    descendants.push({ node: child, pos: basePos + 1 + relativePos })
-    return true
-  })
-
-  // dvnIndentLevel 会把同一层 taskList 中的后续兄弟项显示成当前项的
-  // 子项；这些“视觉子项”不是 ProseMirror 结构 descendants，手动勾选
-  // 父项时也必须一起级联。
-  const parentVisualDepth = taskItemVisualDepthAt(doc, basePos, node)
-  for (const sibling of collectTaskItemsFromFollowingVisualSiblings(doc, basePos, parentVisualDepth, 'descendants')) {
-    descendants.push(sibling)
-    sibling.node.descendants((child, relativePos) => {
-      if (!isTaskItem(child)) return true
-      descendants.push({ node: child, pos: sibling.pos + 1 + relativePos })
-      return true
-    })
+  const visit = (pos) => {
+    const entry = graph.get(pos)
+    for (const child of taskChildren(entry)) {
+      if (seen.has(child.pos)) continue
+      seen.add(child.pos)
+      descendants.push({ node: child.node, pos: child.pos })
+      visit(child.pos)
+    }
   }
 
-  return uniqueTaskItems(descendants)
+  visit(basePos)
+  return descendants
 }
 
 function directChildTaskItems(doc, node, basePos) {
-  const candidates = visualTaskItemsUnder(doc, node, basePos, 'descendants')
-  if (!candidates.length) return []
-
-  // 历史数据/连续 Shift+Tab 可能让一级父项下面直接出现三级视觉子项，
-  // 中间没有二级节点。此时不能要求“恰好父级 + 1”才算直接子项，否则
-  // 子项全部完成后父项永远不更新。取当前子树里最接近父项的可见层级；
-  // 如果存在二级节点，仍然只由二级节点决定父项，三级节点继续向二级冒泡。
-  let nearestDepth = Infinity
-  const candidatesWithDepth = candidates.map((candidate) => {
-    const liveNode = safeNodeAt(doc, candidate.pos) || candidate.node
-    const visualDepth = taskItemVisualDepthAt(doc, candidate.pos, liveNode)
-    nearestDepth = Math.min(nearestDepth, visualDepth)
-    return { ...candidate, visualDepth }
-  }).filter((candidate) => candidate.visualDepth === nearestDepth)
-
-  return candidatesWithDepth.map(({ visualDepth, ...candidate }) => candidate)
+  const graph = buildVisualTaskGraph(doc)
+  return taskChildren(graph.get(basePos)).map((child) => ({ node: child.node, pos: child.pos }))
 }
 
 function collectTaskItems(doc) {
@@ -192,64 +149,46 @@ function safeNodeAt(doc, pos) {
   }
 }
 
-function isTaskRelatedTransaction(transaction) {
-  if (!transaction.docChanged) return false
-
-  return transaction.steps.some((step) => {
-    try {
-      const json = JSON.stringify(step.toJSON())
-      return json.includes('taskItem') || json.includes('taskList') || json.includes('checked')
-    } catch {
-      return true
-    }
-  })
-}
-
-function checkedChangedTaskItems(oldDoc, newDoc) {
-  const changed = []
-  newDoc.descendants((node, pos) => {
-    if (!isTaskItem(node)) return true
-
-    const oldNode = safeNodeAt(oldDoc, pos)
-    if (isTaskItem(oldNode) && checkedOf(oldNode) !== checkedOf(node)) {
-      changed.push({ node, pos, checked: checkedOf(node) })
-    }
-    return true
-  })
-  return changed
-}
-
-function cascadeManualParentChanges(tr, oldDoc, newDoc) {
+function cascadeExplicitCheckboxChanges(tr, transactions) {
   let changed = false
-
-  for (const item of checkedChangedTaskItems(oldDoc, newDoc)) {
-    const currentNode = safeNodeAt(tr.doc, item.pos)
-    const descendants = taskItemDescendants(tr.doc, currentNode, item.pos)
-    if (!descendants.length) continue
-
-    for (const descendant of descendants) {
-      const node = safeNodeAt(tr.doc, descendant.pos)
-      changed = setTaskItemChecked(tr, descendant.pos, node, item.checked) || changed
+  transactions.forEach((transaction, index) => {
+    for (const intent of transaction.getMeta(taskCheckboxIntentKey) || []) {
+      // 位置仅定位这次明确操作；通过事务映射跟随后续编辑，不充当节点身份。
+      let mapped = transaction.mapping.slice(intent.mappingIndex).mapResult(intent.pos)
+      if (mapped.deleted) continue
+      let pos = mapped.pos
+      let deleted = false
+      for (const later of transactions.slice(index + 1)) {
+        mapped = later.mapping.mapResult(pos)
+        if (mapped.deleted) { deleted = true; break }
+        pos = mapped.pos
+      }
+      const currentNode = safeNodeAt(tr.doc, pos)
+      if (deleted || !isTaskItem(currentNode) || checkedOf(currentNode) !== intent.checked) continue
+      for (const descendant of taskItemDescendants(tr.doc, currentNode, pos)) {
+        changed = setTaskItemChecked(tr, descendant.pos, safeNodeAt(tr.doc, descendant.pos), intent.checked) || changed
+      }
     }
-  }
-
+  })
   return changed
 }
 
-function normalizeParentCheckedStates(tr) {
+export function normalizeTaskParentCheckedStates(tr) {
   let changed = false
 
   // 子节点 position 总是大于父节点，倒序可保证先归一化子树，再回推父级。
   // 父级完成态只由直接子级决定；孙级先影响其父级，再逐层向上冒泡。
   // 部分子项完成时父级保持未完成，不展示半选态。
-  const taskItems = collectTaskItems(tr.doc).sort((left, right) => right.pos - left.pos)
-  for (const item of taskItems) {
-    const node = safeNodeAt(tr.doc, item.pos)
-    const children = directChildTaskItems(tr.doc, node, item.pos)
+  const graph = buildVisualTaskGraph(tr.doc)
+  const taskEntries = [...graph.values()]
+    .filter((entry) => isTaskItem(entry.node))
+    .sort((left, right) => right.pos - left.pos)
+  for (const entry of taskEntries) {
+    const children = taskChildren(entry)
     if (!children.length) continue
 
     const allChildrenChecked = children.every((child) => checkedOf(safeNodeAt(tr.doc, child.pos)))
-    changed = setTaskItemChecked(tr, item.pos, node, allChildrenChecked) || changed
+    changed = setTaskItemChecked(tr, entry.pos, safeNodeAt(tr.doc, entry.pos), allChildrenChecked) || changed
   }
 
   return changed
@@ -263,16 +202,33 @@ export const TaskListCascade = Extension.create({
       new Plugin({
         key: taskListCascadePluginKey,
 
-        appendTransaction: (transactions, oldState, newState) => {
-          if (!transactions.some((transaction) => isTaskRelatedTransaction(transaction))) return null
-          if (transactions.some((transaction) => transaction.getMeta(taskListCascadePluginKey))) return null
+        appendTransaction: (transactions, _oldState, newState) => {
+          // Undo/Redo 必须原样恢复历史中的 checked 状态。历史事务里的
+          // true -> false 不是用户手动取消父项，若再跑一次级联会把子项
+          // 一并取消，导致一次 Undo 连上一次子项勾选也回退。
+          if (transactions.some((transaction) => transaction.getMeta('history$') != null)) return null
+          if (transactions.some((transaction) => transaction.getMeta(taskListNormalizationDoneKey))) return null
+          if (!transactions.some((transaction) => transaction.docChanged)) return null
 
+          const manualCascadeDisabled = transactions.some(
+            (transaction) => transaction.getMeta(taskListCascadePluginKey),
+          )
           const tr = newState.tr
-          let changed = cascadeManualParentChanges(tr, oldState.doc, newState.doc)
-          changed = normalizeParentCheckedStates(tr) || changed
+          let changed = false
+          if (!manualCascadeDisabled) {
+            changed = cascadeExplicitCheckboxChanges(tr, transactions)
+          }
+          changed = normalizeTaskParentCheckedStates(tr) || changed
           if (!changed) return null
 
+          // splitListItem 会通过 ensureMarks 记录下一次输入的文字格式。
+          // 父项因新建未完成待办而归一化时，此追加事务只修改勾选状态，
+          // 不能把原事务的 storedMarks 清掉，否则已完成项 Enter 后格式丢失。
+          if (newState.selection.empty && newState.storedMarks !== null) {
+            tr.setStoredMarks(newState.storedMarks)
+          }
           tr.setMeta(taskListCascadePluginKey, true)
+          tr.setMeta(taskListNormalizationDoneKey, true)
           return tr
         },
       }),
