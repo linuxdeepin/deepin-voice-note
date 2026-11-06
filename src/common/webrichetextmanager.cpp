@@ -350,11 +350,15 @@ void WebRichTextManager::insertVoiceItem(const QString &voicePath, qint64 voiceS
     if (TiptapChannelBridge::instance()->tiptapEnabled()) {
         TiptapChannelBridge::instance()->sendInsertVoiceBlock(voiceInfoJson);
         qCDebug(voiceNoteLog) << "Tiptap voice block insert requested successfully, voiceId:" << data.ptrVoice->voiceId;
-        return;
+    } else {
+        emit JsContent::instance()->callJsInsertVoice(voiceInfoJson);
+        qCDebug(voiceNoteLog) << "Voice item inserted successfully, voiceId:" << data.ptrVoice->voiceId;
     }
 
-    emit JsContent::instance()->callJsInsertVoice(voiceInfoJson);
-    qCDebug(voiceNoteLog) << "Voice item inserted successfully, voiceId:" << data.ptrVoice->voiceId;
+    m_textChange = true;
+    m_textChangeNoteId = m_noteData ? m_noteData->noteId : -1;
+    ++m_textChangeSerial;
+    emit noteTextChanged();
 }
 
 /**
