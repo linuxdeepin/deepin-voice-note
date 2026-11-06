@@ -495,6 +495,9 @@ bool AudioWatcher::getDeviceEnable(AudioWatcher::AudioMode mode)
         return true;
     } else {
         bool hasDevice = (mode == Internal) ? m_outIsEnable : m_inIsEnable;
+        if (!hasDevice && mode != Internal) {
+            hasDevice = defaultSourcePorts().count() > 0;
+        }
         qCInfo(voiceNoteLog) << "Device enable for mode" << mode << ":" << hasDevice;
         return hasDevice;
     }
@@ -505,9 +508,12 @@ bool AudioWatcher::hasAudioOutputDevice() const
     return m_outIsEnable;
 }
 
-bool AudioWatcher::hasAudioInputDevice() const
+bool AudioWatcher::hasAudioInputDevice()
 {
-    return m_inIsEnable;
+    if (m_inIsEnable) {
+        return true;
+    }
+    return defaultSourcePorts().count() > 0;
 }
 
 /**
