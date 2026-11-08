@@ -43,6 +43,7 @@ body::-webkit-scrollbar-thumb:active,
     /* -webkit-box-shadow:inset 0 0 6px rgba(83,96,118,.6) */
 }
 
+html::-webkit-scrollbar-corner,
 body::-webkit-scrollbar-corner,
 .dropdown-fontname::-webkit-scrollbar-corner {
     background: transparent;
