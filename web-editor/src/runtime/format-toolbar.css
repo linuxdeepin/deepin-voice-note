@@ -621,11 +621,13 @@
 /* Native title tooltips are misplaced by QtWebEngine in both the sticky
    toolbar and the fixed overflow panel. Every toolbar control therefore uses
    a hint anchored to the control itself, matching the Summernote tooltip. */
-.tiptap-toolbar button[data-tooltip] {
+.tiptap-toolbar button[data-tooltip],
+.tiptap-toolbar .tiptap-select-wrap[data-tooltip] {
     position: relative;
 }
 
-.tiptap-toolbar button[data-tooltip]::after {
+.tiptap-toolbar button[data-tooltip]::after,
+.tiptap-toolbar .tiptap-select-wrap[data-tooltip]::after {
     content: attr(data-tooltip);
     position: absolute;
     top: calc(100% + 6px);
@@ -639,6 +641,7 @@
     color: var(--dvn-tooltip-fg, #3f3f3f);
     font-size: 12px;
     font-weight: 400;
+    font-style: normal;
     line-height: 20px;
     white-space: nowrap;
     pointer-events: none;
@@ -649,7 +652,16 @@
 }
 
 .tiptap-toolbar button[data-tooltip]:not(:disabled):hover::after,
-.tiptap-toolbar button[data-tooltip]:not(:disabled):focus-visible::after {
+.tiptap-toolbar button[data-tooltip]:not(:disabled):focus-visible::after,
+.tiptap-toolbar .tiptap-select-wrap[data-tooltip]:not(.is-open):hover::after {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, 0);
+}
+
+/* Qt 5.15 WebEngine does not support :has(). Keep this rule separate so an
+   unsupported focus selector cannot invalidate the select-wrapper hover rule. */
+.tiptap-toolbar .tiptap-select-wrap[data-tooltip]:not(.is-open):has(.tiptap-select-button:focus-visible)::after {
     opacity: 1;
     visibility: visible;
     transform: translate(-50%, 0);
