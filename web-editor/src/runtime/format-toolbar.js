@@ -697,6 +697,7 @@ function createStyledSelect({ control, title, options, onChange, onOpen }) {
   const wrapper = createEl('span', {
     class: `tiptap-select-wrap tiptap-select-${control}`,
     'data-control': control,
+    'data-tooltip': title,
   })
   const select = createEl('select', {
     class: 'tiptap-native-select',

@@ -265,6 +265,20 @@ test('toolbar controls anchor tooltips to themselves instead of native title', (
     assert.equal(button.getAttribute('aria-label'), label)
   }
 
+  const styleControls = new Map([
+    ['heading', '标题'],
+    ['fontFamily', '字体'],
+    ['fontSize', '字号'],
+  ])
+  for (const [control, label] of styleControls) {
+    const wrapper = toolbar.querySelector(`.tiptap-select-${control}`)
+    const button = wrapper?.querySelector('.tiptap-select-button')
+    assert.ok(wrapper, `${control} select wrapper should exist`)
+    assert.ok(button, `${control} select button should exist`)
+    assert.equal(wrapper.getAttribute('data-tooltip'), label)
+    assert.equal(button.getAttribute('aria-label'), label)
+  }
+
   const colorMenu = toolbar.querySelector('button[data-color-menu="foreColor"]')
   assert.ok(colorMenu)
   assert.equal(colorMenu.getAttribute('title'), null)
@@ -277,7 +291,15 @@ test('toolbar controls anchor tooltips to themselves instead of native title', (
   assert.ok(colorCell.getAttribute('data-tooltip'))
 
   assert.match(toolbarCss, /\.tiptap-toolbar button\[data-tooltip\]::after/)
+  assert.match(toolbarCss, /\.tiptap-toolbar \.tiptap-select-wrap\[data-tooltip\]::after/)
   assert.match(toolbarCss, /button\[data-tooltip\]:not\(:disabled\):hover::after/)
+  const selectHoverRule = toolbarCss.match(
+    /[^{}]*\.tiptap-select-wrap\[data-tooltip\]:not\(\.is-open\):hover::after[^{}]*\{([\s\S]*?)\}/,
+  )
+  assert.ok(selectHoverRule, 'select wrapper hover rule should exist')
+  assert.match(selectHoverRule[1], /opacity:\s*1;/)
+  assert.match(selectHoverRule[1], /visibility:\s*visible;/)
+  assert.doesNotMatch(selectHoverRule[0], /:has\(/, 'Qt 5 incompatible selector must be isolated')
   editor.destroy()
 })
 

@@ -540,6 +540,9 @@ function applyTheme(theme, highlightColor, disableHighlightColor, backgroundColo
   root.style.setProperty('--dvn-voice-text', isDark ? '#DCDCDC' : 'rgba(65, 77, 104, 1)')
   root.style.setProperty('--dvn-voice-subtitle', isDark ? 'rgba(140, 140, 140, 1)' : 'rgba(138, 161, 180, 1)')
   root.style.setProperty('--dvn-voice-divider', isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)')
+  root.style.setProperty('--dvn-tooltip-bg', isDark ? 'rgba(45, 45, 45, 0.98)' : 'rgba(245, 245, 245, 0.98)')
+  root.style.setProperty('--dvn-tooltip-border', isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.08)')
+  root.style.setProperty('--dvn-tooltip-fg', isDark ? '#DCDCDC' : '#3f3f3f')
   const themeEvent = typeof CustomEvent === 'function'
     ? new CustomEvent('dvn-theme-applied', { detail: { theme: root.dataset.dvnTheme } })
     : null
