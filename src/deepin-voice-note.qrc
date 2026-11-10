@@ -1,16 +1,16 @@
 <RCC>
     <qresource prefix="/">
         <file>deepin-voice-note-setting.json</file>
-        <file>icon/default_folder_icons/1.svg</file>
-        <file>icon/default_folder_icons/10.svg</file>
-        <file>icon/default_folder_icons/2.svg</file>
-        <file>icon/default_folder_icons/3.svg</file>
-        <file>icon/default_folder_icons/4.svg</file>
-        <file>icon/default_folder_icons/5.svg</file>
-        <file>icon/default_folder_icons/6.svg</file>
-        <file>icon/default_folder_icons/7.svg</file>
-        <file>icon/default_folder_icons/8.svg</file>
-        <file>icon/default_folder_icons/9.svg</file>
+        <file>icon/default_folder_icons/picture_1.dci</file>
+        <file>icon/default_folder_icons/picture_10.dci</file>
+        <file>icon/default_folder_icons/picture_2.dci</file>
+        <file>icon/default_folder_icons/picture_3.dci</file>
+        <file>icon/default_folder_icons/picture_4.dci</file>
+        <file>icon/default_folder_icons/picture_5.dci</file>
+        <file>icon/default_folder_icons/picture_6.dci</file>
+        <file>icon/default_folder_icons/picture_7.dci</file>
+        <file>icon/default_folder_icons/picture_8.dci</file>
+        <file>icon/default_folder_icons/picture_9.dci</file>
         <file>icon/no_content.dci</file>
         <file>main.qml</file>
         <file>gui/VNoteToolButton.qml</file>

@@ -32,7 +32,7 @@ void GlobalEnvent::SetUp()
     VNoteDataManager *dataManager = VNoteDataManager::instance();
     dataManager->m_qspNoteFoldersMap.reset(new VNOTE_FOLDERS_MAP());
     dataManager->m_qspAllNotesMap.reset(new VNOTE_ALL_NOTES_MAP());
-    QString defaultIconPathFmt(":/icons/deepin/builtin/default_folder_icons/%1.svg");
+    QString defaultIconPathFmt(":/icons/deepin/builtin/default_folder_icons/picture_%1.dci");
 
     for (int i = 0; i < 10; i++) {
         QString iconPath = defaultIconPathFmt.arg(i + 1);
