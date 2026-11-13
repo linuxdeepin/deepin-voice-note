@@ -112,8 +112,12 @@ int main(int argc, char *argv[])
     }
 #endif
 
-    // TODO: The DTK theme color is initialized abnormally, and the application is temporarily circumvented
-    DGuiApplicationHelper::instance()->paletteType();
+    // Sync QGuiApplication palette when DTK palette type changes,
+    // so that popup windows (e.g. context menus) inherit the correct palette.
+    QObject::connect(DGuiApplicationHelper::instance(), &DGuiApplicationHelper::paletteTypeChanged,
+        [](DGuiApplicationHelper::ColorType) {
+            QGuiApplication::setPalette(DGuiApplicationHelper::instance()->applicationPalette());
+        });
 
     app->setOrganizationName("deepin");
     app->setApplicationName("deepin-voice-note");
