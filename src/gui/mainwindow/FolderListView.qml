@@ -794,47 +794,43 @@ Item {
                 }
             }
 
-            Menu {
+            VNoteRightMenu {
                 Accessible.name: "FolderItemContextMenu"
+                Accessible.role: Accessible.PopupMenu
+
                 id: folderItemContextMenu
 
-                MenuItem {
-                    Accessible.name: "RenameMenuItem"
-                    text: qsTr("Rename")
+                menuType: ActionManager.NotebookCtxMenu
 
-                    onTriggered: {
-                        folderListView.itemAtIndex(folderListView.currentIndex).isRename = true;
-                    }
+                onAboutToShow: {
+                    ActionManager.resetCtxMenu(ActionManager.NotebookCtxMenu, true);
+                    var menuEnabled = !root.isPlay && !root.isRecordingAudio && !root.isVoiceToText;
+                    ActionManager.enableAction(ActionManager.NotebookDelete, menuEnabled);
+                    ActionManager.enableAction(ActionManager.NotebookAddNew, menuEnabled);
                 }
 
-                MenuItem {
-                    Accessible.name: "DeleteFolderMenuItem"
-                    id: deleteMenuItem
-                    enabled: !root.isPlay && !root.isRecordingAudio && !root.isVoiceToText
-                    text: qsTr("Delete")
-
-                    onTriggered: {
+                onActionTrigger: actionId => {
+                    switch (actionId) {
+                    case ActionManager.NotebookRename:
+                        folderListView.itemAtIndex(folderListView.currentIndex).isRename = true;
+                        break;
+                    case ActionManager.NotebookDelete:
                         if (webVisible || root.isVoiceToText) {
                             console.log("No notes available, cannot delete folder");
                             return;
                         }
-                        
+
                         messageDialogLoader.showDialog(VNoteMessageDialogHandler.DeleteFolder, ret => {
                             if (ret) {
                                 deleteFolderAtIndex(folderListView.contextIndex);
                             }
                         });
-                    }
-                }
-
-                MenuItem {
-                    Accessible.name: "NewNoteFromFolderMenuItem"
-                    id: newNoteMenuItem
-                    enabled: !root.isPlay && !root.isRecordingAudio && !root.isVoiceToText
-                    text: qsTr("New Note")
-
-                    onTriggered: {
+                        break;
+                    case ActionManager.NotebookAddNew:
                         VNoteMainManager.createNote();
+                        break;
+                    default:
+                        break;
                     }
                 }
             }
