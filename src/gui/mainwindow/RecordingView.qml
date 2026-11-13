@@ -10,8 +10,9 @@ FocusScope {
     id: rootItem
     focus: visible
 
-    property int btnSize: ApplicationHelper.sizeMode === ApplicationHelper.CompactMode ? 24 : 30
-    property int iconSize: ApplicationHelper.sizeMode === ApplicationHelper.CompactMode ? 56 : 72
+    property int btnSize: isCompact ? 24 : 30
+    property int iconSize: isCompact ? 56 : 72
+    property bool isCompact: ApplicationHelper.sizeMode() === ApplicationHelper.CompactMode
     property bool isRecording: true
     property string time: "00:00:00"
 
@@ -25,7 +26,7 @@ FocusScope {
         time = "00:00:00";
     }
 
-    implicitHeight: ApplicationHelper.sizeMode === ApplicationHelper.CompactMode ? 56 : 70
+    implicitHeight: isCompact ? 56 : 70
     visible: false
 
     onVisibleChanged: {
@@ -64,15 +65,15 @@ FocusScope {
         border.color: DTK.themeType === ApplicationHelper.LightType ? "#0A000000" : "#19FFFFFF"
         border.width: 1
         color: DTK.themeType === ApplicationHelper.LightType ? "#7FF4F4F4" : "#0A0A10"
-        implicitHeight: ApplicationHelper.sizeMode === ApplicationHelper.CompactMode ? 36 : 42
-        implicitWidth: ApplicationHelper.sizeMode === ApplicationHelper.CompactMode ? 300 : 364
+        implicitHeight: isCompact ? 36 : 42
+        implicitWidth: isCompact ? 300 : 364
         radius: 12
     }
 
     RowLayout {
         anchors.centerIn: back
-        implicitHeight: ApplicationHelper.sizeMode === ApplicationHelper.CompactMode ? 36 : 42
-        implicitWidth: ApplicationHelper.sizeMode === ApplicationHelper.CompactMode ? 300 : 364
+        implicitHeight: isCompact ? 36 : 42
+        implicitWidth: isCompact ? 300 : 364
         spacing: 10
 
         VNoteComponents.VNoteToolButton {
@@ -101,15 +102,15 @@ FocusScope {
         RecordingCurves {
             id: curves
 
-            height: ApplicationHelper.sizeMode === ApplicationHelper.CompactMode ? 20 : 24
-            width: ApplicationHelper.sizeMode === ApplicationHelper.CompactMode ? 150 : 180
+            height: isCompact ? 20 : 24
+            width: isCompact ? 150 : 180
         }
 
         Label {
             id: duation
 
             text: time
-            width: ApplicationHelper.sizeMode === ApplicationHelper.CompactMode ? 54 : 66
+            width: isCompact ? 54 : 66
         }
 
         VNoteComponents.VNoteToolButton {

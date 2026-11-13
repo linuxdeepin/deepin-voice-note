@@ -543,7 +543,7 @@ function applyTheme(theme, highlightColor, disableHighlightColor, backgroundColo
   // 紧凑模式：缩小语音播放块尺寸
   root.style.setProperty('--dvn-voice-playback-height', compact ? '36px' : '42px')
   root.style.setProperty('--dvn-voice-btn-size', compact ? '20px' : '24px')
-  root.style.setProperty('--dvn-voice-slider-track-height', compact ? '2px' : '2px')
+  root.style.setProperty('--dvn-voice-slider-track-height', '2px')
   root.style.setProperty('--dvn-voice-slider-thumb-size', compact ? '14px' : '16px')
   root.style.setProperty('--dvn-tooltip-bg', isDark ? 'rgba(45, 45, 45, 0.98)' : 'rgba(245, 245, 245, 0.98)')
   root.style.setProperty('--dvn-tooltip-border', isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.08)')
