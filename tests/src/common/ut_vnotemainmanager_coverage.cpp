@@ -16,6 +16,7 @@
 #include "vnotefolderoper.h"
 #include "vnoteitemoper.h"
 #include "jscontent.h"
+#include "web_engine_handler.h"
 #include "migrationviewcontroller.h"
 #include "tiptapchannelbridge.h"
 #include "voice_recoder_handler.h"
@@ -26,6 +27,13 @@
 #include <stub.h>
 
 #include <QCoreApplication>
+#include <QTemporaryDir>
+#include <QImage>
+#include <QFile>
+#include <QUrl>
+#include <QDragEnterEvent>
+#include <QMimeData>
+#include <QPoint>
 #include <QEventLoop>
 #include <QPointF>
 #include <QQmlEngine>
@@ -283,4 +291,77 @@ TEST(VNoteMainManagerCoverage, forceExit)
     } catch (int) {
         // Expected: QApplication::exit stub threw to prevent reaching _Exit
     }
+}
+
+
+// BUG-382971: GIF must not be accepted by the drag/drop gate. The QML DropArea
+// calls VNoteMainManager.canInsertImages(); returning false is what rejects the
+// drop. Keep the file-dialog filter and this gate consistent.
+TEST(VNoteMainManagerCoverage, canInsertImagesRejectsGif)
+{
+    VNoteMainManager *m = VNoteMainManager::instance();
+    ASSERT_TRUE(m);
+
+    QTemporaryDir dir;
+    ASSERT_TRUE(dir.isValid());
+
+    const QString pngPath = dir.filePath("control.png");
+    QImage png(2, 2, QImage::Format_RGB32);
+    png.fill(Qt::red);
+    ASSERT_TRUE(png.save(pngPath, "PNG"));
+
+    const QString jpegPath = dir.filePath("control.jpeg");
+    QImage jpeg(2, 2, QImage::Format_RGB32);
+    jpeg.fill(Qt::green);
+    ASSERT_TRUE(jpeg.save(jpegPath, "JPEG"));
+
+    const QString bmpPath = dir.filePath("control.bmp");
+    QImage bmp(2, 2, QImage::Format_RGB32);
+    bmp.fill(Qt::blue);
+    ASSERT_TRUE(bmp.save(bmpPath, "BMP"));
+
+    // Minimal valid 1x1 GIF89a; avoids depending on the Qt GIF writer plugin.
+    const QString gifPath = dir.filePath("reject.gif");
+    QFile gifFile(gifPath);
+    ASSERT_TRUE(gifFile.open(QIODevice::WriteOnly));
+    const QByteArray gifBytes = QByteArray::fromHex(
+        "47494638396101000100800000000000ffffff21f90401000000002c00000000010001000002024401003b");
+    gifFile.write(gifBytes);
+    gifFile.close();
+
+    // A GIF renamed to a supported suffix must still be rejected by the
+    // actual-format check, not just by the file name.
+    const QString renamedGifPath = dir.filePath("renamed.gif.png");
+    QFile renamedGif(renamedGifPath);
+    ASSERT_TRUE(renamedGif.open(QIODevice::WriteOnly));
+    renamedGif.write(gifBytes);
+    renamedGif.close();
+
+    EXPECT_TRUE(m->canInsertImages({QUrl::fromLocalFile(pngPath)}))
+        << "PNG must remain accepted";
+    EXPECT_TRUE(m->canInsertImages({QUrl::fromLocalFile(jpegPath)}))
+        << "JPEG must remain accepted";
+    EXPECT_TRUE(m->canInsertImages({QUrl::fromLocalFile(bmpPath)}))
+        << "BMP must remain accepted";
+    EXPECT_FALSE(m->canInsertImages({QUrl::fromLocalFile(gifPath)}))
+        << "GIF must be rejected by the drag/drop gate";
+    EXPECT_FALSE(m->canInsertImages({QUrl::fromLocalFile(renamedGifPath)}))
+        << "A GIF renamed to .png must be rejected by the actual-format check";
+}
+
+// Image-only drag payloads (no file URL) must also be rejected before they
+// reach Summernote's Dropzone, which would otherwise insert a GIF as a data URL.
+TEST(WebEngineHandlerCoverage, imageOnlyGifDragIsRejected)
+{
+    QObject target;
+    WebEngineHandler handler;
+    handler.setTarget(&target);
+
+    QMimeData mimeData;
+    mimeData.setData("image/gif", QByteArray("GIF89a"));
+    QDragEnterEvent event(QPoint(10, 10), Qt::CopyAction, &mimeData,
+                          Qt::LeftButton, Qt::NoModifier);
+    EXPECT_TRUE(handler.eventFilter(&target, &event));
+    EXPECT_EQ(event.dropAction(), Qt::IgnoreAction);
+    EXPECT_FALSE(event.isAccepted());
 }
