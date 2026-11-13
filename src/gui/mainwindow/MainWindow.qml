@@ -818,7 +818,7 @@ Item {
                     Layout.preferredHeight: 30
                     Layout.preferredWidth: 30
                     Layout.rightMargin: 10
-                    Layout.topMargin: 10
+                    Layout.topMargin: 12
                     display: AbstractButton.IconOnly
                     icon.height: 16
                     icon.name: "action_search"
@@ -924,7 +924,7 @@ Item {
 
                     Layout.fillWidth: true
                     Layout.preferredHeight: 30
-                    Layout.topMargin: 5
+                    Layout.topMargin: 7
                     spacing: 0
                     visible: !initRect.visible
                              && !webEngineView.noSearchResult
