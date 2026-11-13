@@ -641,9 +641,9 @@ Item {
                 topItem.text = setTop ? qsTr("Sticky on Top") : qsTr("Unpin");
             }
 
-            ActionManager.enableVoicePlayActions(!isPlay && !isRecordingAudio);
-            // 录音、播放或语音转文字中禁用删除
-            ActionManager.enableAction(ActionManager.NoteDelete, !isRecordingAudio && !isPlay && !isVoiceToText);
+            ActionManager.enableVoicePlayActions(!isRecordingAudio);
+            // 录音或语音转文字中禁用删除
+            ActionManager.enableAction(ActionManager.NoteDelete, !isRecordingAudio && !isVoiceToText);
             
             // 在搜索状态下禁用移动、置顶和新建笔记选项
             if (isSearching) {
