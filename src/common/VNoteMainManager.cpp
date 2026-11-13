@@ -158,6 +158,14 @@ void VNoteMainManager::start()
     m_initialized = true;
     initNote();
     VTextSpeechAndTrManager::instance()->checkUosAiExists();
+
+#ifdef __mips64
+    ActionManager::instance()->visibleAiActions(false);
+#endif
+
+#ifdef __sw_64__
+    ActionManager::instance()->visibleAiActions(false);
+#endif
 }
 
 void VNoteMainManager::initNote()
