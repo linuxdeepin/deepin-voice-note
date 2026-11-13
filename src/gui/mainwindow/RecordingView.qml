@@ -89,9 +89,6 @@ FocusScope {
             KeyNavigation.tab: stopBtn
             KeyNavigation.backtab: stopBtn
 
-            background: Item {
-            }
-
             onClicked: {
                 pauseRecording();
                 curves.pauseRecording();
@@ -125,9 +122,6 @@ FocusScope {
             implicitWidth: btnSize
             KeyNavigation.tab: pauseBtn
             KeyNavigation.backtab: pauseBtn
-
-            background: Item {
-            }
 
             onClicked: {
                 stop();
