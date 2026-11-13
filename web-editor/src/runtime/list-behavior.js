@@ -851,6 +851,105 @@ function maxVisualDepthForList(node, itemStructuralDepth) {
   return maxDepth
 }
 
+// 把右侧列表挂到左侧最后一项下面会让整棵子树的结构深度 +1，
+// 只有每个列表项自身都还有可减的视觉缩进（dvnIndentLevel >= 1）时，
+// 才能用统一的 -1 精确抵消，保证逐行视觉层级不变。任何一项缩进为 0，
+// 都说明它的视觉层级完全由结构深度承载，挂回会把该行顶深一级。
+// 这种结构必须保留“扁平列表 + dvnIndentLevel”的表示，不能强行改结构。
+function listCanShiftVisualDepthUp(node, doc, listPos) {
+  let canShift = true
+  node.descendants((item, relativePos) => {
+    if (!LIST_ITEM_TYPES.has(item.type.name)) return true
+    const itemPos = listPos + 1 + relativePos
+    const structuralDepth = listItemDepthAtPosition(doc, itemPos)
+    const indent = normalizedIndentLevel(
+      item.attrs?.dvnIndentLevel,
+      maxExtraIndentForStructuralDepth(structuralDepth),
+    )
+    if (indent <= 0) {
+      canShift = false
+      return false
+    }
+    return true
+  })
+  return canShift
+}
+
+// 把右侧列表挂到左侧最后一项下面时，如果某些后代项的 dvnIndentLevel 已经是 0，
+// 统一 -1 无法抵消结构 +1，视觉层级会被顶深。这里把右侧列表按“当前视觉层级”
+// 拍平后重建为规范嵌套树：每项的视觉层级保持不变，同时恢复真实父子结构，
+// 保证待办勾选级联仍能沿视觉父子关系传播。
+function listSubtreeHasSingleType(node) {
+  if (!LIST_TYPES.has(node?.type?.name)) return false
+  let single = true
+  node.descendants((child) => {
+    if (LIST_TYPES.has(child.type.name) && child.type.name !== node.type.name) {
+      single = false
+      return false
+    }
+    return true
+  })
+  return single
+}
+
+function flattenVisualListItems(listNode, doc, listPos) {
+  const entries = []
+  listNode.forEach((item, offset) => {
+    const itemPos = listPos + 1 + offset
+    const structuralDepth = listItemDepthAtPosition(doc, itemPos)
+    const indent = normalizedIndentLevel(
+      item.attrs?.dvnIndentLevel,
+      maxExtraIndentForStructuralDepth(structuralDepth),
+    )
+    const content = []
+    const childEntries = []
+    item.forEach((child, childOffset) => {
+      if (!LIST_TYPES.has(child.type.name)) content.push(child)
+      else childEntries.push(...flattenVisualListItems(child, doc, itemPos + 1 + childOffset))
+    })
+    entries.push({
+      type: item.type,
+      attrs: item.attrs,
+      marks: item.marks,
+      content,
+      visualDepth: structuralDepth + indent,
+      itemPos,
+    })
+    entries.push(...childEntries)
+  })
+  return entries
+}
+
+function buildCanonicalNestedList(entries, listNode, rootDepth) {
+  const root = { level: rootDepth - 1, items: [], children: [] }
+  const stack = [root]
+  for (const entry of entries) {
+    while (stack.length > 1 && stack[stack.length - 1].level >= entry.visualDepth) {
+      stack.pop()
+    }
+    const parent = stack[stack.length - 1]
+    const itemLevel = parent.level + 1
+    const item = entry.type.create({
+      ...entry.attrs,
+      dvnIndentLevel: Math.max(0, entry.visualDepth - itemLevel),
+    }, entry.content, entry.marks)
+    parent.items.push(item)
+    const childSlot = { level: entry.visualDepth, items: [], children: [] }
+    parent.children.push(childSlot)
+    stack.push(childSlot)
+  }
+  const materialize = (slot) => listNode.type.create(
+    listNode.attrs,
+    slot.items.map((item, index) => {
+      const childSlot = slot.children[index]
+      if (!childSlot || !childSlot.items.length) return item
+      return item.type.create(item.attrs, [...childNodesOf(item), materialize(childSlot)], item.marks)
+    }),
+    listNode.marks,
+  )
+  return materialize(root)
+}
+
 // 局部取消/重应用后，会留下这种同一父级下的相邻列表：
 //   [A(0), B(0)] [B1(1), B2(1)] [C(0), D(0)]
 // 后一个列表的首项视觉更深，说明它属于前一个列表最后一项的子列表，
@@ -871,19 +970,25 @@ export function nestAdjacentVisualLists(tr, { skipLists = null } = {}) {
           if (!skipLists?.has(next)) {
             const leftDepth = Number(child.lastChild?.attrs?.dvnIndentLevel) || 0
             const rightDepth = Number(next.firstChild?.attrs?.dvnIndentLevel) || 0
+            const rightPos = childPos + child.nodeSize
             const leftStructuralDepth = listItemDepthAtPosition(tr.doc, childPos + 1)
             const nestedPreview = adjustListSubtreeVisualDepth(next, -1)
             const nextMaxVisualDepth = maxVisualDepthForList(nestedPreview, leftStructuralDepth + 1)
+            const canShiftDepth = listCanShiftVisualDepthUp(next, tr.doc, rightPos)
+            const canRebuild = !canShiftDepth && listSubtreeHasSingleType(next)
             if (
               rightDepth > leftDepth
               && LIST_ITEM_TYPES.has(child.lastChild?.type?.name)
-              && nextMaxVisualDepth <= MAX_LIST_NESTING_DEPTH
+              && (canShiftDepth || canRebuild)
+              // 规范重建按原视觉层级重建，天然不会超过三级；
+              // 只有走统一 -1 的旧路径才需要校验预览最大层级。
+              && (canRebuild || nextMaxVisualDepth <= MAX_LIST_NESTING_DEPTH)
             ) {
               boundary = {
                 left: child,
                 right: next,
                 leftPos: childPos,
-                rightPos: childPos + child.nodeSize,
+                rightPos,
               }
               return true
             }
@@ -911,7 +1016,19 @@ export function nestAdjacentVisualLists(tr, { skipLists = null } = {}) {
       nestedItems,
       boundary.right.marks,
     )
-    const nested = adjustListSubtreeVisualDepth(nestedSource, -1)
+    const outerDepth = listItemDepthAtPosition(tr.doc, boundary.leftPos + 1)
+    const canShiftWholeList = listCanShiftVisualDepthUp(
+      boundary.right,
+      tr.doc,
+      boundary.rightPos,
+    )
+    const nested = !canShiftWholeList && !tailItems.length && listSubtreeHasSingleType(boundary.right)
+      ? buildCanonicalNestedList(
+          flattenVisualListItems(boundary.right, tr.doc, boundary.rightPos),
+          boundary.right,
+          outerDepth + 2,
+        )
+      : adjustListSubtreeVisualDepth(nestedSource, -1)
     const nextLastItem = lastItem.type.create(
       lastItem.attrs,
       [...childNodesOf(lastItem), nested],
