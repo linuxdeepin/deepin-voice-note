@@ -345,6 +345,14 @@ if (typeof window !== 'undefined') {
 // 暴露聚焦接口：QML 侧把 WebEngineView 键盘焦点移入后调用，把光标放进 ProseMirror 编辑器
 window._dvnTiptapFocus = function () {
   editor.commands.focus('end')
+  // Qt/Chromium 可能异步弹出输入法，参照 release/snipe 6897ab1f 增加延迟兜底
+  ;[0, 80, 200].forEach((delay) => {
+    setTimeout(() => {
+      if (tiptapBridge?.jsCallHideInputMethod) {
+        tiptapBridge.jsCallHideInputMethod()
+      }
+    }, delay)
+  })
 }
 
 document.addEventListener('mousedown', function (event) {
@@ -352,6 +360,32 @@ document.addEventListener('mousedown', function (event) {
     editor.commands.focus('end')
   }
 })
+
+// 用户点击编辑区正文时重新请求显示软键盘。
+function shouldRequestInputMethodByUserClick(event) {
+  if ((event.type === 'mouseup' || event.type === 'pointerup')
+      && typeof event.button === 'number'
+      && event.button !== 0) {
+    return false
+  }
+  if (event.target && event.target.closest) {
+    return event.target.closest('.voiceBox, img, button, a, input, textarea, select') === null
+  }
+  return true
+}
+
+function requestInputMethodByUserClick(event) {
+  if (!shouldRequestInputMethodByUserClick(event)) {
+    return
+  }
+  if (tiptapBridge?.jsCallShowInputMethod) {
+    tiptapBridge.jsCallShowInputMethod()
+  }
+}
+
+editor.view.dom.addEventListener('pointerup', requestInputMethodByUserClick)
+editor.view.dom.addEventListener('mouseup', requestInputMethodByUserClick)
+editor.view.dom.addEventListener('touchend', requestInputMethodByUserClick)
 
 bindTiptapChannel(editor, undefined, {
   onUiStrings: (json) => {
