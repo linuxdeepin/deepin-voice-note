@@ -182,3 +182,74 @@ test('显式结构归一：更深相邻列表挂回前一项后再合并外层�
   assert.deepEqual(orderedListMarkerNumbers(outer.child(1).lastChild), [1, 2])
   editor.destroy()
 })
+
+function visualRows(editor) {
+  const doc = editor.state.doc
+  const rows = []
+  doc.descendants((node, pos) => {
+    if (node.type.name !== 'listItem' && node.type.name !== 'taskItem') return true
+    const $pos = doc.resolve(Math.min(pos + 1, doc.content.size))
+    let structural = 0
+    for (let depth = 1; depth <= $pos.depth; depth += 1) {
+      if ($pos.node(depth).type.name === 'listItem' || $pos.node(depth).type.name === 'taskItem') {
+        structural += 1
+      }
+    }
+    const indent = Number(node.attrs?.dvnIndentLevel) || 0
+    rows.push({
+      text: node.firstChild?.textContent || '',
+      type: node.type.name === 'taskItem' ? 'task' : 'ordered',
+      level: structural + indent,
+    })
+    return true
+  })
+  return rows
+}
+
+test('首行普通文本转待办：后续深层缩进为 0 的二级项不得被顶成三级', () => {
+  const paragraph = (text) => ({ type: 'paragraph', content: [{ type: 'text', text }] })
+  const taskItem = (text, dvnIndentLevel, children = []) => ({
+    type: 'taskItem',
+    attrs: { checked: false, dvnIndentLevel },
+    content: [paragraph(text), ...children],
+  })
+  const taskList = (items) => ({ type: 'taskList', content: items })
+
+  const editor = createEditor({
+    type: 'doc',
+    content: [
+      paragraph('1'),
+      taskList([
+        taskItem('2', 1, [
+          taskList([
+            taskItem('3', 1),
+            taskItem('4', 0),
+            taskItem('5', 0),
+          ]),
+        ]),
+      ]),
+    ],
+  })
+
+  const before = visualRows(editor)
+  assert.deepEqual(before.map((row) => `${row.text}:${row.level}`), ['2:2', '3:3', '4:2', '5:2'])
+
+  let cursor = null
+  editor.state.doc.descendants((node, pos) => {
+    if (node.isText && node.text === '1') {
+      cursor = pos + 1
+      return false
+    }
+    return true
+  })
+  assert.notEqual(cursor, null)
+  editor.commands.setTextSelection(cursor)
+
+  assert.equal(toggleActiveListFormatting(editor, 'taskList'), true)
+  assert.deepEqual(
+    visualRows(editor).map((row) => `${row.text}:${row.type}:${row.level}`),
+    ['1:task:1', '2:task:2', '3:task:3', '4:task:2', '5:task:2'],
+    '转换后每一行的视觉层级必须与转换前一致',
+  )
+  editor.destroy()
+})
