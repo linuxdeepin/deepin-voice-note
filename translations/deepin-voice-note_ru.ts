@@ -403,7 +403,7 @@
     <message>
         <location filename="../src/common/VNoteMainManager.cpp" line="831"/>
         <source>Play/Pause</source>
-        <translation>Воспроизвести/Пауза</translation>
+        <translation>Играть/пауза</translation>
     </message>
     <message>
         <location filename="../src/common/VNoteMainManager.cpp" line="832"/>
@@ -458,7 +458,7 @@
     <message>
         <location filename="../src/common/VNoteMainManager.cpp" line="883"/>
         <source>Help</source>
-        <translation>Помощь</translation>
+        <translation>Справка</translation>
     </message>
     <message>
         <location filename="../src/common/VNoteMainManager.cpp" line="884"/>
@@ -531,7 +531,7 @@
     <message>
         <location filename="../src/common/utils.cpp" line="48"/>
         <source>%1 mins ago</source>
-        <translation>%1 минут назад</translation>
+        <translation>%1 мин. назад</translation>
     </message>
     <message>
         <location filename="../src/common/utils.cpp" line="56"/>
