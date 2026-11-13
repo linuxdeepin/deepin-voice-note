@@ -260,6 +260,7 @@ WebEngineHandler::WebEngineHandler(QObject *parent)
     connectWebContent();
 
     connect(DGuiApplicationHelper::instance(), &DGuiApplicationHelper::themeTypeChanged, this, &WebEngineHandler::onThemeChanged);
+    connect(DGuiApplicationHelper::instance(), &DGuiApplicationHelper::sizeModeChanged, this, &WebEngineHandler::onThemeChanged);
 
     connect(ActionManager::instance(), &ActionManager::actionTriggered, this, &WebEngineHandler::onMenuClicked);
 
@@ -712,7 +713,8 @@ void WebEngineHandler::onThemeChanged()
     emit JsContent::instance()->callJsSetTheme(theme, activeHightColor, disableHightColor, backgroundColor);
     // Tiptap 编辑器主题下发（复用取色逻辑，只增一路）
     QString themeStr = (theme == DGuiApplicationHelper::LightType) ? QStringLiteral("light") : QStringLiteral("dark");
-    TiptapChannelBridge::instance()->emitThemeProvided(themeStr, activeHightColor, disableHightColor, backgroundColor);
+    bool compact = DGuiApplicationHelper::instance()->isCompactMode();
+    TiptapChannelBridge::instance()->emitThemeProvided(themeStr, activeHightColor, disableHightColor, backgroundColor, compact);
     qCInfo(voiceNoteLog) << "Theme change handling finished";
 }
 

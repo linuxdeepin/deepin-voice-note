@@ -106,8 +106,8 @@ const themeConnectedBridges = new WeakSet()
 function connectThemeSignal(bridge) {
   if (!bridge || themeConnectedBridges.has(bridge)) return
   if (bridge.themeProvided?.connect) {
-    bridge.themeProvided.connect(function (theme, highlightColor, disableHighlightColor, backgroundColor) {
-      applyTheme(theme, highlightColor, disableHighlightColor, backgroundColor)
+    bridge.themeProvided.connect(function (theme, highlightColor, disableHighlightColor, backgroundColor, compact) {
+      applyTheme(theme, highlightColor, disableHighlightColor, backgroundColor, compact)
     })
     themeConnectedBridges.add(bridge)
   }
@@ -474,7 +474,7 @@ function insertVoiceBlockWithLegacySpacing(editor, attrs) {
   return inserted
 }
 
-function applyTheme(theme, highlightColor, disableHighlightColor, backgroundColor) {
+function applyTheme(theme, highlightColor, disableHighlightColor, backgroundColor, compact) {
   const root = document.documentElement
   if (highlightColor) root.style.setProperty('--highlightColor', highlightColor)
   if (disableHighlightColor) root.style.setProperty('--color', disableHighlightColor)
@@ -540,6 +540,11 @@ function applyTheme(theme, highlightColor, disableHighlightColor, backgroundColo
   root.style.setProperty('--dvn-voice-text', isDark ? '#DCDCDC' : 'rgba(65, 77, 104, 1)')
   root.style.setProperty('--dvn-voice-subtitle', isDark ? 'rgba(140, 140, 140, 1)' : 'rgba(138, 161, 180, 1)')
   root.style.setProperty('--dvn-voice-divider', isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)')
+  // 紧凑模式：缩小语音播放块尺寸
+  root.style.setProperty('--dvn-voice-playback-height', compact ? '36px' : '42px')
+  root.style.setProperty('--dvn-voice-btn-size', compact ? '20px' : '24px')
+  root.style.setProperty('--dvn-voice-slider-track-height', compact ? '2px' : '2px')
+  root.style.setProperty('--dvn-voice-slider-thumb-size', compact ? '14px' : '16px')
   root.style.setProperty('--dvn-tooltip-bg', isDark ? 'rgba(45, 45, 45, 0.98)' : 'rgba(245, 245, 245, 0.98)')
   root.style.setProperty('--dvn-tooltip-border', isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.08)')
   root.style.setProperty('--dvn-tooltip-fg', isDark ? '#DCDCDC' : '#3f3f3f')

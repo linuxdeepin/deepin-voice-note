@@ -10,8 +10,8 @@ FocusScope {
     id: rootItem
     focus: visible
 
-    property int btnSize: 30
-    property int iconSize: 72
+    property int btnSize: ApplicationHelper.sizeMode === ApplicationHelper.CompactMode ? 24 : 30
+    property int iconSize: ApplicationHelper.sizeMode === ApplicationHelper.CompactMode ? 56 : 72
     property bool isRecording: true
     property string time: "00:00:00"
 
@@ -25,7 +25,7 @@ FocusScope {
         time = "00:00:00";
     }
 
-    implicitHeight: 70
+    implicitHeight: ApplicationHelper.sizeMode === ApplicationHelper.CompactMode ? 56 : 70
     visible: false
 
     onVisibleChanged: {
@@ -64,15 +64,15 @@ FocusScope {
         border.color: DTK.themeType === ApplicationHelper.LightType ? "#0A000000" : "#19FFFFFF"
         border.width: 1
         color: DTK.themeType === ApplicationHelper.LightType ? "#7FF4F4F4" : "#0A0A10"
-        implicitHeight: 42
-        implicitWidth: 364
+        implicitHeight: ApplicationHelper.sizeMode === ApplicationHelper.CompactMode ? 36 : 42
+        implicitWidth: ApplicationHelper.sizeMode === ApplicationHelper.CompactMode ? 300 : 364
         radius: 12
     }
 
     RowLayout {
         anchors.centerIn: back
-        implicitHeight: 42
-        implicitWidth: 364
+        implicitHeight: ApplicationHelper.sizeMode === ApplicationHelper.CompactMode ? 36 : 42
+        implicitWidth: ApplicationHelper.sizeMode === ApplicationHelper.CompactMode ? 300 : 364
         spacing: 10
 
         VNoteComponents.VNoteToolButton {
@@ -101,15 +101,15 @@ FocusScope {
         RecordingCurves {
             id: curves
 
-            height: 24
-            width: 180
+            height: ApplicationHelper.sizeMode === ApplicationHelper.CompactMode ? 20 : 24
+            width: ApplicationHelper.sizeMode === ApplicationHelper.CompactMode ? 150 : 180
         }
 
         Label {
             id: duation
 
             text: time
-            width: 66
+            width: ApplicationHelper.sizeMode === ApplicationHelper.CompactMode ? 54 : 66
         }
 
         VNoteComponents.VNoteToolButton {
