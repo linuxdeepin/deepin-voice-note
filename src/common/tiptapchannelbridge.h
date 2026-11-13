@@ -147,7 +147,7 @@ public:
     void emitVoiceToTextCompleted(const QString &voiceId, const QString &text);
     // 主题下发（深浅色 + 高亮色），前端写 CSS 变量
     void emitThemeProvided(const QString &theme, const QString &highlightColor,
-                           const QString &disableHighlightColor, const QString &backgroundColor);
+                           const QString &disableHighlightColor, const QString &backgroundColor, bool compact);
 
     // 测试辅助：获取当前缓存的待下发 envelope（未就绪时）
     Q_INVOKABLE QString pendingEnvelope() const;
@@ -210,7 +210,7 @@ signals:
     void voiceToTextCompleted(const QString &voiceId, const QString &text);
     // C++→JS：主题下发
     void themeProvided(const QString &theme, const QString &highlightColor,
-                       const QString &disableHighlightColor, const QString &backgroundColor);
+                       const QString &disableHighlightColor, const QString &backgroundColor, bool compact);
     // C++→JS：当前笔记标题变化
     void currentNoteChanged(int noteId, const QString &title);
     // C++→JS：搜索 query 变化/清空。
@@ -262,6 +262,7 @@ private:
     QString m_lastHighlightColor;
     QString m_lastDisableHighlightColor;
     QString m_lastBackgroundColor;
+    bool m_lastCompact { false };
     bool m_hasTheme { false };
 };
 

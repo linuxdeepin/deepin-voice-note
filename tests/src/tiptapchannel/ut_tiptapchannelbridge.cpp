@@ -590,11 +590,12 @@ TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_emitThemeProvided_001)
 
     QSignalSpy spy(&bridge, &TiptapChannelBridge::themeProvided);
     bridge.emitThemeProvided(QStringLiteral("dark"), QStringLiteral("#007AFF"),
-                             QStringLiteral("#999999"), QStringLiteral("#090A17"));
+                             QStringLiteral("#999999"), QStringLiteral("#090A17"), false);
     ASSERT_EQ(spy.count(), 1);
     auto args = spy.takeFirst();
     EXPECT_EQ(args.at(0).toString(), QStringLiteral("dark"));
     EXPECT_EQ(args.at(1).toString(), QStringLiteral("#007AFF"));
+    EXPECT_EQ(args.at(4).toBool(), false);
 }
 
 // emitThemeProvided：ready 前缓存主题，ready 后补发，避免首次暗色主题信号丢失。
@@ -604,7 +605,7 @@ TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_emitThemeProvided_cacheBef
     QSignalSpy spy(&bridge, &TiptapChannelBridge::themeProvided);
 
     bridge.emitThemeProvided(QStringLiteral("dark"), QStringLiteral("#007AFF"),
-                             QStringLiteral("#999999"), QStringLiteral("#090A17"));
+                             QStringLiteral("#999999"), QStringLiteral("#090A17"), true);
     EXPECT_EQ(spy.count(), 0);
 
     bridge.jsEditorReady();
@@ -614,6 +615,7 @@ TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_emitThemeProvided_cacheBef
     EXPECT_EQ(args.at(1).toString(), QStringLiteral("#007AFF"));
     EXPECT_EQ(args.at(2).toString(), QStringLiteral("#999999"));
     EXPECT_EQ(args.at(3).toString(), QStringLiteral("#090A17"));
+    EXPECT_EQ(args.at(4).toBool(), true);
 }
 
 // currentVoiceId / setCurrentVoiceId
