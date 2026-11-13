@@ -1,28 +1,32 @@
 :root {
-    --color: rgba(192, 198, 212, 1);
+    --color: #DCDCDC;
     --backgroundColor: #242424;
 }
 
 body {
-    color: rgba(192, 198, 212, 1) !important;
+    color: #DCDCDC !important;
     background-color: #242424 !important;
 }
 
+.note-placeholder {
+    color: rgba(0, 0, 0, 0.30) !important;
+}
+
 u {
-    border-bottom: 1px solid rgba(192, 198, 212, 1) !important;
+    border-bottom: 1px solid #DCDCDC !important;
 }
 
 strike {
-    text-decoration-color: rgba(192, 198, 212, 1) !important;
+    text-decoration-color: #DCDCDC !important;
 }
 
 strike[style="text-decoration-line: underline;"] {
-    border-bottom: 1px solid rgba(192, 198, 212, 1) !important;
+    border-bottom: 1px solid #DCDCDC !important;
 }
 
 .title,
 .time {
-    color: rgba(192, 198, 212, 1) !important
+    color: #DCDCDC !important
 }
 
 .li {
@@ -38,13 +42,13 @@ strike[style="text-decoration-line: underline;"] {
 }
 
 .tooltip-inner {
-    color: rgba(192, 198, 212, 1);
+    color: #DCDCDC;
     background-color: rgba(42, 42, 42, 1) !important;
     border: 1px solid rgba(0, 0, 0, 0.30);
 }
 
 .btn-default {
-    color: rgba(197, 207, 224, 1) !important
+    color: rgba(255, 255, 255, 0.7) !important
 }
 
 .dropdown-menu {
@@ -52,24 +56,24 @@ strike[style="text-decoration-line: underline;"] {
 }
 
 .colorFont {
-    color: rgba(192, 198, 212, 1) !important
+    color: #DCDCDC !important
 }
 
 .dropdown-fontsize li a {
-    color: rgba(192, 198, 212, 1) !important
+    color: #DCDCDC !important
 }
 
 .dropdown-fontname li a {
-    color: rgba(192, 198, 212, 1) !important
+    color: #DCDCDC !important
 }
 
 .dropdown-fontsize>li>a,
 .dropdown-fontname>li>a {
-    color: rgba(197, 207, 224, 1)
+    color: rgba(255, 255, 255, 0.7)
 }
 
 .icon-forecolor .path1 {
-    color: rgba(192, 198, 212, 1);
+    color: #DCDCDC;
 }
 
 .icon-backcolor .path2 {
@@ -114,7 +118,7 @@ body::-webkit-scrollbar-thumb:active,
 }
 
 .translate>div {
-    color: rgba(192, 198, 212, 1) !important;
+    color: #DCDCDC !important;
 }
 
 .fontsizeBut .note-current-fontsize {
