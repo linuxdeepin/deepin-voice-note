@@ -17,7 +17,7 @@ Settings.SettingsDialog {
     height: 548
     width: 664
 
-    config: QtObject {
+    config: Config {
         id: settingConfig
 
         property int audioSource: 1
