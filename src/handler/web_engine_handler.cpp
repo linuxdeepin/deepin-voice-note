@@ -314,6 +314,21 @@ void WebEngineHandler::setTarget(QObject *targetWebEngine)
     qCInfo(voiceNoteLog) << "Target web engine setting finished";
 }
 
+static bool hasUnsupportedImagePayload(const QMimeData *mimeData)
+{
+    if (!mimeData || mimeData->hasUrls()) {
+        return false;
+    }
+    const QStringList formats = mimeData->formats();
+    for (const QString &format : formats) {
+        if (format.compare(QStringLiteral("image/gif"), Qt::CaseInsensitive) == 0
+            || format.compare(QStringLiteral("image/webp"), Qt::CaseInsensitive) == 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
 bool WebEngineHandler::eventFilter(QObject *watched, QEvent *event)
 {
     if (watched == m_targetWebEngine) {
@@ -323,7 +338,8 @@ bool WebEngineHandler::eventFilter(QObject *watched, QEvent *event)
             const QMimeData *mimeData = dropEvent->mimeData();
             m_dragImageCheckUrls = mimeData && mimeData->hasUrls() ? mimeData->urls() : QList<QUrl>();
             m_dragCanInsertImages = !m_dragImageCheckUrls.isEmpty() && VNoteMainManager::instance()->canInsertImages(m_dragImageCheckUrls);
-            if (!m_dragImageCheckUrls.isEmpty() && !m_dragCanInsertImages) {
+            if (hasUnsupportedImagePayload(mimeData)
+                || (!m_dragImageCheckUrls.isEmpty() && !m_dragCanInsertImages)) {
                 dropEvent->setDropAction(Qt::IgnoreAction);
                 dropEvent->ignore();
                 return true;
@@ -345,6 +361,11 @@ bool WebEngineHandler::eventFilter(QObject *watched, QEvent *event)
                     return true;
                 }
             }
+            if (hasUnsupportedImagePayload(mimeData)) {
+                dropEvent->setDropAction(Qt::IgnoreAction);
+                dropEvent->ignore();
+                return true;
+            }
             break;
         }
         case QEvent::Drop: {
@@ -353,7 +374,8 @@ bool WebEngineHandler::eventFilter(QObject *watched, QEvent *event)
             const bool canInsertImages = mimeData && mimeData->hasUrls() && VNoteMainManager::instance()->canInsertImages(mimeData->urls());
             m_dragImageCheckUrls.clear();
             m_dragCanInsertImages = false;
-            if (mimeData && mimeData->hasUrls() && !canInsertImages) {
+            if ((mimeData && mimeData->hasUrls() && !canInsertImages)
+                || hasUnsupportedImagePayload(mimeData)) {
                 dropEvent->setDropAction(Qt::IgnoreAction);
                 dropEvent->ignore();
                 return true;
@@ -884,6 +906,10 @@ void WebEngineHandler::onPaste(bool isVoice)
     // VNoteMainManager 复用 Tiptap 图片下发链路；位图剪贴板则编码为
     // data URL，交给 TiptapChannelBridge::jsPasteImage 统一落盘。
     if (TiptapChannelBridge::instance()->tiptapEnabled() && mimeData) {
+        if (hasUnsupportedImagePayload(mimeData)) {
+            qCWarning(voiceNoteLog) << "Tiptap paste: unsupported image payload rejected";
+            return;
+        }
         if (mimeData->hasUrls()) {
             qCInfo(voiceNoteLog) << "Tiptap paste: mimeData has urls";
             VNoteMainManager::instance()->insertImages(mimeData->urls());
@@ -908,6 +934,10 @@ void WebEngineHandler::onPaste(bool isVoice)
     }
 
     // Summernote 路径：存在文件 URL 或位图时由 JsContent 负责落盘。
+    if (hasUnsupportedImagePayload(mimeData)) {
+        qCWarning(voiceNoteLog) << "Summernote paste: unsupported image payload rejected";
+        return;
+    }
     if (mimeData && mimeData->hasUrls()) {
         qCInfo(voiceNoteLog) << "mimeData has urls";
         QStringList paths;
