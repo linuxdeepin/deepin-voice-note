@@ -22,7 +22,22 @@ DialogWindow {
 
     onVisibleChanged: if (visible) folderList.currentIndex = 0
 
+    Component.onCompleted: _enableCloseButtonTabFocus(titleBar)
+
+    function _enableCloseButtonTabFocus(item) {
+        if (!item) return
+        for (var i = 0; i < item.children.length; i++) {
+            var child = item.children[i]
+            if (child.icon && child.icon.name === "window_close") {
+                child.activeFocusOnTab = true
+                return
+            }
+            _enableCloseButtonTabFocus(child)
+        }
+    }
+
     header: DialogTitleBar {
+        id: titleBar
         enableInWindowBlendBlur: true
         title: qsTr("Move Note")
     }
