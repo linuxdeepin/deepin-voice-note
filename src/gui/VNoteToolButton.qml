@@ -39,7 +39,7 @@ ToolButton {
 
     Component.onCompleted: {
         if (contentItem)
-            contentItem.smooth = false;
+            contentItem.smooth = true;
         resetContentScale();
     }
 
