@@ -6,6 +6,7 @@ import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Window 2.15
 import org.deepin.dtk 1.0
+import org.deepin.dtk.style 1.0 as DS
 import "../" as VNoteComponents
 
 DialogWindow {
@@ -18,13 +19,14 @@ DialogWindow {
     signal moveToFolder(int index)
 
     height: 365
-    width: 370
+    width: 360
 
     onVisibleChanged: if (visible) folderList.currentIndex = 0
 
     header: DialogTitleBar {
         enableInWindowBlendBlur: true
         title: qsTr("Move Note")
+        height: DS.Style.dialogWindow.titleBarHeight
     }
 
     ColumnLayout {
@@ -38,105 +40,114 @@ DialogWindow {
             text: name
         }
 
-        ListView {
-            id: folderList
-            Accessible.name: "FolderList"
+        Rectangle {
+            Layout.alignment: Qt.AlignHCenter
+            border.color: DTK.themeType === ApplicationHelper.LightType ? "#1A000000" : "#1AFFFFFF"
+            border.width: 1
+            height: 228
+            radius: 6
+            width: 350
 
-            activeFocusOnTab: true
-            clip: true
-            height: 226
-            keyNavigationEnabled: true
-            width: 348
+            ListView {
+                id: folderList
+                Accessible.name: "FolderList"
 
-            // currentIndex 作为选中项的唯一来源，同步给 dialog.index，
-            // 使 Tab 可聚焦列表、上/下方向键可切换记事本
-            onCurrentIndexChanged: dialog.index = currentIndex
+                activeFocusOnTab: true
+                anchors.fill: parent
+                anchors.margins: 1
+                clip: true
+                keyNavigationEnabled: true
 
-            ScrollBar.vertical: ScrollBar {
-                Accessible.name: "FolderListScrollBar"
-            }
-            delegate: Rectangle {
-                id: folderItem
+                // currentIndex 作为选中项的唯一来源，同步给 dialog.index，
+                // 使 Tab 可聚焦列表、上/下方向键可切换记事本
+                onCurrentIndexChanged: dialog.index = currentIndex
 
-                property bool isHovered: false
+                ScrollBar.vertical: ScrollBar {
+                    Accessible.name: "FolderListScrollBar"
+                }
+                delegate: Rectangle {
+                    id: folderItem
 
-                color: index === dialog.index
-                    ? palette.highlight
-                    : (isHovered ? (DTK.themeType === ApplicationHelper.LightType ? "#1A000000" : "#1AFFFFFF") : "transparent")
-                height: 30
-                radius: 6
-                width: 336
+                    property bool isHovered: false
 
-                RowLayout {
-                    anchors.fill: parent
-                    anchors.leftMargin: 8
+                    color: index === dialog.index
+                        ? (DTK.themeType === ApplicationHelper.LightType ? "#33000000" : "#33FFFFFF")
+                        : (isHovered ? (DTK.themeType === ApplicationHelper.LightType ? "#1A000000" : "#1AFFFFFF") : "transparent")
+                    height: 30
+                    radius: 6
+                    width: 336
 
-                    Rectangle {
-                        Layout.alignment: Qt.AlignVCenter
-                        height: 16
-                        radius: 8
-                        width: 16
-
-                        Image {
-                            id: _image
-
-                            antialiasing: true
-                            fillMode: Image.PreserveAspectCrop
-                            height: 16
-                            smooth: true
-                            source: "image://Provider/" + model.icon
-                            visible: false
-                            width: 16
-                        }
+                    RowLayout {
+                        anchors.fill: parent
+                        anchors.leftMargin: 8
 
                         Rectangle {
-                            id: _mask
-
-                            antialiasing: true
-                            color: "red"
+                            Layout.alignment: Qt.AlignVCenter
                             height: 16
                             radius: 8
-                            smooth: true
-                            visible: false
                             width: 16
+
+                            Image {
+                                id: _image
+
+                                antialiasing: true
+                                fillMode: Image.PreserveAspectCrop
+                                height: 16
+                                smooth: true
+                                source: "image://Provider/" + model.icon
+                                visible: false
+                                width: 16
+                            }
+
+                            Rectangle {
+                                id: _mask
+
+                                antialiasing: true
+                                color: "red"
+                                height: 16
+                                radius: 8
+                                smooth: true
+                                visible: false
+                                width: 16
+                            }
+
+                            OpacityMask {
+                                id: mask_image
+
+                                anchors.fill: _image
+                                antialiasing: true
+                                maskSource: _mask
+                                source: _image
+                                visible: true
+                            }
                         }
 
-                        OpacityMask {
-                            id: mask_image
+                        Label {
+                            id: folderNameLabel
 
-                            anchors.fill: _image
-                            antialiasing: true
-                            maskSource: _mask
-                            source: _image
-                            visible: true
+                            Layout.alignment: Qt.AlignVCenter
+                            Layout.fillWidth: true
+                            color: DTK.palette.windowText
+                            font.pixelSize: 14
+                            horizontalAlignment: Text.AlignLeft
+                            text: model.name
+                            verticalAlignment: Text.AlignVCenter
                         }
                     }
 
-                    Label {
-                        id: folderNameLabel
+                    MouseArea {
+                        anchors.fill: parent
+                        hoverEnabled: true
 
-                        Layout.alignment: Qt.AlignVCenter
-                        Layout.fillWidth: true
-                        color: index === dialog.index ? palette.highlightedText : DTK.palette.windowText
-                        font.pixelSize: 14
-                        horizontalAlignment: Text.AlignLeft
-                        text: model.name
-                        verticalAlignment: Text.AlignVCenter
-                    }
-                }
-
-                MouseArea {
-                    anchors.fill: parent
-                    hoverEnabled: true
-
-                    onClicked: {
-                        folderList.currentIndex = index;
-                    }
-                    onEntered: {
-                        folderItem.isHovered = true;
-                    }
-                    onExited: {
-                        folderItem.isHovered = false;
+                        onClicked: {
+                            folderList.currentIndex = index;
+                        }
+                        onEntered: {
+                            folderItem.isHovered = true;
+                        }
+                        onExited: {
+                            folderItem.isHovered = false;
+                        }
                     }
                 }
             }
@@ -151,6 +162,7 @@ DialogWindow {
             VNoteComponents.VNoteButton {
                 Accessible.name: "CancelButton"
                 Accessible.role: Accessible.Button
+                Layout.preferredHeight: 30
                 Layout.preferredWidth: 171
                 text: qsTr("Cancel")
 
@@ -169,6 +181,7 @@ DialogWindow {
                 Accessible.name: "MoveDialogOk"
                 Accessible.role: Accessible.Button
                 Layout.alignment: Qt.AlignRight
+                Layout.preferredHeight: 30
                 Layout.preferredWidth: 171
                 enabled: index !== -1
                 text: qsTr("Ok")
