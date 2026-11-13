@@ -6,6 +6,8 @@ import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Window 2.15
 import org.deepin.dtk 1.0
+import org.deepin.dtk.style 1.0 as DS
+import org.deepin.dtk.private 1.0 as DPrivate
 import "../" as VNoteComponents
 
 DialogWindow {
@@ -18,7 +20,9 @@ DialogWindow {
     signal moveToFolder(int index)
 
     height: 365
-    width: 370
+    width: 360
+    minimumWidth: 360
+    maximumWidth: 360
 
     onVisibleChanged: if (visible) folderList.currentIndex = 0
 
@@ -34,7 +38,7 @@ DialogWindow {
             id: description
 
             Layout.alignment: Qt.AlignHCenter
-            font: DTK.fontManager.t5
+            font: DTK.fontManager.t6
             text: name
         }
 
@@ -55,17 +59,36 @@ DialogWindow {
             ScrollBar.vertical: ScrollBar {
                 Accessible.name: "FolderListScrollBar"
             }
-            delegate: Rectangle {
+            delegate: ItemDelegate {
                 id: folderItem
 
-                property bool isHovered: false
-
-                color: index === dialog.index
-                    ? palette.highlight
-                    : (isHovered ? (DTK.themeType === ApplicationHelper.LightType ? "#1A000000" : "#1AFFFFFF") : "transparent")
+                backgroundVisible: true
                 height: 30
-                radius: 6
+                spacing: 8
                 width: 336
+
+                // 条件设置normalBackgroundVisible属性，仅在支持的DTK版本中使用
+                Component.onCompleted: {
+                    if (DTK.majorVersion >= 6) {
+                        // 在DTK 6.x中可能支持此属性
+                        if (typeof normalBackgroundVisible !== "undefined") {
+                            normalBackgroundVisible = index % 2 === 0;
+                        }
+                    }
+                }
+
+                onClicked: {
+                    folderList.currentIndex = index;
+                }
+
+                background: Rectangle {
+                    radius: 6
+                    color: index === dialog.index
+                        ? (DTK.themeType === ApplicationHelper.LightType ? "#33000000" : "#33FFFFFF")
+                        : "transparent"
+                    border.color: DTK.themeType === ApplicationHelper.LightType ? "#1A000000" : "#1AFFFFFF"
+                    border.width: 1
+                }
 
                 RowLayout {
                     anchors.fill: parent
@@ -124,21 +147,6 @@ DialogWindow {
                         verticalAlignment: Text.AlignVCenter
                     }
                 }
-
-                MouseArea {
-                    anchors.fill: parent
-                    hoverEnabled: true
-
-                    onClicked: {
-                        folderList.currentIndex = index;
-                    }
-                    onEntered: {
-                        folderItem.isHovered = true;
-                    }
-                    onExited: {
-                        folderItem.isHovered = false;
-                    }
-                }
             }
         }
 
@@ -151,6 +159,7 @@ DialogWindow {
             VNoteComponents.VNoteButton {
                 Accessible.name: "CancelButton"
                 Accessible.role: Accessible.Button
+                Layout.preferredHeight: 30
                 Layout.preferredWidth: 171
                 text: qsTr("Cancel")
 
@@ -169,6 +178,7 @@ DialogWindow {
                 Accessible.name: "MoveDialogOk"
                 Accessible.role: Accessible.Button
                 Layout.alignment: Qt.AlignRight
+                Layout.preferredHeight: 30
                 Layout.preferredWidth: 171
                 enabled: index !== -1
                 text: qsTr("Ok")
