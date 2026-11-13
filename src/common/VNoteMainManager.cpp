@@ -1738,6 +1738,13 @@ void VNoteMainManager::checkNoteText(const QVariantList &index)
             ActionManager::instance()->enableAction(ActionManager::SaveNoteAsHtml, true);
             return;
         }
+        if (m_richTextManager && m_richTextManager->hasPendingTextChange()
+            && m_richTextManager->pendingTextChangeNoteId() == noteIndex) {
+            ActionManager::instance()->enableAction(ActionManager::NoteSave, true);
+            ActionManager::instance()->enableAction(ActionManager::SaveNoteAsText, true);
+            ActionManager::instance()->enableAction(ActionManager::SaveNoteAsHtml, true);
+            return;
+        }
     }
     ActionManager::instance()->enableAction(ActionManager::NoteSave, false);
     ActionManager::instance()->enableAction(ActionManager::SaveNoteAsText, false);
