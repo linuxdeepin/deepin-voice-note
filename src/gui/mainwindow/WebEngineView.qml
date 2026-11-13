@@ -1075,8 +1075,6 @@ Item {
                 ActionManager.resetCtxMenu(ActionManager.VoiceCtxMenu, true);
                 var isConverting = VNoteMainManager.isVoiceToText();
                 ActionManager.enableAction(ActionManager.VoiceToText, !isConverting);
-                // 播放中禁用删除
-                ActionManager.enableAction(ActionManager.VoiceDelete, !titleBar.isPlaying);
             }
 
             Connections {

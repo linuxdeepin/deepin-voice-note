@@ -997,10 +997,9 @@ VNoteItem *VNoteMainManager::deleteNoteById(const int &id)
 bool VNoteMainManager::deleteNote(const QList<int> &index)
 {
     qCDebug(voiceNoteLog) << "Deleting" << index.size() << "notes";
-    // 录音或播放中禁止删除
-    if (VoiceRecoderHandler::instance()->getRecoderType() == VoiceRecoderHandler::Recording
-        || OpsStateInterface::instance()->isPlaying()) {
-        qCWarning(voiceNoteLog) << "Cannot delete note while recording or playing";
+    // 录音中禁止删除；播放中先停止播放再删除
+    if (VoiceRecoderHandler::instance()->getRecoderType() == VoiceRecoderHandler::Recording) {
+        qCWarning(voiceNoteLog) << "Cannot delete note while recording";
         return false;
     }
     for (int noteId : index) {
@@ -1008,6 +1007,10 @@ bool VNoteMainManager::deleteNote(const QList<int> &index)
             qCWarning(voiceNoteLog) << "Cannot delete note while voice-to-text is converting, note ID:" << noteId;
             return false;
         }
+    }
+    if (OpsStateInterface::instance()->isPlaying()) {
+        qCDebug(voiceNoteLog) << "Stopping playback before delete";
+        JsContent::instance()->jsCallPlayVoiceStop();
     }
 
     struct DeleteTarget {
