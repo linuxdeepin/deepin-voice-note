@@ -653,6 +653,12 @@ Item {
                 backgroundColor: DTK.themeType === ApplicationHelper.LightType ? "white" : "black"
                 visible: webVisible
 
+                onActiveFocusChanged: {
+                    if (activeFocus && webVisible && !VNoteMainManager.isInSearchMode()) {
+                        Qt.inputMethod.show();
+                    }
+                }
+
                 Component.onCompleted: {
                     if (!TiptapChannel.tiptapEnabled) {
                         noteWebChannel.registerObject("webobj", Webobj);
@@ -1250,6 +1256,12 @@ Item {
                 viewPictureLoader.active = true;
             else
                 viewPictureLoader.item.show();
+        }
+        onRequestShowInputMethod: {
+            if (!webVisible || VNoteMainManager.isInSearchMode()) {
+                return;
+            }
+            Qt.inputMethod.show();
         }
     }
 

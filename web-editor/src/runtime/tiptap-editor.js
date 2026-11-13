@@ -351,6 +351,7 @@ document.addEventListener('mousedown', function (event) {
   if (shouldFocusEditorOnDocumentMouseDown(event.target, event.button)) {
     editor.commands.focus('end')
   }
+  tiptapBridge?.jsRequestShowInputMethod?.()
 })
 
 bindTiptapChannel(editor, undefined, {

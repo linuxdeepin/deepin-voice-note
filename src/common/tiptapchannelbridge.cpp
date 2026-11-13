@@ -353,6 +353,11 @@ void TiptapChannelBridge::jsRequestRecordVoice()
     emit recordVoiceRequested();
 }
 
+void TiptapChannelBridge::jsRequestShowInputMethod()
+{
+    emit requestShowInputMethod();
+}
+
 QString TiptapChannelBridge::currentSearchQuery() const
 {
     return m_currentSearchQuery;
