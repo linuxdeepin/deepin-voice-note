@@ -565,8 +565,11 @@ function buildColorPicker(editor, kind, colors, apply, clear, onOpen, strings) {
     let viewportLeft = triggerRect.left - 12
     let viewportTop = triggerRect.bottom + 4
 
-    if (viewportWidth) {
-      viewportLeft = Math.max(margin, Math.min(viewportLeft, viewportWidth - panelWidth - margin))
+    if (viewportWidth && viewportLeft + panelWidth > viewportWidth - margin) {
+      viewportLeft = Math.max(margin, viewportWidth - panelWidth - margin)
+    }
+    if (viewportWidth && viewportLeft < margin) {
+      viewportLeft = margin
     }
     if (viewportHeight && viewportTop + panelHeight > viewportHeight - margin && triggerRect.top - panelHeight - 4 >= margin) {
       viewportTop = triggerRect.top - panelHeight - 4
@@ -637,7 +640,6 @@ function buildColorPicker(editor, kind, colors, apply, clear, onOpen, strings) {
           type: 'button',
           'data-color': color,
           'data-kind': kind,
-          'data-tooltip': colorLabel,
           role: 'menuitemradio',
           'aria-label': colorLabel,
           'aria-pressed': 'false',
