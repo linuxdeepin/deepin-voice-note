@@ -93,6 +93,9 @@ public:
     // 前端请求开始录音（工具栏麦克风按钮）
     Q_INVOKABLE void jsRequestRecordVoice();
 
+    // 前端请求唤起软键盘（编辑区 mousedown，activeFocus 未变时补偿）
+    Q_INVOKABLE void jsRequestShowInputMethod();
+
     // 搜索状态桥接：Native 搜索框同步到 Tiptap 编辑器运行态高亮。
     // 搜索高亮不修改文档、不触发保存、不进入 undo/redo。
     Q_INVOKABLE QString currentSearchQuery() const;
@@ -234,6 +237,9 @@ signals:
 
     // C++→QML：前端请求查看原图，携带归一化后的本地路径
     void viewPictureRequested(const QString &localPath);
+
+    // C++→QML：前端请求唤起软键盘（编辑区点击，activeFocus 未变时补偿）
+    void requestShowInputMethod();
 
 public slots:
     // JS→C++ 回告入口（Q_INVOKABLE 供前端直接调用）

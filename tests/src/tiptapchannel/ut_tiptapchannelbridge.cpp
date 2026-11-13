@@ -122,6 +122,19 @@ TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_jsRequestPickImage_001)
 }
 
 
+// ---------------------------------------------------------------------------
+// 软键盘唤起：编辑区 mousedown 请求唤起软键盘
+// ---------------------------------------------------------------------------
+
+TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_jsRequestShowInputMethod_001)
+{
+    TiptapChannelBridge bridge;
+    QSignalSpy spy(&bridge, &TiptapChannelBridge::requestShowInputMethod);
+    bridge.jsRequestShowInputMethod();
+    EXPECT_EQ(spy.count(), 1);
+}
+
+
 TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_jsCopyPlainTextToClipboard_001)
 {
     TiptapChannelBridge bridge;
