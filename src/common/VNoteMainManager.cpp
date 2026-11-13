@@ -1594,6 +1594,26 @@ void VNoteMainManager::changeAudioSource(const int &source)
     VoiceRecoderHandler::instance()->changeMode(source);
 }
 
+static bool isSupportedImageFile(const QFileInfo &fileInfo)
+{
+    const QString suffix = fileInfo.suffix().toLower();
+    if (suffix != QStringLiteral("jpg")
+        && suffix != QStringLiteral("jpeg")
+        && suffix != QStringLiteral("png")
+        && suffix != QStringLiteral("bmp")) {
+        return false;
+    }
+
+    // 后缀可以被改名伪造（例如把 GIF 改成 .png）。这里同时校验 QImageReader
+    // 识别出的真实格式，确保拖拽入口和文件框支持的格式一致。
+    QImageReader reader(fileInfo.absoluteFilePath());
+    const QByteArray format = reader.format().toLower();
+    if (suffix == QStringLiteral("jpg") || suffix == QStringLiteral("jpeg")) {
+        return format == QByteArrayLiteral("jpeg") || format == QByteArrayLiteral("jpg");
+    }
+    return format == suffix.toLatin1();
+}
+
 bool VNoteMainManager::canInsertImages(const QList<QUrl> &filePaths) const
 {
     if (filePaths.isEmpty())
@@ -1606,6 +1626,10 @@ bool VNoteMainManager::canInsertImages(const QList<QUrl> &filePaths) const
         const QString localPath = QDir::cleanPath(path.toLocalFile());
         const QFileInfo fileInfo(localPath);
         if (!fileInfo.exists() || !fileInfo.isFile())
+            return false;
+        // GIF/WebP 等格式即使 QImageReader 能解码也不允许拖入，和文件框
+        // 的 jpg/png/bmp 过滤保持一致，避免“文件框选不了、拖拽却能插入”。
+        if (!isSupportedImageFile(fileInfo))
             return false;
 
         QImageReader imageReader(localPath);
@@ -1638,6 +1662,10 @@ void VNoteMainManager::insertImages(const QList<QUrl> &filePaths)
         QFileInfo fileInfo(localPath);
         if (!fileInfo.exists() || !fileInfo.isFile()) {
             qCWarning(voiceNoteLog) << "Image file does not exist or is not a file:" << localPath;
+            continue;
+        }
+        if (!isSupportedImageFile(fileInfo)) {
+            qCWarning(voiceNoteLog) << "Unsupported image format:" << fileInfo.suffix() << "from path:" << localPath;
             continue;
         }
         QImageReader imageReader(localPath);

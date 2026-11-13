@@ -1147,7 +1147,7 @@ Item {
 
             fileMode: FileDialog.OpenFiles
             folder: StandardPaths.writableLocation(StandardPaths.PicturesLocation)
-            nameFilters: ["Image file(*.jpg *.png *.bmp)"]
+            nameFilters: ["Image file(*.jpg *.jpeg *.png *.bmp)"]
 
             Component.onCompleted: {
                 fileDialog.open();
