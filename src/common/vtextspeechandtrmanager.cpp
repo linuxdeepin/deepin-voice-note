@@ -180,19 +180,15 @@ VTextSpeechAndTrManager::Status VTextSpeechAndTrManager::onTextToSpeech()
         return NoOutputDevice;
     }
 
-    QDBusInterface interface(kCopilotService, "/aiassistant/deepinmain", "com.iflytek.aiassistant.mainWindow");
-    if (!interface.isValid()) {
-        qCWarning(voiceNoteLog) << "Text-to-speech operation failed: Invalid interface";
-        return Failed;
-    }
-
     // check if speech now
     if (isTextToSpeechInWorking()) {
         qCDebug(voiceNoteLog) << "Stopping current text-to-speech before starting new one";
         onStopTextToSpeech();
     }
 
-    interface.asyncCall("TextToSpeech");
+    QDBusMessage textToSpeechMsg =
+        QDBusMessage::createMethodCall(kCopilotService, "/aiassistant/deepinmain", "com.iflytek.aiassistant.mainWindow", "TextToSpeech");
+    QDBusConnection::sessionBus().asyncCall(textToSpeechMsg);
     m_isSpeeching = true;
     qCDebug(voiceNoteLog) << "Text-to-speech operation started successfully";
     return Success;
@@ -210,13 +206,9 @@ VTextSpeechAndTrManager::Status VTextSpeechAndTrManager::onStopTextToSpeech()
     }
 
     if (m_isSpeeching) {
-        QDBusInterface interface(kCopilotService, "/aiassistant/tts", "com.iflytek.aiassistant.tts");
-        if (!interface.isValid()) {
-            qCWarning(voiceNoteLog) << "Stop text-to-speech failed: Invalid interface";
-            return Failed;
-        }
-
-        interface.asyncCall("stopTTSDirectly");
+        QDBusMessage stopTtsMsg =
+            QDBusMessage::createMethodCall(kCopilotService, "/aiassistant/tts", "com.iflytek.aiassistant.tts", "stopTTSDirectly");
+        QDBusConnection::sessionBus().asyncCall(stopTtsMsg);
         m_isSpeeching = false;
         qCDebug(voiceNoteLog) << "Text-to-speech stopped successfully";
     }
@@ -246,13 +238,9 @@ VTextSpeechAndTrManager::Status VTextSpeechAndTrManager::onSpeechToText()
         return NoInputDevice;
     }
 
-    QDBusInterface interface(kCopilotService, "/aiassistant/deepinmain", "com.iflytek.aiassistant.mainWindow");
-    if (!interface.isValid()) {
-        qCWarning(voiceNoteLog) << "Speech-to-text operation failed: Invalid interface";
-        return Failed;
-    }
-
-    interface.asyncCall("SpeechToText");
+    QDBusMessage speechToTextMsg =
+        QDBusMessage::createMethodCall(kCopilotService, "/aiassistant/deepinmain", "com.iflytek.aiassistant.mainWindow", "SpeechToText");
+    QDBusConnection::sessionBus().asyncCall(speechToTextMsg);
     qCDebug(voiceNoteLog) << "Speech-to-text operation started successfully";
     return Success;
 }
