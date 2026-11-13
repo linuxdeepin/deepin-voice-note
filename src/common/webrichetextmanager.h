@@ -41,7 +41,6 @@ public slots:
 
 signals:
     void needUpdateNote(int noteId);
-    void noteTextChanged();
     void updateSearch();
     void scrollChange(const bool &isTop);
     void finishedUpdateNote();
