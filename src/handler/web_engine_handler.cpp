@@ -745,6 +745,12 @@ void WebEngineHandler::onMenuClicked(ActionManager::ActionKind kind)
             m_voiceToTextHandler->setAudioToText(m_voiceBlock);
             break;
         case ActionManager::VoiceDelete:
+            // 播放中先停止播放再删除语音块
+            if (OpsStateInterface::instance()->isPlaying()) {
+                JsContent::instance()->jsCallPlayVoiceStop();
+            }
+            Q_EMIT JsContent::instance()->callJsDeleteSelection();
+            break;
         case ActionManager::PictureDelete:
         case ActionManager::TxtDelete:
             // 调用 js 删除选中文本
