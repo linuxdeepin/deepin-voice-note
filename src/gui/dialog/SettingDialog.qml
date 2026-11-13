@@ -17,6 +17,15 @@ Settings.SettingsDialog {
     height: 548
     width: 664
 
+    // DTK SettingsDialog's internal ScrollViews (navigationBg/contentBg) lack
+    // bottom anchoring; use exposed aliases to fill dialog height at runtime
+    Component.onCompleted: {
+        navigationView.parent.anchors.top = control.top
+        navigationView.parent.anchors.bottom = control.bottom
+        navigationView.parent.height = control.height
+        contentView.parent.anchors.bottom = control.bottom
+    }
+
     config: QtObject {
         id: settingConfig
 
