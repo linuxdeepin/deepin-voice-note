@@ -13,6 +13,7 @@ Window {
     property var itemText: ""
     property int noteItemWidth: 240
 
+    DWindow.enableBlurWindow: true
     color: "transparent"
     // color: "green"
     //设置无标题栏
@@ -26,7 +27,7 @@ Window {
 
         anchors.centerIn: parent
         anchors.horizontalCenterOffset: -2
-        border.color: "#0D000000"
+        border.color: "#04000000"
         border.width: 1
         color: itemColor
         height: itemHeight
@@ -40,7 +41,7 @@ Window {
             cornerRadius: rect2.radius
             hollow: true
             shadowBlur: 8
-            shadowColor: Qt.rgba(0, 0, 0, 0.1)
+            shadowColor: Qt.rgba(0, 0, 0, 0.039)
             shadowOffsetX: 0
             shadowOffsetY: 4
             spread: 0
@@ -52,7 +53,7 @@ Window {
 
         anchors.centerIn: parent
         anchors.horizontalCenterOffset: -2
-        border.color: "#0D000000"
+        border.color: "#04000000"
         border.width: 1
         color: itemColor
         height: itemHeight
@@ -65,7 +66,7 @@ Window {
             cornerRadius: rect3.radius
             hollow: true
             shadowBlur: 8
-            shadowColor: Qt.rgba(0, 0, 0, 0.1)
+            shadowColor: Qt.rgba(0, 0, 0, 0.039)
             shadowOffsetX: 0
             shadowOffsetY: 4
             spread: 0
@@ -77,7 +78,7 @@ Window {
 
         anchors.centerIn: parent
         anchors.horizontalCenterOffset: -2
-        border.color: "#0D000000"
+        border.color: "#04000000"
         border.width: 1
         color: itemColor
         height: itemHeight
@@ -89,8 +90,8 @@ Window {
             anchors.fill: rect1
             cornerRadius: rect1.radius
             hollow: true
-            shadowBlur: 0
-            shadowColor: Qt.rgba(0, 0, 0, 0.1)
+            shadowBlur: 8
+            shadowColor: Qt.rgba(0, 0, 0, 0.039)
             shadowOffsetX: 0
             shadowOffsetY: 4
             spread: 0
@@ -99,7 +100,9 @@ Window {
         Text {
             id: text1
 
-            anchors.centerIn: parent
+            anchors.left: parent.left
+            anchors.leftMargin: 10
+            anchors.verticalCenter: parent.verticalCenter
             color: "#000000"
             elide: Text.ElideRight
             font: DTK.fontManager.t6
@@ -121,14 +124,14 @@ Window {
         radius: 10
         visible: itemNumber > 1
         width: 20
-        x: rect1.x + rect1.width - width / 2
+        x: Math.min(rect1.x + rect1.width - width / 2, parent.width - width)
         y: rect1.y - height + 2
 
         BoxShadow {
             anchors.fill: rect4
             cornerRadius: rect4.radius
             hollow: true
-            shadowBlur: 0
+            shadowBlur: 8
             shadowColor: Qt.rgba(0, 0, 0, 0.2)
             shadowOffsetX: 0
             shadowOffsetY: -1
