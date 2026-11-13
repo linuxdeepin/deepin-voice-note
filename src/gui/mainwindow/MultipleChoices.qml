@@ -50,12 +50,13 @@ Item {
 
                 Layout.alignment: Qt.AlignHCenter
                 text: qsTr("%1 note selected").arg(selectSize)
+                font: DTK.fontManager.t3
                 wrapMode: Text.WordWrap
             }
 
             FloatingPanel {
                 id: operationPanel
-                property font actionFont: DTK.fontManager.t8
+                property font actionFont: DTK.fontManager.t7
 
                 Layout.topMargin: 20
                 implicitHeight: 52
@@ -78,6 +79,7 @@ Item {
                         icon.width: 16
                         icon.height: 16
                         font: operationPanel.actionFont
+                        palette.buttonText: DTK.themeType === ApplicationHelper.LightType ? "#CC000000" : "#CCFFFFFF"
                         leftPadding: 0
                         rightPadding: 0
                         topPadding: 0
@@ -101,6 +103,7 @@ Item {
                         icon.width: 16
                         icon.height: 16
                         font: operationPanel.actionFont
+                        palette.buttonText: DTK.themeType === ApplicationHelper.LightType ? "#CC000000" : "#CCFFFFFF"
                         leftPadding: 0
                         rightPadding: 0
                         topPadding: 0
@@ -123,6 +126,7 @@ Item {
                         icon.width: 16
                         icon.height: 16
                         font: operationPanel.actionFont
+                        palette.buttonText: DTK.themeType === ApplicationHelper.LightType ? "#CC000000" : "#CCFFFFFF"
                         leftPadding: 0
                         rightPadding: 0
                         topPadding: 0
@@ -146,6 +150,7 @@ Item {
                         icon.width: 16
                         icon.height: 16
                         font: operationPanel.actionFont
+                        palette.buttonText: DTK.themeType === ApplicationHelper.LightType ? "#CC000000" : "#CCFFFFFF"
                         leftPadding: 0
                         rightPadding: 0
                         topPadding: 0
