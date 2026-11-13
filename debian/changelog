@@ -1,3 +1,13 @@
+deepin-voice-note (6.6.7) unstable; urgency=medium
+
+  * fix(editor): preserve visual list levels across conversions
+  * test(image): cover GIF rejection and renamed GIF payloads
+  * fix(image): reject unsupported GIF on drag and drop
+  * chore: replace default folder icons with DCI
+  * fix: adapt tooltip theming and style dropdown hints
+
+ -- dengzhongyuan <dengzhongyuan@uniontech.com>  Fri, 13 Nov 2026 13:29:42 +0800
+
 deepin-voice-note (6.6.6) unstable; urgency=medium
 
   * test: add rich-text and mixed-list regression coverage
