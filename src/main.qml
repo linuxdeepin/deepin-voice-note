@@ -109,6 +109,12 @@ ApplicationWindow {
         }
     }
 
+    Shortcut {
+        sequence: "Ctrl+N"
+        enabled: !workspaceLoader.active
+        onActivated: activateWorkspace(true)
+    }
+
     VNoteMessageDialogLoader {
         id: messageDialogLoader
         Accessible.name: "MessageDialogLoader"
