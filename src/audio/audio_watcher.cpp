@@ -125,7 +125,7 @@ void AudioWatcher::updateDeviceEnabled(const QString cardsStr, bool isEmitSig)
         QJsonArray ports = card.toObject()["Ports"].toArray();
         foreach (QJsonValue port, ports) {
             QString portName = port.toObject()["Name"].toString();
-            bool isEnable = false;
+            bool isEnable = true; // Enabled field missing != unavailable
             AudioPort audioPort;
             audioPort.name = portName;
             audioPort.description = port.toObject()["Description"].toString();

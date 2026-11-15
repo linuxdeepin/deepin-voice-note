@@ -133,7 +133,7 @@ void VoiceRecoderHandler::onDeviceEnableChanged(int mode, bool enabled)
     qCInfo(voiceNoteLog) << "Device enable state changed, mode:" << mode << "enabled:" << enabled;
     if (m_currentMode == mode) {
         qCInfo(voiceNoteLog) << "mode is equal to current mode";
-        emit updateRecordBtnState(enabled);
+        emit updateRecordBtnState(isRecordDeviceEnabled());
     }
     qCInfo(voiceNoteLog) << "Device enable state change handling finished";
 }
