@@ -24,6 +24,7 @@ DialogWindow {
 
     header: DialogTitleBar {
         enableInWindowBlendBlur: true
+        icon.name: "deepin-voice-note"
         title: qsTr("Move Note")
     }
 
@@ -34,7 +35,7 @@ DialogWindow {
             id: description
 
             Layout.alignment: Qt.AlignHCenter
-            font: DTK.fontManager.t5
+            font: DTK.fontManager.t8
             text: name
         }
 
@@ -46,6 +47,7 @@ DialogWindow {
             clip: true
             height: 226
             keyNavigationEnabled: true
+            spacing: 6
             width: 348
 
             // currentIndex 作为选中项的唯一来源，同步给 dialog.index，
@@ -62,10 +64,10 @@ DialogWindow {
 
                 color: index === dialog.index
                     ? palette.highlight
-                    : (isHovered ? (DTK.themeType === ApplicationHelper.LightType ? "#1A000000" : "#1AFFFFFF") : "transparent")
+                    : (isHovered ? (DTK.themeType === ApplicationHelper.LightType ? "#1A000000" : "#1AFFFFFF") : (index % 2 === 0 ? (DTK.themeType === ApplicationHelper.LightType ? "#0D000000" : "#0DFFFFFF") : "transparent"))
                 height: 30
                 radius: 6
-                width: 336
+                width: 348
 
                 RowLayout {
                     anchors.fill: parent
