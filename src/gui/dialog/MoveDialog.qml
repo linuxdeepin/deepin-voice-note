@@ -44,6 +44,7 @@ DialogWindow {
 
             activeFocusOnTab: true
             clip: true
+            focus: true
             height: 226
             keyNavigationEnabled: true
             width: 348
