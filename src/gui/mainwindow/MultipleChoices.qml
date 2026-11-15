@@ -78,9 +78,9 @@ Item {
                         icon.width: 16
                         icon.height: 16
                         font: operationPanel.actionFont
-                        leftPadding: 0
-                        rightPadding: 0
-                        topPadding: 0
+                        leftPadding: 6
+                        rightPadding: 6
+                        topPadding: 4
                         bottomPadding: 0
                         enabled: moveEnabled
                         text: qsTr("Move")
@@ -101,9 +101,9 @@ Item {
                         icon.width: 16
                         icon.height: 16
                         font: operationPanel.actionFont
-                        leftPadding: 0
-                        rightPadding: 0
-                        topPadding: 0
+                        leftPadding: 6
+                        rightPadding: 6
+                        topPadding: 4
                         bottomPadding: 0
                         text: qsTr("Save Note")
 
@@ -123,9 +123,9 @@ Item {
                         icon.width: 16
                         icon.height: 16
                         font: operationPanel.actionFont
-                        leftPadding: 0
-                        rightPadding: 0
-                        topPadding: 0
+                        leftPadding: 6
+                        rightPadding: 6
+                        topPadding: 4
                         bottomPadding: 0
                         text: qsTr("Save Voice")
                         enabled: saveVoiceEnabled
@@ -146,9 +146,9 @@ Item {
                         icon.width: 16
                         icon.height: 16
                         font: operationPanel.actionFont
-                        leftPadding: 0
-                        rightPadding: 0
-                        topPadding: 0
+                        leftPadding: 6
+                        rightPadding: 6
+                        topPadding: 4
                         bottomPadding: 0
                         enabled: deleteEnabled
                         text: qsTr("Delete")
