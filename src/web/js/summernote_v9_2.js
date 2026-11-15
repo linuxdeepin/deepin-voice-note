@@ -124,7 +124,7 @@
                     'style="background-color:', color, '" ',
                     'data-event="', eventName, '" ',
                     'data-value="', color, '" ',
-                    'data-toggle="button" tabindex="-1">',
+                    'title="" tabindex="-1">',
                     color == 'transparent' ? '<div class="slopingside"></div>' : '',
                     '</button>'
                 ].join(''));
@@ -6224,6 +6224,9 @@
 
                                 }).render());
                             });
+
+                            // Defensive: clear title attributes on color buttons to suppress native tooltip
+                            $dropdown.find(".note-color-btn").removeAttr("title data-original-title");
 
                             /* TODO: do we have to record recent custom colors within cookies? */
                             var customColors = [

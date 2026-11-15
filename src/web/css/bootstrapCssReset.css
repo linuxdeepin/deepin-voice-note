@@ -411,8 +411,6 @@ ul {
 
 /* 定制组件，浮动工具栏 */
 .note-popover.popover {
-    margin-left: 4%;
-    margin-right: 4%;
     max-width: 70%;
 }
 
