@@ -25,6 +25,16 @@ DialogWindow {
     header: DialogTitleBar {
         enableInWindowBlendBlur: true
         title: qsTr("Move Note")
+
+        Component.onCompleted: {
+            for (var i = 0; i < children.length; i++) {
+                var child = children[i]
+                if (child.toString().indexOf("WindowButton") !== -1) {
+                    child.activeFocusOnTab = true
+                    child.focusPolicy = Qt.TabFocus
+                }
+            }
+        }
     }
 
     ColumnLayout {
