@@ -70,6 +70,8 @@ static QWebEngineContextMenuRequest::EditFlags stub_editFlags_all()
 
 static QPoint stub_position_value() { return QPoint(12, 34); }
 
+static bool stub_isContentEditable_true() { return true; }
+
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
@@ -378,6 +380,8 @@ TEST(WebEngineHandlerCoverageUT, ProcessTextMenuRequest_AllEditFlags)
     Stub stub;
     stub.set(ADDR(QWebEngineContextMenuRequest, editFlags), stub_editFlags_all);
     stub.set(ADDR(QWebEngineContextMenuRequest, position), stub_position_value);
+    stub.set(ADDR(QWebEngineContextMenuRequest, isContentEditable),
+             stub_isContentEditable_true);
 
     WebEngineHandler h;
     QObject dummy;
