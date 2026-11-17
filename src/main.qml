@@ -1,5 +1,5 @@
 // Copyright (C) 2020 ~ 2026 Deepin Technology Co., Ltd.
-// SPDX-FileCopyrightText: 2023 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2023-2026 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -67,6 +67,27 @@ ApplicationWindow {
             });
         } else {
             VNoteMainManager.forceExit();
+        }
+    }
+
+    // 初始界面（workspaceLoader 未激活）下注册 Ctrl+N 和 F1 快捷键
+    // Shortcuts.qml 仅在 MainWindow.qml 内通过 workspaceLoader 实例化，
+    // 无记事本时 workspaceLoader.active=false，Shortcuts.qml 不存在。
+    // 此处通过 enabled: !workspaceLoader.active 与 Shortcuts.qml 互斥，
+    // 工作区加载后由 Shortcuts.qml 接管（含拖拽/录音/搜索等屏蔽逻辑）。
+    Shortcut {
+        sequence: "Ctrl+N"
+        enabled: !workspaceLoader.active
+        onActivated: {
+            rootWindow.activateWorkspace(true);
+        }
+    }
+
+    Shortcut {
+        sequence: "F1"
+        enabled: !workspaceLoader.active
+        onActivated: {
+            ApplicationHelper.handleHelpAction();
         }
     }
 
