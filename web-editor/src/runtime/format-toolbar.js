@@ -1434,6 +1434,10 @@ export function createFormatToolbar(editor, host, uiStrings = DEFAULT_TIPTAP_UI_
       toolbarNoteId = nextId
       forePicker.reset()
       backPicker.reset()
+      headingControl.close()
+      fontControl.close()
+      sizeControl.close()
+      closeOverflowPanel()
     },
     setOnPickImage(fn) {
       onPickImage = typeof fn === 'function' ? fn : null
