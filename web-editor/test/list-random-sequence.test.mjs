@@ -376,6 +376,29 @@ test('首行普通文本转待办后，后续待办仍沿视觉父子关系级�
   }
 })
 
+test('混排任务转出待办后，视觉父任务必须按剩余直接任务子项重算', () => {
+  const editor = createEditor(doc(
+    task([
+      taskItem('A', 0, [
+        task([
+          taskItem('P', 0, [], true),
+          taskItem('P2', 0, [], true),
+        ]),
+        task([taskItem('O', 0, [], false)]),
+        ordered([listItem('O2', 0)]),
+        bullet([listItem('U', 0)]),
+      ]),
+    ]),
+  ))
+  try {
+    selectRow(editor, 'O')
+    assert.equal(toggleActiveListFormatting(editor, 'bulletList'), true)
+    assert.deepEqual(checkedMap(editor), { A: true, P: true, P2: true })
+  } finally {
+    editor.destroy()
+  }
+})
+
 test('恢复普通文本后重新应用待办：父子关系必须重建且勾选级联正确', () => {
   const editor = createEditor(doc(
     task([taskItem('A', 0)]),

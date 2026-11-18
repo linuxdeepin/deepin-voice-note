@@ -1705,14 +1705,13 @@ function switchListTypeForSelection(editor, targetListType, selection, cursorCon
     selectedLists,
     preserveOrderedStart: true,
   })
-  // 转成待办时，新 taskItem 的 checked 默认是 false。转换事务为了避免
-  // 误级联未选中祖先而禁用了全局任务插件，但父项完成态仍必须按转换后的
-  // 直接视觉子项重新归一化，否则会出现“父项已勾选、所有子项未勾选”。
+  // 列表类型切换会改变视觉任务树：转入待办时新增未勾选子项，转出待办时
+  // 移除任务子项，两个方向都必须按转换后的直接视觉子项重算父项完成态。
+  // 转换事务仍通过 taskListNormalizationDoneKey 阻止全局插件再次级联，
+  // 避免影响未参与本次转换的任务分支。
   // 必须先完成归一化再构造选区；setNodeMarkup 虽不改尺寸，但会生成新文档，
   // 旧文档上构造的 Selection 不能再交给当前 transaction。
-  if (targetListType === 'taskList') {
-    normalizeTaskParentCheckedStates(tr)
-  }
+  normalizeTaskParentCheckedStates(tr)
   const nextSelection = cursorContext
     ? cursorSelectionAfterTransform(tr.doc, cursorContext)
     : selectionForRangeContext(tr.doc, rangeContext) ?? selectionAfterListConversion(
