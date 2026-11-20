@@ -338,11 +338,15 @@ bool WebEngineHandler::eventFilter(QObject *watched, QEvent *event)
             const QMimeData *mimeData = dropEvent->mimeData();
             m_dragImageCheckUrls = mimeData && mimeData->hasUrls() ? mimeData->urls() : QList<QUrl>();
             m_dragCanInsertImages = !m_dragImageCheckUrls.isEmpty() && VNoteMainManager::instance()->canInsertImages(m_dragImageCheckUrls);
-            if (hasUnsupportedImagePayload(mimeData)
-                || (!m_dragImageCheckUrls.isEmpty() && !m_dragCanInsertImages)) {
+            if (hasUnsupportedImagePayload(mimeData)) {
                 dropEvent->setDropAction(Qt::IgnoreAction);
                 dropEvent->ignore();
                 return true;
+            }
+            if (!m_dragImageCheckUrls.isEmpty() && !m_dragCanInsertImages) {
+                dropEvent->setDropAction(Qt::IgnoreAction);
+                dropEvent->ignore();
+                break;
             }
             break;
         }
@@ -358,7 +362,7 @@ bool WebEngineHandler::eventFilter(QObject *watched, QEvent *event)
                 if (!m_dragCanInsertImages) {
                     dropEvent->setDropAction(Qt::IgnoreAction);
                     dropEvent->ignore();
-                    return true;
+                    break;
                 }
             }
             if (hasUnsupportedImagePayload(mimeData)) {
