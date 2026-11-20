@@ -290,6 +290,8 @@ QString VTextSpeechAndTrManager::errorString(Status status)
             return QObject::tr("No audio input device detected. Please check and try again");
         case NoOutputDevice:
             return QObject::tr("No audio output device detected. Please check and try again");
+        case NoUserAgreement:
+            return QObject::tr("Please enable UOS AI before using");
         default:
             // Unknown error
             return {};
@@ -319,6 +321,10 @@ VTextSpeechAndTrManager::Status VTextSpeechAndTrManager::checkValid()
             if (NoUserAgreement == m_status) {
                 qCInfo(voiceNoteLog) << "Launching UOS AI chat page for user agreement";
                 launchCopilotChat(m_copilot);
+                // isCopilotEnabled returning false does not block SpeechToText,
+                // TextToSpeech or TextTranslate (verified via DBus probe).
+                // Allow the operation to proceed instead of silent failure.
+                m_status = Enable;
             }
         } break;
         default:
