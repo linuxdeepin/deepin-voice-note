@@ -11,6 +11,9 @@ import org.deepin.dtk 1.0
 Menu {
     id: rightMenu
 
+    // 使用 Item 叠加模式，避免 Popup.Window 模式下 popup 窗口未初始化 DTK palette 管理机制导致主题切换后右键菜单颜色不更新
+    popupType: Popup.Item
+
     // 菜单类型 ActionManager::MenuType
     property int menuType: ActionManager.UnknownMenu
 
