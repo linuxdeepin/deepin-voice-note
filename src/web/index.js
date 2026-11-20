@@ -143,6 +143,8 @@ var global_activeColor = ''
 var lastRightClickX = 0;  // 保存右键点击的X坐标
 var lastRightClickY = 0;  // 保存右键点击的Y坐标
 var global_disableColor = ''
+var global_selectedForeColor = null
+var global_selectedBackColor = null
 var global_theme = 1    // theme type 1:light 2:dark
 var global_themeColor = 'transparent'  //主题色
 var global_isRecording = false  // 录音状态标志
@@ -1137,6 +1139,16 @@ function setHtml(html) {
 
     // We need call once at init, ensure the foreground color / background color is correct.
     switchTextColor(global_theme == 2)
+    if (global_selectedForeColor) {
+        setSelectColorButton($('.note-color-fore .note-color-btn[data-value="' + global_selectedForeColor + '"]'))
+        $('.note-color-fore .note-current-color-button').attr('data-foreColor', global_selectedForeColor)
+        $('.icon-forecolor .path1').css('color', global_selectedForeColor)
+    }
+    if (global_selectedBackColor) {
+        setSelectColorButton($('.note-color-back .note-color-btn[data-value="' + global_selectedBackColor + '"]'))
+        $('.note-color-back .note-current-color-button').attr('data-backColor', global_selectedBackColor)
+        $('.icon-backcolor .path1').css('color', global_selectedBackColor)
+    }
     webobj.jsCallSetDataFinsh();
 }
 
@@ -2186,6 +2198,13 @@ function returnCopyFlag() {
 function setSelectColorButton($dom) {
     $dom.parents('.note-color-palette').find('.note-color-btn').removeClass('selectColor')
     $dom.addClass('selectColor')
+    if ($dom.length === 1) {
+        if ($dom.closest('.note-color-fore').length) {
+            global_selectedForeColor = $dom.attr('data-value')
+        } else if ($dom.closest('.note-color-back').length) {
+            global_selectedBackColor = $dom.attr('data-value')
+        }
+    }
 }
 
 /**
