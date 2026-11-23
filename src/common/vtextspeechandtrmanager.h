@@ -1,5 +1,5 @@
 // Copyright (C) 2019 ~ 2020 Deepin Technology Co., Ltd.
-// SPDX-FileCopyrightText: 2023 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2023-2026 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -60,6 +60,7 @@ public:
     static Status launchCopilotChat(const QSharedPointer<QDBusInterface> &copilot);
 
 private:
+    bool isDictationServiceAvailable();
     bool m_isSpeeching{false};
     Status m_status{NotInstalled};
     QSharedPointer<QDBusInterface> m_copilot;
