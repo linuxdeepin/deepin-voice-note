@@ -1,5 +1,5 @@
 // Copyright (C) 2019 ~ 2019 UnionTech Software Technology Co.,Ltd.
-// SPDX-FileCopyrightText: 2022 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2022-2026 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -348,7 +348,9 @@ void WebRichTextEditor::onMenuActionClicked(QAction *action)
     case ActionManager::TxtSelectAll: {
         //模拟全选快捷键ctrl+A
         QKeyEvent event(QEvent::KeyPress, Qt::Key_A, Qt::ControlModifier);
-        QApplication::sendEvent(focusProxy(), &event);
+        if (nullptr != focusProxy()) {
+            QApplication::sendEvent(focusProxy(), &event);
+        }
         break;
     }
     case ActionManager::VoiceCopy:
@@ -598,7 +600,9 @@ void WebRichTextEditor::deleteSelectText()
 {
     //向焦点代理窗口发送delete按键，删除选中内容
     QKeyEvent event(QEvent::KeyPress, Qt::Key_Delete, Qt::NoModifier);
-    QApplication::sendEvent(focusProxy(), &event);
+    if (nullptr != focusProxy()) {
+        QApplication::sendEvent(focusProxy(), &event);
+    }
 }
 
 void WebRichTextEditor::onThemeChanged()
@@ -711,7 +715,9 @@ void WebRichTextEditor::shortcutPopupMenu()
         if (m_mouseClickPos.x() < 0 || TxtMenu == m_menuType) {
             //模拟发送菜单键事件
             QKeyEvent event(QEvent::KeyPress, Qt::Key_Menu, Qt::NoModifier);
-            QApplication::sendEvent(focusProxy(), &event);
+            if (nullptr != focusProxy()) {
+                QApplication::sendEvent(focusProxy(), &event);
+            }
             return;
         }
         //语音与图片菜单，根据鼠标选中图片或语音时的位置显示菜单
