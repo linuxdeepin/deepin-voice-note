@@ -289,6 +289,7 @@ private:
     LeftView *m_leftView {nullptr};
     MiddleView *m_middleView {nullptr};
     WebRichTextEditor *m_richTextEdit {nullptr};
+    bool m_isReleased {false};
 
     DPushButton *m_addNotepadBtn {nullptr};
     DFloatingButton *m_addNoteBtn {nullptr};
