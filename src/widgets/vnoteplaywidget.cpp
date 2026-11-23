@@ -1,5 +1,5 @@
 // Copyright (C) 2019 ~ 2020 Uniontech Software Technology Co.,Ltd.
-// SPDX-FileCopyrightText: 2023 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2023-2026 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -101,6 +101,7 @@ void VNotePlayWidget::initUI()
     this->setLayout(mainLayout);
     m_sliderHover->installEventFilter(this);
     m_slider->installEventFilter(this);
+    onChangeTheme();
 }
 
 /**
@@ -135,6 +136,9 @@ void VNotePlayWidget::initConnection()
             this, &VNotePlayWidget::onSliderReleased);
     connect(m_slider, &DSlider::sliderMoved,
             this, &VNotePlayWidget::onSliderMove);
+
+    connect(DApplicationHelper::instance(), &DApplicationHelper::themeTypeChanged,
+            this, &VNotePlayWidget::onChangeTheme);
 }
 
 /**
@@ -146,6 +150,16 @@ void VNotePlayWidget::onVoicePlayPosChange(qint64 pos)
     if (m_sliderReleased == true) {
         onSliderMove(static_cast<int>(pos));
     }
+}
+
+void VNotePlayWidget::onChangeTheme()
+{
+    DPalette palette = DApplicationHelper::instance()->palette(this);
+    DGuiApplicationHelper::ColorType theme =
+        DGuiApplicationHelper::instance()->themeType();
+    QColor borderColor = theme == DGuiApplicationHelper::DarkType ? QColor(80, 80, 80) : QColor(180, 180, 180);
+    palette.setColor(DPalette::FrameBorder, borderColor);
+    this->setPalette(palette);
 }
 
 /**

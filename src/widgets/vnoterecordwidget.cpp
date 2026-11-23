@@ -1,5 +1,5 @@
 // Copyright (C) 2019 ~ 2020 Uniontech Software Technology Co.,Ltd.
-// SPDX-FileCopyrightText: 2023 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2023-2026 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -199,4 +199,8 @@ void VNoteRecordWidget::onChangeTheme()
     palette = DApplicationHelper::instance()->palette(m_finshBtn);
     palette.setBrush(DPalette::Highlight, highColor);
     m_finshBtn->setPalette(palette);
+    DPalette widgetPalette = DApplicationHelper::instance()->palette(this);
+    QColor borderColor = theme == DGuiApplicationHelper::DarkType ? QColor(80, 80, 80) : QColor(180, 180, 180);
+    widgetPalette.setColor(DPalette::FrameBorder, borderColor);
+    this->setPalette(widgetPalette);
 }
