@@ -1,5 +1,5 @@
 // Copyright (C) 2019 ~ 2020 Uniontech Software Technology Co.,Ltd.
-// SPDX-FileCopyrightText: 2023 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2023-2026 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -2077,7 +2077,7 @@ bool VNoteMainWindow::eventFilter(QObject *o, QEvent *e)
         m_buttonAnchor->setBottomMargin(17);
         //qDebug() << m_middleViewHolder->geometry() << m_noteBookName->height() << m_noteBookName->geometry();
         updateFolderName();
-        return true;
+        return false;
     }
 
     if (e->type() == QEvent::KeyPress) {
