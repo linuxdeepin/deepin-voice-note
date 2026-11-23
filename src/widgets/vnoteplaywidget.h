@@ -60,6 +60,8 @@ private:
     void initConnection();
     //初始化播放库
     void initPlayer();
+    //主题切换时更新控件样式
+    void onChangeTheme();
     bool m_sliderReleased {true};
     DLabel *m_timeLab {nullptr};
     DLabel *m_nameLab {nullptr};
