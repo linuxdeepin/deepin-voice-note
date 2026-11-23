@@ -199,4 +199,9 @@ void VNoteRecordWidget::onChangeTheme()
     palette = DApplicationHelper::instance()->palette(m_finshBtn);
     palette.setBrush(DPalette::Highlight, highColor);
     m_finshBtn->setPalette(palette);
+
+    DPalette framePalette = DApplicationHelper::instance()->palette(this);
+    QColor frameBorderColor = theme == DGuiApplicationHelper::DarkType ? "#4D4D4D" : "#BABABA";
+    framePalette.setBrush(DPalette::FrameBorder, frameBorderColor);
+    this->setPalette(framePalette);
 }
