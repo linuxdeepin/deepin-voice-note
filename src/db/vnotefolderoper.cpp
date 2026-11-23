@@ -100,6 +100,29 @@ bool VNoteFolderOper::renameVNoteFolder(const QString &folderName)
 }
 
 /**
+ * @brief VNoteFolderOper::updateFolderMaxNoteId
+ * @return true 成功
+ */
+bool VNoteFolderOper::updateFolderMaxNoteId()
+{
+    bool isUpdateOK = true;
+
+    if (nullptr != m_folder) {
+        QDateTime oldModifyTime = m_folder->modifyTime;
+        m_folder->modifyTime = QDateTime::currentDateTime();
+
+        RenameFolderDbVisitor renameFolderVisitor(VNoteDbManager::instance()->getVNoteDb(), m_folder, nullptr);
+
+        if (Q_UNLIKELY(!VNoteDbManager::instance()->updateData(&renameFolderVisitor))) {
+            m_folder->modifyTime = oldModifyTime;
+            isUpdateOK = false;
+        }
+    }
+
+    return isUpdateOK;
+}
+
+/**
  * @brief VNoteFolderOper::loadVNoteFolders
  * @return 所有记事本数据
  */
