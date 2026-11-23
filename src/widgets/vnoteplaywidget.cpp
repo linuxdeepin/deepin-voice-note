@@ -1,5 +1,5 @@
 // Copyright (C) 2019 ~ 2020 Uniontech Software Technology Co.,Ltd.
-// SPDX-FileCopyrightText: 2023 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2023-2026 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -12,8 +12,10 @@
 #include <DFontSizeManager>
 #include <DFloatingWidget>
 #include <DBlurEffectWidget>
+#include <DGuiApplicationHelper>
 #include <QGridLayout>
 #include <QDebug>
+#include <QPainter>
 
 /**
  * @brief VNotePlayWidget::VNotePlayWidget
@@ -135,6 +137,9 @@ void VNotePlayWidget::initConnection()
             this, &VNotePlayWidget::onSliderReleased);
     connect(m_slider, &DSlider::sliderMoved,
             this, &VNotePlayWidget::onSliderMove);
+
+    connect(DApplicationHelper::instance(), &DApplicationHelper::themeTypeChanged,
+            this, &VNotePlayWidget::onChangeTheme);
 }
 
 /**
@@ -205,6 +210,24 @@ void VNotePlayWidget::onSliderMove(int pos)
     if (m_sliderReleased == true) {
         m_slider->setValue(pos);
     }
+}
+
+void VNotePlayWidget::paintEvent(QPaintEvent *event)
+{
+    DFloatingWidget::paintEvent(event);
+    QPainter painter(this);
+    DGuiApplicationHelper::ColorType theme = DGuiApplicationHelper::instance()->themeType();
+    QColor borderColor = (theme == DGuiApplicationHelper::DarkType)
+                             ? QColor(80, 80, 80)
+                             : QColor(180, 180, 180);
+    painter.setPen(QPen(borderColor, 1));
+    painter.setBrush(Qt::NoBrush);
+    painter.drawRoundedRect(rect().adjusted(0, 0, -1, -1), 6, 6);
+}
+
+void VNotePlayWidget::onChangeTheme()
+{
+    update();
 }
 
 /**

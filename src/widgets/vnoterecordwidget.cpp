@@ -1,5 +1,5 @@
 // Copyright (C) 2019 ~ 2020 Uniontech Software Technology Co.,Ltd.
-// SPDX-FileCopyrightText: 2023 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2023-2026 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -13,6 +13,8 @@
 #include <QDir>
 #include <QDateTime>
 #include <QDebug>
+#include <QPainter>
+#include <DGuiApplicationHelper>
 
 /**
  * @brief VNoteRecordWidget::VNoteRecordWidget
@@ -186,6 +188,19 @@ void VNoteRecordWidget::onRecordDurationChange(qint64 duration)
 void VNoteRecordWidget::setAudioDevice(QString device)
 {
     m_audioRecoder->setDevice(device);
+}
+
+void VNoteRecordWidget::paintEvent(QPaintEvent *event)
+{
+    DFloatingWidget::paintEvent(event);
+    QPainter painter(this);
+    DGuiApplicationHelper::ColorType theme = DGuiApplicationHelper::instance()->themeType();
+    QColor borderColor = (theme == DGuiApplicationHelper::DarkType)
+                             ? QColor(80, 80, 80)
+                             : QColor(180, 180, 180);
+    painter.setPen(QPen(borderColor, 1));
+    painter.setBrush(Qt::NoBrush);
+    painter.drawRoundedRect(rect().adjusted(0, 0, -1, -1), 6, 6);
 }
 
 void VNoteRecordWidget::onChangeTheme()
