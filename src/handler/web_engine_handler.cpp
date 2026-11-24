@@ -314,6 +314,25 @@ void WebEngineHandler::setTarget(QObject *targetWebEngine)
     qCInfo(voiceNoteLog) << "Target web engine setting finished";
 }
 
+QObject *WebEngineHandler::dragFilterTarget() const
+{
+    return m_dragFilterTarget.data();
+}
+
+void WebEngineHandler::setDragFilterTarget(QObject *targetWebEngine)
+{
+    if (targetWebEngine == m_dragFilterTarget.data())
+        return;
+
+    if (m_dragFilterTarget)
+        m_dragFilterTarget->removeEventFilter(this);
+    m_dragFilterTarget = targetWebEngine;
+    if (m_dragFilterTarget)
+        m_dragFilterTarget->installEventFilter(this);
+
+    Q_EMIT dragFilterTargetChanged();
+}
+
 static bool hasUnsupportedImagePayload(const QMimeData *mimeData)
 {
     if (!mimeData || mimeData->hasUrls()) {
@@ -331,17 +350,28 @@ static bool hasUnsupportedImagePayload(const QMimeData *mimeData)
 
 bool WebEngineHandler::eventFilter(QObject *watched, QEvent *event)
 {
-    if (watched == m_targetWebEngine) {
+    // target（summernote 视图）与 dragFilterTarget（tiptap 视图）二选一可见，
+    // 两个目标共用同一套拖拽拦截逻辑。
+    if (watched == m_targetWebEngine || watched == m_dragFilterTarget.data()) {
         switch (event->type()) {
         case QEvent::DragEnter: {
             auto *dropEvent = static_cast<QDropEvent *>(event);
             const QMimeData *mimeData = dropEvent->mimeData();
             m_dragImageCheckUrls = mimeData && mimeData->hasUrls() ? mimeData->urls() : QList<QUrl>();
             m_dragCanInsertImages = !m_dragImageCheckUrls.isEmpty() && VNoteMainManager::instance()->canInsertImages(m_dragImageCheckUrls);
-            if (hasUnsupportedImagePayload(mimeData)
-                || (!m_dragImageCheckUrls.isEmpty() && !m_dragCanInsertImages)) {
+            if (hasUnsupportedImagePayload(mimeData)) {
                 dropEvent->setDropAction(Qt::IgnoreAction);
                 dropEvent->ignore();
+                return true;
+            }
+            if (!m_dragImageCheckUrls.isEmpty() && !m_dragCanInsertImages) {
+                dropEvent->setDropAction(Qt::IgnoreAction);
+                dropEvent->ignore();
+                // 必须拦截（return true）而不是 break：QML 拖拽投递会先问
+                // DropArea（前序子项），被拒后继续问 WebEngineView 自身，
+                // 而 QQuickWebEngineView::dragEnterEvent 对 DragEnter 无条件
+                // accept 并转发给 Chromium（页面 dragover 一律 preventDefault），
+                // break 放行会让不支持格式的拖拽显示绿色"+"光标。
                 return true;
             }
             break;
@@ -358,6 +388,8 @@ bool WebEngineHandler::eventFilter(QObject *watched, QEvent *event)
                 if (!m_dragCanInsertImages) {
                     dropEvent->setDropAction(Qt::IgnoreAction);
                     dropEvent->ignore();
+                    // 同 DragEnter：必须拦截，防止事件落到
+                    // QQuickWebEngineView::dragMoveEvent 被 Chromium 接受。
                     return true;
                 }
             }

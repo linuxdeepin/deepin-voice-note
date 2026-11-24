@@ -9,6 +9,7 @@
 
 #include <QVariant>
 #include <QObject>
+#include <QPointer>
 #include <QRect>
 #include <QEventLoop>
 #include <QUrl>
@@ -38,6 +39,11 @@ class WebEngineHandler : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QObject *target READ target WRITE setTarget NOTIFY targetChanged FINAL)
+    // 拖拽光标拦截目标：与 target 不同，tiptap 模式下可见编辑视图是独立的
+    // WebEngineView（target 指向隐藏的 summernote 视图），需要把 DragEnter/
+    // DragMove/Drop 拦截逻辑单独挂到可见视图上，否则 QQuickWebEngineView
+    // 对 DragEnter 无条件 accept 并转发 Chromium，导致不支持格式显示绿色"+"。
+    Q_PROPERTY(QObject *dragFilterTarget READ dragFilterTarget WRITE setDragFilterTarget NOTIFY dragFilterTargetChanged FINAL)
 
 public:
     enum Menu {
@@ -53,6 +59,10 @@ public:
     QObject *target() const;
     void setTarget(QObject *targetWebEngine);
     Q_SIGNAL void targetChanged();
+
+    QObject *dragFilterTarget() const;
+    void setDragFilterTarget(QObject *targetWebEngine);
+    Q_SIGNAL void dragFilterTargetChanged();
 
     QVariant callJsSynchronous(const QString &function);
 
@@ -125,6 +135,7 @@ private:
 
 private:
     QObject *m_targetWebEngine { nullptr };  // 关联的 qml WebEngineView
+    QPointer<QObject> m_dragFilterTarget;    // 拖拽事件拦截目标（可见编辑视图）
 
     VoicePlayerHandler *m_voicePlayerHandler { nullptr };  // 语音播放管理
     VoiceToTextHandler *m_voiceToTextHandler { nullptr };  // 语音转文字管理

@@ -158,3 +158,69 @@ TEST(WebEngineHandlerUT, BUG300535_eventFilterRejectsNonImageDrop)
                        Qt::NoButton, Qt::NoModifier);
     EXPECT_FALSE(h.eventFilter(&target, &dropImg));
 }
+
+// BUG 383467 回归补充：tiptap 模式下可见编辑视图是独立的 WebEngineView，
+// 拦截逻辑通过 dragFilterTarget 挂到该视图（handler.target 仍指向隐藏的
+// summernote 视图）。验证 dragFilterTarget 上的三阶段拦截与放行行为，
+// 以及 break 放行（回归）会导致拦截失效的问题。
+TEST(WebEngineHandlerUT, BUG383467_eventFilterRejectsNonImageDropOnDragFilterTarget)
+{
+    WebEngineHandler h;
+    QObject summernoteView;   // handler.target：tiptap 模式下隐藏
+    QObject tiptapView;       // 可见编辑视图
+    h.setTarget(&summernoteView);
+    EXPECT_EQ(nullptr, h.dragFilterTarget());
+    h.setDragFilterTarget(&tiptapView);
+    h.setDragFilterTarget(&tiptapView);   // same -> no change
+    EXPECT_EQ(&tiptapView, h.dragFilterTarget());
+
+    QTemporaryDir dir;
+    ASSERT_TRUE(dir.isValid());
+    const QString imgPath = dir.filePath("a.png");
+    ASSERT_TRUE(QImage(2, 2, QImage::Format_RGB32).save(imgPath, "PNG"));
+    QTemporaryDir dir2;
+    ASSERT_TRUE(dir2.isValid());
+    const QString txtPath = dir2.filePath("a.txt");
+    {
+        QFile f(txtPath);
+        ASSERT_TRUE(f.open(QIODevice::WriteOnly));
+        f.write("x", 1);
+    }
+
+    QMimeData mdImg;
+    mdImg.setUrls({QUrl::fromLocalFile(imgPath)});
+    QMimeData mdTxt;
+    mdTxt.setUrls({QUrl::fromLocalFile(txtPath)});
+
+    // 合法图片拖入：放行（由 QML DropArea 接管插入）
+    QDropEvent enterImg(QPointF(0, 0), Qt::CopyAction, &mdImg,
+                        Qt::NoButton, Qt::NoModifier, QEvent::DragEnter);
+    EXPECT_FALSE(h.eventFilter(&tiptapView, &enterImg));
+
+    // 不支持格式：DragEnter / DragMove / Drop 三阶段均拦截（return true），
+    // 否则事件落到 QQuickWebEngineView::dragEnterEvent 被无条件 accept 并
+    // 转发 Chromium，光标显示绿色"+"。
+    QDropEvent enterTxt(QPointF(0, 0), Qt::CopyAction, &mdTxt,
+                        Qt::NoButton, Qt::NoModifier, QEvent::DragEnter);
+    EXPECT_TRUE(h.eventFilter(&tiptapView, &enterTxt));
+    QDropEvent moveTxt(QPointF(0, 0), Qt::CopyAction, &mdTxt,
+                       Qt::NoButton, Qt::NoModifier, QEvent::DragMove);
+    EXPECT_TRUE(h.eventFilter(&tiptapView, &moveTxt));
+    QDropEvent dropTxt(QPointF(0, 0), Qt::CopyAction, &mdTxt,
+                       Qt::NoButton, Qt::NoModifier);
+    EXPECT_TRUE(h.eventFilter(&tiptapView, &dropTxt));
+
+    // 非 dragFilterTarget 对象：放行
+    QObject other;
+    QDropEvent enterOther(QPointF(0, 0), Qt::CopyAction, &mdTxt,
+                          Qt::NoButton, Qt::NoModifier, QEvent::DragEnter);
+    EXPECT_FALSE(h.eventFilter(&other, &enterOther));
+
+    // 切换/清空目标：先切到新对象，再清空
+    QObject tiptapView2;
+    h.setDragFilterTarget(&tiptapView2);
+    EXPECT_EQ(&tiptapView2, h.dragFilterTarget());
+    h.setDragFilterTarget(nullptr);
+    EXPECT_EQ(nullptr, h.dragFilterTarget());
+    SUCCEED();
+}

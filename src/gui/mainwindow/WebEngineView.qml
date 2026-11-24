@@ -828,6 +828,19 @@ Item {
                         tiptapWebChannel.registerObject("tiptapChannel", TiptapChannel);
                         tiptapWebView.webChannel = tiptapWebChannel;
                         tiptapWebView.url = Qt.resolvedUrl(TiptapChannel.tiptapHtmlPath());
+                        // 拖拽光标拦截必须挂在可见的 tiptap 视图上：handler.target
+                        // 指向隐藏的 summernote 视图，其 eventFilter 在 tiptap 模式下
+                        // 不会触发；而 QQuickWebEngineView 对 DragEnter 无条件 accept
+                        // 并转发 Chromium（页面 dragover 一律 preventDefault），不支持
+                        // 格式的文件会显示绿色"+"光标。DropArea 拒绝后事件会继续
+                        // 投递到本视图，由该 filter 拦截并显示红色"-"拒绝光标。
+                        handler.dragFilterTarget = tiptapWebView;
+                    }
+
+                    Component.onDestruction: {
+                        // 防御销毁顺序：handler 可能先于本视图析构
+                        if (handler && handler.dragFilterTarget === tiptapWebView)
+                            handler.dragFilterTarget = null;
                     }
 
                     onLoadingChanged: function(loadRequest) {
