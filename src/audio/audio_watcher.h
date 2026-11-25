@@ -80,7 +80,7 @@ public:
     bool getDeviceEnable(AudioMode mode);
     
     bool hasAudioOutputDevice() const;
-    bool hasAudioInputDevice() const;
+    bool hasAudioInputDevice();
 signals:
     void sigVolumeChange(AudioMode mode);
     void sigDeviceChange(AudioMode mode);
