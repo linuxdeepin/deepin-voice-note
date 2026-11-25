@@ -1086,6 +1086,14 @@ function updatePlayBackState(playback, state) {
 function toggleState(state) {
     updatePlayBackState(activePlayback, state);
     updatePlayBackState(airVoicePlayback, state);
+    if (state == '0') {
+        enableSummerNote();
+        setFocusColor(1);
+    } else if (state == '2') {
+        activePlayback = null;
+        enableSummerNote();
+        setFocusColor(2);
+    }
 }
 
 /**
