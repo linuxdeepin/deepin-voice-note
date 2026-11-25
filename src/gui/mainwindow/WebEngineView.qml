@@ -725,6 +725,18 @@ Item {
                     }
                 }
 
+                MouseArea {
+                    anchors.fill: parent
+                    propagateComposedEvents: true
+                    onPressed: mouse.accepted = false
+                    onClicked: {
+                        if (webView.activeFocus) {
+                            webView.focus = false
+                            webView.forceActiveFocus()
+                        }
+                    }
+                }
+
                 WebEngineHandler {
                     id: handler
 
@@ -974,6 +986,18 @@ Item {
                             drop.accepted = false;
                         }
                         currentDragCanDropImages = false;
+                    }
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    propagateComposedEvents: true
+                    onPressed: mouse.accepted = false
+                    onClicked: {
+                        if (tiptapWebView.activeFocus) {
+                            tiptapWebView.focus = false
+                            tiptapWebView.forceActiveFocus()
+                        }
                     }
                 }
 
