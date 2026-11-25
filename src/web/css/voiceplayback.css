@@ -257,10 +257,10 @@
 }
 
 .translateHeader .translateIcon {
-    width: 14px;
-    height: 14px;
+    width: 16px;
+    height: 16px;
     background-image: none;
-    background-color: var(--color);
+    background-color: black;
     -webkit-mask: url('../img/voice_to_text/Normal.svg') no-repeat center/cover;
     mask: url('../img/voice_to_text/Normal.svg') no-repeat center/cover;
     background-size: contain;
@@ -269,6 +269,7 @@
 .translateHeader .translateLabel {
     margin-left: 13px;
     font-size: 12px;
+    color: rgba(0, 0, 0, 0.85);
     user-select: none;
 }
 
@@ -285,6 +286,7 @@
     margin-right: 20px;
     margin-bottom: 12px;
     font-size: 14px;
+    color: black;
     text-align: left;
     white-space: pre-wrap;
     word-break: break-word;
