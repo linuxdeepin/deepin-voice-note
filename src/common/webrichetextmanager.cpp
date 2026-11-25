@@ -149,7 +149,6 @@ void WebRichTextManager::initConnect()
         m_textChange = true;
         m_textChangeNoteId = m_noteData ? m_noteData->noteId : -1;
         ++m_textChangeSerial;
-        emit noteTextChanged();
     });
 
     connect(JsContent::instance(), &JsContent::scrollTopChange, this, [=](bool isTop){
@@ -161,7 +160,6 @@ void WebRichTextManager::initConnect()
         m_textChange = true;
         m_textChangeNoteId = m_noteData ? m_noteData->noteId : -1;
         ++m_textChangeSerial;
-        emit noteTextChanged();
     });
     connect(TiptapChannelBridge::instance(), &TiptapChannelBridge::contentSaved,
             this, &WebRichTextManager::onTiptapContentSaved);
