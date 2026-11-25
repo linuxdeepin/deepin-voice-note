@@ -117,6 +117,7 @@ int main(int argc, char *argv[])
 
     app->setOrganizationName("deepin");
     app->setApplicationName("deepin-voice-note");
+    app->setDesktopFileName("deepin-voice-note.desktop");
     app->setApplicationVersion(VERSION);
     qCInfo(voiceNoteLog) << "Application initialized with version:" << VERSION;
 
