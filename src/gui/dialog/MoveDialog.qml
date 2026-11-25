@@ -20,7 +20,12 @@ DialogWindow {
     height: 365
     width: 370
 
-    onVisibleChanged: if (visible) folderList.currentIndex = 0
+    // 打开时把键盘焦点交给列表，使上/下方向键可直接切换记事本，
+    // 无需先 Tab 或点击（列表仅设置 activeFocusOnTab 不会自动获得焦点）
+    onVisibleChanged: if (visible) {
+        folderList.currentIndex = 0;
+        folderList.forceActiveFocus();
+    }
 
     header: DialogTitleBar {
         enableInWindowBlendBlur: true
@@ -131,6 +136,8 @@ DialogWindow {
 
                     onClicked: {
                         folderList.currentIndex = index;
+                        // 点击后同样把键盘焦点交给列表，保证随后可直接用方向键切换
+                        folderList.forceActiveFocus();
                     }
                     onEntered: {
                         folderItem.isHovered = true;
