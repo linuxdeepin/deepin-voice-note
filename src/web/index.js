@@ -330,7 +330,7 @@ function initSummernote() {
     listenFontnameList()
     // 默认选中前景色和背景色
     setSelectColorButton($('[data-value="#000000"]'))
-    setSelectColorButton($('[data-value="#FFFFFF33"]'))
+    setSelectColorButton($('[data-value="rgba(255, 215, 0, 0.2)"]'))
     var selectColor = $('.note-backcolor .selectColor').css('background-color')
     $('.icon-backcolor .path1').css('color', selectColor)
 

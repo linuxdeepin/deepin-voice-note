@@ -7911,7 +7911,7 @@
             ],
             colorButton: {
                 foreColor: '#414D68',
-                backColor: 'transparent'
+                backColor: 'rgba(255, 215, 0, 0.2)'
             },
             lineHeights: ['1.0', '1.2', '1.4', '1.5', '1.6', '1.8', '2.0', '3.0'],
             tableClassName: 'table table-bordered',
