@@ -103,7 +103,9 @@ QString stripLegacyVoiceBlocks(const QString &html)
             // the skipped subtree only when its matching tag is closed.
             for (qsizetype i = skippedTags.size() - 1; i >= 0; --i) {
                 if (skippedTags.at(i) == tagName) {
-                    skippedTags.resize(i);
+                    while (skippedTags.size() > i) {
+                        skippedTags.removeLast();
+                    }
                     break;
                 }
             }

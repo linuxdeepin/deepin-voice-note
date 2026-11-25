@@ -516,7 +516,11 @@ void WebEngineHandler::initFontsInformation()
     // 外观服务不可用时仍使用 Qt 的系统字体库兜底。字体名保持系统原值，
     // 不翻译、不改写，确保简中与繁体行为一致且下拉不会为空。
     if (m_fontList.isEmpty()) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
         m_fontList = QFontDatabase::families();
+#else
+        m_fontList = QFontDatabase().families();
+#endif
         m_fontList.removeAll(QString());
         m_fontList.removeDuplicates();
         if (m_defaultFont.isEmpty()) {
