@@ -264,7 +264,7 @@ Item {
             event.accepted = true;
             break;
         case Qt.Key_Delete:
-            if (root.isDragging || webVisible || isRecordingAudio || isPlay || isVoiceToText) {
+            if (root.isDragging || webVisible || isRecordingAudio || isVoiceToText) {
                 console.log("No notes available, cannot delete folder");
                 return;
             }
@@ -810,7 +810,7 @@ Item {
                 MenuItem {
                     Accessible.name: "DeleteFolderMenuItem"
                     id: deleteMenuItem
-                    enabled: !root.isPlay && !root.isRecordingAudio && !root.isVoiceToText
+                    enabled: !root.isRecordingAudio && !root.isVoiceToText
                     text: qsTr("Delete")
 
                     onTriggered: {
