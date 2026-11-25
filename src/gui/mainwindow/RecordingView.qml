@@ -10,8 +10,9 @@ FocusScope {
     id: rootItem
     focus: visible
 
-    property int btnSize: 30
-    property int iconSize: 72
+    property int btnSize: isCompact ? 24 : 30
+    property int iconSize: isCompact ? 56 : 72
+    property bool isCompact: ApplicationHelper.sizeMode() === ApplicationHelper.CompactMode
     property bool isRecording: true
     property string time: "00:00:00"
 
@@ -25,7 +26,7 @@ FocusScope {
         time = "00:00:00";
     }
 
-    implicitHeight: 70
+    implicitHeight: isCompact ? 56 : 70
     visible: false
 
     onVisibleChanged: {
@@ -64,15 +65,15 @@ FocusScope {
         border.color: DTK.themeType === ApplicationHelper.LightType ? "#0A000000" : "#19FFFFFF"
         border.width: 1
         color: DTK.themeType === ApplicationHelper.LightType ? "#7FF4F4F4" : "#0A0A10"
-        implicitHeight: 42
-        implicitWidth: 364
+        implicitHeight: isCompact ? 36 : 42
+        implicitWidth: isCompact ? 300 : 364
         radius: 12
     }
 
     RowLayout {
         anchors.centerIn: back
-        implicitHeight: 42
-        implicitWidth: 364
+        implicitHeight: isCompact ? 36 : 42
+        implicitWidth: isCompact ? 300 : 364
         spacing: 10
 
         VNoteComponents.VNoteToolButton {
@@ -101,15 +102,15 @@ FocusScope {
         RecordingCurves {
             id: curves
 
-            height: 24
-            width: 180
+            height: isCompact ? 20 : 24
+            width: isCompact ? 150 : 180
         }
 
         Label {
             id: duation
 
             text: time
-            width: 66
+            width: isCompact ? 54 : 66
         }
 
         VNoteComponents.VNoteToolButton {

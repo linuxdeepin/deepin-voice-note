@@ -202,7 +202,7 @@ void TiptapChannelBridge::notifyEditorReady()
     // themeProvided 再调用 jsEditorReady，因此这里先补发缓存主题；随后
     // editorReady 回调里若重新采集当前系统主题，会再用最新值覆盖。
     if (m_hasTheme) {
-        emit themeProvided(m_lastTheme, m_lastHighlightColor, m_lastDisableHighlightColor, m_lastBackgroundColor);
+        emit themeProvided(m_lastTheme, m_lastHighlightColor, m_lastDisableHighlightColor, m_lastBackgroundColor, m_lastCompact);
     }
 
     emit editorReady();
@@ -625,16 +625,17 @@ void TiptapChannelBridge::emitVoiceToTextCompleted(const QString &voiceId, const
 
 void TiptapChannelBridge::emitThemeProvided(const QString &theme, const QString &highlightColor,
                                              const QString &disableHighlightColor,
-                                             const QString &backgroundColor)
+                                             const QString &backgroundColor, bool compact)
 {
     m_lastTheme = theme;
     m_lastHighlightColor = highlightColor;
     m_lastDisableHighlightColor = disableHighlightColor;
     m_lastBackgroundColor = backgroundColor;
+    m_lastCompact = compact;
     m_hasTheme = true;
 
     if (m_editorReady) {
-        emit themeProvided(theme, highlightColor, disableHighlightColor, backgroundColor);
+        emit themeProvided(theme, highlightColor, disableHighlightColor, backgroundColor, compact);
     }
 }
 

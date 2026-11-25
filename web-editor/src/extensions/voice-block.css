@@ -114,7 +114,7 @@
 }
 
 .voicePlayback {
-    height: 42px;
+    height: var(--dvn-voice-playback-height, 42px);
     width: 100%;
     display: flex;
     align-items: center;
@@ -129,12 +129,12 @@
     gap: 10px;
     margin-left: 10px;
     min-width: 160px;
-    min-height: 24px;
+    min-height: var(--dvn-voice-btn-size, 24px);
 }
 
 .voicePlayback .voiceBtn {
-    width: 24px;
-    height: 24px;
+    width: var(--dvn-voice-btn-size, 24px);
+    height: var(--dvn-voice-btn-size, 24px);
     flex-shrink: 0;
     border-radius: 50%;
     cursor: pointer;
@@ -226,7 +226,7 @@
     margin-left: 10px;
     margin-right: 10px;
     width: 50%;
-    height: 24px;
+    height: var(--dvn-voice-btn-size, 24px);
     -webkit-appearance: none;
     appearance: none;
     cursor: pointer;
@@ -240,7 +240,7 @@
 
 .voicePlayback input[type="range"]::-webkit-slider-runnable-track {
     width: 100px;
-    height: 2px;
+    height: var(--dvn-voice-slider-track-height, 2px);
     background: repeating-linear-gradient(to right, var(--voice-progress-color), var(--voice-progress-color) 2px, transparent 2px, transparent 3px);
     background-repeat: no-repeat;
     background-size: var(--progressValue);
@@ -260,8 +260,8 @@
 .voicePlayback input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 16px;
-    height: 16px;
+    width: var(--dvn-voice-slider-thumb-size, 16px);
+    height: var(--dvn-voice-slider-thumb-size, 16px);
     background: rgb(77, 77, 77);
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5), 0 -1px 0 0 rgba(0, 0, 0, 0.2) inset;
     border-radius: 4px;
