@@ -6221,6 +6221,7 @@
                                     colorsName: _this.options.colorsName,
                                     eventName: $holder.data('event'),
                                     container: _this.options.container,
+                                    tooltip: _this.options.tooltip,
 
                                 }).render());
                             });
@@ -7274,10 +7275,30 @@
             this.$popover.find('.note-fontsize-class').removeClass('open')
             this.$popover.find('.note-font-family-class').removeClass('open')
             let winWidth = $(document).width()
-            if (winWidth - x < airPopoverWidth) {
-                x = winWidth - airPopoverWidth
+            var finalLeft;
+            if (hasRange && !styleInfo.range.isCollapsed()) {
+                var rect = lists.last(styleInfo.range.getClientRects());
+                if (rect) {
+                    var bnd = func.rect2bnd(rect);
+                    finalLeft = Math.max(bnd.left + bnd.width / 2 - 150, 0);
+                    if (winWidth - finalLeft < airPopoverWidth + airPopoverRightMargin) {
+                        finalLeft = winWidth - airPopoverWidth - airPopoverRightMargin;
+                    }
+                    if (finalLeft <= airPopoverLeftMargin) {
+                        if (finalLeft <= 2)
+                            finalLeft = -5;
+                        else
+                            finalLeft = airPopoverLeftMargin;
+                    }
+                } else {
+                    finalLeft = x + $(document).scrollLeft();
+                }
+            } else {
+                if (winWidth - x < airPopoverWidth) {
+                    x = winWidth - airPopoverWidth
+                }
+                finalLeft = x + $(document).scrollLeft();
             }
-            var finalLeft = x + $(document).scrollLeft();
             var finalTop = y + $(document).scrollTop();
             this.$popover.css({
                 display: 'block',
