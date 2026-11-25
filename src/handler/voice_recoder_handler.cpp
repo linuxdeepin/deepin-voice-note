@@ -133,6 +133,12 @@ void VoiceRecoderHandler::onDeviceEnableChanged(int mode, bool enabled)
     qCInfo(voiceNoteLog) << "Device enable state changed, mode:" << mode << "enabled:" << enabled;
     if (m_currentMode == mode) {
         qCInfo(voiceNoteLog) << "mode is equal to current mode";
+        if (!enabled && m_type != RecoderType::Idle) {
+            qCInfo(voiceNoteLog) << "Recording device disabled during recording, stopping recorder";
+            stopRecoder();
+            emit recoderStateChange(RecoderType::Idle);
+            updateWave(0.0);
+        }
         emit updateRecordBtnState(enabled);
     }
     qCInfo(voiceNoteLog) << "Device enable state change handling finished";
@@ -143,6 +149,14 @@ void VoiceRecoderHandler::intRecoder()
     qCInfo(voiceNoteLog) << "Initializing recorder";
     m_audioRecoder = new GstreamRecorder(this);
     connect(m_audioRecoder, &GstreamRecorder::audioBufferProbed, this, &VoiceRecoderHandler::onAudioBufferProbed);
+    connect(m_audioRecoder, &GstreamRecorder::errorMsg, this, [this](const QString &msg) {
+        qCWarning(voiceNoteLog) << "Recorder error:" << msg;
+        if (m_type != RecoderType::Idle) {
+            stopRecoder();
+            emit recoderStateChange(RecoderType::Idle);
+            updateWave(0.0);
+        }
+    });
     qCInfo(voiceNoteLog) << "Recorder initialization finished";
 }
 
@@ -164,6 +178,7 @@ void VoiceRecoderHandler::initAudioWatcher()
     qCInfo(voiceNoteLog) << "Initializing audio watcher";
     m_audioWatcher = new AudioWatcher(this);
     connect(m_audioWatcher, &AudioWatcher::sigDeviceEnableChanged, this, &VoiceRecoderHandler::onDeviceEnableChanged);
+    connect(m_audioWatcher, &AudioWatcher::sigDeviceChange, this, &VoiceRecoderHandler::onAudioDeviceChange);
     connect(m_audioWatcher, &AudioWatcher::sigReduceNoiseChanged, this, &VoiceRecoderHandler::onReduceNoiseChanged);
     qCInfo(voiceNoteLog) << "Audio watcher initialization finished";
 }
