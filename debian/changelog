@@ -1,3 +1,12 @@
+deepin-voice-note (6.6.8) unstable; urgency=medium
+
+  * fix(editor): refresh task parents after list type changes
+  * fix: show reject cursor for unsupported drag files in editor
+  * fix: register Ctrl+N shortcut at window level for initial interface
+  * test: fix webengine context menu UT crash
+
+ -- dengzhongyuan <dengzhongyuan@uniontech.com>  Wed, 25 Nov 2026 13:05:44 +0800
+
 deepin-voice-note (6.6.7) unstable; urgency=medium
 
   * fix(editor): preserve visual list levels across conversions
