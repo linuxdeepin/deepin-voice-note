@@ -587,6 +587,11 @@ All notes in it will be deleted</source>
         <source>The voice note has been deleted</source>
         <translation>该语音笔记已被删除</translation>
     </message>
+    <message>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="159"/>
+        <source>The pasted content is too long and may cause the application to freeze. It has not been pasted.</source>
+        <translation>粘贴的内容过长，可能导致应用卡顿，已取消粘贴。</translation>
+    </message>
 </context>
 <context>
     <name>VNoteRecordBar</name>
