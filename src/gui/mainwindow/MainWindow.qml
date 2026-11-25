@@ -318,6 +318,7 @@ Item {
         }
 
         function handleUpdateNoteList(notesData) {
+            itemListView.noteCtxMenu.close();
             itemListView.model.clear();
             if (notesData.length === 0) {
                 webEngineView.webVisible = false;
