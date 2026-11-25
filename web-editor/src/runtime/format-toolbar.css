@@ -4,11 +4,11 @@
 .tiptap-toolbar {
     display: flex;
     /* 616px 默认右侧编辑区：宿主左边距 10px，工具栏内容预算约 606px。
-       以下密度 token 保留 30px 控件热区，仅压缩间距，保证设计稿中的全量按钮常驻一行。 */
+       以下密度 token 保留 30px 控件热区，仅压缩间距；宽度不足时按钮折行显示。 */
     --dvn-toolbar-group-gap: 2px;
     --dvn-toolbar-separator-margin: 3px;
     --dvn-toolbar-color-button-gap: 1px;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     align-items: center;
     gap: 0;
     width: max-content;

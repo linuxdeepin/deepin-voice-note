@@ -1311,13 +1311,11 @@ export function createFormatToolbar(editor, host, uiStrings = DEFAULT_TIPTAP_UI_
     renderOverflowLayout()
     if (measuredToolbarWidth() <= maxToolbarWidth + 1) return
 
-    // Summernote 工具栏按视觉顺序从后往前折叠，不能跳过末尾资源区去隐藏中间按钮。
-    // 渲染时仍使用 orderedToolbarUnits，保证主工具栏与更多面板内的视觉顺序稳定。
-    for (const unit of overflowCollapseUnits) {
-      overflowSet.add(unit)
-      renderOverflowLayout()
-      if (measuredToolbarWidth() <= maxToolbarWidth + 1) break
-    }
+    // flex-wrap: wrap lets the toolbar wrap to a second row when the host
+    // width is insufficient, instead of collapsing buttons into the overflow
+    // menu. The overflow infrastructure (overflowSet, renderOverflowLayout,
+    // moreBtn) is preserved but the per-button collapse loop is disabled to
+    // match the UI design requirement for row wrapping.
   }
 
   moreBtn.addEventListener('click', (event) => {
