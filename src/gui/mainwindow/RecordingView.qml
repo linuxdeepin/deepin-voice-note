@@ -11,7 +11,7 @@ FocusScope {
     focus: visible
 
     property int btnSize: 30
-    property int iconSize: 72
+    property int iconSize: 24
     property bool isRecording: true
     property string time: "00:00:00"
 
@@ -58,12 +58,23 @@ FocusScope {
     Rectangle {
         id: back
 
+        BoxShadow {
+            anchors.fill: parent
+            cornerRadius: 12
+            hollow: true
+            shadowBlur: 0
+            shadowColor: DTK.themeType === ApplicationHelper.LightType ? "#19000000" : "#33000000"
+            shadowOffsetX: 0
+            shadowOffsetY: 0
+            spread: 0
+        }
+
         anchors.bottom: backRectangle.bottom
         anchors.bottomMargin: 10
         anchors.horizontalCenter: parent.horizontalCenter
         border.color: DTK.themeType === ApplicationHelper.LightType ? "#0A000000" : "#19FFFFFF"
         border.width: 1
-        color: DTK.themeType === ApplicationHelper.LightType ? "#7FF4F4F4" : "#0A0A10"
+        color: DTK.themeType === ApplicationHelper.LightType ? "#F4F4F4F4" : "#F00A0A10"
         implicitHeight: 42
         implicitWidth: 364
         radius: 12
@@ -110,6 +121,7 @@ FocusScope {
 
             text: time
             width: 66
+            font.pixelSize: 24
         }
 
         VNoteComponents.VNoteToolButton {
