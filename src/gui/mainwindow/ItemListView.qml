@@ -209,7 +209,7 @@ Item {
         }
     }
 
-    function onSaveNote() {
+    function doSaveNote(saveType) {
         if (webVisible) {
             console.log("No notes available, cannot save note");
             return;
@@ -218,19 +218,36 @@ Item {
         var validIndexes = validSelectedNoteIndexes();
         if (validIndexes.length === 0)
             return;
-        
+
         if (validIndexes.length > 1) {
-            folderDialogLoader.saveType = VNoteMainManager.Text;
+            folderDialogLoader.saveType = saveType;
             if (!folderDialogLoader.active) {
                 folderDialogLoader.active = true;
             } else {
                 folderDialogLoader.item.open();
             }
         } else {
-            fileDialogLoader.saveType = VNoteMainManager.Text;
+            fileDialogLoader.saveType = saveType;
             fileDialogLoader.active = false;
             fileDialogLoader.active = true;
         }
+    }
+
+    function onSaveNote() {
+        doSaveNote(VNoteMainManager.Text);
+    }
+
+    function onSaveNoteWithFormatChoice() {
+        if (webVisible) {
+            console.log("No notes available, cannot save note");
+            return;
+        }
+
+        var validIndexes = validSelectedNoteIndexes();
+        if (validIndexes.length === 0)
+            return;
+
+        saveFormatMenu.open();
     }
 
     function renameCurrentItem() {
@@ -594,6 +611,31 @@ Item {
         }
     }
 
+    Menu {
+        Accessible.name: "SaveFormatMenu"
+        Accessible.role: Accessible.PopupMenu
+
+        id: saveFormatMenu
+
+        MenuItem {
+            Accessible.name: "SaveAsTxtMenuItem"
+            text: qsTr("Save as TXT")
+
+            onTriggered: {
+                rootItem.doSaveNote(VNoteMainManager.Text);
+            }
+        }
+
+        MenuItem {
+            Accessible.name: "SaveAsHtmlMenuItem"
+            text: qsTr("Save as HTML")
+
+            onTriggered: {
+                rootItem.doSaveNote(VNoteMainManager.Html);
+            }
+        }
+    }
+
     Loader {
         id: noSearchResultsLoader
 
@@ -697,24 +739,7 @@ Item {
                 rootItem.onSaveNote();
                 break;
             case ActionManager.SaveNoteAsHtml:
-                onTriggered: {
-                    var validIndexes = validSelectedNoteIndexes();
-                    if (validIndexes.length === 0)
-                        return;
-
-                    if (validIndexes.length > 1) {
-                        folderDialogLoader.saveType = VNoteMainManager.Html;
-                        if (!folderDialogLoader.active) {
-                            folderDialogLoader.active = true;
-                        } else {
-                            folderDialogLoader.item.open();
-                        }
-                    } else {
-                        fileDialogLoader.saveType = VNoteMainManager.Html;
-                        fileDialogLoader.active = false;
-                        fileDialogLoader.active = true;
-                    }
-                }
+                rootItem.doSaveNote(VNoteMainManager.Html);
                 break;
             case ActionManager.NoteSaveVoice:
                 rootItem.onSaveAudio();
