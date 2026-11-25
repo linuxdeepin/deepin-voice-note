@@ -64,17 +64,17 @@
         <location filename="../src/gui/mainwindow/ItemListView.qml" line="112"/>
         <location filename="../src/gui/mainwindow/ItemListView.qml" line="114"/>
         <source>move </source>
-        <translation type="unfinished"></translation>
+        <translation>移動 </translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/ItemListView.qml" line="112"/>
         <source> notes to :</source>
-        <translation type="unfinished"></translation>
+        <translation> 個筆記到：</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/ItemListView.qml" line="114"/>
         <source> note to :</source>
-        <translation type="unfinished"></translation>
+        <translation> 筆記到：</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/ItemListView.qml" line="303"/>
@@ -121,7 +121,7 @@
     <message>
         <location filename="../src/gui/dialog/MoveDialog.qml" line="27"/>
         <source>Move Note</source>
-        <translation>儲存筆記</translation>
+        <translation>移動筆記</translation>
     </message>
     <message>
         <location filename="../src/gui/dialog/MoveDialog.qml" line="144"/>
