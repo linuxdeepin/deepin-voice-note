@@ -430,6 +430,8 @@ export const VoiceBlock = Node.create({
       const voiceBtn = document.createElement('div')
       voiceBtn.className = 'voiceBtn'
       voiceBtn.setAttribute('contenteditable', 'false')
+      voiceBtn.setAttribute('tabindex', '0')
+      voiceBtn.setAttribute('role', 'button')
 
       const titleEl = document.createElement('div')
       titleEl.className = 'title'
@@ -489,6 +491,8 @@ export const VoiceBlock = Node.create({
       const closePlaybackBarBtn = document.createElement('div')
       closePlaybackBarBtn.className = 'closePlaybackBarBtn'
       closePlaybackBarBtn.setAttribute('contenteditable', 'false')
+      closePlaybackBarBtn.setAttribute('tabindex', '0')
+      closePlaybackBarBtn.setAttribute('role', 'button')
       right.appendChild(closePlaybackBarBtn)
 
       playback.appendChild(right)
@@ -587,6 +591,24 @@ export const VoiceBlock = Node.create({
         paused = false
         progress = 0
         refreshState()
+      }
+
+      function onVoiceBtnKeyDown(event) {
+        const key = String(event.key || '')
+        if (key === 'Enter' || key === ' ') {
+          event.preventDefault()
+          event.stopPropagation()
+          onVoiceBtnClick()
+        }
+      }
+
+      function onClosePlaybackBtnKeyDown(event) {
+        const key = String(event.key || '')
+        if (key === 'Enter' || key === ' ') {
+          event.preventDefault()
+          event.stopPropagation()
+          onClosePlaybackClick()
+        }
       }
 
       function onFoldToggle() {
@@ -752,6 +774,8 @@ export const VoiceBlock = Node.create({
       voiceBtn.addEventListener('click', onVoiceBtnClick)
       toTextTrigger.addEventListener('click', onToTextTriggerClick)
       closePlaybackBarBtn.addEventListener('click', onClosePlaybackClick)
+      voiceBtn.addEventListener('keydown', onVoiceBtnKeyDown)
+      closePlaybackBarBtn.addEventListener('keydown', onClosePlaybackBtnKeyDown)
       foldBtn.addEventListener('click', onFoldToggle)
       translateText.addEventListener('mousedown', onTranslateTextPointerDown)
       translateText.addEventListener('pointerdown', onTranslateTextPointerDown)
@@ -890,6 +914,8 @@ export const VoiceBlock = Node.create({
           voiceBtn.removeEventListener('click', onVoiceBtnClick)
           toTextTrigger.removeEventListener('click', onToTextTriggerClick)
           closePlaybackBarBtn.removeEventListener('click', onClosePlaybackClick)
+          voiceBtn.removeEventListener('keydown', onVoiceBtnKeyDown)
+          closePlaybackBarBtn.removeEventListener('keydown', onClosePlaybackBtnKeyDown)
           foldBtn.removeEventListener('click', onFoldToggle)
           translateText.removeEventListener('mousedown', onTranslateTextPointerDown)
           translateText.removeEventListener('pointerdown', onTranslateTextPointerDown)
