@@ -1039,6 +1039,8 @@ bool VNoteMainManager::deleteNote(const QList<int> &index)
     int deletedCount = 0;
     for (const DeleteTarget &target : std::as_const(deleteTargets)) {
         qCWarning(voiceNoteLog) << "Deleting note from folder ID:" << target.folderId;
+        // 先从列表移除，避免 deleteNote() 释放后 target.note 成为悬垂指针
+        m_noteItems.removeOne(target.note);
         VNoteItemOper noteOper(target.note);
         if (!noteOper.deleteNote()) {
             qCWarning(voiceNoteLog) << "Failed to delete note from storage, note ID:" << target.noteId;
@@ -1046,7 +1048,6 @@ bool VNoteMainManager::deleteNote(const QList<int> &index)
         }
 
         NoteSearchService::instance()->removeNote(target.noteId);
-        m_noteItems.removeOne(target.note);
         if (target.isTop)
             m_currentHasTop--;
         folderIdToDeletedCount[target.folderId] += 1;
