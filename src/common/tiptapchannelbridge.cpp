@@ -23,6 +23,8 @@
 #include <QHash>
 #include <QUrl>
 #include <QMimeData>
+#include <QGuiApplication>
+#include <QInputMethod>
 
 namespace {
 
@@ -112,6 +114,20 @@ bool TiptapChannelBridge::tiptapEnabled() const
 bool TiptapChannelBridge::debugEnabled() const
 {
     return tiptapEnabled();
+}
+
+void TiptapChannelBridge::jsCallShowInputMethod()
+{
+    if (QGuiApplication::inputMethod()) {
+        QGuiApplication::inputMethod()->show();
+    }
+}
+
+void TiptapChannelBridge::jsCallHideInputMethod()
+{
+    if (QGuiApplication::inputMethod()) {
+        QGuiApplication::inputMethod()->hide();
+    }
 }
 
 QString TiptapChannelBridge::tiptapHtmlPath() const

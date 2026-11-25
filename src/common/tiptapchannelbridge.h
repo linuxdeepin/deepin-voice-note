@@ -71,6 +71,11 @@ public:
     // 工具栏提示以及语音转写标签；前端在 editorReady 前读取并应用。
     Q_INVOKABLE QString uiStringsJson() const;
 
+    // 用户点击编辑区时请求显示/重新显示软键盘。
+    Q_INVOKABLE void jsCallShowInputMethod();
+    // 程序化聚焦后隐藏软键盘，保留原生光标。
+    Q_INVOKABLE void jsCallHideInputMethod();
+
     // --- 加载就绪缓存语义（R6） ---
     // 前端就绪后调用；宿主收到后才下发缓存请求，不丢数据
     Q_INVOKABLE void notifyEditorReady();
