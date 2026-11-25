@@ -19,6 +19,10 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QDebug>
+#include <QTextDocument>
+#include <QRegularExpression>
+#include <QJsonDocument>
+#include <QJsonObject>
 
 /**
  * @brief ExportNoteWorker::ExportNoteWorker
@@ -152,8 +156,49 @@ ExportNoteWorker::ExportError ExportNoteWorker::exportText()
                 out.write(TiptapDocumentExporter::toPlainText(meta).toUtf8());
             } else if (!noteData->htmlCode.isEmpty()) {
                 qCDebug(voiceNoteLog) << "Converting HTML content to plain text";
+                QString html = noteData->htmlCode;
+                // Extract actual transcription text from voiceBox jsonKey
+                // attributes and replace the "正在转为文字" placeholder in
+                // translatingLabel. QTextDocument cannot parse the custom
+                // jsonKey attribute and does not honor CSS display:none,
+                // so without this step the placeholder leaks into the txt
+                // export and the real transcription is lost.
+                {
+                    QRegularExpression jsonKeyRe("jsonKey=\"([^\"]*)\"");
+                    auto it = jsonKeyRe.globalMatch(html);
+                    struct VoiceBoxInfo {
+                        int matchEnd;
+                        QString text;
+                    };
+                    QVector<VoiceBoxInfo> vbInfos;
+                    while (it.hasNext()) {
+                        auto match = it.next();
+                        QString jsonStr = match.captured(1);
+                        jsonStr.replace("&quot;", "\"");
+                        jsonStr.replace("&amp;", "&");
+                        QJsonDocument jsonDoc =
+                            QJsonDocument::fromJson(jsonStr.toUtf8());
+                        QString text = jsonDoc.object().value("text").toString();
+                        vbInfos.append({match.capturedEnd(0), text});
+                    }
+                    // Process end-to-start so earlier offsets stay valid
+                    for (int i = vbInfos.size() - 1; i >= 0; --i) {
+                        int labelIdx = html.indexOf("translatingLabel", vbInfos[i].matchEnd);
+                        if (labelIdx < 0)
+                            continue;
+                        int contentStart = html.indexOf('>', labelIdx);
+                        if (contentStart < 0)
+                            continue;
+                        ++contentStart;
+                        int contentEnd = html.indexOf("</div>", contentStart);
+                        if (contentEnd > contentStart) {
+                            html.replace(contentStart, contentEnd - contentStart,
+                                         vbInfos[i].text.toHtmlEscaped());
+                        }
+                    }
+                }
                 QTextDocument doc;
-                doc.setHtml(noteData->htmlCode);
+                doc.setHtml(html);
                 out.write(doc.toPlainText().toUtf8());
             } else {
                 qCDebug(voiceNoteLog) << "Writing plain text content";
