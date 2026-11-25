@@ -130,6 +130,9 @@ int main(int argc, char *argv[])
 
     app->loadTranslator();
     app->setApplicationDisplayName(QObject::tr("deepin-voice-note"));
+    app->setWindowIcon(QIcon::fromTheme("deepin-voice-note"));
+    app->setProductIcon(QIcon::fromTheme("deepin-voice-note"));
+    app->setDesktopFileName("deepin-voice-note.desktop");
     QQmlApplicationEngine engine;
     const QUrl url(QStringLiteral("qrc:/main.qml"));
     engine.addImageProvider("Provider", imageProvider);
