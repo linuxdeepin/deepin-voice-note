@@ -684,9 +684,9 @@ int VNoteMainManager::loadNotes(VNoteFolder *folder)
             }
             if (!foundPreferredNote) {
                 selectIndex = 0;
-                m_currentNoteId = notesDataList[selectIndex].value("noteId").toInt();
-                vNoteChanged(m_currentNoteId);
-                qCDebug(voiceNoteLog) << "Switched to note ID:" << m_currentNoteId << "at index:" << selectIndex;
+                int newNoteId = notesDataList[selectIndex].value("noteId").toInt();
+                vNoteChanged(newNoteId);
+                qCDebug(voiceNoteLog) << "Switched to note ID:" << newNoteId << "at index:" << selectIndex;
             }
         } else {
             m_currentNoteId = -1;
