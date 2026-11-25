@@ -595,7 +595,7 @@ Item {
                     Layout.fillWidth: true
                     Layout.rightMargin: 5
                     bottomPadding: 0
-                    implicitHeight: 24
+                    implicitHeight: Math.max(24, Math.ceil(font.pixelSize * 1.8))
                     maximumLength: 64
                     text: model.name
                     topPadding: 0

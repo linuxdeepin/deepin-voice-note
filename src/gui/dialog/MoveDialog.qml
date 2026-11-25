@@ -18,7 +18,7 @@ DialogWindow {
     signal moveToFolder(int index)
 
     height: 365
-    width: 370
+    minimumWidth: 360
 
     onVisibleChanged: if (visible) folderList.currentIndex = 0
 
@@ -151,7 +151,8 @@ DialogWindow {
             VNoteComponents.VNoteButton {
                 Accessible.name: "CancelButton"
                 Accessible.role: Accessible.Button
-                Layout.preferredWidth: 171
+                Layout.fillWidth: true
+                Layout.minimumWidth: 120
                 text: qsTr("Cancel")
 
                 onClicked: {
@@ -169,7 +170,8 @@ DialogWindow {
                 Accessible.name: "MoveDialogOk"
                 Accessible.role: Accessible.Button
                 Layout.alignment: Qt.AlignRight
-                Layout.preferredWidth: 171
+                Layout.fillWidth: true
+                Layout.minimumWidth: 120
                 enabled: index !== -1
                 text: qsTr("Ok")
 

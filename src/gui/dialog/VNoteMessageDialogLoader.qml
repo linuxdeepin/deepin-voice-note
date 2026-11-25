@@ -44,17 +44,14 @@ Loader {
         readonly property int btnHeight: 30
         readonly property bool isUpdateUosAiDialog: loader.messageType === VNoteMessageDialogHandler.UpdateUosAi
         readonly property int btnWidth: Math.floor((width - 20 - 6) / 2)
-        readonly property int dialogContentHeight: isUpdateUosAiDialog
-                                                   ? DS.Style.dialogWindow.titleBarHeight
+        readonly property int dialogContentHeight: DS.Style.dialogWindow.titleBarHeight
                                                      + DS.Style.dialogWindow.footerMargin
                                                      + messageColumn.implicitHeight + contentLayout.spacing + btnHeight
-                                                   : 158
 
         flags: Qt.Window | Qt.WindowCloseButtonHint
         height: dialogContentHeight
         icon: "dialog-warning"
         maximumHeight: dialogContentHeight
-        maximumWidth: 360
         minimumHeight: dialogContentHeight
         minimumWidth: 360
         modality: Qt.ApplicationModal
@@ -104,9 +101,7 @@ Loader {
 
                 Layout.alignment: Qt.AlignCenter
                 Layout.fillWidth: true
-                Layout.maximumHeight: dialog.isUpdateUosAiDialog ? implicitHeight : 58
-                Layout.minimumHeight: dialog.isUpdateUosAiDialog ? implicitHeight : 58
-                Layout.preferredHeight: dialog.isUpdateUosAiDialog ? implicitHeight : 58
+                Layout.preferredHeight: implicitHeight
                 spacing: dialog.isUpdateUosAiDialog ? 8 : 0
 
                 Label {
@@ -126,7 +121,6 @@ Loader {
                     elide: Text.ElideNone
                     font: DTK.fontManager.t6
                     horizontalAlignment: Text.AlignHCenter
-                    maximumLineCount: dialog.isUpdateUosAiDialog ? 1 : 2
                     text: handler.mainMessage
                     verticalAlignment: Text.AlignVCenter
                     wrapMode: Text.Wrap
@@ -148,7 +142,6 @@ Loader {
                     elide: Text.ElideNone
                     font: DTK.fontManager.t7
                     horizontalAlignment: Text.AlignHCenter
-                    maximumLineCount: 3
                     text: handler.detailMessage
                     verticalAlignment: Text.AlignVCenter
                     visible: handler.detailMessage.length
