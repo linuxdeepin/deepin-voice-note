@@ -12,11 +12,11 @@
     align-items: center;
     gap: 0;
     width: max-content;
-    max-width: calc(100% - 10px);
+    max-width: calc(100% - 20px);
     flex-shrink: 0;
     min-height: 40px;
     box-sizing: border-box;
-    margin: 0 0 0 10px;
+    margin: 0 10px 0 10px;
     padding: 4px 0;
     background: transparent;
     border: 0;
