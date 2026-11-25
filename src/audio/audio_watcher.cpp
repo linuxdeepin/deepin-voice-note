@@ -113,6 +113,8 @@ void AudioWatcher::updateDeviceEnabled(const QString cardsStr, bool isEmitSig)
     QJsonArray cards = doc.array();
     if(cards.isEmpty()){
         qCWarning(voiceNoteLog) << "Current Audio Cards is Empty!!!!";
+        m_outIsEnable = false;
+        m_inIsEnable = false;
         return;
     }else{
         qCInfo(voiceNoteLog) << "Current Audio Cards: "<< cards;
