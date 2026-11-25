@@ -165,6 +165,7 @@ void VoiceRecoderHandler::initAudioWatcher()
     m_audioWatcher = new AudioWatcher(this);
     connect(m_audioWatcher, &AudioWatcher::sigDeviceEnableChanged, this, &VoiceRecoderHandler::onDeviceEnableChanged);
     connect(m_audioWatcher, &AudioWatcher::sigReduceNoiseChanged, this, &VoiceRecoderHandler::onReduceNoiseChanged);
+    connect(m_audioWatcher, &AudioWatcher::sigDeviceChange, this, &VoiceRecoderHandler::onAudioDeviceChange);
     qCInfo(voiceNoteLog) << "Audio watcher initialization finished";
 }
 
