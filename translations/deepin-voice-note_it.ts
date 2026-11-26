@@ -581,6 +581,11 @@ Tutte le note contenute saranno eliminate</translation>
         <source>The voice note has been deleted</source>
         <translation>La nota vocale è stata eliminata</translation>
     </message>
+    <message>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="159"/>
+        <source>The pasted content is too long and may cause the application to freeze. It has not been pasted.</source>
+        <translation type="unfinished"/>
+    </message>
 </context>
 <context>
     <name>VNoteRecordBar</name>
