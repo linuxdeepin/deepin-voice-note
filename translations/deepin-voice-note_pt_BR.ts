@@ -583,7 +583,7 @@ Todas as notas nele contidas serão excluídas</translation>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="159"/>
         <source>The pasted content is too long and may cause the application to freeze. It has not been pasted.</source>
-        <translation type="unfinished"/>
+        <translation>O conteúdo copiado é muito longo e pode fazer o aplicativo travar. Por isso, não foi colado.</translation>
     </message>
 </context>
 <context>
