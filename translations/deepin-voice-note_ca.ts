@@ -2,20 +2,20 @@
 <context>
     <name>AppMain</name>
     <message>
-        <location filename="../src/common/vlcpalyer.cpp" line="39"/>
-        <location filename="../src/main.cpp" line="79"/>
-        <location filename="../src/main.cpp" line="80"/>
-        <location filename="../src/views/vnotemainwindow.cpp" line="602"/>
+        <location filename="../src/common/vlcpalyer.cpp" line="43"/>
+        <location filename="../src/main.cpp" line="86"/>
+        <location filename="../src/main.cpp" line="87"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="603"/>
         <source>Voice Notes</source>
         <translation>Notes de veu</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="81"/>
+        <location filename="../src/main.cpp" line="88"/>
         <source>Voice Notes is a lightweight memo tool to make text notes and voice recordings.</source>
         <translation>Les Notes de veu és una eina lleugera per fer notes de text i gravacions de veu.</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="603"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="604"/>
         <source>Recordings not saved</source>
         <translation>Gravacions no desades</translation>
     </message>
@@ -99,12 +99,12 @@
 <context>
     <name>MiddleView</name>
     <message>
-        <location filename="../src/views/middleview.cpp" line="289"/>
+        <location filename="../src/views/middleview.cpp" line="291"/>
         <source>Save</source>
         <translation>Desa-ho</translation>
     </message>
     <message>
-        <location filename="../src/views/middleview.cpp" line="1043"/>
+        <location filename="../src/views/middleview.cpp" line="1045"/>
         <source>No search results</source>
         <translation>No hi ha cap resultat de la cerca.</translation>
     </message>
@@ -181,18 +181,8 @@
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="322"/>
-        <source>Stop reading</source>
-        <translation>Interromp la lectura</translation>
-    </message>
-    <message>
-        <location filename="../src/common/actionmanager.cpp" line="323"/>
         <source>Speech to Text</source>
         <translation>De veu a text</translation>
-    </message>
-    <message>
-        <location filename="../src/common/actionmanager.cpp" line="324"/>
-        <source>Translate</source>
-        <translation>Tradueix</translation>
     </message>
 </context>
 <context>
@@ -268,14 +258,32 @@
         <translation>Nota nova</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1261"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1262"/>
         <source>Unstick</source>
         <translation>Desenganxa</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1263"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1264"/>
         <source>Sticky on Top</source>
         <translation>Les adhesives a dalt</translation>
+    </message>
+</context>
+<context>
+    <name>QObject</name>
+    <message>
+        <location filename="../src/common/vtextspeechandtrmanager.cpp" line="220"/>
+        <source>Please install &apos;UOS AI&apos; from the App Store before using</source>
+        <translation>Si us plau, instal·leu UOS AI des de la Botiga d&apos;aplicacions abans.</translation>
+    </message>
+    <message>
+        <location filename="../src/common/vtextspeechandtrmanager.cpp" line="222"/>
+        <source>No audio input device detected. Please check and try again</source>
+        <translation>No s&apos;ha detectat cap dispositiu d&apos;entrada d&apos;àudio. Si us plau, comproveu-ho i torneu-ho a provar.</translation>
+    </message>
+    <message>
+        <location filename="../src/common/vtextspeechandtrmanager.cpp" line="224"/>
+        <source>No audio output device detected. Please check and try again</source>
+        <translation>No s&apos;ha detectat cap dispositiu de sortida d&apos;àudio. Si us plau, comproveu-ho i torneu-ho a provar.</translation>
     </message>
 </context>
 <context>
@@ -304,97 +312,97 @@
 <context>
     <name>Shortcuts</name>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="909"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="910"/>
         <source>New notebook</source>
         <translation>Quadern nou</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="910"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="911"/>
         <source>Rename notebook</source>
         <translation>Canvia el nom del quadern</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="911"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="912"/>
         <source>Delete notebook</source>
         <translation>Elimina el quadern</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="933"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="934"/>
         <source>New note</source>
         <translation>Nota nova</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="934"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="935"/>
         <source>Rename note</source>
         <translation>Canvia el nom de la nota</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="935"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="936"/>
         <source>Delete note</source>
         <translation>Elimina la nota</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="936"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="937"/>
         <source>Play/Pause</source>
         <translation>Reprodueix / Pausa</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="937"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="938"/>
         <source>Record voice</source>
         <translation>Gravació de veu</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="938"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="939"/>
         <source>Save note</source>
         <translation>Desa la nota</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="939"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="940"/>
         <source>Save recordings</source>
         <translation>Desa les gravacions</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="959"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="960"/>
         <source>Select all</source>
         <translation>Selecciona-ho tot</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="960"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="961"/>
         <source>Copy</source>
         <translation>Copia</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="961"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="962"/>
         <source>Cut</source>
         <translation>Retalla</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="962"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="963"/>
         <source>Paste</source>
         <translation>Enganxa</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="963"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="964"/>
         <source>Undo</source>
         <translation>Desfés</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="964"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="965"/>
         <source>Redo</source>
         <translation>Refés</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="965"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="966"/>
         <source>Delete</source>
         <translation>Elimina</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="988"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="989"/>
         <source>Help</source>
         <translation>Ajuda</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="989"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="990"/>
         <source>Display shortcuts</source>
         <translation>Mostra les dreceres</translation>
     </message>
@@ -402,22 +410,22 @@
 <context>
     <name>ShortcutsGroups</name>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="915"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="916"/>
         <source>Notebooks</source>
         <translation>Quaderns</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="943"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="944"/>
         <source>Notes</source>
         <translation>Notes</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="969"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="970"/>
         <source>Edit</source>
         <translation>Edita-ho</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="993"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="994"/>
         <source>Settings</source>
         <translation>Paràmetres</translation>
     </message>
@@ -433,17 +441,17 @@
 <context>
     <name>TitleBar</name>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="349"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="350"/>
         <source>Search</source>
         <translation>Cerca</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1903"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1948"/>
         <source>Settings</source>
         <translation>Paràmetres</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1904"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1949"/>
         <source>Privacy Policy</source>
         <translation>Política de privadesa</translation>
     </message>
@@ -460,7 +468,6 @@
     <name>Utils</name>
     <message>
         <location filename="../src/common/utils.cpp" line="41"/>
-        <location filename="../tests/src/common/ut_utils.cpp" line="32"/>
         <source>1 min ago</source>
         <translation>fa 1 minut</translation>
     </message>
@@ -471,25 +478,19 @@
     </message>
     <message>
         <location filename="../src/common/utils.cpp" line="49"/>
-        <location filename="../tests/src/common/ut_utils.cpp" line="37"/>
         <source>Yesterday</source>
         <translation>ahir</translation>
-    </message>
-    <message>
-        <location filename="../tests/src/common/ut_utils.cpp" line="33"/>
-        <source>2 mins ago</source>
-        <translation>fa 2 minuts</translation>
     </message>
 </context>
 <context>
     <name>VNoteErrorMessage</name>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="871"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="872"/>
         <source>The voice conversion failed due to the poor network connection, please have a check</source>
         <translation>La conversió de veu ha fallat a causa de la mala connexió de xarxa. Comproveu-la, si us plau.</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="875"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="876"/>
         <source>Voice to text conversion failed</source>
         <translation>Ha fallat la conversió de veu a text.</translation>
     </message>
@@ -497,7 +498,7 @@
 <context>
     <name>VNoteMainWindow</name>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="450"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="451"/>
         <source>Create Notebook</source>
         <translation>Crea un quadern</translation>
     </message>
@@ -506,28 +507,24 @@
     <name>VNoteMessageDialog</name>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="37"/>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="28"/>
         <source>OK</source>
         <comment>button</comment>
         <translation>D&apos;acord</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="116"/>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="94"/>
         <source>Cancel</source>
         <comment>button</comment>
         <translation>Cancel·la</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="117"/>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="98"/>
         <source>Confirm</source>
         <comment>button</comment>
         <translation>Confirmeu-ho</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="120"/>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="39"/>
         <source>Are you sure you want to delete this notebook?
 All notes in it will be deleted</source>
         <translation>Segur que voleu eliminar aquest quadern?
@@ -535,74 +532,69 @@ Se n&apos;eliminaran totes les notes.</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="123"/>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="46"/>
         <source>Do you want to stop the current recording?</source>
         <translation>Voleu interrompre la gravació actual?</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="127"/>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="87"/>
         <source>Are you sure you want to delete the selected %1 notes?</source>
         <translation>Segur que voleu eliminar les %1 notes seleccionades?</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="129"/>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="81"/>
         <source>Are you sure you want to delete this note?</source>
         <translation>Segur que voleu eliminar aquesta nota?</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="133"/>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="52"/>
         <source>Cannot convert this voice note, as notes over 20 minutes are not supported at present.</source>
         <translation>No es pot convertir aquesta nota de veu. Actualment no s&apos;admeten les notes de més de 20 minuts.</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="137"/>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="59"/>
         <source>Converting a voice note now. Do you want to stop it?</source>
         <translation>Ara es converteix una nota de veu. Ho voleu interrompre?</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="140"/>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="65"/>
         <source>The low input volume may result in bad recordings. Do you want to continue?</source>
         <translation>Un volum baix d&apos;entrada pot tenir com a resultat una mala gravació. Voleu continuar?</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="143"/>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="72"/>
         <source>The clipped recordings and converted text will not be pasted. Do you want to continue?</source>
         <translation>Les gravacions truncades i el text convertit no s&apos;enganxaran. Voleu continuar?</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="146"/>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="106"/>
         <source>Save failed</source>
         <translation>Ha fallat desar-ho.</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="150"/>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="111"/>
         <source>You do not have permission to save files there</source>
         <translation>No teniu permís per desar fitxers aquí.</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="154"/>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="116"/>
         <source>The voice note has been deleted</source>
         <translation>S&apos;ha eliminat la nota de veu.</translation>
+    </message>
+    <message>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="159"/>
+        <source>The pasted content is too long and may cause the application to freeze. It has not been pasted.</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>VNoteRecordBar</name>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1750"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1757"/>
         <source>Your audio recording device does not work.</source>
         <translation>El dispositiu de gravació d&apos;àudio no funciona.</translation>
     </message>
     <message>
-        <location filename="../src/views/vnoterecordbar.cpp" line="240"/>
+        <location filename="../src/views/vnoterecordbar.cpp" line="242"/>
         <source>No recording device detected</source>
         <translation>No s&apos;ha detectat cap dispositiu de gravació.</translation>
     </message>
@@ -610,7 +602,7 @@ Se n&apos;eliminaran totes les notes.</translation>
 <context>
     <name>VoiceNoteItem</name>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1691"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1698"/>
         <source>Converting voice to text</source>
         <translation>Es converteix de veu a text</translation>
     </message>
