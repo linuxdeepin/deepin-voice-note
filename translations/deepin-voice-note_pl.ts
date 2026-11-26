@@ -583,7 +583,7 @@ Wszystkie zawarte w nim notatki zostaną usunięte</translation>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="159"/>
         <source>The pasted content is too long and may cause the application to freeze. It has not been pasted.</source>
-        <translation type="unfinished"/>
+        <translation>Zawartość, którą próbujesz wkleić, jest za duża i może doprowadzić do zawieszenia aplikacji. Operacja została przerwana.</translation>
     </message>
 </context>
 <context>
