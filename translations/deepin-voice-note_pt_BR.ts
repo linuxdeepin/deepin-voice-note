@@ -72,7 +72,7 @@
     <message>
         <location filename="../src/views/homepage.cpp" line="32"/>
         <source>Create Notebook</source>
-        <translation>Criar bloco de notas</translation>
+        <translation>Criar Bloco de Notas</translation>
     </message>
     <message>
         <location filename="../src/views/homepage.cpp" line="44"/>
@@ -114,7 +114,7 @@
     <message>
         <location filename="../src/views/middleviewdelegate.cpp" line="438"/>
         <source>Sticky Notes</source>
-        <translation>Notas rápidas</translation>
+        <translation>Notas Adesivas</translation>
     </message>
 </context>
 <context>
@@ -500,7 +500,7 @@
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="451"/>
         <source>Create Notebook</source>
-        <translation>Criar bloco de notas</translation>
+        <translation>Criar Bloco de Notas</translation>
     </message>
 </context>
 <context>
@@ -579,6 +579,11 @@ Todas as notas nele contidas serão excluídas</translation>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="154"/>
         <source>The voice note has been deleted</source>
         <translation>A nota de voz foi excluída</translation>
+    </message>
+    <message>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="159"/>
+        <source>The pasted content is too long and may cause the application to freeze. It has not been pasted.</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
