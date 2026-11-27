@@ -47,7 +47,7 @@ Loader {
         readonly property int dialogContentHeight: isUpdateUosAiDialog
                                                    ? DS.Style.dialogWindow.titleBarHeight
                                                      + DS.Style.dialogWindow.footerMargin
-                                                     + messageColumn.implicitHeight + contentLayout.spacing + btnHeight
+                                                     + messageColumn.implicitHeight + contentLayout.spacing + btnHeight + 20
                                                    : 158
 
         flags: Qt.Window | Qt.WindowCloseButtonHint
@@ -159,6 +159,7 @@ Loader {
 
             Row {
                 Layout.alignment: Qt.AlignLeft | Qt.AlignBottom
+                Layout.bottomMargin: dialog.isUpdateUosAiDialog ? 20 : 0
                 Layout.fillHeight: !dialog.isUpdateUosAiDialog
                 Layout.leftMargin: handler.singleButton
                                     ? Math.max(0, (parent.width - btnWidth) / 2)
