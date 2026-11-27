@@ -26,6 +26,7 @@ Build-Depends:
  libvlc-dev,
  libvlccore-dev,
  libgtest-dev,
+ libgmock-dev,
  libffmpegthumbnailer-dev,
  libdmr-dev [!mipsel !mips64el],
  deepin-desktop-base,
