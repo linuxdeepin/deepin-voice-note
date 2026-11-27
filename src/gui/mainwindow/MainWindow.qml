@@ -572,7 +572,7 @@ Item {
         icon.width: 16
         height: 30
         width: 30
-        visible: !(needHideSearch && search.visible) || leftBgArea.visible
+        visible: !leftBgArea.visible || !(needHideSearch && search.visible)
         z: 100
 
         onClicked: {
