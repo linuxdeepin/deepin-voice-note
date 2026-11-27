@@ -583,7 +583,7 @@ Se n&apos;eliminaran totes les notes.</translation>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="159"/>
         <source>The pasted content is too long and may cause the application to freeze. It has not been pasted.</source>
-        <translation type="unfinished"/>
+        <translation>El contingut per enganxar és massa llarg i pot fer que l&apos;aplicació es bloqui. No s&apos;ha enganxat.</translation>
     </message>
 </context>
 <context>
