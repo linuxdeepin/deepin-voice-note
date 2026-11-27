@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="zh_CN">
+<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="zh_CN">
 <context>
     <name>AppMain</name>
     <message>
@@ -492,11 +490,6 @@
         <translation>网络异常，转写失败</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="878"/>
-        <source>Voice to text conversion timed out, please try again</source>
-        <translation>转写超时，请重试</translation>
-    </message>
-    <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="876"/>
         <source>Voice to text conversion failed</source>
         <translation>语音转文字失败</translation>
@@ -590,7 +583,7 @@ All notes in it will be deleted</source>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="159"/>
         <source>The pasted content is too long and may cause the application to freeze. It has not been pasted.</source>
-        <translation>粘贴的内容过长，可能导致应用卡顿，已取消粘贴。</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>

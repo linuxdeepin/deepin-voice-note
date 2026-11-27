@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="bo">
+<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="bo">
 <context>
     <name>AppMain</name>
     <message>
@@ -275,17 +273,17 @@
     <message>
         <location filename="../src/common/vtextspeechandtrmanager.cpp" line="220"/>
         <source>Please install &apos;UOS AI&apos; from the App Store before using</source>
-        <translation type="unfinished"></translation>
+        <translation>གཞི་རྒྱུན་གྱི &apos;UOS AI&apos; འཕྲོད་ལྟར་གནང་བའི་སྐད་རིག་གི་མེ་ཤོག་རིགས་སྤེ་ལོན་པར་བྱ་རོགས།</translation>
     </message>
     <message>
         <location filename="../src/common/vtextspeechandtrmanager.cpp" line="222"/>
         <source>No audio input device detected. Please check and try again</source>
-        <translation type="unfinished"></translation>
+        <translation>ཨུ་ཤོག་གི་དོ་དོ་དུས་མི་ལྟ་བུ་འདུག་པ་མེད། ཁོ་ནས་ཉི་མོ་དང་ལེགས་པར་བྱ་རོགས།</translation>
     </message>
     <message>
         <location filename="../src/common/vtextspeechandtrmanager.cpp" line="224"/>
         <source>No audio output device detected. Please check and try again</source>
-        <translation type="unfinished"></translation>
+        <translation>ཨུ་ཤོག་གི་ཉི་མོ་མི་ལྟ་བུ་འདུག་པ་མེད། ཁོ་ནས་ཉི་མོ་དང་ལེགས་པར་བྱ་རོགས།</translation>
     </message>
 </context>
 <context>
@@ -581,6 +579,11 @@ All notes in it will be deleted</source>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="154"/>
         <source>The voice note has been deleted</source>
         <translation>སྒྲའི་ཟིན་ཐོ་འདི་སུབ་ཚར།</translation>
+    </message>
+    <message>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="159"/>
+        <source>The pasted content is too long and may cause the application to freeze. It has not been pasted.</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>

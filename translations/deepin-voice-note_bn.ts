@@ -2,20 +2,20 @@
 <context>
     <name>AppMain</name>
     <message>
-        <location filename="../src/common/vlcpalyer.cpp" line="39"/>
-        <location filename="../src/main.cpp" line="79"/>
-        <location filename="../src/main.cpp" line="80"/>
-        <location filename="../src/views/vnotemainwindow.cpp" line="602"/>
+        <location filename="../src/common/vlcpalyer.cpp" line="43"/>
+        <location filename="../src/main.cpp" line="86"/>
+        <location filename="../src/main.cpp" line="87"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="603"/>
         <source>Voice Notes</source>
         <translation>ভিন্ডিকেন্স নোটস</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="81"/>
+        <location filename="../src/main.cpp" line="88"/>
         <source>Voice Notes is a lightweight memo tool to make text notes and voice recordings.</source>
         <translation>ভিন্ডিকেন্স নোটস হল একটি সোজা মেমো টপ্ল, যা টেক্সট নোট এবং গল্ফ রেকর্ডিং তৈরি করার জন্য।</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="603"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="604"/>
         <source>Recordings not saved</source>
         <translation>রেকর্ডিং সংরক্ষণ করা হয়নি</translation>
     </message>
@@ -99,12 +99,12 @@
 <context>
     <name>MiddleView</name>
     <message>
-        <location filename="../src/views/middleview.cpp" line="289"/>
+        <location filename="../src/views/middleview.cpp" line="291"/>
         <source>Save</source>
         <translation>সংরক্ষণ</translation>
     </message>
     <message>
-        <location filename="../src/views/middleview.cpp" line="1043"/>
+        <location filename="../src/views/middleview.cpp" line="1045"/>
         <source>No search results</source>
         <translation>নাই সার্চ রিজাল্টস</translation>
     </message>
@@ -181,18 +181,8 @@
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="322"/>
-        <source>Stop reading</source>
-        <translation>পড়া থামান</translation>
-    </message>
-    <message>
-        <location filename="../src/common/actionmanager.cpp" line="323"/>
         <source>Speech to Text</source>
         <translation>বাক্য থেকে লিখি</translation>
-    </message>
-    <message>
-        <location filename="../src/common/actionmanager.cpp" line="324"/>
-        <source>Translate</source>
-        <translation>অনুবাদ করুন</translation>
     </message>
 </context>
 <context>
@@ -268,14 +258,32 @@
         <translation>নতুন নোট তৈরি করুন</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1261"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1262"/>
         <source>Unstick</source>
         <translation>বন্ধ করুন</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1263"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1264"/>
         <source>Sticky on Top</source>
         <translation>প্রথমে থাকুন</translation>
+    </message>
+</context>
+<context>
+    <name>QObject</name>
+    <message>
+        <location filename="../src/common/vtextspeechandtrmanager.cpp" line="220"/>
+        <source>Please install &apos;UOS AI&apos; from the App Store before using</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/common/vtextspeechandtrmanager.cpp" line="222"/>
+        <source>No audio input device detected. Please check and try again</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/common/vtextspeechandtrmanager.cpp" line="224"/>
+        <source>No audio output device detected. Please check and try again</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -304,97 +312,97 @@
 <context>
     <name>Shortcuts</name>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="909"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="910"/>
         <source>New notebook</source>
         <translation>নতুন নোটবুক তৈরি করুন</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="910"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="911"/>
         <source>Rename notebook</source>
         <translation>নোটবুক পুনরায় নামকরণ করুন</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="911"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="912"/>
         <source>Delete notebook</source>
         <translation>নোটবুক ডিলিট করুন</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="933"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="934"/>
         <source>New note</source>
         <translation>নতুন নোট</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="934"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="935"/>
         <source>Rename note</source>
         <translation>নোট পরিবর্তন করুন</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="935"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="936"/>
         <source>Delete note</source>
         <translation>নোট মুছে ফেলুন</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="936"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="937"/>
         <source>Play/Pause</source>
         <translation>প্লে/পেজ্যাস</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="937"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="938"/>
         <source>Record voice</source>
         <translation>ভাষার রেকর্ড করুন</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="938"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="939"/>
         <source>Save note</source>
         <translation>নোট সেভ করুন</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="939"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="940"/>
         <source>Save recordings</source>
         <translation>রেকর্ড সেভ করুন</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="959"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="960"/>
         <source>Select all</source>
         <translation>সব নির্বাছন করুন</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="960"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="961"/>
         <source>Copy</source>
         <translation>কপি করুন</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="961"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="962"/>
         <source>Cut</source>
         <translation>কাট করুন</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="962"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="963"/>
         <source>Paste</source>
         <translation>পেস্ট করুন</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="963"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="964"/>
         <source>Undo</source>
         <translation>রিসেট করুন</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="964"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="965"/>
         <source>Redo</source>
         <translation>রিডো করুন</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="965"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="966"/>
         <source>Delete</source>
         <translation>মুছে ফেলুন</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="988"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="989"/>
         <source>Help</source>
         <translation>বাণী</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="989"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="990"/>
         <source>Display shortcuts</source>
         <translation>স্ক্রোটচার্ট প্রদর্শন করুন</translation>
     </message>
@@ -402,22 +410,22 @@
 <context>
     <name>ShortcutsGroups</name>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="915"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="916"/>
         <source>Notebooks</source>
         <translation>নোটবুক</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="943"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="944"/>
         <source>Notes</source>
         <translation>নোট</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="969"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="970"/>
         <source>Edit</source>
         <translation>সম্পাদনা</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="993"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="994"/>
         <source>Settings</source>
         <translation>সেটিংস</translation>
     </message>
@@ -433,17 +441,17 @@
 <context>
     <name>TitleBar</name>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="349"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="350"/>
         <source>Search</source>
         <translation>অনুসন্ধান</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1903"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1948"/>
         <source>Settings</source>
         <translation>সেটিংস</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1904"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1949"/>
         <source>Privacy Policy</source>
         <translation>ব্যাক্তিগত তথ্য নীতি</translation>
     </message>
@@ -460,7 +468,6 @@
     <name>Utils</name>
     <message>
         <location filename="../src/common/utils.cpp" line="41"/>
-        <location filename="../tests/src/common/ut_utils.cpp" line="32"/>
         <source>1 min ago</source>
         <translation>পূর্বাপেক্ষা 1 মিনিট</translation>
     </message>
@@ -471,25 +478,19 @@
     </message>
     <message>
         <location filename="../src/common/utils.cpp" line="49"/>
-        <location filename="../tests/src/common/ut_utils.cpp" line="37"/>
         <source>Yesterday</source>
         <translation>গত দিন</translation>
-    </message>
-    <message>
-        <location filename="../tests/src/common/ut_utils.cpp" line="33"/>
-        <source>2 mins ago</source>
-        <translation>পূর্বাপেক্ষা 2 মিনিট</translation>
     </message>
 </context>
 <context>
     <name>VNoteErrorMessage</name>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="871"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="872"/>
         <source>The voice conversion failed due to the poor network connection, please have a check</source>
         <translation>ভাষার পরিবর্তন কারণ খারাপ নেটওয়ার্ক যোগাযোগে ত্রুটি হয়েছে, অনুযায়ী চে크 করুন</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="875"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="876"/>
         <source>Voice to text conversion failed</source>
         <translation>ভাষার থেকে টেক্সটে পরিবর্তন ত্রুটি</translation>
     </message>
@@ -497,7 +498,7 @@
 <context>
     <name>VNoteMainWindow</name>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="450"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="451"/>
         <source>Create Notebook</source>
         <translation>নোটবুক তৈরি করুন</translation>
     </message>
@@ -506,102 +507,93 @@
     <name>VNoteMessageDialog</name>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="37"/>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="28"/>
         <source>OK</source>
         <comment>button</comment>
         <translation>স্বাক্ষর</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="116"/>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="94"/>
         <source>Cancel</source>
         <comment>button</comment>
         <translation>বাতিল</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="117"/>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="98"/>
         <source>Confirm</source>
         <comment>button</comment>
         <translation>পেশ করুন</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="120"/>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="39"/>
         <source>Are you sure you want to delete this notebook?
 All notes in it will be deleted</source>
         <translation>আপনি কি কোনও নোটবুক থেকে সমস্ত নোট ডিলিট করতে চান? সেই নোটবুকের সমস্ত নোট ডিলিট হবে</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="123"/>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="46"/>
         <source>Do you want to stop the current recording?</source>
         <translation>আপনি এখন রেকর্ড থেকে বন্ধ করতে চান?</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="127"/>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="87"/>
         <source>Are you sure you want to delete the selected %1 notes?</source>
         <translation>আপনি কি সিলেক্ট করা %1 নোট ডিলিট করতে চান?</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="129"/>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="81"/>
         <source>Are you sure you want to delete this note?</source>
         <translation>আপনি কি এই নোট ডিলিট করতে চান?</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="133"/>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="52"/>
         <source>Cannot convert this voice note, as notes over 20 minutes are not supported at present.</source>
         <translation>এই ভাষার নোটটি পরিবর্তন করা যাবে না, কারণ এর সময় অধিক এবং এর পরিবর্তন ত্রুটি হয়েছে</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="137"/>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="59"/>
         <source>Converting a voice note now. Do you want to stop it?</source>
         <translation>এখন একটি ভাষার নোট পরিবর্তন হচ্ছে। আপনি এটি বন্ধ করতে চান?</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="140"/>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="65"/>
         <source>The low input volume may result in bad recordings. Do you want to continue?</source>
         <translation>মূল্যবর্ণনার কম প্রবেশ সুরে রেকর্ডিং ভাল হবে না। আপনি যদি চান তবে চালানো যাবে?</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="143"/>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="72"/>
         <source>The clipped recordings and converted text will not be pasted. Do you want to continue?</source>
         <translation>ক্লিপড রেকর্ডিং এবং পরিবর্তিত টেক্সট পেস্ট হবে না। আপনি যদি চান তবে চালানো যাবে?</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="146"/>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="106"/>
         <source>Save failed</source>
         <translation>সংরক্ষণ ত্রুটি</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="150"/>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="111"/>
         <source>You do not have permission to save files there</source>
         <translation>সেখানে ফাইল সংরক্ষণ করার অনুমোদন নেই</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="154"/>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="116"/>
         <source>The voice note has been deleted</source>
         <translation>ভাষার নোটটি ডিলিট হয়েছে</translation>
+    </message>
+    <message>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="159"/>
+        <source>The pasted content is too long and may cause the application to freeze. It has not been pasted.</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>VNoteRecordBar</name>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1750"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1757"/>
         <source>Your audio recording device does not work.</source>
         <translation>আপনার আудিও রেকর্ডিং ডিভাইস কাজ করছে না</translation>
     </message>
     <message>
-        <location filename="../src/views/vnoterecordbar.cpp" line="240"/>
+        <location filename="../src/views/vnoterecordbar.cpp" line="242"/>
         <source>No recording device detected</source>
         <translation>নেক্স্ট রেকর্ডিং ডিভাইস অনুসন্ধান করা হয়েছে</translation>
     </message>
@@ -609,7 +601,7 @@ All notes in it will be deleted</source>
 <context>
     <name>VoiceNoteItem</name>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1691"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1698"/>
         <source>Converting voice to text</source>
         <translation>ভাষাটি টেক্সটে পরিবর্তন করছে</translation>
     </message>

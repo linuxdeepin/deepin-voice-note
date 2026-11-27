@@ -2,20 +2,20 @@
 <context>
     <name>AppMain</name>
     <message>
-        <location filename="../src/common/vlcpalyer.cpp" line="39"/>
-        <location filename="../src/main.cpp" line="79"/>
-        <location filename="../src/main.cpp" line="80"/>
-        <location filename="../src/views/vnotemainwindow.cpp" line="602"/>
+        <location filename="../src/common/vlcpalyer.cpp" line="43"/>
+        <location filename="../src/main.cpp" line="86"/>
+        <location filename="../src/main.cpp" line="87"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="603"/>
         <source>Voice Notes</source>
         <translation>Nota Suara</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="81"/>
+        <location filename="../src/main.cpp" line="88"/>
         <source>Voice Notes is a lightweight memo tool to make text notes and voice recordings.</source>
         <translation>Nota Suara ialah sebuah alat memo ringkas dan pantas yang dapat membuat nota teks dan rakaman suara.</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="603"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="604"/>
         <source>Recordings not saved</source>
         <translation>Rakaman tidak disimpan</translation>
     </message>
@@ -99,12 +99,12 @@
 <context>
     <name>MiddleView</name>
     <message>
-        <location filename="../src/views/middleview.cpp" line="289"/>
+        <location filename="../src/views/middleview.cpp" line="291"/>
         <source>Save</source>
         <translation>Simpan</translation>
     </message>
     <message>
-        <location filename="../src/views/middleview.cpp" line="1043"/>
+        <location filename="../src/views/middleview.cpp" line="1045"/>
         <source>No search results</source>
         <translation>Tiada keputusan gelintar</translation>
     </message>
@@ -181,18 +181,8 @@
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="322"/>
-        <source>Stop reading</source>
-        <translation>Henti membaca</translation>
-    </message>
-    <message>
-        <location filename="../src/common/actionmanager.cpp" line="323"/>
         <source>Speech to Text</source>
         <translation>Pertuturan ke Teks</translation>
-    </message>
-    <message>
-        <location filename="../src/common/actionmanager.cpp" line="324"/>
-        <source>Translate</source>
-        <translation>Terjemah</translation>
     </message>
 </context>
 <context>
@@ -268,14 +258,32 @@
         <translation>Nota baharu</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1261"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1262"/>
         <source>Unstick</source>
         <translation>Nyahlekat</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1263"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1264"/>
         <source>Sticky on Top</source>
         <translation>Lekat paling Atas</translation>
+    </message>
+</context>
+<context>
+    <name>QObject</name>
+    <message>
+        <location filename="../src/common/vtextspeechandtrmanager.cpp" line="220"/>
+        <source>Please install &apos;UOS AI&apos; from the App Store before using</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/common/vtextspeechandtrmanager.cpp" line="222"/>
+        <source>No audio input device detected. Please check and try again</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/common/vtextspeechandtrmanager.cpp" line="224"/>
+        <source>No audio output device detected. Please check and try again</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -304,97 +312,97 @@
 <context>
     <name>Shortcuts</name>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="909"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="910"/>
         <source>New notebook</source>
         <translation>Buku nota baharu</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="910"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="911"/>
         <source>Rename notebook</source>
         <translation>Nama semula buku nota</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="911"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="912"/>
         <source>Delete notebook</source>
         <translation>Padam buku nota</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="933"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="934"/>
         <source>New note</source>
         <translation>Nota baharu</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="934"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="935"/>
         <source>Rename note</source>
         <translation>Nama semula nota</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="935"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="936"/>
         <source>Delete note</source>
         <translation>Padam nota</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="936"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="937"/>
         <source>Play/Pause</source>
         <translation>Main/Jeda</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="937"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="938"/>
         <source>Record voice</source>
         <translation>Rakam suara</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="938"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="939"/>
         <source>Save note</source>
         <translation>Simpan nota</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="939"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="940"/>
         <source>Save recordings</source>
         <translation>Simpan rakaman</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="959"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="960"/>
         <source>Select all</source>
         <translation>Pilih semua</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="960"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="961"/>
         <source>Copy</source>
         <translation>Salin</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="961"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="962"/>
         <source>Cut</source>
         <translation>Potong</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="962"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="963"/>
         <source>Paste</source>
         <translation>Tampal</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="963"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="964"/>
         <source>Undo</source>
         <translation>Buat Asal</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="964"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="965"/>
         <source>Redo</source>
         <translation>Buat Semula</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="965"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="966"/>
         <source>Delete</source>
         <translation>Padam</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="988"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="989"/>
         <source>Help</source>
         <translation>Bantuan</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="989"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="990"/>
         <source>Display shortcuts</source>
         <translation>Papar pintasan</translation>
     </message>
@@ -402,22 +410,22 @@
 <context>
     <name>ShortcutsGroups</name>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="915"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="916"/>
         <source>Notebooks</source>
         <translation>Buku nota</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="943"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="944"/>
         <source>Notes</source>
         <translation>Nota</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="969"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="970"/>
         <source>Edit</source>
         <translation>Sunting</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="993"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="994"/>
         <source>Settings</source>
         <translation>Tetapan</translation>
     </message>
@@ -433,17 +441,17 @@
 <context>
     <name>TitleBar</name>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="349"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="350"/>
         <source>Search</source>
         <translation>Gelintar</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1903"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1948"/>
         <source>Settings</source>
         <translation>Tetapan</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1904"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1949"/>
         <source>Privacy Policy</source>
         <translation>Dasar Persendirian</translation>
     </message>
@@ -460,7 +468,6 @@
     <name>Utils</name>
     <message>
         <location filename="../src/common/utils.cpp" line="41"/>
-        <location filename="../tests/src/common/ut_utils.cpp" line="32"/>
         <source>1 min ago</source>
         <translation>1 min yang lalu</translation>
     </message>
@@ -471,25 +478,19 @@
     </message>
     <message>
         <location filename="../src/common/utils.cpp" line="49"/>
-        <location filename="../tests/src/common/ut_utils.cpp" line="37"/>
         <source>Yesterday</source>
         <translation>Semalam</translation>
-    </message>
-    <message>
-        <location filename="../tests/src/common/ut_utils.cpp" line="33"/>
-        <source>2 mins ago</source>
-        <translation>2 min yang lalu</translation>
     </message>
 </context>
 <context>
     <name>VNoteErrorMessage</name>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="871"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="872"/>
         <source>The voice conversion failed due to the poor network connection, please have a check</source>
         <translation>Penukaran format suara gagal disebabkan sambungan rangkaian yang lemah. Sila semak</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="875"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="876"/>
         <source>Voice to text conversion failed</source>
         <translation>Penukaran format suara ke teks mengalami kegagalan</translation>
     </message>
@@ -497,7 +498,7 @@
 <context>
     <name>VNoteMainWindow</name>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="450"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="451"/>
         <source>Create Notebook</source>
         <translation>Cipta Buku Nota</translation>
     </message>
@@ -506,28 +507,24 @@
     <name>VNoteMessageDialog</name>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="37"/>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="28"/>
         <source>OK</source>
         <comment>button</comment>
         <translation>OK</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="116"/>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="94"/>
         <source>Cancel</source>
         <comment>button</comment>
         <translation>Batal</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="117"/>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="98"/>
         <source>Confirm</source>
         <comment>button</comment>
         <translation>Sahkan</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="120"/>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="39"/>
         <source>Are you sure you want to delete this notebook?
 All notes in it will be deleted</source>
         <translation>Anda pasti mahu memadam buku nota ini?
@@ -535,74 +532,69 @@ Semua nota di dalamnya akan terpadam</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="123"/>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="46"/>
         <source>Do you want to stop the current recording?</source>
         <translation>Anda pasti mahu menghentikan rakaman semasa?</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="127"/>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="87"/>
         <source>Are you sure you want to delete the selected %1 notes?</source>
         <translation>Anda pasti mahu memadam %1 nota terpilih?</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="129"/>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="81"/>
         <source>Are you sure you want to delete this note?</source>
         <translation>Anda pasti mahu memadam nota ini?</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="133"/>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="52"/>
         <source>Cannot convert this voice note, as notes over 20 minutes are not supported at present.</source>
         <translation>Tidak dapat menukar format nota suara ini, kerana nota melebihi 20 minit tidak disokong buat masa ini.</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="137"/>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="59"/>
         <source>Converting a voice note now. Do you want to stop it?</source>
         <translation>Menukar format satu nota suara sekarang. Anda mahu hentikannya?</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="140"/>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="65"/>
         <source>The low input volume may result in bad recordings. Do you want to continue?</source>
         <translation>Volum input rendah boleh mengakibatkan rakaman menjadi bermasalah. Anda mahu teruskan?</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="143"/>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="72"/>
         <source>The clipped recordings and converted text will not be pasted. Do you want to continue?</source>
         <translation>Rakaman terklip dan teks yang ditukarkan tidak akan ditampal. Anda pasti mahu teruskan?</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="146"/>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="106"/>
         <source>Save failed</source>
         <translation>Gagal disimpan</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="150"/>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="111"/>
         <source>You do not have permission to save files there</source>
         <translation>Anda tiada keizinan untuk menyimpan fail di sini</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="154"/>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="116"/>
         <source>The voice note has been deleted</source>
         <translation>Nota suara telah dipadamkan</translation>
+    </message>
+    <message>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="159"/>
+        <source>The pasted content is too long and may cause the application to freeze. It has not been pasted.</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>VNoteRecordBar</name>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1750"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1757"/>
         <source>Your audio recording device does not work.</source>
         <translation>Peranti rakaman audio anda tidak berfungsi</translation>
     </message>
     <message>
-        <location filename="../src/views/vnoterecordbar.cpp" line="240"/>
+        <location filename="../src/views/vnoterecordbar.cpp" line="242"/>
         <source>No recording device detected</source>
         <translation>Tiada peranti rakaman dikesan</translation>
     </message>
@@ -610,7 +602,7 @@ Semua nota di dalamnya akan terpadam</translation>
 <context>
     <name>VoiceNoteItem</name>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1691"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1698"/>
         <source>Converting voice to text</source>
         <translation>Menukar format suara ke teks</translation>
     </message>
