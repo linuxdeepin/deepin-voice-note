@@ -583,7 +583,7 @@ Do të fshihen krejt shënimet në të</translation>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="159"/>
         <source>The pasted content is too long and may cause the application to freeze. It has not been pasted.</source>
-        <translation type="unfinished"/>
+        <translation>Lënda e ngjitur është shumë e madhe mund të sjellë bllokimin e aplikacionit. S’u ngjit.</translation>
     </message>
 </context>
 <context>
